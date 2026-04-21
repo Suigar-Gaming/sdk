@@ -22,7 +22,7 @@ Runtime requirements:
 ## Public API
 
 ```ts
-import { suigar, SuigarClient } from '@suigar/sdk';
+import { suigar } from '@suigar/sdk';
 ```
 
 ### `suigar(options?)`
