@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: publish-npm
@@ -20,6 +21,10 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.release.outputs.should_publish }}
+      package_name: ${{ steps.metadata.outputs.package_name }}
+      current_version: ${{ steps.metadata.outputs.current_version }}
 
     steps:
       - name: Checkout repository
@@ -72,12 +77,28 @@ jobs:
         if: steps.release.outputs.should_publish == 'true'
         run: npm pack --dry-run
 
+      - name: Read package metadata
+        if: steps.release.outputs.should_publish == 'true'
+        id: metadata
+        shell: bash
+        run: |
+          echo "package_name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "current_version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Publish to npm
         if: steps.release.outputs.should_publish == 'true'
         run: npm run release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Skip publish
         if: steps.release.outputs.should_publish != 'true'
         run: echo "No release changes detected; skipping npm publish."
+
+  deprecate:
+    needs: publish
+    if: needs.publish.result == 'success' && needs.publish.outputs.should_publish == 'true'
+    uses: ./.github/workflows/deprecate-previous-npm.yml
+    secrets:
+      npm_deprecate_token: ${{ secrets.NPM_DEPRECATE_TOKEN }}
+    with:
+      package_name: ${{ needs.publish.outputs.package_name }}
+      current_version: ${{ needs.publish.outputs.current_version }}

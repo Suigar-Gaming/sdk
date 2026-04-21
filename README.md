@@ -2,13 +2,6 @@
 
 TypeScript SDK for building Suigar v2 game transactions on Sui.
 
-The published package entrypoint currently exposes:
-
-- `suigar`
-- `SuigarClient`
-
-It does not currently export the individual game builder functions from the package root.
-
 ## Installation
 
 ```bash
@@ -18,42 +11,33 @@ npm install @suigar/sdk
 Runtime requirements:
 
 - Node.js `>=22`
+- `@mysten/sui`
 
-## Public API
+## What This Package Exposes
+
+The package root currently exposes the extension factory:
 
 ```ts
 import { suigar } from '@suigar/sdk';
 ```
 
-### `suigar(options?)`
+It does not export the individual transaction builders from the package root.
+It also does not export `SuigarClient` as a public root symbol.
 
-Creates a named Sui client extension. By default, it registers under `client.suigar`.
+What you actually use at runtime is the registered extension instance:
 
 ```ts
 const client = new SuiClient({ url }).$extend(suigar());
-client.suigar;
+
+client.suigar.serializeTransactionToBase64(...);
+client.suigar.bcs;
+client.suigar.tx;
 ```
 
-You can rename the extension:
+## Quick Start
 
 ```ts
-const client = new SuiClient({ url }).$extend(suigar({ name: 'casino' }));
-
-client.casino;
-```
-
-### `SuigarClient`
-
-The registered extension instance exposes:
-
-- `serializeTransactionToBase64(transaction)`
-- `bcs.BetResultEvent`
-- `tx.createBetTransaction(gameId, options)`
-
-## Quick start
-
-```ts
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { suigar } from '@suigar/sdk';
 
 const client = new SuiClient({
@@ -77,220 +61,25 @@ const tx = client.suigar.tx.createBetTransaction('coinflip', {
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
 
-## Game transactions
+## Extension Registration
 
-`tx.createBetTransaction(gameId, options)` supports these game ids:
+### `suigar(options?)`
 
-- `coinflip`
-- `limbo`
-- `plinko`
-- `range`
-- `wheel`
-
-All games share this base option shape:
-
-- `owner: string`
-- `coinType: string`
-- `stake: number | bigint`
-- `cashStake?: number | bigint`
-- `betCount?: number | bigint`
-- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
-- `gasBudget?: number | bigint`
-- `sender?: string`
-- `allowGasCoinShortcut?: boolean`
-
-Shared behavior:
-
-- `stake` is the logical game stake passed into the Move call
-- `cashStake` is the actual coin balance withdrawn into the bet coin and defaults to `stake`
-- `betCount` defaults to `1`
-- `sender` overrides the transaction sender
-- `metadata` is encoded into `keys` and `values` byte arrays
-- the SDK resolves the Pyth price object from the configured coin mapping
-- the built reward object is transferred back to the owner
-
-### Coinflip
-
-Additional options:
-
-- `side: 'heads' | 'tails'`
-
-Example:
+Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
 ```ts
-const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	owner: '0x123',
-	coinType: '0x2::sui::SUI',
-	stake: 1_000_000_000n,
-	side: 'tails',
-});
+const client = new SuiClient({ url }).$extend(suigar());
+
+client.suigar;
 ```
 
-### Limbo
-
-Additional options:
-
-- `targetMultiplier: number`
-- `scale?: number`
-
-Behavior:
-
-- `scale` defaults to the SDK limbo multiplier scale
-- `targetMultiplier` is converted with `Math.round(targetMultiplier * scale)`
-
-Example:
+You can rename the extension:
 
 ```ts
-const tx = client.suigar.tx.createBetTransaction('limbo', {
-	owner: '0x123',
-	coinType: '0x2::sui::SUI',
-	stake: 1_000_000_000n,
-	targetMultiplier: 2.5,
-});
-```
+const client = new SuiClient({ url }).$extend(suigar({ name: 'casino' }));
 
-### Plinko
-
-Additional options:
-
-- `configId: number`
-
-Behavior:
-
-- `configId` must fit in `u8`
-
-Example:
-
-```ts
-const tx = client.suigar.tx.createBetTransaction('plinko', {
-	owner: '0x123',
-	coinType: '0x2::sui::SUI',
-	stake: 1_000_000_000n,
-	configId: 3,
-});
-```
-
-### Range
-
-Additional options:
-
-- `leftPoint: number`
-- `rightPoint: number`
-- `outOfRange?: boolean`
-- `scale?: number`
-
-Behavior:
-
-- `scale` defaults to the SDK fixed-point range scale
-- `leftPoint` and `rightPoint` are converted with `Math.round(value * scale)`
-- `outOfRange` is coerced with `Boolean(...)`
-
-Example:
-
-```ts
-const tx = client.suigar.tx.createBetTransaction('range', {
-	owner: '0x123',
-	coinType: '0x2::sui::SUI',
-	stake: 1_000_000_000n,
-	leftPoint: 0.95,
-	rightPoint: 1.05,
-	outOfRange: false,
-});
-```
-
-### Wheel
-
-Additional options:
-
-- `configId: number`
-
-Behavior:
-
-- `configId` must fit in `u8`
-
-Example:
-
-```ts
-const tx = client.suigar.tx.createBetTransaction('wheel', {
-	owner: '0x123',
-	coinType: '0x2::sui::SUI',
-	stake: 1_000_000_000n,
-	configId: 1,
-});
-```
-
-## BCS helpers
-
-The client extension also exposes a generated MoveStruct helper for Suigar bet result data:
-
-- `client.suigar.bcs.BetResultEvent`
-
-Use generated BCS types to parse onchain object data. Fetch the object with `include: { content: true }` and pass `object.content` to the generated type's `.parse()` method.
-
-Always use `content`, not `objectBcs`, when parsing with generated types. The `objectBcs` field contains a full object envelope with additional metadata and is not the payload expected by the generated struct parser.
-
-### Parse onchain object content
-
-```ts
-async function readBetResult(client: ClientWithCoreApi, id: string) {
-	const { object } = await client.core.getObject({
-		objectId: id,
-		include: {
-			content: true,
-		},
-	});
-
-	const parsed = client.suigar.bcs.BetResultEvent.parse(object.content);
-
-	console.log(parsed.player);
-	console.log(parsed.coin_type.name);
-	console.log(parsed.stake_amount);
-	console.log(parsed.outcome_amount);
-
-	return parsed;
-}
-```
-
-### Using the generated helper directly
-
-If you already have a content-bearing object response, parse `object.content` directly:
-
-```ts
-const { object } = await client.core.getObject({
-	objectId: '0xOBJECT_ID',
-	include: {
-		content: true,
-	},
-});
-
-const decoded = client.suigar.bcs.BetResultEvent.parse(object.content);
-```
-
-Parsed fields include:
-
-- `player`
-- `coin_type`
-- `stake_amount`
-- `unsafe_oracle_usd_coin_price`
-- `adjusted_oracle_usd_coin_price`
-- `outcome_amount`
-- `game_details`
-- `metadata`
-
-For `game_details` and `metadata`, the decoded value is a `VecMap<string, vector<u8>>`-shaped structure, so values come back as byte arrays.
-
-Example conversion to strings:
-
-```ts
-const decoded = client.suigar.bcs.BetResultEvent.parse(object.data.content);
-const textDecoder = new TextDecoder();
-
-const metadata = new Map(
-	decoded.metadata.contents.map(({ key, value }) => [
-		key,
-		textDecoder.decode(new Uint8Array(value)),
-	]),
-);
+client.casino.tx;
+client.casino.bcs;
 ```
 
 ## Config
@@ -341,6 +130,223 @@ const client = new SuiClient({ url }).$extend(
 	}),
 );
 ```
+
+## Runtime Surface
+
+The registered extension instance exposes three main areas:
+
+- `serializeTransactionToBase64(transaction, options?)`
+- `bcs`
+- `tx`
+
+### `serializeTransactionToBase64(transaction, options?)`
+
+Builds a transaction with the configured Sui client and returns base64-encoded transaction bytes.
+
+Use this when you need a transport-safe payload for a wallet, API, or external signer.
+
+```ts
+const base64 = await client.suigar.serializeTransactionToBase64(tx);
+```
+
+## `tx`
+
+Transaction builders live under `client.suigar.tx`.
+
+### Standard Games
+
+Use `createBetTransaction(gameId, options)` for:
+
+- `coinflip`
+- `limbo`
+- `plinko`
+- `range`
+- `wheel`
+
+```ts
+const tx = client.suigar.tx.createBetTransaction('coinflip', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	side: 'tails',
+});
+```
+
+Shared option shape:
+
+- `owner: string`
+- `coinType: string`
+- `stake: number | bigint`
+- `cashStake?: number | bigint`
+- `betCount?: number | bigint`
+- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
+- `gasBudget?: number | bigint`
+- `sender?: string`
+- `allowGasCoinShortcut?: boolean`
+
+Shared behavior:
+
+- `stake` is the logical stake passed into the Move call
+- `cashStake` controls the withdrawn balance and defaults to `stake`
+- `betCount` defaults to `1`
+- `sender` overrides the transaction sender
+- `metadata` is encoded into `keys` and `values` byte arrays
+- the SDK resolves the Pyth price info object from the configured coin mapping
+- the reward object is transferred back to `owner`
+
+Per-game options:
+
+- `coinflip`: `side: 'heads' | 'tails'`
+- `limbo`: `targetMultiplier: number`, `scale?: number`
+- `plinko`: `configId: number`
+- `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
+- `wheel`: `configId: number`
+
+Examples:
+
+```ts
+const limboTx = client.suigar.tx.createBetTransaction('limbo', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	targetMultiplier: 2.5,
+});
+
+const rangeTx = client.suigar.tx.createBetTransaction('range', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	leftPoint: 0.95,
+	rightPoint: 1.05,
+	outOfRange: false,
+});
+```
+
+Notes:
+
+- limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
+- range converts each point with `Math.round(value * scale)`
+- plinko and wheel `configId` must fit in `u8`
+
+### PvP Coinflip
+
+Use `createPvPCoinflipTransaction(action, options)` for PvP coinflip flows:
+
+- `create`
+- `join`
+- `cancel`
+
+Create:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	side: 'heads',
+	isPrivate: false,
+});
+```
+
+Join:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	gameId: '0xGAME_ID',
+	extraObjectId: '0xEXTRA_OBJECT_ID',
+	stake: 1_000_000_000n,
+});
+```
+
+Cancel:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
+	owner: '0x123',
+	coinType: '0x2::sui::SUI',
+	gameId: '0xGAME_ID',
+});
+```
+
+PvP shared options:
+
+- `owner: string`
+- `coinType: string`
+- `metadata?: ...`
+- `gasBudget?: number | bigint`
+- `sender?: string`
+- `allowGasCoinShortcut?: boolean`
+
+Action-specific options:
+
+- `create`: `stake`, `side`, `isPrivate?`
+- `join`: `gameId`, `extraObjectId`, `stake`
+- `cancel`: `gameId`
+
+## `bcs`
+
+BCS helpers live under `client.suigar.bcs`.
+
+Current exposed helpers:
+
+- `BetResultEvent`
+- `PvPCoinflipGameCreated`
+- `PvPCoinflipGameResolved`
+- `PvPCoinflipGameCancelled`
+
+These are generated Move struct/event decoders. Use them to parse Suigar event payloads and structured onchain content.
+
+### Parse Standard Bet Result Data
+
+```ts
+const { object } = await client.core.getObject({
+	objectId: '0xOBJECT_ID',
+	include: {
+		content: true,
+	},
+});
+
+const decoded = client.suigar.bcs.BetResultEvent.parse(object.content);
+```
+
+Parsed fields include:
+
+- `player`
+- `coin_type`
+- `stake_amount`
+- `unsafe_oracle_usd_coin_price`
+- `adjusted_oracle_usd_coin_price`
+- `outcome_amount`
+- `game_details`
+- `metadata`
+
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays.
+
+```ts
+const textDecoder = new TextDecoder();
+
+const metadata = new Map(
+	decoded.metadata.contents.map(({ key, value }) => [
+		key,
+		textDecoder.decode(new Uint8Array(value)),
+	]),
+);
+```
+
+Important:
+
+- use `content`, not `objectBcs`, with these generated parsers
+- the generated parser expects the struct payload, not a full object envelope
+
+### Parse PvP Coinflip Event Data
+
+Use the matching helper for the PvP coinflip event payload you fetched from chain:
+
+- `client.suigar.bcs.PvPCoinflipGameCreated`
+- `client.suigar.bcs.PvPCoinflipGameResolved`
+- `client.suigar.bcs.PvPCoinflipGameCancelled`
 
 ## Development
 
