@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
-import { Transaction } from '@mysten/sui/transactions';
+import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import {
 	BuildCoinflipTransactionOptions,
 	BuildGameOptions,
@@ -31,6 +31,7 @@ import {
 	GameCreatedEvent,
 	GameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip';
+import { toBase64 } from '@mysten/sui/utils';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -44,7 +45,7 @@ export function suigar<const Name = 'suigar'>({
 	};
 }
 
-export class SuigarClient {
+class SuigarClient {
 	#client: ClientWithCoreApi;
 
 	#config: SuigarConfig;
@@ -61,14 +62,22 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Builds a transaction with the configured Sui client and returns the BCS bytes as a base64 string.
+	 * Builds a transaction with the configured Sui client and encodes the resulting BCS bytes as base64.
 	 *
-	 * @param transaction Transaction block to serialize.
+	 * Use this when an external wallet, API, or transport expects the built transaction payload as a base64 string
+	 * instead of raw bytes. The SDK always injects the configured Sui client, so `options` accepts the standard
+	 * transaction build options except for `client`.
+	 *
+	 * @param transaction Transaction to build and serialize.
+	 * @param options Optional transaction build options forwarded to `transaction.build()`, excluding `client`.
 	 * @returns Base64-encoded transaction bytes ready to send over the wire.
 	 */
-	async serializeTransactionToBase64(transaction: Transaction) {
-		const bytes = await transaction.build({ client: this.#client });
-		return Buffer.from(bytes).toString('base64');
+	async serializeTransactionToBase64(
+		transaction: Transaction,
+		options?: Omit<BuildTransactionOptions, 'client'>,
+	) {
+		const bytes = await transaction.build({ ...options, client: this.#client });
+		return toBase64(bytes);
 	}
 
 	/**
