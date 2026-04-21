@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0
+
+### Patch Changes
+
+- 0eb6663: Update public API
+
 ## 2.0.0-beta.0
 
 ### Major Changes
