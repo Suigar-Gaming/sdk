@@ -42,127 +42,22 @@ jobs:
           fi
 
           PREVIOUS_VERSION="$(node <<'NODE'
-          const { execFileSync } = require('node:child_process');
-
-          function parseVersion(version) {
-            const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-            if (!match) {
-              return null;
-            }
-
-            const [, major, minor, patch, prereleaseRaw] = match;
-            const prerelease = prereleaseRaw
-              ? prereleaseRaw.split('.').map((part) => (/^\d+$/.test(part) ? Number(part) : part))
-              : [];
-
-            return {
-              raw: version,
-              major: Number(major),
-              minor: Number(minor),
-              patch: Number(patch),
-              prerelease,
-            };
-          }
-
-          function compareIdentifiers(left, right) {
-            const leftNumeric = typeof left === 'number';
-            const rightNumeric = typeof right === 'number';
-
-            if (leftNumeric && rightNumeric) {
-              return left - right;
-            }
-
-            if (leftNumeric) {
-              return -1;
-            }
-
-            if (rightNumeric) {
-              return 1;
-            }
-
-            return left.localeCompare(right);
-          }
-
-          function compareVersions(left, right) {
-            for (const key of ['major', 'minor', 'patch']) {
-              if (left[key] !== right[key]) {
-                return left[key] - right[key];
-              }
-            }
-
-            const leftPre = left.prerelease;
-            const rightPre = right.prerelease;
-
-            if (leftPre.length === 0 && rightPre.length === 0) {
-              return 0;
-            }
-
-            if (leftPre.length === 0) {
-              return 1;
-            }
-
-            if (rightPre.length === 0) {
-              return -1;
-            }
-
-            const length = Math.max(leftPre.length, rightPre.length);
-            for (let index = 0; index < length; index += 1) {
-              if (index >= leftPre.length) {
-                return -1;
-              }
-
-              if (index >= rightPre.length) {
-                return 1;
-              }
-
-              const diff = compareIdentifiers(leftPre[index], rightPre[index]);
-              if (diff !== 0) {
-                return diff;
-              }
-            }
-
-            return 0;
-          }
-
-          const current = parseVersion(process.env.CURRENT_VERSION);
-          if (!current) {
+          const match = process.env.CURRENT_VERSION.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
+          if (!match) {
             process.exit(0);
           }
 
-          let versions = [];
-          try {
-            const output = execFileSync(
-              'npm',
-              ['view', process.env.PACKAGE_NAME, 'versions', '--json'],
-              { encoding: 'utf8' }
-            ).trim();
-            const parsed = JSON.parse(output);
-            versions = Array.isArray(parsed) ? parsed : [parsed];
-          } catch {
+          const [, major, minor, patch, prerelease] = match;
+          if (prerelease) {
             process.exit(0);
           }
 
-          const parsedVersions = versions
-            .map(parseVersion)
-            .filter(Boolean)
-            .filter((version) => compareVersions(version, current) < 0);
-
-          const sameCoreCandidates = parsedVersions.filter(
-            (version) =>
-              version.major === current.major &&
-              version.minor === current.minor &&
-              version.patch === current.patch
-          );
-
-          const fallbackCandidates = parsedVersions.filter((version) => version.prerelease.length === 0);
-          const candidates = sameCoreCandidates.length > 0 ? sameCoreCandidates : fallbackCandidates;
-
-          if (candidates.length === 0) {
+          const previousPatch = Number(patch) - 1;
+          if (previousPatch < 0) {
             process.exit(0);
           }
 
-          candidates.sort(compareVersions);
-          process.stdout.write(candidates[candidates.length - 1].raw);
+          process.stdout.write(`${major}.${minor}.${previousPatch}`);
           NODE
           )"
 
