@@ -69,6 +69,14 @@ class SuigarClient {
 	}
 
 	/**
+	 *
+	 * @returns
+	 */
+	getConfig() {
+		return this.#config;
+	}
+
+	/**
 	 * Builds a transaction with the configured Sui client and encodes the resulting BCS bytes as base64.
 	 *
 	 * Use this when an external wallet, API, or transport expects the built transaction payload as a base64 string

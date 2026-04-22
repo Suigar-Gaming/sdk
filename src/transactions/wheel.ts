@@ -20,7 +20,7 @@ export function buildWheelTransaction(options: BuildWheelTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
@@ -34,7 +34,7 @@ export function buildWheelTransaction(options: BuildWheelTransactionOptions) {
 					configId,
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

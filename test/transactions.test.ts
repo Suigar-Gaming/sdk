@@ -18,7 +18,6 @@ const TEST_CONFIG = {
 	coinTypes: {
 		sui: normalizeStructTag('0x2::sui::SUI'),
 		usdc: normalizeStructTag('0xusdc::coin::USDC'),
-		usdcFlowx: normalizeStructTag('0xflowx::coin::USDC'),
 	},
 	gamesPackageId: {
 		coinflip: '0xabc',
@@ -28,10 +27,9 @@ const TEST_CONFIG = {
 		range: '0x4',
 		wheel: '0x5',
 	},
-	pyth: {
-		priceInfoObjectIds: {},
-		suiPriceInfoObjectId: '0x789',
-		usdcPriceInfoObjectId: '0x987',
+	priceInfoObjectIds: {
+		sui: '0x789',
+		usdc: '0x987',
 	},
 } as const;
 
@@ -179,7 +177,7 @@ describe('shared transaction helpers', () => {
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
 		expect(context!.betCount).toBe(3n);
-		expect(context!.pythPriceInfoObjectId).toBe('0x789');
+		expect(context!.priceInfoObjectId).toBe('0x789');
 		expect(context!.metadata).toEqual({
 			keys: ['referrer', 'label'],
 			values: [

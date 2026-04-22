@@ -3,21 +3,24 @@
 
 import { normalizeStructTag, SUI_TYPE_ARG } from '@mysten/sui/utils';
 
-import type { Game, SuigarConfig, SuiNetwork } from '../types';
-import { DEFAULT_USDC_COIN_TYPE, PACKAGE_IDS } from '../configs/index.js';
+import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
+import {
+	DEFAULT_USDC_COIN_TYPE,
+	PACKAGE_IDS,
+	PRICE_INFO_OBJECT_IDS,
+} from '../configs/index.js';
 
 export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
+	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 	const suiCoinType = normalizeStructTag(SUI_TYPE_ARG);
 	const usdcCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
-	const usdcFlowxCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
 
 	return {
 		sweetHousePackageId: packageIds.sweetHouse,
 		coinTypes: {
 			sui: suiCoinType,
 			usdc: usdcCoinType,
-			usdcFlowx: usdcFlowxCoinType,
 		},
 		gamesPackageId: {
 			coinflip: packageIds.coinflip,
@@ -27,8 +30,9 @@ export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 			range: packageIds.range,
 			wheel: packageIds.wheel,
 		},
-		pyth: {
-			priceInfoObjectIds: {},
+		priceInfoObjectIds: {
+			sui: priceInfoObjectIds.sui,
+			usdc: priceInfoObjectIds.usdc,
 		},
 	};
 }
@@ -37,34 +41,42 @@ export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 	return config.gamesPackageId[game];
 }
 
-export function resolvePythPriceInfoObjectId(
+export function resolvePriceInfoObjectId(
 	config: SuigarConfig,
 	coinType: string,
 ): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
-	const explicitObjectId = config.pyth.priceInfoObjectIds[normalizedCoinType];
+	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
+	const objectId = config.priceInfoObjectIds[supportedCoin];
 
-	if (explicitObjectId) {
-		return explicitObjectId;
-	}
-
-	if (
-		normalizedCoinType === config.coinTypes.sui &&
-		config.pyth.suiPriceInfoObjectId
-	) {
-		return config.pyth.suiPriceInfoObjectId;
-	}
-
-	if (
-		(normalizedCoinType === config.coinTypes.usdc ||
-			normalizedCoinType === config.coinTypes.usdcFlowx) &&
-		config.pyth.usdcPriceInfoObjectId
-	) {
-		return config.pyth.usdcPriceInfoObjectId;
+	if (objectId) {
+		return objectId;
 	}
 
 	throw new Error(
-		`Missing Pyth price object configuration for coin type ${coinType}`,
+		`Missing price info object configuration for coin type ${coinType}`,
+	);
+}
+
+function resolveSupportedCoin(
+	config: SuigarConfig,
+	coinType: string,
+): SuigarCoin {
+	const entries = Object.entries(config.coinTypes) as Array<
+		[SuigarCoin, string]
+	>;
+	const supportedCoin = entries.find(
+		([, configuredCoinType]) => configuredCoinType === coinType,
+	)?.[0];
+
+	if (supportedCoin) {
+		return supportedCoin;
+	}
+
+	throw new Error(
+		`Unsupported coin type ${coinType}. Supported coin types: ${entries
+			.map(([, configuredCoinType]) => configuredCoinType)
+			.join(', ')}`,
 	);
 }
 

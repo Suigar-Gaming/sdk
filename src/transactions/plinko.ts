@@ -20,7 +20,7 @@ export function buildPlinkoTransaction(options: BuildPlinkoTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
@@ -34,7 +34,7 @@ export function buildPlinkoTransaction(options: BuildPlinkoTransactionOptions) {
 					configId,
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

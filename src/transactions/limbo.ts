@@ -21,7 +21,7 @@ export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
@@ -36,7 +36,7 @@ export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
 					BigInt(scale),
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

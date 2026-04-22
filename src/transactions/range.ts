@@ -22,7 +22,7 @@ export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
@@ -38,7 +38,7 @@ export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
 					Boolean(options.outOfRange),
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

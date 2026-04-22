@@ -19,7 +19,7 @@ export function buildCoinflipTransaction(
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
@@ -33,7 +33,7 @@ export function buildCoinflipTransaction(
 					options.side === 'tails',
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SuiNetwork } from '../types/network.type.js';
+import type { SuigarCoin } from '../types/suigar-config.type.js';
 
 export const SUIGAR_PACKAGES = {
 	sweetHouse: 'sweetHouse',
@@ -15,6 +16,7 @@ export const SUIGAR_PACKAGES = {
 } as const;
 
 export type SuigarPackage = Record<keyof typeof SUIGAR_PACKAGES, string>;
+export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
 
 const CURRENT_PACKAGE_IDS: SuigarPackage = {
 	sweetHouse:
@@ -35,6 +37,19 @@ const CURRENT_PACKAGE_IDS: SuigarPackage = {
 export const PACKAGE_IDS: Record<SuiNetwork, SuigarPackage> = {
 	mainnet: { ...CURRENT_PACKAGE_IDS },
 	testnet: { ...CURRENT_PACKAGE_IDS },
+};
+
+const CURRENT_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
+	sui: '',
+	usdc: '',
+};
+
+export const PRICE_INFO_OBJECT_IDS: Record<
+	SuiNetwork,
+	SuigarPriceInfoObjectId
+> = {
+	mainnet: { ...CURRENT_PRICE_INFO_OBJECT_IDS },
+	testnet: { ...CURRENT_PRICE_INFO_OBJECT_IDS },
 };
 
 export const DEFAULT_USDC_COIN_TYPE =
