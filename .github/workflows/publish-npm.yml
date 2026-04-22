@@ -77,6 +77,8 @@ jobs:
 
       - name: Publish to npm
         if: steps.release.outputs.should_publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ''
         run: npm run release
 
       - name: Skip publish
