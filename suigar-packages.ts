@@ -1,9 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { PACKAGE_IDS } from './src/configs/package.ts';
-
-const TESTNET_PACKAGE_IDS = PACKAGE_IDS.testnet;
+import { TESTNET_PACKAGE_IDS } from './src/configs/package.testnet.ts';
 
 export interface PackageInfo {
 	package: string;
