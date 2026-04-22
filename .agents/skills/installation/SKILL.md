@@ -12,7 +12,6 @@ Use this skill when the task is about integrating `@suigar/sdk` into an app befo
 The package root currently exports:
 
 - `suigar`
-- `SuigarClient`
 
 Do not assume individual game builders are exported from `@suigar/sdk`.
 
@@ -26,14 +25,7 @@ import { suigar } from '@suigar/sdk';
 
 const client = new SuiClient({
 	url: getFullnodeUrl('testnet'),
-}).$extend(
-	suigar({
-		pyth: {
-			suiPriceInfoObjectId: '0xPYTH_SUI_PRICE_INFO',
-			usdcPriceInfoObjectId: '0xPYTH_USDC_PRICE_INFO',
-		},
-	}),
-);
+}).$extend(suigar());
 ```
 
 If the app uses a custom extension name, preserve it consistently:
@@ -45,8 +37,8 @@ client.casino;
 
 ## Required config guardrails
 
-- Standard games require Pyth price object ids for supported coin types.
-- Keep coin type configuration explicit if the product supports more than default SUI and USDC mappings.
+- Standard games rely on the SDK's network-resolved `priceInfoObjectIds` for supported coins.
+- Prefer the SDK's resolved supported coin types from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
 - Do not invent package-root exports that do not exist.
 - Keep wallet address ownership explicit and pass the same connected account through the integration.
 
@@ -73,5 +65,5 @@ Use the extension's generated BCS helpers and parse object `content`, not `objec
 
 1. Install and import `@suigar/sdk`.
 2. Extend the existing `SuiClient` with `suigar()`.
-3. Add Pyth price object config for every supported betting coin.
+3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin types, and price info object ids.
 4. Keep transaction serialization inside the same registered client instance.
