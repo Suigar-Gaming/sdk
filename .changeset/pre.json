@@ -4,5 +4,5 @@
 	"initialVersions": {
 		"@suigar/sdk": "2.0.0-beta.1"
 	},
-	"changesets": []
+	"changesets": ["sweet-stars-brush"]
 }
