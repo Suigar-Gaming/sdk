@@ -13,6 +13,7 @@ import {
 	BuildWheelTransactionOptions,
 	PvPCoinflipAction,
 	StandardGame,
+	SUPPORTED_SUI_NETWORKS,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuiNetwork,
@@ -58,9 +59,13 @@ class SuigarClient {
 		options: SuigarExtensionOptions;
 	}) {
 		this.#client = client;
-		this.#config = resolveSuigarConfig(
-			(this.#client as ClientWithCoreApi & { network: SuiNetwork }).network,
-		);
+
+		const network = this.#client.network as SuiNetwork;
+		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
+			throw new Error(`Unsupported network: ${network}`);
+		}
+
+		this.#config = resolveSuigarConfig(network);
 	}
 
 	/**
