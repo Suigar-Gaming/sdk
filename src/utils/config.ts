@@ -37,7 +37,7 @@ export function assertConfiguredBetGame(
 	}
 }
 
-function resolveGamePackageId(config: SuigarConfig, game: Game): string {
+export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
