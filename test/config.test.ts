@@ -9,86 +9,64 @@ import {
 	resolvePythPriceInfoObjectId,
 	resolveSuigarConfig,
 } from '../src/utils/config.js';
-import {
-	DEFAULT_GAMES_PACKAGE_ID,
-	DEFAULT_USDC_COIN_TYPE,
-	DEFAULT_USDC_FLOWX_COIN_TYPE,
-} from '../src/configs';
+import { DEFAULT_USDC_COIN_TYPE, PACKAGE_IDS } from '../src/configs';
 
 describe('resolveSuigarConfig', () => {
-	it('resolves direct overrides for game package ids and coin types', () => {
-		const config = resolveSuigarConfig({
-			coinTypes: {
-				sui: '0x2::sui::SUI',
-				usdc: '0x123::usdc::USDC',
-			},
-			gamesPackageId: {
-				coinflip: '0x2',
-				wheel: '0x3',
-			},
-		});
+	it('resolves internal package ids and default coin types', () => {
+		const config = resolveSuigarConfig('testnet');
 
 		expect(config.coinTypes.sui).toBe(normalizeStructTag(SUI_TYPE_ARG));
-		expect(config.coinTypes.usdc).toBe(normalizeStructTag('0x123::usdc::USDC'));
-		expect(config.coinTypes.usdcFlowx).toBe(
-			normalizeStructTag(DEFAULT_USDC_FLOWX_COIN_TYPE),
+		expect(config.coinTypes.usdc).toBe(
+			normalizeStructTag(DEFAULT_USDC_COIN_TYPE),
 		);
-		expect(config.gamesPackageId.coinflip).toBe('0x2');
-		expect(config.gamesPackageId.wheel).toBe('0x3');
-		expect(config.gamesPackageId.plinko).toBe(DEFAULT_GAMES_PACKAGE_ID.plinko);
+		expect(config.coinTypes.usdcFlowx).toBe(
+			normalizeStructTag(DEFAULT_USDC_COIN_TYPE),
+		);
+		expect(config.gamesPackageId.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
+		expect(config.gamesPackageId.wheel).toBe(PACKAGE_IDS.testnet.wheel);
+		expect(config.gamesPackageId.plinko).toBe(PACKAGE_IDS.testnet.plinko);
 	});
 
-	it('normalizes explicit pyth mapping by coin type', () => {
-		const config = resolveSuigarConfig({
-			pyth: {
-				priceInfoObjectIds: {
-					'0x2::sui::SUI': '0xabc',
-				},
-			},
-		});
+	it('uses the selected network package map', () => {
+		const config = resolveSuigarConfig('mainnet');
+
+		expect(config.sweetHousePackageId).toBe(PACKAGE_IDS.mainnet.sweetHouse);
+		expect(config.gamesPackageId.range).toBe(PACKAGE_IDS.mainnet.range);
+	});
+
+	it('allows resolving explicit pyth mappings on the internal config', () => {
+		const config = resolveSuigarConfig('testnet');
+		config.pyth.priceInfoObjectIds[normalizeStructTag('0x2::sui::SUI')] =
+			'0xabc';
 
 		expect(resolvePythPriceInfoObjectId(config, '0x0002::sui::SUI')).toBe(
 			'0xabc',
 		);
 	});
 
-	it('accepts sweetHouse package id overrides from user options', () => {
-		const config = resolveSuigarConfig({
-			sweetHousePackageId: '0x123',
-		});
-
-		expect(config.sweetHousePackageId).toBe('0x123');
-	});
-
 	it('falls back to sui and usdc price info object ids for default coin types', () => {
-		const config = resolveSuigarConfig({
-			pyth: {
-				suiPriceInfoObjectId: '0xsui',
-				usdcPriceInfoObjectId: '0xusdc',
-			},
-		});
+		const config = resolveSuigarConfig('testnet');
+		config.pyth.suiPriceInfoObjectId = '0xsui';
+		config.pyth.usdcPriceInfoObjectId = '0xusdc';
 
 		expect(resolvePythPriceInfoObjectId(config, SUI_TYPE_ARG)).toBe('0xsui');
 		expect(resolvePythPriceInfoObjectId(config, DEFAULT_USDC_COIN_TYPE)).toBe(
 			'0xusdc',
 		);
 		expect(
-			resolvePythPriceInfoObjectId(config, DEFAULT_USDC_FLOWX_COIN_TYPE),
+			resolvePythPriceInfoObjectId(config, config.coinTypes.usdcFlowx),
 		).toBe('0xusdc');
 	});
 
 	it('resolves game package ids through the config record', () => {
-		const config = resolveSuigarConfig({
-			gamesPackageId: {
-				range: '0x123',
-			},
-		});
+		const config = resolveSuigarConfig('testnet');
+		config.gamesPackageId.range = '0x123';
 
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
 	});
 
 	it('throws when no pyth object id is configured for the requested coin type', () => {
-		const config = resolveSuigarConfig({});
+		const config = resolveSuigarConfig('testnet');
 
 		expect(() =>
 			resolvePythPriceInfoObjectId(config, '0x999::custom::COIN'),

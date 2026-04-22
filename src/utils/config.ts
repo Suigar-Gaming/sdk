@@ -3,62 +3,32 @@
 
 import { normalizeStructTag, SUI_TYPE_ARG } from '@mysten/sui/utils';
 
-import type { Game, SuigarConfig, SuigarOptions } from '../types';
-import {
-	DEFAULT_GAMES_PACKAGE_ID,
-	DEFAULT_SWEETHOUSE_PACKAGE_ID,
-	DEFAULT_USDC_COIN_TYPE,
-	DEFAULT_USDC_FLOWX_COIN_TYPE,
-} from '../configs/index.js';
+import type { Game, SuigarConfig, SuiNetwork } from '../types';
+import { DEFAULT_USDC_COIN_TYPE, PACKAGE_IDS } from '../configs/index.js';
 
-const trim = (value?: string) => value?.trim() ?? '';
-
-export function resolveSuigarConfig(options: SuigarOptions): SuigarConfig {
-	const suiCoinType = normalizeStructTag(
-		options.coinTypes?.sui ?? SUI_TYPE_ARG,
-	);
-	const usdcCoinType = normalizeStructTag(
-		options.coinTypes?.usdc ?? DEFAULT_USDC_COIN_TYPE,
-	);
-	const usdcFlowxCoinType = normalizeStructTag(
-		options.coinTypes?.usdcFlowx ?? DEFAULT_USDC_FLOWX_COIN_TYPE,
-	);
-
-	const explicitPriceInfoObjectIds = Object.fromEntries(
-		Object.entries(options.pyth?.priceInfoObjectIds ?? {}).map(
-			([coinType, objectId]) => [normalizeStructTag(coinType), objectId],
-		),
-	);
+export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
+	const packageIds = PACKAGE_IDS[network];
+	const suiCoinType = normalizeStructTag(SUI_TYPE_ARG);
+	const usdcCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
+	const usdcFlowxCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
 
 	return {
-		sweetHousePackageId:
-			trim(options.sweetHousePackageId) || trim(DEFAULT_SWEETHOUSE_PACKAGE_ID),
+		sweetHousePackageId: packageIds.sweetHouse,
 		coinTypes: {
 			sui: suiCoinType,
 			usdc: usdcCoinType,
 			usdcFlowx: usdcFlowxCoinType,
 		},
 		gamesPackageId: {
-			coinflip:
-				trim(options.gamesPackageId?.coinflip) ||
-				DEFAULT_GAMES_PACKAGE_ID.coinflip,
-			limbo:
-				trim(options.gamesPackageId?.limbo) || DEFAULT_GAMES_PACKAGE_ID.limbo,
-			plinko:
-				trim(options.gamesPackageId?.plinko) || DEFAULT_GAMES_PACKAGE_ID.plinko,
-			'pvp-coinflip':
-				trim(options.gamesPackageId?.['pvp-coinflip']) ||
-				DEFAULT_GAMES_PACKAGE_ID.pvp_coinflip,
-			range:
-				trim(options.gamesPackageId?.range) || DEFAULT_GAMES_PACKAGE_ID.range,
-			wheel:
-				trim(options.gamesPackageId?.wheel) || DEFAULT_GAMES_PACKAGE_ID.wheel,
+			coinflip: packageIds.coinflip,
+			limbo: packageIds.limbo,
+			plinko: packageIds.plinko,
+			'pvp-coinflip': packageIds.pvpCoinflip,
+			range: packageIds.range,
+			wheel: packageIds.wheel,
 		},
 		pyth: {
-			packageId: trim(options.pyth?.packageId) || undefined,
-			suiPriceInfoObjectId: trim(options.pyth?.suiPriceInfoObjectId),
-			usdcPriceInfoObjectId: trim(options.pyth?.usdcPriceInfoObjectId),
-			priceInfoObjectIds: explicitPriceInfoObjectIds,
+			priceInfoObjectIds: {},
 		},
 	};
 }

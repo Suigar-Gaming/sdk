@@ -14,7 +14,8 @@ import {
 	PvPCoinflipAction,
 	StandardGame,
 	SuigarConfig,
-	SuigarOptions,
+	SuigarExtensionOptions,
+	SuiNetwork,
 } from './types';
 import { resolveSuigarConfig } from './utils';
 import {
@@ -36,7 +37,7 @@ import { toBase64 } from '@mysten/sui/utils';
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
 	...options
-}: SuigarOptions<Name> = {}) {
+}: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
 		register: (client: ClientWithCoreApi) => {
@@ -52,13 +53,14 @@ class SuigarClient {
 
 	constructor({
 		client,
-		options,
 	}: {
 		client: ClientWithCoreApi;
-		options: SuigarOptions;
+		options: SuigarExtensionOptions;
 	}) {
 		this.#client = client;
-		this.#config = resolveSuigarConfig(options);
+		this.#config = resolveSuigarConfig(
+			(this.#client as ClientWithCoreApi & { network: SuiNetwork }).network,
+		);
 	}
 
 	/**

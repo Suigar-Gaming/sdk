@@ -1,5 +1,13 @@
 # @suigar/sdk
 
+## 2.0.0-beta.1
+
+### Patch Changes
+
+- Updated the npm release workflows to install dependencies without a committed lockfile and removed the obsolete Node.js cache configuration.
+- Simplified previous-release deprecation logic so prerelease publishes do not attempt to deprecate earlier npm versions.
+- Stopped tracking `package-lock.json` and removed the obsolete changeset file after the version bump.
+
 ## 2.0.0-beta.0
 
 ### Major Changes

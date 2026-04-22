@@ -573,14 +573,7 @@ describe('SuigarClient', () => {
 			defaultNameServiceName = async () => ({ address: null }) as never;
 		}
 
-		const client = new TestClient().$extend(
-			suigar({
-				pyth: {
-					suiPriceInfoObjectId: '0x789',
-					usdcPriceInfoObjectId: '0x987',
-				},
-			}),
-		);
+		const client = new TestClient().$extend(suigar());
 
 		expect(client.suigar).toBeDefined();
 		expect(client.suigar.serializeTransactionToBase64).toBeTypeOf('function');
@@ -644,14 +637,7 @@ describe('SuigarClient', () => {
 			defaultNameServiceName = async () => ({ address: null }) as never;
 		}
 
-		const client = new TestClient().$extend(
-			suigar({
-				pyth: {
-					suiPriceInfoObjectId: '0x789',
-					usdcPriceInfoObjectId: '0x987',
-				},
-			}),
-		);
+		const client = new TestClient().$extend(suigar());
 
 		expect(client.suigar.tx.createBetTransaction).toBeTypeOf('function');
 		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(

@@ -42,14 +42,7 @@ import { suigar } from '@suigar/sdk';
 
 const client = new SuiClient({
 	url: getFullnodeUrl('testnet'),
-}).$extend(
-	suigar({
-		pyth: {
-			suiPriceInfoObjectId: '0xPYTH_SUI_PRICE_INFO',
-			usdcPriceInfoObjectId: '0xPYTH_USDC_PRICE_INFO',
-		},
-	}),
-);
+}).$extend(suigar());
 
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
 	owner: '0x123',
@@ -86,50 +79,14 @@ client.casino.bcs;
 
 `suigar(options?)` resolves config from:
 
-- the connected Sui network
-- internal default package ids
-- internal default SweetHouse package id by network
+- internal package ids by network
 - default coin types for `SUI`, `USDC`, and FlowX `USDC`
-- user overrides
+- the connected Sui client network
+- the extension name
 
 Supported override areas:
 
 - `name`
-- `sweetHousePackageId`
-- `coinTypes.sui`
-- `coinTypes.usdc`
-- `coinTypes.usdcFlowx`
-- `gamesPackageId.coinflip`
-- `gamesPackageId.limbo`
-- `gamesPackageId.plinko`
-- `gamesPackageId['pvp-coinflip']`
-- `gamesPackageId.range`
-- `gamesPackageId.wheel`
-- `pyth.packageId`
-- `pyth.suiPriceInfoObjectId`
-- `pyth.usdcPriceInfoObjectId`
-- `pyth.priceInfoObjectIds[coinType]`
-
-Example:
-
-```ts
-const client = new SuiClient({ url }).$extend(
-	suigar({
-		sweetHousePackageId: '0xsweethouse',
-		pyth: {
-			suiPriceInfoObjectId: '0xsui',
-			usdcPriceInfoObjectId: '0xusdc',
-			priceInfoObjectIds: {
-				'0x123::custom::TOKEN': '0xprice',
-			},
-		},
-		gamesPackageId: {
-			coinflip: '0xcoinflip',
-			wheel: '0xwheel',
-		},
-	}),
-);
-```
 
 ## Runtime Surface
 

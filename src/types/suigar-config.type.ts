@@ -1,12 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { DeepPartial } from './deep-partial.type';
 import { Game } from './game.type';
 
-export interface SuigarOptions<
-	Name = 'suigar',
-> extends DeepPartial<SuigarConfig> {
+export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
 }
 
@@ -22,8 +19,7 @@ export type SuigarConfig = {
 };
 
 export type SuigarPythConfig = {
-	packageId?: string;
 	priceInfoObjectIds: Record<string, string>;
-	suiPriceInfoObjectId: string;
-	usdcPriceInfoObjectId: string;
+	suiPriceInfoObjectId?: string;
+	usdcPriceInfoObjectId?: string;
 };
