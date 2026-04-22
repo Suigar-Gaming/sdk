@@ -20,18 +20,21 @@ Do not assume individual game builders are exported from `@suigar/sdk`.
 Prefer the Sui client extension pattern:
 
 ```ts
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
+import { SuiGrpcClient } from '@mysten/sui/grpc';
 import { suigar } from '@suigar/sdk';
 
-const client = new SuiClient({
-	url: getFullnodeUrl('testnet'),
+const client = new SuiGrpcClient({
+	baseUrl: 'https://fullnode.testnet.sui.io:443',
+	network: 'testnet',
 }).$extend(suigar());
 ```
 
 If the app uses a custom extension name, preserve it consistently:
 
 ```ts
-const client = new SuiClient({ url }).$extend(suigar({ name: 'casino' }));
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({ name: 'casino' }),
+);
 client.casino;
 ```
 
@@ -63,7 +66,8 @@ Use the extension's generated BCS helpers and parse object `content`, not `objec
 
 ## Setup checklist
 
-1. Install and import `@suigar/sdk`.
-2. Extend the existing `SuiClient` with `suigar()`.
+1. Install and import `@suigar/sdk`, `@mysten/sui`, and `@mysten/bcs`.
+2. Extend the existing client with `suigar()`.
 3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin types, and price info object ids.
 4. Keep transaction serialization inside the same registered client instance.
+5. Keep the consuming app on ESM and pass the explicit `network` required by current client constructors.

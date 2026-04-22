@@ -86,7 +86,7 @@ npm run release
 
 ### Key Patterns
 
-1. **Client extension first**: Prefer integrating through `suigar()` on an existing `SuiClient` instead of bypassing the extension layer.
+1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public root exports**: The package root exports `suigar`. Do not invent additional root exports.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
@@ -170,6 +170,7 @@ Documentation is part of the deliverable:
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
 - At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
+- If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
 
 ## AI Skills
 
