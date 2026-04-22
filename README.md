@@ -5,13 +5,17 @@ TypeScript SDK for building Suigar v2 game transactions on Sui.
 ## Installation
 
 ```bash
-npm install @suigar/sdk
+npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 ```
 
 Runtime requirements:
 
 - Node.js `>=22`
-- `@mysten/sui`
+- ESM project configuration (`"type": "module"`)
+- `@mysten/sui` v2
+- `@mysten/bcs` v2
+
+This SDK targets Sui TypeScript SDK 2.0+ only. Follow the official [Sui 2.0 migration guide](https://sdk.mystenlabs.com/sui/migrations/sui-2.0) if your app still uses the pre-2.0 client API.
 
 ## What This Package Exposes
 
@@ -27,7 +31,7 @@ It also does not export `SuigarClient` as a public root symbol.
 What you actually use at runtime is the registered extension instance:
 
 ```ts
-const client = new SuiClient({ url }).$extend(suigar());
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 
 client.suigar.serializeTransactionToBase64(...);
 client.suigar.getConfig();
@@ -38,11 +42,12 @@ client.suigar.tx;
 ## Quick Start
 
 ```ts
-import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
+import { SuiGrpcClient } from '@mysten/sui/grpc';
 import { suigar } from '@suigar/sdk';
 
-const client = new SuiClient({
-	url: getFullnodeUrl('testnet'),
+const client = new SuiGrpcClient({
+	baseUrl: 'https://fullnode.testnet.sui.io:443',
+	network: 'testnet',
 }).$extend(suigar());
 
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
@@ -62,7 +67,7 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
 ```ts
-const client = new SuiClient({ url }).$extend(suigar());
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 
 client.suigar;
 ```
@@ -70,10 +75,12 @@ client.suigar;
 You can rename the extension:
 
 ```ts
-const client = new SuiClient({ url }).$extend(suigar({ name: 'casino' }));
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({ name: 'games' }),
+);
 
-client.casino.tx;
-client.casino.bcs;
+client.games.tx;
+client.games.bcs;
 ```
 
 ## Config
@@ -83,7 +90,7 @@ client.casino.bcs;
 - internal package ids by network
 - internal supported coin types by network
 - internal price info object ids by network
-- the connected Sui client network
+- the connected client network
 - the extension name
 
 Supported override areas:
@@ -295,14 +302,13 @@ const finalResult = await client.core.waitForTransaction({
 	},
 });
 
-if (finalResult.Transaction) {
-	console.log(finalResult.Transaction.digest);
-} else if (finalResult.FailedTransaction) {
-	throw new Error(finalResult.FailedTransaction.status.error.message);
+if (finalResult.$kind === 'FailedTransaction') {
+	throw new Error(finalResult.FailedTransaction.status.error?.message);
 }
 
-const transactionResult =
-	finalResult.Transaction ?? finalResult.FailedTransaction;
+console.log(finalResult.Transaction.digest);
+
+const transactionResult = finalResult.Transaction;
 
 const betResults = [];
 
@@ -343,7 +349,8 @@ const metadata = new Map(
 Important:
 
 - execute or wait for the transaction with `include: { events: true }`
-- parse emitted events from `result.Transaction.events` or `result.FailedTransaction.events`
+- unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
+- parse emitted events from the unwrapped transaction result
 - use `event.bcs` for consistent decoding across transports
 - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
 - these helpers decode the event payload itself, not a full transaction response

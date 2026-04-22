@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize casino game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -76,7 +76,7 @@ npm run release
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `test/` - Vitest coverage for config resolution and transaction builders
 - `dist/` - generated build output
-- `.agents/skills/` - repo-local skills for casino-specific AI workflows
+- `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System
 
@@ -86,7 +86,7 @@ npm run release
 
 ### Key Patterns
 
-1. **Client extension first**: Prefer integrating through `suigar()` on an existing `SuiClient` instead of bypassing the extension layer.
+1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public root exports**: The package root exports `suigar`. Do not invent additional root exports.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
@@ -170,10 +170,11 @@ Documentation is part of the deliverable:
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
 - At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
+- If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
 
 ## AI Skills
 
-Use the repo-local skills in `.agents/skills/` when the task is about building a casino product on top of this SDK:
+Use the repo-local skills in `.agents/skills/` when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
 - `create-standard-games` for standard game transactions
