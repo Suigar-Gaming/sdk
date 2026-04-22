@@ -3,8 +3,9 @@
 
 import type { SuiNetwork } from '../types/network.type.js';
 import type {
-	SuigarCoin,
 	SuigarCoinTypes,
+	SuigarPackage,
+	SuigarPriceInfoObjectId,
 } from '../types/suigar-config.type.js';
 import {
 	MAINNET_COIN_TYPES,
@@ -28,8 +29,6 @@ export const SUIGAR_PACKAGES = {
 	wheel: 'wheel',
 } as const;
 
-export type SuigarPackage = Record<keyof typeof SUIGAR_PACKAGES, string>;
-export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
 export const PACKAGE_IDS: Record<SuiNetwork, SuigarPackage> = {
 	mainnet: { ...MAINNET_PACKAGE_IDS },
 	testnet: { ...TESTNET_PACKAGE_IDS },

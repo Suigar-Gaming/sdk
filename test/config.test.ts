@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { normalizeStructTag, SUI_TYPE_ARG } from '@mysten/sui/utils';
+import { normalizeStructTag } from '@mysten/sui/utils';
 
 import {
 	resolveGamePackageId,
@@ -38,7 +38,9 @@ describe('resolveSuigarConfig', () => {
 		const config = resolveSuigarConfig('testnet');
 		config.priceInfoObjectIds.sui = '0xabc';
 
-		expect(resolvePriceInfoObjectId(config, '0x0002::sui::SUI')).toBe('0xabc');
+		expect(resolvePriceInfoObjectId(config, COIN_TYPES.testnet.sui)).toBe(
+			'0xabc',
+		);
 	});
 
 	it('maps configured coin types to supported coin object ids', () => {
@@ -46,7 +48,9 @@ describe('resolveSuigarConfig', () => {
 		config.priceInfoObjectIds.sui = '0xsui';
 		config.priceInfoObjectIds.usdc = '0xusdc';
 
-		expect(resolvePriceInfoObjectId(config, SUI_TYPE_ARG)).toBe('0xsui');
+		expect(resolvePriceInfoObjectId(config, COIN_TYPES.testnet.sui)).toBe(
+			'0xsui',
+		);
 		expect(resolvePriceInfoObjectId(config, COIN_TYPES.testnet.usdc)).toBe(
 			'0xusdc',
 		);

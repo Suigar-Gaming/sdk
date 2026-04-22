@@ -76,8 +76,11 @@ function renderNetworkFile(
 	return `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarCoinTypes } from '../types/suigar-config.type.js';
-import type { SuigarPackage, SuigarPriceInfoObjectId } from './package.js';
+import type {
+\tSuigarCoinTypes,
+\tSuigarPackage,
+\tSuigarPriceInfoObjectId,
+} from '../types/suigar-config.type.js';
 
 // \`sweetHouse\` is preserved manually because it is not currently resolved from MVR.
 export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackage = {
