@@ -1,4 +1,4 @@
-name: Deprecate previous NPM Release
+name: Deprecate previous NPM release
 
 on:
   workflow_call:
