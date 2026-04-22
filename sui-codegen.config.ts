@@ -22,7 +22,7 @@ const packagesConfiguration: SuiCodegenConfig['packages'] = Object.entries(
 
 const config: SuiCodegenConfig = {
 	output: './src/contracts',
-	includePhantomTypeParameters: true,
+	includePhantomTypeParameters: false,
 	packages: packagesConfiguration,
 	generateSummaries: false,
 };

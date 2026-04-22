@@ -274,19 +274,46 @@ Current exposed helpers:
 - `PvPCoinflipGameResolved`
 - `PvPCoinflipGameCancelled`
 
-These are generated Move struct/event decoders. Use them to parse Suigar event payloads and structured onchain content.
+These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results.
 
 ### Parse Standard Bet Result Data
 
 ```ts
-const { object } = await client.core.getObject({
-	objectId: '0xOBJECT_ID',
+const executeResult = await client.core.executeTransaction({
+	transaction: transactionBytes,
+	signatures: [signature],
 	include: {
-		content: true,
+		events: true,
 	},
 });
 
-const decoded = client.suigar.bcs.BetResultEvent.parse(object.content);
+const finalResult = await client.core.waitForTransaction({
+	result: executeResult,
+	include: {
+		effects: true,
+		events: true,
+	},
+});
+
+if (finalResult.Transaction) {
+	console.log(finalResult.Transaction.digest);
+} else if (finalResult.FailedTransaction) {
+	throw new Error(finalResult.FailedTransaction.status.error.message);
+}
+
+const transactionResult =
+	finalResult.Transaction ?? finalResult.FailedTransaction;
+
+const betResults = [];
+
+for (const event of transactionResult.events ?? []) {
+	try {
+		const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+		betResults.push(decoded);
+	} catch {
+		// Ignore non-BetResultEvent payloads.
+	}
+}
 ```
 
 Parsed fields include:
@@ -315,12 +342,15 @@ const metadata = new Map(
 
 Important:
 
-- use `content`, not `objectBcs`, with these generated parsers
-- the generated parser expects the struct payload, not a full object envelope
+- execute or wait for the transaction with `include: { events: true }`
+- parse emitted events from `result.Transaction.events` or `result.FailedTransaction.events`
+- use `event.bcs` for consistent decoding across transports
+- `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
+- these helpers decode the event payload itself, not a full transaction response
 
 ### Parse PvP Coinflip Event Data
 
-Use the matching helper for the PvP coinflip event payload you fetched from chain:
+Use the matching helper for each PvP coinflip event payload found in `transactionResult.events`:
 
 - `client.suigar.bcs.PvPCoinflipGameCreated`
 - `client.suigar.bcs.PvPCoinflipGameResolved`

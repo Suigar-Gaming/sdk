@@ -165,6 +165,12 @@ This is a core invariant: standard game transactions must fail clearly when the 
 4. Run `npm run typecheck`
 5. Add a changeset when the user-visible package behavior changes
 
+Documentation is part of the deliverable:
+
+- When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
+- At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
+- If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
+
 ## AI Skills
 
 Use the repo-local skills in `.agents/skills/` when the task is about building a casino product on top of this SDK:
