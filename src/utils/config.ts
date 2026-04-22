@@ -17,18 +17,10 @@ export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	const usdcCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
 
 	return {
-		sweetHousePackageId: packageIds.sweetHouse,
+		packageIds: { ...packageIds },
 		coinTypes: {
 			sui: suiCoinType,
 			usdc: usdcCoinType,
-		},
-		gamesPackageId: {
-			coinflip: packageIds.coinflip,
-			limbo: packageIds.limbo,
-			plinko: packageIds.plinko,
-			'pvp-coinflip': packageIds.pvpCoinflip,
-			range: packageIds.range,
-			wheel: packageIds.wheel,
 		},
 		priceInfoObjectIds: {
 			sui: priceInfoObjectIds.sui,
@@ -38,7 +30,20 @@ export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 }
 
 export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
-	return config.gamesPackageId[game];
+	switch (game) {
+		case 'coinflip':
+			return config.packageIds.coinflip;
+		case 'limbo':
+			return config.packageIds.limbo;
+		case 'plinko':
+			return config.packageIds.plinko;
+		case 'pvp-coinflip':
+			return config.packageIds.pvpCoinflip;
+		case 'range':
+			return config.packageIds.range;
+		case 'wheel':
+			return config.packageIds.wheel;
+	}
 }
 
 export function resolvePriceInfoObjectId(
@@ -84,9 +89,7 @@ export function assertConfiguredBetGame(
 	config: SuigarConfig,
 	game: Game,
 ): void {
-	if (!config.gamesPackageId[game]) {
-		throw new Error(
-			`Missing required config for ${game}: gamesPackageId.${game}`,
-		);
+	if (!resolveGamePackageId(config, game)) {
+		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
 }

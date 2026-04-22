@@ -14,18 +14,19 @@ import {
 import { suigar } from '../src/client.js';
 
 const TEST_CONFIG = {
-	sweetHousePackageId: '0x456',
-	coinTypes: {
-		sui: normalizeStructTag('0x2::sui::SUI'),
-		usdc: normalizeStructTag('0xusdc::coin::USDC'),
-	},
-	gamesPackageId: {
+	packageIds: {
+		sweetHouse: '0x456',
+		core: '0xcore',
 		coinflip: '0xabc',
 		limbo: '0x1',
 		plinko: '0x2',
-		'pvp-coinflip': '0x3',
+		pvpCoinflip: '0x3',
 		range: '0x4',
 		wheel: '0x5',
+	},
+	coinTypes: {
+		sui: normalizeStructTag('0x2::sui::SUI'),
+		usdc: normalizeStructTag('0xusdc::coin::USDC'),
 	},
 	priceInfoObjectIds: {
 		sui: '0x789',

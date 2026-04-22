@@ -26,10 +26,10 @@ export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.range,
+				package: config.packageIds.range,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

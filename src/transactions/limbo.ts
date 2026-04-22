@@ -25,10 +25,10 @@ export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.limbo,
+				package: config.packageIds.limbo,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

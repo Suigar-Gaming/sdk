@@ -23,16 +23,16 @@ describe('resolveSuigarConfig', () => {
 		expect(config.coinTypes.usdc).toBe(
 			normalizeStructTag(DEFAULT_USDC_COIN_TYPE),
 		);
-		expect(config.gamesPackageId.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
-		expect(config.gamesPackageId.wheel).toBe(PACKAGE_IDS.testnet.wheel);
-		expect(config.gamesPackageId.plinko).toBe(PACKAGE_IDS.testnet.plinko);
+		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
+		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
+		expect(config.packageIds.plinko).toBe(PACKAGE_IDS.testnet.plinko);
 	});
 
 	it('uses the selected network package map', () => {
 		const config = resolveSuigarConfig('mainnet');
 
-		expect(config.sweetHousePackageId).toBe(PACKAGE_IDS.mainnet.sweetHouse);
-		expect(config.gamesPackageId.range).toBe(PACKAGE_IDS.mainnet.range);
+		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
+		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.priceInfoObjectIds).toEqual(PRICE_INFO_OBJECT_IDS.mainnet);
 	});
 
@@ -56,7 +56,7 @@ describe('resolveSuigarConfig', () => {
 
 	it('resolves game package ids through the config record', () => {
 		const config = resolveSuigarConfig('testnet');
-		config.gamesPackageId.range = '0x123';
+		config.packageIds.range = '0x123';
 
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
 	});

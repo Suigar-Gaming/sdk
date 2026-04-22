@@ -24,10 +24,10 @@ export function buildWheelTransaction(options: BuildWheelTransactionOptions) {
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.wheel,
+				package: config.packageIds.wheel,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

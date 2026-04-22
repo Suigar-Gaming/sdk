@@ -35,6 +35,7 @@
 		"release": "changeset publish",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
+		"update:package-configs": "node ./scripts/update-package-configs.mjs",
 		"version-packages": "changeset version"
 	},
 	"repository": {

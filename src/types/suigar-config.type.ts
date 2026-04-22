@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { Game } from './game.type';
+import type { SuigarPackage } from '../configs/package.js';
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
@@ -12,8 +12,7 @@ export type SuigarCoin = 'sui' | 'usdc';
 export type SuigarCoinTypes = Record<SuigarCoin, string>;
 
 export type SuigarConfig = {
-	sweetHousePackageId: string;
+	packageIds: SuigarPackage;
 	coinTypes: SuigarCoinTypes;
-	gamesPackageId: Record<Game, string>;
 	priceInfoObjectIds: Record<SuigarCoin, string>;
 };

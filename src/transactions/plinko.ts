@@ -24,10 +24,10 @@ export function buildPlinkoTransaction(options: BuildPlinkoTransactionOptions) {
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.plinko,
+				package: config.packageIds.plinko,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

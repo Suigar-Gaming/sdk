@@ -43,10 +43,10 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 			tx.add(
 				createGame({
-					package: createOptions.config.gamesPackageId['pvp-coinflip'],
+					package: createOptions.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						createOptions.config.sweetHousePackageId,
+						createOptions.config.packageIds.sweetHouse,
 						betCoin,
 						createOptions.side === 'tails',
 						Boolean(createOptions.isPrivate),
@@ -69,11 +69,11 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 			tx.add(
 				joinGame({
-					package: joinOptions.config.gamesPackageId['pvp-coinflip'],
+					package: joinOptions.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						joinOptions.gameId,
-						joinOptions.config.sweetHousePackageId,
+						joinOptions.config.packageIds.sweetHouse,
 						betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
@@ -89,11 +89,11 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 			tx.add(
 				cancelGame({
-					package: cancelOptions.config.gamesPackageId['pvp-coinflip'],
+					package: cancelOptions.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						cancelOptions.gameId,
-						cancelOptions.config.sweetHousePackageId,
+						cancelOptions.config.packageIds.sweetHouse,
 					],
 				}),
 			);
