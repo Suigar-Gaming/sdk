@@ -76,11 +76,11 @@ You can rename the extension:
 
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
-	suigar({ name: 'casino' }),
+	suigar({ name: 'games' }),
 );
 
-client.casino.tx;
-client.casino.bcs;
+client.games.tx;
+client.games.bcs;
 ```
 
 ## Config

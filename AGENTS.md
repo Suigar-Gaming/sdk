@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize casino game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -76,7 +76,7 @@ npm run release
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `test/` - Vitest coverage for config resolution and transaction builders
 - `dist/` - generated build output
-- `.agents/skills/` - repo-local skills for casino-specific AI workflows
+- `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System
 
@@ -174,7 +174,7 @@ Documentation is part of the deliverable:
 
 ## AI Skills
 
-Use the repo-local skills in `.agents/skills/` when the task is about building a casino product on top of this SDK:
+Use the repo-local skills in `.agents/skills/` when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
 - `create-standard-games` for standard game transactions
