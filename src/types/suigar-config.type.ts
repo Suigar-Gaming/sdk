@@ -1,29 +1,27 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { DeepPartial } from './deep-partial.type';
-import { Game } from './game.type';
-
-export interface SuigarOptions<
-	Name = 'suigar',
-> extends DeepPartial<SuigarConfig> {
+export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
 }
 
-export type SuigarConfig = {
-	sweetHousePackageId: string;
-	coinTypes: {
-		sui: string;
-		usdc: string;
-		usdcFlowx: string;
-	};
-	gamesPackageId: Record<Game, string>;
-	pyth: SuigarPythConfig;
-};
+export type SuigarCoin = 'sui' | 'usdc';
 
-export type SuigarPythConfig = {
-	packageId?: string;
-	priceInfoObjectIds: Record<string, string>;
-	suiPriceInfoObjectId: string;
-	usdcPriceInfoObjectId: string;
+export type SuigarCoinTypes = Record<SuigarCoin, string>;
+export type SuigarPackageKey =
+	| 'sweetHouse'
+	| 'core'
+	| 'coinflip'
+	| 'limbo'
+	| 'plinko'
+	| 'pvpCoinflip'
+	| 'range'
+	| 'wheel';
+export type SuigarPackage = Record<SuigarPackageKey, string>;
+export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
+
+export type SuigarConfig = {
+	packageIds: SuigarPackage;
+	coinTypes: SuigarCoinTypes;
+	priceInfoObjectIds: SuigarPriceInfoObjectId;
 };

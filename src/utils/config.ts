@@ -1,110 +1,94 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeStructTag, SUI_TYPE_ARG } from '@mysten/sui/utils';
+import { normalizeStructTag } from '@mysten/sui/utils';
 
-import type { Game, SuigarConfig, SuigarOptions } from '../types';
+import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
 import {
-	DEFAULT_GAMES_PACKAGE_ID,
-	DEFAULT_SWEETHOUSE_PACKAGE_ID,
-	DEFAULT_USDC_COIN_TYPE,
-	DEFAULT_USDC_FLOWX_COIN_TYPE,
+	COIN_TYPES,
+	PACKAGE_IDS,
+	PRICE_INFO_OBJECT_IDS,
 } from '../configs/index.js';
 
-const trim = (value?: string) => value?.trim() ?? '';
-
-export function resolveSuigarConfig(options: SuigarOptions): SuigarConfig {
-	const suiCoinType = normalizeStructTag(
-		options.coinTypes?.sui ?? SUI_TYPE_ARG,
-	);
-	const usdcCoinType = normalizeStructTag(
-		options.coinTypes?.usdc ?? DEFAULT_USDC_COIN_TYPE,
-	);
-	const usdcFlowxCoinType = normalizeStructTag(
-		options.coinTypes?.usdcFlowx ?? DEFAULT_USDC_FLOWX_COIN_TYPE,
-	);
-
-	const explicitPriceInfoObjectIds = Object.fromEntries(
-		Object.entries(options.pyth?.priceInfoObjectIds ?? {}).map(
-			([coinType, objectId]) => [normalizeStructTag(coinType), objectId],
-		),
-	);
+export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
+	const packageIds = PACKAGE_IDS[network];
+	const coinTypes = COIN_TYPES[network];
+	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 
 	return {
-		sweetHousePackageId:
-			trim(options.sweetHousePackageId) || trim(DEFAULT_SWEETHOUSE_PACKAGE_ID),
+		packageIds: { ...packageIds },
 		coinTypes: {
-			sui: suiCoinType,
-			usdc: usdcCoinType,
-			usdcFlowx: usdcFlowxCoinType,
+			sui: normalizeStructTag(coinTypes.sui),
+			usdc: normalizeStructTag(coinTypes.usdc),
 		},
-		gamesPackageId: {
-			coinflip:
-				trim(options.gamesPackageId?.coinflip) ||
-				DEFAULT_GAMES_PACKAGE_ID.coinflip,
-			limbo:
-				trim(options.gamesPackageId?.limbo) || DEFAULT_GAMES_PACKAGE_ID.limbo,
-			plinko:
-				trim(options.gamesPackageId?.plinko) || DEFAULT_GAMES_PACKAGE_ID.plinko,
-			'pvp-coinflip':
-				trim(options.gamesPackageId?.['pvp-coinflip']) ||
-				DEFAULT_GAMES_PACKAGE_ID.pvp_coinflip,
-			range:
-				trim(options.gamesPackageId?.range) || DEFAULT_GAMES_PACKAGE_ID.range,
-			wheel:
-				trim(options.gamesPackageId?.wheel) || DEFAULT_GAMES_PACKAGE_ID.wheel,
-		},
-		pyth: {
-			packageId: trim(options.pyth?.packageId) || undefined,
-			suiPriceInfoObjectId: trim(options.pyth?.suiPriceInfoObjectId),
-			usdcPriceInfoObjectId: trim(options.pyth?.usdcPriceInfoObjectId),
-			priceInfoObjectIds: explicitPriceInfoObjectIds,
+		priceInfoObjectIds: {
+			sui: priceInfoObjectIds.sui,
+			usdc: priceInfoObjectIds.usdc,
 		},
 	};
-}
-
-export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
-	return config.gamesPackageId[game];
-}
-
-export function resolvePythPriceInfoObjectId(
-	config: SuigarConfig,
-	coinType: string,
-): string {
-	const normalizedCoinType = normalizeStructTag(coinType);
-	const explicitObjectId = config.pyth.priceInfoObjectIds[normalizedCoinType];
-
-	if (explicitObjectId) {
-		return explicitObjectId;
-	}
-
-	if (
-		normalizedCoinType === config.coinTypes.sui &&
-		config.pyth.suiPriceInfoObjectId
-	) {
-		return config.pyth.suiPriceInfoObjectId;
-	}
-
-	if (
-		(normalizedCoinType === config.coinTypes.usdc ||
-			normalizedCoinType === config.coinTypes.usdcFlowx) &&
-		config.pyth.usdcPriceInfoObjectId
-	) {
-		return config.pyth.usdcPriceInfoObjectId;
-	}
-
-	throw new Error(
-		`Missing Pyth price object configuration for coin type ${coinType}`,
-	);
 }
 
 export function assertConfiguredBetGame(
 	config: SuigarConfig,
 	game: Game,
 ): void {
-	if (!config.gamesPackageId[game]) {
-		throw new Error(
-			`Missing required config for ${game}: gamesPackageId.${game}`,
-		);
+	if (!resolveGamePackageId(config, game)) {
+		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
+}
+
+export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
+	switch (game) {
+		case 'coinflip':
+			return config.packageIds.coinflip;
+		case 'limbo':
+			return config.packageIds.limbo;
+		case 'plinko':
+			return config.packageIds.plinko;
+		case 'pvp-coinflip':
+			return config.packageIds.pvpCoinflip;
+		case 'range':
+			return config.packageIds.range;
+		case 'wheel':
+			return config.packageIds.wheel;
+	}
+}
+
+export function resolvePriceInfoObjectId(
+	config: SuigarConfig,
+	coinType: string,
+): string {
+	const normalizedCoinType = normalizeStructTag(coinType);
+	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
+	const objectId = config.priceInfoObjectIds[supportedCoin];
+
+	if (objectId) {
+		return objectId;
+	}
+
+	throw new Error(
+		`Missing price info object configuration for coin type ${coinType}`,
+	);
+}
+
+function resolveSupportedCoin(
+	config: SuigarConfig,
+	coinType: string,
+): SuigarCoin {
+	const entries = Object.entries(config.coinTypes) as Array<
+		[SuigarCoin, string]
+	>;
+	const supportedCoin = entries.find(
+		([, configuredCoinType]) => configuredCoinType === coinType,
+	)?.[0];
+
+	if (supportedCoin) {
+		return supportedCoin;
+	}
+
+	throw new Error(
+		`Unsupported coin type ${coinType}. Supported coin types: ${entries
+			.map(([, configuredCoinType]) => configuredCoinType)
+			.join(', ')}`,
+	);
 }

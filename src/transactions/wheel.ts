@@ -20,21 +20,21 @@ export function buildWheelTransaction(options: BuildWheelTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.wheel,
+				package: config.packageIds.wheel,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,
 					configId,
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

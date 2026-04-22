@@ -16,7 +16,7 @@ import type {
 import { encodeBetMetadata } from '../utils/metadata.js';
 import {
 	assertConfiguredBetGame,
-	resolvePythPriceInfoObjectId,
+	resolvePriceInfoObjectId,
 } from '../utils/config.js';
 import { DEFAULT_GAS_BUDGET_MIST, toBigIntAmount } from '../utils/shared.js';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -30,7 +30,7 @@ export type BuildSharedBetTransactionContext = {
 	cashStake: bigint;
 	betCount: bigint;
 	metadata: EncodedBetMetadata;
-	pythPriceInfoObjectId: string;
+	priceInfoObjectId: string;
 	betCoin: TransactionResult;
 };
 
@@ -84,7 +84,7 @@ export function buildSharedStandardGameBetCall({
 		const resolvedCashStake = toBigIntAmount(cashStake ?? stake, 'cashStake');
 		const resolvedBetCount = toBigIntAmount(betCount ?? 1, 'betCount');
 		const encodedMetadata = encodeBetMetadata(metadata);
-		const pythPriceInfoObjectId = resolvePythPriceInfoObjectId(
+		const priceInfoObjectId = resolvePriceInfoObjectId(
 			config,
 			normalizedCoinType,
 		);
@@ -104,7 +104,7 @@ export function buildSharedStandardGameBetCall({
 			cashStake: resolvedCashStake,
 			betCount: resolvedBetCount,
 			metadata: encodedMetadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		});
 

@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension and `SuigarClient`, which are used to build and serialize casino game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize casino game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -68,12 +68,12 @@ npm run release
 ### Repository Structure
 
 - `src/` - SDK source code
-  - `client.ts` - `suigar()` extension registration and `SuigarClient`
+  - `client.ts` - `suigar()` extension registration and extension client implementation
   - `transactions/` - transaction builders for standard and PvP games
   - `contracts/` - generated Move bindings and BCS helpers
   - `types/` - public option and config types
   - `utils/` - config resolution, metadata encoding, and shared helpers
-  - `configs/` - default package ids and coin type configuration
+  - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `test/` - Vitest coverage for config resolution and transaction builders
 - `dist/` - generated build output
 - `.agents/skills/` - repo-local skills for casino-specific AI workflows
@@ -87,7 +87,7 @@ npm run release
 ### Key Patterns
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing `SuiClient` instead of bypassing the extension layer.
-2. **Public root exports**: The package root currently exports `suigar` and `SuigarClient`. Do not invent additional root exports.
+2. **Public root exports**: The package root exports `suigar`. Do not invent additional root exports.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
@@ -100,9 +100,9 @@ The SDK is organized around a client extension plus typed transaction builders. 
 
 The integration has three practical layers:
 
-1. **Public SDK surface** - `suigar()` and `SuigarClient` exposed from the package root.
+1. **Public SDK surface** - `suigar()` exposed from the package root.
 2. **Client extension implementation** - `src/client.ts` registers the extension on top of a `ClientWithCoreApi` and exposes serialization, BCS helpers, and transaction builders.
-3. **Transaction and contract layer** - `src/transactions/` resolves config, normalizes user input, and invokes generated Move wrappers from `src/contracts/`.
+3. **Transaction and contract layer** - `src/transactions/` consumes network-resolved config, normalizes user input, and invokes generated Move wrappers from `src/contracts/`.
 
 Key files:
 
@@ -131,12 +131,12 @@ When making changes:
 
 Config is normalized in `src/utils/config.ts`. This layer is responsible for:
 
-- resolving default package ids
-- normalizing struct tags for supported coin types
-- resolving Pyth price info object ids
+- resolving network-scoped package ids
+- normalizing the configured supported coin types for the active network
+- resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 
-This is a core invariant: standard game transactions must fail clearly when the required Pyth object configuration is not available for the chosen coin type.
+This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
 #### Metadata and Amount Handling
 
@@ -164,6 +164,12 @@ This is a core invariant: standard game transactions must fail clearly when the 
 3. Run `npm test`
 4. Run `npm run typecheck`
 5. Add a changeset when the user-visible package behavior changes
+
+Documentation is part of the deliverable:
+
+- When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
+- At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
+- If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 
 ## AI Skills
 

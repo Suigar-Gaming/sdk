@@ -21,14 +21,14 @@ export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.limbo,
+				package: config.packageIds.limbo,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,
@@ -36,7 +36,7 @@ export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
 					BigInt(scale),
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

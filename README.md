@@ -30,6 +30,7 @@ What you actually use at runtime is the registered extension instance:
 const client = new SuiClient({ url }).$extend(suigar());
 
 client.suigar.serializeTransactionToBase64(...);
+client.suigar.getConfig();
 client.suigar.bcs;
 client.suigar.tx;
 ```
@@ -42,14 +43,7 @@ import { suigar } from '@suigar/sdk';
 
 const client = new SuiClient({
 	url: getFullnodeUrl('testnet'),
-}).$extend(
-	suigar({
-		pyth: {
-			suiPriceInfoObjectId: '0xPYTH_SUI_PRICE_INFO',
-			usdcPriceInfoObjectId: '0xPYTH_USDC_PRICE_INFO',
-		},
-	}),
-);
+}).$extend(suigar());
 
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
 	owner: '0x123',
@@ -86,58 +80,42 @@ client.casino.bcs;
 
 `suigar(options?)` resolves config from:
 
-- the connected Sui network
-- internal default package ids
-- internal default SweetHouse package id by network
-- default coin types for `SUI`, `USDC`, and FlowX `USDC`
-- user overrides
+- internal package ids by network
+- internal supported coin types by network
+- internal price info object ids by network
+- the connected Sui client network
+- the extension name
 
 Supported override areas:
 
 - `name`
-- `sweetHousePackageId`
-- `coinTypes.sui`
-- `coinTypes.usdc`
-- `coinTypes.usdcFlowx`
-- `gamesPackageId.coinflip`
-- `gamesPackageId.limbo`
-- `gamesPackageId.plinko`
-- `gamesPackageId['pvp-coinflip']`
-- `gamesPackageId.range`
-- `gamesPackageId.wheel`
-- `pyth.packageId`
-- `pyth.suiPriceInfoObjectId`
-- `pyth.usdcPriceInfoObjectId`
-- `pyth.priceInfoObjectIds[coinType]`
-
-Example:
-
-```ts
-const client = new SuiClient({ url }).$extend(
-	suigar({
-		sweetHousePackageId: '0xsweethouse',
-		pyth: {
-			suiPriceInfoObjectId: '0xsui',
-			usdcPriceInfoObjectId: '0xusdc',
-			priceInfoObjectIds: {
-				'0x123::custom::TOKEN': '0xprice',
-			},
-		},
-		gamesPackageId: {
-			coinflip: '0xcoinflip',
-			wheel: '0xwheel',
-		},
-	}),
-);
-```
 
 ## Runtime Surface
 
 The registered extension instance exposes three main areas:
 
+- `getConfig()`
 - `serializeTransactionToBase64(transaction, options?)`
 - `bcs`
 - `tx`
+
+### `getConfig()`
+
+Returns the resolved SDK configuration for the connected network.
+
+This is intended mainly for debugging and inspection, for example to verify the
+resolved package ids or supported coin mappings for the active client network.
+
+It includes:
+
+- `packageIds`
+- `coinTypes`
+- `priceInfoObjectIds`
+
+```ts
+const config = client.suigar.getConfig();
+console.log(config.packageIds);
+```
 
 ### `serializeTransactionToBase64(transaction, options?)`
 
@@ -191,7 +169,7 @@ Shared behavior:
 - `betCount` defaults to `1`
 - `sender` overrides the transaction sender
 - `metadata` is encoded into `keys` and `values` byte arrays
-- the SDK resolves the Pyth price info object from the configured coin mapping
+- the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `owner`
 
 Per-game options:
@@ -296,19 +274,46 @@ Current exposed helpers:
 - `PvPCoinflipGameResolved`
 - `PvPCoinflipGameCancelled`
 
-These are generated Move struct/event decoders. Use them to parse Suigar event payloads and structured onchain content.
+These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results.
 
 ### Parse Standard Bet Result Data
 
 ```ts
-const { object } = await client.core.getObject({
-	objectId: '0xOBJECT_ID',
+const executeResult = await client.core.executeTransaction({
+	transaction: transactionBytes,
+	signatures: [signature],
 	include: {
-		content: true,
+		events: true,
 	},
 });
 
-const decoded = client.suigar.bcs.BetResultEvent.parse(object.content);
+const finalResult = await client.core.waitForTransaction({
+	result: executeResult,
+	include: {
+		effects: true,
+		events: true,
+	},
+});
+
+if (finalResult.Transaction) {
+	console.log(finalResult.Transaction.digest);
+} else if (finalResult.FailedTransaction) {
+	throw new Error(finalResult.FailedTransaction.status.error.message);
+}
+
+const transactionResult =
+	finalResult.Transaction ?? finalResult.FailedTransaction;
+
+const betResults = [];
+
+for (const event of transactionResult.events ?? []) {
+	try {
+		const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+		betResults.push(decoded);
+	} catch {
+		// Ignore non-BetResultEvent payloads.
+	}
+}
 ```
 
 Parsed fields include:
@@ -337,12 +342,15 @@ const metadata = new Map(
 
 Important:
 
-- use `content`, not `objectBcs`, with these generated parsers
-- the generated parser expects the struct payload, not a full object envelope
+- execute or wait for the transaction with `include: { events: true }`
+- parse emitted events from `result.Transaction.events` or `result.FailedTransaction.events`
+- use `event.bcs` for consistent decoding across transports
+- `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
+- these helpers decode the event payload itself, not a full transaction response
 
 ### Parse PvP Coinflip Event Data
 
-Use the matching helper for the PvP coinflip event payload you fetched from chain:
+Use the matching helper for each PvP coinflip event payload found in `transactionResult.events`:
 
 - `client.suigar.bcs.PvPCoinflipGameCreated`
 - `client.suigar.bcs.PvPCoinflipGameResolved`

@@ -22,14 +22,14 @@ export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
 			stake,
 			betCount,
 			metadata,
-			pythPriceInfoObjectId,
+			priceInfoObjectId,
 			betCoin,
 		}) =>
 			play({
-				package: config.gamesPackageId.range,
+				package: config.packageIds.range,
 				typeArguments: [coinType],
 				arguments: [
-					config.sweetHousePackageId,
+					config.packageIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,
@@ -38,7 +38,7 @@ export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
 					Boolean(options.outOfRange),
 					metadata.keys,
 					metadata.values,
-					pythPriceInfoObjectId,
+					priceInfoObjectId,
 				],
 			})(tx),
 	});

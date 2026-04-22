@@ -29,12 +29,15 @@
 		"clean": "rm -rf dist src/contracts .vitest-cache",
 		"codegen": "sui-ts-codegen generate",
 		"changeset": "changeset",
+		"changeset:beta:enter": "changeset pre enter beta",
+		"changeset:beta:exit": "changeset pre exit",
 		"format": "prettier --write .",
 		"lint": "eslint . --fix && npm run format",
 		"prepare": "husky",
 		"release": "changeset publish",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
+		"update:package-configs": "node ./scripts/update-package-configs.mjs",
 		"version-packages": "changeset version"
 	},
 	"repository": {

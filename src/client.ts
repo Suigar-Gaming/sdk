@@ -13,8 +13,10 @@ import {
 	BuildWheelTransactionOptions,
 	PvPCoinflipAction,
 	StandardGame,
+	SUPPORTED_SUI_NETWORKS,
 	SuigarConfig,
-	SuigarOptions,
+	SuigarExtensionOptions,
+	SuiNetwork,
 } from './types';
 import { resolveSuigarConfig } from './utils';
 import {
@@ -35,12 +37,11 @@ import { toBase64 } from '@mysten/sui/utils';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
-	...options
-}: SuigarOptions<Name> = {}) {
+}: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
 		register: (client: ClientWithCoreApi) => {
-			return new SuigarClient({ client, options });
+			return new SuigarClient({ client });
 		},
 	};
 }
@@ -50,15 +51,28 @@ class SuigarClient {
 
 	#config: SuigarConfig;
 
-	constructor({
-		client,
-		options,
-	}: {
-		client: ClientWithCoreApi;
-		options: SuigarOptions;
-	}) {
+	constructor({ client }: { client: ClientWithCoreApi }) {
 		this.#client = client;
-		this.#config = resolveSuigarConfig(options);
+
+		const network = this.#client.network as SuiNetwork;
+		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
+			throw new Error(`Unsupported network: ${network}`);
+		}
+
+		this.#config = resolveSuigarConfig(network);
+	}
+
+	/**
+	 * Returns the resolved SDK configuration for the connected network.
+	 *
+	 * This is primarily useful for debugging or inspecting which package ids,
+	 * supported coin types, and price info object ids the SDK resolved for the
+	 * current client network.
+	 *
+	 * @returns Network-resolved Suigar configuration.
+	 */
+	getConfig() {
+		return this.#config;
 	}
 
 	/**

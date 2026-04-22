@@ -14,24 +14,23 @@ import {
 import { suigar } from '../src/client.js';
 
 const TEST_CONFIG = {
-	sweetHousePackageId: '0x456',
-	coinTypes: {
-		sui: normalizeStructTag('0x2::sui::SUI'),
-		usdc: normalizeStructTag('0xusdc::coin::USDC'),
-		usdcFlowx: normalizeStructTag('0xflowx::coin::USDC'),
-	},
-	gamesPackageId: {
+	packageIds: {
+		sweetHouse: '0x456',
+		core: '0xcore',
 		coinflip: '0xabc',
 		limbo: '0x1',
 		plinko: '0x2',
-		'pvp-coinflip': '0x3',
+		pvpCoinflip: '0x3',
 		range: '0x4',
 		wheel: '0x5',
 	},
-	pyth: {
-		priceInfoObjectIds: {},
-		suiPriceInfoObjectId: '0x789',
-		usdcPriceInfoObjectId: '0x987',
+	coinTypes: {
+		sui: normalizeStructTag('0x2::sui::SUI'),
+		usdc: normalizeStructTag('0xusdc::coin::USDC'),
+	},
+	priceInfoObjectIds: {
+		sui: '0x789',
+		usdc: '0x987',
 	},
 } as const;
 
@@ -179,7 +178,7 @@ describe('shared transaction helpers', () => {
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
 		expect(context!.betCount).toBe(3n);
-		expect(context!.pythPriceInfoObjectId).toBe('0x789');
+		expect(context!.priceInfoObjectId).toBe('0x789');
 		expect(context!.metadata).toEqual({
 			keys: ['referrer', 'label'],
 			values: [
@@ -573,14 +572,7 @@ describe('SuigarClient', () => {
 			defaultNameServiceName = async () => ({ address: null }) as never;
 		}
 
-		const client = new TestClient().$extend(
-			suigar({
-				pyth: {
-					suiPriceInfoObjectId: '0x789',
-					usdcPriceInfoObjectId: '0x987',
-				},
-			}),
-		);
+		const client = new TestClient().$extend(suigar());
 
 		expect(client.suigar).toBeDefined();
 		expect(client.suigar.serializeTransactionToBase64).toBeTypeOf('function');
@@ -644,14 +636,7 @@ describe('SuigarClient', () => {
 			defaultNameServiceName = async () => ({ address: null }) as never;
 		}
 
-		const client = new TestClient().$extend(
-			suigar({
-				pyth: {
-					suiPriceInfoObjectId: '0x789',
-					usdcPriceInfoObjectId: '0x987',
-				},
-			}),
-		);
+		const client = new TestClient().$extend(suigar());
 
 		expect(client.suigar.tx.createBetTransaction).toBeTypeOf('function');
 		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(
