@@ -1,10 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SuigarCoinTypes } from '../types/suigar-config.type.js';
 import type { SuigarPackage, SuigarPriceInfoObjectId } from './package.js';
 
 // `sweetHouse` is preserved manually because it is not currently resolved from MVR.
-export const DEFAULT_MAINNET_PACKAGE_IDS: SuigarPackage = {
+export const MAINNET_PACKAGE_IDS: SuigarPackage = {
 	sweetHouse:
 		'0xa1549d73230118716bc08865b8d62454f360ddaf40eee2158e458e52125d4ef1',
 	core: '0xcbb0929f21450013ebe5e86e7139f2409da2e3ed212c51126a7e6448b795a43f',
@@ -18,7 +19,12 @@ export const DEFAULT_MAINNET_PACKAGE_IDS: SuigarPackage = {
 	wheel: '0x6791eac73fe7bf463b7f3b1ea391df265fbc1b96201270664a5a11e2441e9955',
 };
 
-export const DEFAULT_MAINNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
+export const MAINNET_COIN_TYPES: SuigarCoinTypes = {
+	sui: '0x2::sui::SUI',
+	usdc: '0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC',
+};
+
+export const MAINNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
 	sui: '0x801dbc2f0053d34734814b2d6df491ce7807a725fe9a01ad74a07e9c51396c37',
 	usdc: '0x5dec622733a204ca27f5a90d8c2fad453cc6665186fd5dff13a83d0b6c9027ab',
 };

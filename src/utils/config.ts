@@ -1,26 +1,25 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeStructTag, SUI_TYPE_ARG } from '@mysten/sui/utils';
+import { normalizeStructTag } from '@mysten/sui/utils';
 
 import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
 import {
-	DEFAULT_USDC_COIN_TYPE,
+	COIN_TYPES,
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 } from '../configs/index.js';
 
 export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
+	const coinTypes = COIN_TYPES[network];
 	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
-	const suiCoinType = normalizeStructTag(SUI_TYPE_ARG);
-	const usdcCoinType = normalizeStructTag(DEFAULT_USDC_COIN_TYPE);
 
 	return {
 		packageIds: { ...packageIds },
 		coinTypes: {
-			sui: suiCoinType,
-			usdc: usdcCoinType,
+			sui: normalizeStructTag(coinTypes.sui),
+			usdc: normalizeStructTag(coinTypes.usdc),
 		},
 		priceInfoObjectIds: {
 			sui: priceInfoObjectIds.sui,

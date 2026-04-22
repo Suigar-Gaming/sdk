@@ -80,7 +80,7 @@ client.casino.bcs;
 `suigar(options?)` resolves config from:
 
 - internal package ids by network
-- default coin types for `SUI`, `USDC`, and FlowX `USDC`
+- internal supported coin types by network
 - the connected Sui client network
 - the extension name
 

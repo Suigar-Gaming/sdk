@@ -67,16 +67,20 @@ function getNetworkBaseUrl(network) {
 	return `https://${network}.mvr.mystenlabs.com`;
 }
 
-function renderNetworkFile(network, { packageIds, priceInfoObjectIds }) {
+function renderNetworkFile(
+	network,
+	{ packageIds, coinTypes, priceInfoObjectIds },
+) {
 	const uppercaseNetwork = network.toUpperCase();
 
 	return `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SuigarCoinTypes } from '../types/suigar-config.type.js';
 import type { SuigarPackage, SuigarPriceInfoObjectId } from './package.js';
 
 // \`sweetHouse\` is preserved manually because it is not currently resolved from MVR.
-export const DEFAULT_${uppercaseNetwork}_PACKAGE_IDS: SuigarPackage = {
+export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackage = {
 \tsweetHouse:
 \t\t'${packageIds.sweetHouse}',
 \tcore: '${packageIds.core}',
@@ -90,7 +94,12 @@ export const DEFAULT_${uppercaseNetwork}_PACKAGE_IDS: SuigarPackage = {
 \twheel: '${packageIds.wheel}',
 };
 
-export const DEFAULT_${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
+export const ${uppercaseNetwork}_COIN_TYPES: SuigarCoinTypes = {
+\tsui: '${coinTypes.sui}',
+\tusdc: '${coinTypes.usdc}',
+};
+
+export const ${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
 \tsui: '${priceInfoObjectIds.sui}',
 \tusdc: '${priceInfoObjectIds.usdc}',
 };
@@ -102,8 +111,9 @@ async function updateNetworkConfig(network) {
 	const baseUrl = getNetworkBaseUrl(network);
 	const currentSource = await readFile(filePath, 'utf8');
 	const uppercaseNetwork = network.toUpperCase();
-	const currentPackageObjectName = `DEFAULT_${uppercaseNetwork}_PACKAGE_IDS`;
-	const currentPriceObjectName = `DEFAULT_${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS`;
+	const currentPackageObjectName = `${uppercaseNetwork}_PACKAGE_IDS`;
+	const currentCoinTypesObjectName = `${uppercaseNetwork}_COIN_TYPES`;
+	const currentPriceObjectName = `${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS`;
 
 	const packageIds = {
 		sweetHouse: extractObjectValue(
@@ -124,8 +134,14 @@ async function updateNetworkConfig(network) {
 		usdc: extractObjectValue(currentSource, currentPriceObjectName, 'usdc'),
 	};
 
+	const coinTypes = {
+		sui: extractObjectValue(currentSource, currentCoinTypesObjectName, 'sui'),
+		usdc: extractObjectValue(currentSource, currentCoinTypesObjectName, 'usdc'),
+	};
+
 	const nextSource = renderNetworkFile(network, {
 		packageIds,
+		coinTypes,
 		priceInfoObjectIds,
 	});
 

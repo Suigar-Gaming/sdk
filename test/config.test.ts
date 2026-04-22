@@ -9,19 +9,17 @@ import {
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
 } from '../src/utils/config.js';
-import {
-	DEFAULT_USDC_COIN_TYPE,
-	PACKAGE_IDS,
-	PRICE_INFO_OBJECT_IDS,
-} from '../src/configs';
+import { COIN_TYPES, PACKAGE_IDS, PRICE_INFO_OBJECT_IDS } from '../src/configs';
 
 describe('resolveSuigarConfig', () => {
 	it('resolves internal package ids and default coin types', () => {
 		const config = resolveSuigarConfig('testnet');
 
-		expect(config.coinTypes.sui).toBe(normalizeStructTag(SUI_TYPE_ARG));
+		expect(config.coinTypes.sui).toBe(
+			normalizeStructTag(COIN_TYPES.testnet.sui),
+		);
 		expect(config.coinTypes.usdc).toBe(
-			normalizeStructTag(DEFAULT_USDC_COIN_TYPE),
+			normalizeStructTag(COIN_TYPES.testnet.usdc),
 		);
 		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
@@ -49,7 +47,7 @@ describe('resolveSuigarConfig', () => {
 		config.priceInfoObjectIds.usdc = '0xusdc';
 
 		expect(resolvePriceInfoObjectId(config, SUI_TYPE_ARG)).toBe('0xsui');
-		expect(resolvePriceInfoObjectId(config, DEFAULT_USDC_COIN_TYPE)).toBe(
+		expect(resolvePriceInfoObjectId(config, COIN_TYPES.testnet.usdc)).toBe(
 			'0xusdc',
 		);
 	});
