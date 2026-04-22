@@ -37,12 +37,11 @@ import { toBase64 } from '@mysten/sui/utils';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
-	...options
 }: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
 		register: (client: ClientWithCoreApi) => {
-			return new SuigarClient({ client, options });
+			return new SuigarClient({ client });
 		},
 	};
 }
@@ -52,12 +51,7 @@ class SuigarClient {
 
 	#config: SuigarConfig;
 
-	constructor({
-		client,
-	}: {
-		client: ClientWithCoreApi;
-		options: SuigarExtensionOptions;
-	}) {
+	constructor({ client }: { client: ClientWithCoreApi }) {
 		this.#client = client;
 
 		const network = this.#client.network as SuiNetwork;
@@ -69,8 +63,13 @@ class SuigarClient {
 	}
 
 	/**
+	 * Returns the resolved SDK configuration for the connected network.
 	 *
-	 * @returns
+	 * This is primarily useful for debugging or inspecting which package ids,
+	 * supported coin types, and price info object ids the SDK resolved for the
+	 * current client network.
+	 *
+	 * @returns Network-resolved Suigar configuration.
 	 */
 	getConfig() {
 		return this.#config;

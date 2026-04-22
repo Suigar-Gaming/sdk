@@ -18,17 +18,6 @@ import {
 	TESTNET_PRICE_INFO_OBJECT_IDS,
 } from './package.testnet.js';
 
-export const SUIGAR_PACKAGES = {
-	sweetHouse: 'sweetHouse',
-	core: 'core',
-	coinflip: 'coinflip',
-	limbo: 'limbo',
-	plinko: 'plinko',
-	pvpCoinflip: 'pvpCoinflip',
-	range: 'range',
-	wheel: 'wheel',
-} as const;
-
 export const PACKAGE_IDS: Record<SuiNetwork, SuigarPackage> = {
 	mainnet: { ...MAINNET_PACKAGE_IDS },
 	testnet: { ...TESTNET_PACKAGE_IDS },

@@ -28,7 +28,16 @@ export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	};
 }
 
-export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
+export function assertConfiguredBetGame(
+	config: SuigarConfig,
+	game: Game,
+): void {
+	if (!resolveGamePackageId(config, game)) {
+		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
+	}
+}
+
+function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
@@ -82,13 +91,4 @@ function resolveSupportedCoin(
 			.map(([, configuredCoinType]) => configuredCoinType)
 			.join(', ')}`,
 	);
-}
-
-export function assertConfiguredBetGame(
-	config: SuigarConfig,
-	game: Game,
-): void {
-	if (!resolveGamePackageId(config, game)) {
-		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
-	}
 }
