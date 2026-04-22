@@ -12,18 +12,20 @@ import type {
 } from './transaction-options.type';
 import type { StandardGame } from './game.type';
 
+type WithoutConfig<T> = Omit<T, 'config'>;
+
 export type BuildGameOptions<GameId extends StandardGame> =
 	GameId extends 'coinflip'
-		? BuildCoinflipTransactionOptions
+		? WithoutConfig<BuildCoinflipTransactionOptions>
 		: GameId extends 'wheel'
-			? BuildWheelTransactionOptions
+			? WithoutConfig<BuildWheelTransactionOptions>
 			: GameId extends 'limbo'
-				? BuildLimboTransactionOptions
+				? WithoutConfig<BuildLimboTransactionOptions>
 				: GameId extends 'plinko'
-					? BuildPlinkoTransactionOptions
+					? WithoutConfig<BuildPlinkoTransactionOptions>
 					: GameId extends 'range'
-						? BuildRangeTransactionOptions
+						? WithoutConfig<BuildRangeTransactionOptions>
 						: never;
 
 export type BuildPvPGameOptions<Action extends PvPCoinflipAction> =
-	BuildPvPCoinflipTransactionOptions<Action>;
+	WithoutConfig<BuildPvPCoinflipTransactionOptions<Action>>;
