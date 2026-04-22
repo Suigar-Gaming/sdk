@@ -2,6 +2,8 @@
 '@suigar/sdk': patch
 ---
 
+Make SDK configuration network-resolved and expose runtime config inspection through the client extension.
+
 - `suigar()` now only accepts the extension `name`.
 - The SDK now validates the connected client network and supports `mainnet` and `testnet`.
 - Added `client.suigar.getConfig()` to inspect the resolved network config at runtime.

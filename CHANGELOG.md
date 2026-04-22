@@ -4,14 +4,16 @@
 
 ### Patch Changes
 
-- e1cdedc: - Fix exported transaction option types so `BuildGameOptions` and `BuildPvPGameOptions` no longer require the internal `config` field
+- e1cdedc: Improve public transaction builder typings and refresh Sui 2.0+ integration guidance around the gRPC client.
+  - Fix exported transaction option types so `BuildGameOptions` and `BuildPvPGameOptions` no longer require the internal `config` field
   - Update installation and integration documentation for Sui 2.0+ by switching examples to `SuiGrpcClient`, clarifying required peer dependencies, and aligning transaction-result examples with the current client API.
 
 ## 2.0.0-beta.2
 
 ### Patch Changes
 
-- 128cb6c: - `suigar()` now only accepts the extension `name`.
+- 128cb6c: Make SDK configuration network-resolved and expose runtime config inspection through the client extension.
+  - `suigar()` now only accepts the extension `name`.
   - The SDK now validates the connected client network and supports `mainnet` and `testnet`.
   - Added `client.suigar.getConfig()` to inspect the resolved network config at runtime.
   - Exported the `SuiNetwork` type and `resolveGamePackageId()` helper.
