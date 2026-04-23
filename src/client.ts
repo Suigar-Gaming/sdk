@@ -6,7 +6,10 @@ import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { toBase64 } from '@mysten/sui/utils';
 import {
 	BuildCoinflipTransactionOptions,
+	BuildCancelPvPCoinflipTransactionOptions,
+	BuildCreatePvPCoinflipTransactionOptions,
 	BuildGameOptions,
+	BuildJoinPvPCoinflipTransactionOptions,
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildPvPCoinflipTransactionOptions,
@@ -30,6 +33,7 @@ import {
 } from './transactions';
 import { BetResultEvent } from './contracts/core/core';
 import {
+	Game,
 	GameCancelledEvent,
 	GameCreatedEvent,
 	GameResolvedEvent,
@@ -95,9 +99,22 @@ class SuigarClient {
 	}
 
 	/**
-	 * BCS struct constructors for decoding Suigar events emitted on-chain.
+	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
+	 *
+	 * These can be used to parse the `content` field of on-chain objects and events into structured data with the
+	 * expected types. For example, use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` to decode a PvP
+	 * coinflip game object.
+	 *
+	 * Note that these constructors are not meant for encoding transaction arguments, as the SDK's transaction
+	 * builders handle argument serialization internally. Use these primarily for decoding and parsing on-chain data.
 	 */
 	bcs = {
+		// Objects
+		/**
+		 * Object representing the state of a PvP coinflip game, as stored on-chain.
+		 */
+		PvPCoinflipGame: Game,
+		// Events
 		/**
 		 * Event emitted at the end of a standard game (e.g., Coinflip, Limbo), containing the result and payout information.
 		 */
@@ -172,10 +189,52 @@ class SuigarClient {
 			action: Action,
 			options: BuildPvPCoinflipTransactionOptions<Action>,
 		) => {
-			return buildPvPCoinflipTransaction(action, {
-				...options,
-				config: this.#config,
-			});
+			switch (action) {
+				case 'create':
+					return buildPvPCoinflipTransaction('create', {
+						...(options as BuildCreatePvPCoinflipTransactionOptions),
+						config: this.#config,
+					});
+				case 'join': {
+					const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
+					return buildPvPCoinflipTransaction('join', {
+						...joinOptions,
+						betCoin: this.#createPvPBetCoin(joinOptions),
+						config: this.#config,
+					});
+				}
+				case 'cancel':
+					return buildPvPCoinflipTransaction('cancel', {
+						...(options as BuildCancelPvPCoinflipTransactionOptions),
+						config: this.#config,
+					});
+				default:
+					throw new Error(`Unsupported PvP coinflip action: ${action}`);
+			}
 		},
 	};
+
+	#createPvPBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
+		return async (tx: Transaction) => {
+			const stake = await this.#resolvePvPStake(options.gameId);
+			return tx.coin({
+				type: options.coinType,
+				balance: stake,
+				useGasCoin: options.allowGasCoinShortcut,
+			});
+		};
+	}
+
+	async #resolvePvPStake(gameId: string) {
+		const { object } = await this.#client.core.getObject({
+			objectId: gameId,
+			include: { content: true },
+		});
+
+		if (!object.content) {
+			throw new Error('Unable to resolve PvP coinflip stake from game object');
+		}
+
+		return BigInt(Game.parse(object.content).stake_per_player);
+	}
 }

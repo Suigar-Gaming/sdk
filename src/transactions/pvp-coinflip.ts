@@ -12,18 +12,23 @@ import {
 import type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCreatePvPCoinflipTransactionOptions,
-	BuildJoinPvPCoinflipTransactionOptions,
 	BuildPvPCoinflipTransactionOptions,
 	PvPCoinflipAction,
+	ResolvedJoinPvPCoinflipTransactionOptions,
 } from '../types/index.js';
 import { resolvePriceInfoObjectId } from '../utils/config.js';
 import { encodeBetMetadata } from '../utils/metadata.js';
 import { toBigIntAmount } from '../utils/shared.js';
 import { createBaseGameTransaction } from './shared.js';
 
+type InternalPvPCoinflipTransactionOptions<Action extends PvPCoinflipAction> =
+	Action extends 'join'
+		? ResolvedJoinPvPCoinflipTransactionOptions
+		: BuildPvPCoinflipTransactionOptions<Action>;
+
 export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 	action: Action,
-	options: BuildPvPCoinflipTransactionOptions<Action>,
+	options: InternalPvPCoinflipTransactionOptions<Action>,
 ): Transaction {
 	const tx = createBaseGameTransaction({
 		...options,
@@ -60,17 +65,11 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'join': {
-			const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
+			const joinOptions = options as ResolvedJoinPvPCoinflipTransactionOptions;
 			const priceInfoObjectId = resolvePriceInfoObjectId(
 				joinOptions.config,
 				normalizedCoinType,
 			);
-			const stake = toBigIntAmount(joinOptions.stake, 'stake');
-			const betCoin = tx.coin({
-				type: normalizedCoinType,
-				balance: stake,
-				useGasCoin: joinOptions.allowGasCoinShortcut,
-			});
 
 			tx.add(
 				joinGame({
@@ -79,7 +78,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					arguments: [
 						joinOptions.gameId,
 						joinOptions.config.packageIds.sweetHouse,
-						betCoin,
+						tx.add(joinOptions.betCoin),
 						encodedMetadata.keys,
 						encodedMetadata.values,
 						priceInfoObjectId,

@@ -466,10 +466,10 @@ describe('pvp coinflip transaction wrapper', () => {
 		buildPvPCoinflipTransactionWithMock('join', {
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
-			stake: 1000,
 			gameId: '0x999',
 			metadata: { label: 'vip' },
 			config: TEST_CONFIG,
+			betCoin: (tx: Transaction) => Promise.resolve(tx.coin({ balance: 1000 })),
 		});
 
 		const options = getFirstMockArg<{
