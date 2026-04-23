@@ -28,6 +28,12 @@ import { suigar } from '@suigar/sdk';
 It does not export the individual transaction builders from the package root.
 It also does not export `SuigarClient` as a public root symbol.
 
+Parser and helper utilities are available from the single utils subpath:
+
+```ts
+import { parseFloat, parseI64 } from '@suigar/sdk/utils';
+```
+
 What you actually use at runtime is the registered extension instance:
 
 ```ts
