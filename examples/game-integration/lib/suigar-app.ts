@@ -178,6 +178,10 @@ export function compactAddress(value?: string) {
 		return 'n/a';
 	}
 
+	if (value.length <= 18) {
+		return value;
+	}
+
 	return `${value.slice(0, 8)}...${value.slice(-6)}`;
 }
 

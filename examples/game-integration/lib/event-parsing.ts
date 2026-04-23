@@ -4,6 +4,10 @@ import { bigintToString } from '@/lib/suigar-app';
 
 type ParsedEvent = {
 	bcs?: string | Uint8Array;
+	contents?: {
+		value?: string | Uint8Array | number[];
+	};
+	eventType?: string;
 	type?: string;
 };
 
@@ -68,26 +72,46 @@ function getBcs(event: unknown) {
 	}
 
 	const parsedEvent = event as ParsedEvent;
-	if (!('bcs' in parsedEvent)) {
+	const value = parsedEvent.bcs ?? parsedEvent.contents?.value;
+	if (!value) {
 		return undefined;
 	}
 
-	return typeof parsedEvent.bcs === 'string'
-		? fromBase64(parsedEvent.bcs)
-		: parsedEvent.bcs;
+	if (typeof value === 'string') {
+		return fromBase64(value);
+	}
+
+	return value instanceof Uint8Array ? value : new Uint8Array(value);
 }
 
 function getEventTypeName(event: unknown) {
-	if (typeof event !== 'object' || event === null) {
+	const eventType = getEventType(event);
+	if (typeof eventType !== 'string') {
 		return '';
+	}
+
+	return eventType.split('<')[0]?.split('::').at(-1) ?? '';
+}
+
+function getEventType(event: unknown) {
+	if (typeof event !== 'object' || event === null) {
+		return undefined;
 	}
 
 	const parsedEvent = event as ParsedEvent;
-	if (typeof parsedEvent.type !== 'string') {
-		return '';
+	return parsedEvent.eventType ?? parsedEvent.type;
+}
+
+function getStandardGameName(event: unknown) {
+	const eventType = getEventType(event);
+	if (typeof eventType !== 'string') {
+		return 'unknown';
 	}
 
-	return parsedEvent.type.split('::').at(-1)?.split('<')[0] ?? '';
+	const gameType = eventType.match(/<([^>]+)>/)?.[1];
+	const gameModule = gameType?.split('::').at(-2);
+
+	return gameModule?.replaceAll('_', '-') ?? 'unknown';
 }
 
 export function parseSuigarEvents(
@@ -119,7 +143,9 @@ export function parseSuigarEvents(
 
 		if (eventTypeName === 'BetResultEvent') {
 			const payload = bcsApi.BetResultEvent.parse(bcs);
+			const gameName = getStandardGameName(event);
 			const details = [
+				`game: ${gameName}`,
 				`coin: ${(payload.coin_type as { name?: string })?.name ?? 'unknown'}`,
 				`stake: ${bigintToString(payload.stake_amount)}`,
 				`outcome: ${bigintToString(payload.outcome_amount)}`,

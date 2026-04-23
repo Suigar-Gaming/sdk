@@ -3,7 +3,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LoaderCircle, Swords } from 'lucide-react';
+import {
+	CheckCircle2,
+	Gamepad2,
+	LoaderCircle,
+	SendHorizontal,
+	Swords,
+} from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	useCurrentAccount,
@@ -23,6 +29,7 @@ import { RangeForm } from '@/components/games/range-form';
 import { WheelForm } from '@/components/games/wheel-form';
 import { useEventLog } from '@/components/providers/event-log-provider';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -111,16 +118,21 @@ function parseError(error: unknown) {
 function SectionShell({
 	title,
 	description,
+	icon,
 	children,
 }: {
 	title: string;
 	description: string;
+	icon: React.ReactNode;
 	children: React.ReactNode;
 }) {
 	return (
 		<Card className="h-full border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<CardHeader>
-				<CardTitle>{title}</CardTitle>
+				<CardTitle className="flex items-center gap-2">
+					{icon}
+					{title}
+				</CardTitle>
 				<CardDescription>{description}</CardDescription>
 			</CardHeader>
 			<CardContent>{children}</CardContent>
@@ -271,7 +283,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			}
 
 			const digest = execution.Transaction.digest;
-			setStatus(`Executed ${digest}`);
+			setStatus(digest);
 
 			const finalResult = await currentClient.waitForTransaction({
 				digest,
@@ -457,6 +469,13 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 						<SectionShell
 							title={mode === 'standard' ? 'Game controls' : 'PvP controls'}
+							icon={
+								mode === 'standard' ? (
+									<Gamepad2 className="size-5 text-secondary dark:text-primary" />
+								) : (
+									<Swords className="size-5 text-secondary dark:text-primary" />
+								)
+							}
 							description={
 								mode === 'standard'
 									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
@@ -539,14 +558,17 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 							<Card>
 								<CardHeader>
-									<CardTitle>Execute transaction</CardTitle>
+									<CardTitle className="flex items-center gap-2">
+										<SendHorizontal className="size-5 text-secondary dark:text-primary" />
+										Execute transaction
+									</CardTitle>
 									<CardDescription>
 										The connected wallet signs and submits the same transaction
 										shown in the code block.
 									</CardDescription>
 								</CardHeader>
 								<CardContent className="space-y-4">
-									<div className="flex flex-wrap items-center gap-3">
+									<div className="flex flex-col items-center gap-4">
 										<Button
 											size="lg"
 											onClick={handleExecute}
@@ -560,9 +582,13 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											Sign and execute transaction
 										</Button>
 										{visibleStatus ? (
-											<div className="rounded-full border border-primary/35 bg-primary/12 px-4 py-2 text-sm font-medium text-primary shadow-xs">
-												{visibleStatus}
-											</div>
+											<Alert variant="success" className="w-full">
+												<CheckCircle2 />
+												<AlertTitle>Executed</AlertTitle>
+												<AlertDescription className="font-mono text-xs text-foreground break-all">
+													{visibleStatus}
+												</AlertDescription>
+											</Alert>
 										) : null}
 									</div>
 

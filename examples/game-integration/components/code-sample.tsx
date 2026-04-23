@@ -25,7 +25,7 @@ export function CodeSample({ code }: { code: string }) {
 			<CardHeader className="flex-row items-start justify-between gap-4">
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
-						<FileCode2 className="size-5 text-primary" />
+						<FileCode2 className="size-5 text-secondary dark:text-primary" />
 						Transaction code
 					</CardTitle>
 					<CardDescription>

@@ -4,6 +4,7 @@ import { DAppKitProvider } from '@mysten/dapp-kit-react';
 import { dAppKit } from '@/lib/dapp-kit';
 import { EventLogProvider } from '@/components/providers/event-log-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
 	return (
@@ -11,6 +12,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 			<DAppKitProvider dAppKit={dAppKit}>
 				<EventLogProvider>{children}</EventLogProvider>
 			</DAppKitProvider>
+			<Toaster position="bottom-right" richColors />
 		</ThemeProvider>
 	);
 }
