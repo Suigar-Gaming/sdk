@@ -304,7 +304,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		<div className="min-h-screen">
 			<div className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5 md:pt-4 lg:px-8">
 				<div className="mx-auto max-w-[1500px]">
-					<nav className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-[backdrop-filter]:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] sm:px-4 md:rounded-[1.5rem] md:py-2.5">
+					<nav className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] sm:px-4 md:rounded-[1.5rem] md:py-2.5">
 						<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full px-1 py-1">
 							<Link
 								href="/standard?game=coinflip"
