@@ -31,7 +31,7 @@ It also does not export `SuigarClient` as a public root symbol.
 Parser and helper utilities are available from the single utils subpath:
 
 ```ts
-import { parseFloat, parseI64 } from '@suigar/sdk/utils';
+import { parseFloat, parseGameDetails, parseI64 } from '@suigar/sdk/utils';
 ```
 
 What you actually use at runtime is the registered extension instance:
@@ -287,7 +287,11 @@ Current exposed helpers:
 - `PvPCoinflipGameResolved`
 - `PvPCoinflipGameCancelled`
 
-These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results.
+These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
+
+- `parseI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
+- `parseFloat(float)` converts a generated Move `Float` struct to a JavaScript number
+- `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse Standard Bet Result Data
 
@@ -339,18 +343,16 @@ Parsed fields include:
 - `game_details`
 - `metadata`
 
-`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays.
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameDetails` from `@suigar/sdk/utils` to decode `game_details` with the SDK's known game-detail schemas.
 
 ```ts
-const textDecoder = new TextDecoder();
+import { parseGameDetails } from '@suigar/sdk/utils';
 
-const metadata = new Map(
-	decoded.metadata.contents.map(({ key, value }) => [
-		key,
-		textDecoder.decode(new Uint8Array(value)),
-	]),
-);
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+const gameDetails = parseGameDetails(decoded.game_details);
 ```
+
+`parseGameDetails` preserves the onchain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
 Important:
 
@@ -358,6 +360,7 @@ Important:
 - unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
 - parse emitted events from the unwrapped transaction result
 - use `event.bcs` for consistent decoding across transports
+- use `parseGameDetails(decoded.game_details)` instead of hand-decoding standard game detail byte arrays
 - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
 - these helpers decode the event payload itself, not a full transaction response
 
@@ -388,6 +391,7 @@ It demonstrates:
 - wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
 - supported coin selection from `client.suigar.getConfig()`
 - decoding `BetResultEvent` and PvP events into a persistent event log
+- parsing `BetResultEvent.game_details` with `parseGameDetails`
 
 Run it from the repo root with:
 

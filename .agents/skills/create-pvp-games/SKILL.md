@@ -145,10 +145,26 @@ Use:
 - `client.suigar.bcs.PvPCoinflipGameResolved`
 - `client.suigar.bcs.PvPCoinflipGameCancelled`
 
+When a flow also decodes `BetResultEvent`, use the generated standard event helper and the SDK game-details parser:
+
+```ts
+import { parseGameDetails } from '@suigar/sdk/utils';
+
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+const gameDetails = parseGameDetails(decoded.game_details);
+```
+
+Guardrails:
+
+- Use `event.bcs` as the event payload input when available.
+- Do not route PvP coinflip transaction creation through standard bet builders.
+- Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.
+
 ## Implementation checklist
 
 1. Confirm whether the feature is create, join, or cancel.
 2. Wire the flow to `createPvPCoinflipTransaction`.
 3. Pass the full action-specific shape, especially `extraObjectId` for joins.
 4. Parse emitted PvP events with the generated BCS helpers.
-5. Keep frontend or backend state aligned with onchain ids and privacy flags.
+5. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
+6. Keep frontend or backend state aligned with onchain ids and privacy flags.
