@@ -41,6 +41,7 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 
 client.suigar.serializeTransactionToBase64(...);
 client.suigar.getConfig();
+client.suigar.resolvePvPConflipGame(...);
 client.suigar.bcs;
 client.suigar.tx;
 ```
@@ -105,10 +106,11 @@ Supported override areas:
 
 ## Runtime Surface
 
-The registered extension instance exposes three main areas:
+The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
 - `serializeTransactionToBase64(transaction, options?)`
+- `resolvePvPConflipGame(gameId)`
 - `bcs`
 - `tx`
 
@@ -139,6 +141,29 @@ Use this when you need a transport-safe payload for a wallet, API, or external s
 ```ts
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
+
+### `resolvePvPConflipGame(gameId)`
+
+Fetches a PvP coinflip game object from chain and parses its `content` into the
+generated `PvPCoinflipGame` shape.
+
+Use this when a product needs the live onchain match state before rendering a
+lobby, gating join or cancel actions, or inspecting the resolved stake and
+privacy flag for a game.
+
+```ts
+const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID');
+
+console.log(game.owner);
+console.log(game.stake_per_player);
+console.log(game.is_private);
+```
+
+Notes:
+
+- it throws if the object response does not include decodable `content`
+- the PvP join builder uses this internally to derive the required join stake
+- prefer this helper over manual object parsing when you only need the parsed game
 
 ## `tx`
 
@@ -283,6 +308,7 @@ BCS helpers live under `client.suigar.bcs`.
 
 Current exposed helpers:
 
+- `PvPCoinflipGame`
 - `BetResultEvent`
 - `PvPCoinflipGameCreated`
 - `PvPCoinflipGameResolved`
@@ -290,9 +316,35 @@ Current exposed helpers:
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
+- `PvPCoinflipGame` parses a PvP coinflip game object's `content`
 - `parseI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `parseFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
+
+### Parse PvP Coinflip Game Object Data
+
+Use the BCS helper directly when you already fetched the object with `content`:
+
+```ts
+const objectResult = await client.core.getObject({
+	objectId: '0xGAME_ID',
+	include: { content: true },
+});
+
+if (!objectResult.object.content) {
+	throw new Error('Missing game content');
+}
+
+const parsed = client.suigar.bcs.PvPCoinflipGame.parse(
+	objectResult.object.content,
+);
+```
+
+If you only need the parsed game object, prefer the convenience method:
+
+```ts
+const parsed = await client.suigar.resolvePvPConflipGame('0xGAME_ID');
+```
 
 ### Parse Standard Bet Result Data
 

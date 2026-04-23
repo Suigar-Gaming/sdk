@@ -15,6 +15,8 @@ For PvP coinflip, use:
 
 ```ts
 client.suigar.tx.createPvPCoinflipTransaction(action, options);
+client.suigar.resolvePvPConflipGame(gameId);
+client.suigar.bcs.PvPCoinflipGame;
 ```
 
 ## PvP Coinflip
@@ -92,6 +94,7 @@ Guardrails:
 
 - Join derives the stake from `gameId`.
 - Join uses the configured price info object id for `coinType`.
+- Prefer `client.suigar.resolvePvPConflipGame(gameId)` when product logic needs the current onchain owner, stake, or privacy state before rendering a join flow.
 
 ## Cancel Game
 
@@ -135,9 +138,22 @@ Guardrails:
 
 Use:
 
+- `client.suigar.resolvePvPConflipGame(gameId)`
+- `client.suigar.bcs.PvPCoinflipGame`
 - `client.suigar.bcs.PvPCoinflipGameCreated`
 - `client.suigar.bcs.PvPCoinflipGameResolved`
 - `client.suigar.bcs.PvPCoinflipGameCancelled`
+
+Use the resolver when you need the current onchain PvP game object and not just
+transaction events:
+
+```ts
+const game = await client.suigar.resolvePvPConflipGame('0xGAME');
+
+if (game.is_private) {
+	// reflect private-lobby state in the product
+}
+```
 
 When a flow also decodes `BetResultEvent`, use the generated standard event helper and the SDK game-details parser:
 
@@ -150,6 +166,7 @@ const gameDetails = parseGameDetails(decoded.game_details);
 
 Guardrails:
 
+- Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
 - Use `event.bcs` as the event payload input when available.
 - Do not route PvP coinflip transaction creation through standard bet builders.
 - Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.
@@ -159,6 +176,7 @@ Guardrails:
 1. Confirm whether the feature is create, join, or cancel.
 2. Wire the flow to `createPvPCoinflipTransaction`.
 3. For join or cancel, pass `gameId` and provide the transaction `coinType`.
-4. Parse emitted PvP events with the generated BCS helpers.
-5. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
-6. Keep frontend or backend state aligned with onchain ids and privacy flags.
+4. If the product needs live match state, resolve the game with `client.suigar.resolvePvPConflipGame(gameId)`.
+5. Parse emitted PvP events with the generated BCS helpers.
+6. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
+7. Keep frontend or backend state aligned with onchain ids and privacy flags.
