@@ -4,10 +4,8 @@
 import { bcs } from '@mysten/sui/bcs';
 import { describe, expect, it } from 'vitest';
 
-import type { BetResultEvent } from '../src/contracts/core/core.js';
 import { parseGameDetails } from '../src/helpers/index.js';
-
-type GameDetails = ReturnType<(typeof BetResultEvent)['parse']>['game_details'];
+import { BetResultGameDetails } from '../src/types/index.js';
 
 function writeU64(value: bigint): number[] {
 	const bytes = new Array<number>(8).fill(0);
@@ -40,7 +38,7 @@ function encodeString(value: string): number[] {
 
 function gameDetails(
 	contents: Array<{ key: string; value: number[] }>,
-): GameDetails {
+): BetResultGameDetails {
 	return { contents };
 }
 

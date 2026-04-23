@@ -4,15 +4,13 @@
 import { bcs } from '@mysten/sui/bcs';
 
 import { Float } from '../contracts/core/float';
-import type { BetResultEvent } from '../contracts/core/core';
-import { GAME_DETAILS_SCHEMA, type GameDetailValueType } from '../types';
-
-type BetResultGameDetails = ReturnType<
-	(typeof BetResultEvent)['parse']
->['game_details'];
-
-type ParsedGameDetailValue = string | number | boolean;
-type ParsedGameDetails = Record<string, ParsedGameDetailValue>;
+import {
+	BetResultGameDetails,
+	GAME_DETAILS_SCHEMA,
+	ParsedGameDetails,
+	ParsedGameDetailValue,
+	type GameDetailValueType,
+} from '../types';
 
 const bcsU8 = bcs.u8();
 const bcsU64 = bcs.u64();

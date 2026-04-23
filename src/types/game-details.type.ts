@@ -1,6 +1,15 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { BetResultEvent } from '../contracts/core/core';
+
+export type BetResultGameDetails = ReturnType<
+	(typeof BetResultEvent)['parse']
+>['game_details'];
+
+export type ParsedGameDetailValue = string | number | boolean;
+export type ParsedGameDetails = Record<string, ParsedGameDetailValue>;
+
 export type GameDetailValueType = 'u8' | 'u64' | 'bool' | 'float' | 'string';
 export type GameDetailsSchema = Record<string, GameDetailValueType>;
 
