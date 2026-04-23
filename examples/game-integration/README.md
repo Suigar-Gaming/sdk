@@ -18,6 +18,7 @@ Next.js example app for the Suigar SDK. It uses:
 - Live transaction-builder code preview
 - Wallet sign-and-execute via the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled`
+- Oracle price formatting with `parseFloat` from `@suigar/sdk/utils`
 - Shared persistent event table across route and game changes
 
 ## Run it

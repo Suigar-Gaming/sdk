@@ -1,5 +1,6 @@
 import type { EventLogRow } from '@/lib/suigar-app';
 import { fromBase64 } from '@mysten/sui/utils';
+import { parseFloat as parseMoveFloat } from '@suigar/sdk/utils';
 import { bigintToString } from '@/lib/suigar-app';
 
 type ParsedEvent = {
@@ -46,6 +47,21 @@ function decodeVecMap(value: unknown) {
 			return `${entry.key}: ${decodeBytes(entry.value)}`;
 		})
 		.join(' | ');
+}
+
+function formatOraclePrice(value: unknown) {
+	if (typeof value !== 'object' || value === null) {
+		return 'n/a';
+	}
+
+	const parsed = parseMoveFloat(value as Parameters<typeof parseMoveFloat>[0]);
+	if (!Number.isFinite(parsed)) {
+		return 'n/a';
+	}
+
+	return parsed.toLocaleString(undefined, {
+		maximumFractionDigits: 8,
+	});
 }
 
 function createRow(
@@ -149,6 +165,8 @@ export function parseSuigarEvents(
 				`coin: ${(payload.coin_type as { name?: string })?.name ?? 'unknown'}`,
 				`stake: ${bigintToString(payload.stake_amount)}`,
 				`outcome: ${bigintToString(payload.outcome_amount)}`,
+				`unsafe oracle price: ${formatOraclePrice(payload.unsafe_oracle_usd_coin_price)}`,
+				`adjusted oracle price: ${formatOraclePrice(payload.adjusted_oracle_usd_coin_price)}`,
 				decodeVecMap(payload.game_details),
 				decodeVecMap(payload.metadata),
 			]
