@@ -11,3 +11,4 @@ Add BCS parser helpers and a Next.js game integration example app.
 - integrate Mysten dApp Kit wallet connection, signing, and execution
 - add live transaction code previews and shared decoded event logging with SDK parser helpers
 - add Suigar-themed responsive UI, supported coin selection, and human-readable stake handling
+- update PvP coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id
