@@ -3,9 +3,13 @@
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
+import { toBase64 } from '@mysten/sui/utils';
 import {
 	BuildCoinflipTransactionOptions,
+	BuildCancelPvPCoinflipTransactionOptions,
+	BuildCreatePvPCoinflipTransactionOptions,
 	BuildGameOptions,
+	BuildJoinPvPCoinflipTransactionOptions,
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildPvPCoinflipTransactionOptions,
@@ -29,11 +33,11 @@ import {
 } from './transactions';
 import { BetResultEvent } from './contracts/core/core';
 import {
+	Game,
 	GameCancelledEvent,
 	GameCreatedEvent,
 	GameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip';
-import { toBase64 } from '@mysten/sui/utils';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -95,9 +99,46 @@ class SuigarClient {
 	}
 
 	/**
-	 * BCS struct constructors for decoding Suigar events emitted on-chain.
+	 * Fetches and parses a PvP coinflip game object from chain.
+	 *
+	 * This resolves the raw object through the configured client, requires the
+	 * object's `content` to be present, and decodes that content with the
+	 * generated `PvPCoinflipGame` BCS parser.
+	 *
+	 * @param gameId On-chain object id of the PvP coinflip game.
+	 * @returns Parsed PvP coinflip game state.
+	 * @throws Error If the object cannot be decoded because no content was returned.
+	 */
+	async resolvePvPConflipGame(gameId: string) {
+		const { object } = await this.#client.core.getObject({
+			objectId: gameId,
+			include: { content: true },
+		});
+
+		if (!object.content) {
+			throw new Error('Unable to resolve PvP coinflip from game object');
+		}
+
+		return Game.parse(object.content);
+	}
+
+	/**
+	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
+	 *
+	 * These can be used to parse the `content` field of on-chain objects and events into structured data with the
+	 * expected types. For example, use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` to decode a PvP
+	 * coinflip game object.
+	 *
+	 * Note that these constructors are not meant for encoding transaction arguments, as the SDK's transaction
+	 * builders handle argument serialization internally. Use these primarily for decoding and parsing on-chain data.
 	 */
 	bcs = {
+		// Objects
+		/**
+		 * Object representing the state of a PvP coinflip game, as stored on-chain.
+		 */
+		PvPCoinflipGame: Game,
+		// Events
 		/**
 		 * Event emitted at the end of a standard game (e.g., Coinflip, Limbo), containing the result and payout information.
 		 */
@@ -172,10 +213,41 @@ class SuigarClient {
 			action: Action,
 			options: BuildPvPCoinflipTransactionOptions<Action>,
 		) => {
-			return buildPvPCoinflipTransaction(action, {
-				...options,
-				config: this.#config,
-			});
+			switch (action) {
+				case 'create':
+					return buildPvPCoinflipTransaction('create', {
+						...(options as BuildCreatePvPCoinflipTransactionOptions),
+						config: this.#config,
+					});
+				case 'join': {
+					const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
+					return buildPvPCoinflipTransaction('join', {
+						...joinOptions,
+						betCoin: this.#createPvPCoinflipBetCoin(joinOptions),
+						config: this.#config,
+					});
+				}
+				case 'cancel':
+					return buildPvPCoinflipTransaction('cancel', {
+						...(options as BuildCancelPvPCoinflipTransactionOptions),
+						config: this.#config,
+					});
+				default:
+					throw new Error(`Unsupported PvP coinflip action: ${action}`);
+			}
 		},
 	};
+
+	#createPvPCoinflipBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
+		return async (tx: Transaction) => {
+			const { stake_per_player } = await this.resolvePvPConflipGame(
+				options.gameId,
+			);
+			return tx.coin({
+				type: options.coinType,
+				balance: BigInt(stake_per_player),
+				useGasCoin: options.allowGasCoinShortcut,
+			});
+		};
+	}
 }

@@ -135,6 +135,7 @@ Config is normalized in `src/utils/config.ts`. This layer is responsible for:
 - normalizing the configured supported coin types for the active network
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
+- providing the price info object id used by PvP coinflip join
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 

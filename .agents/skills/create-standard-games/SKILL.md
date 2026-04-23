@@ -184,10 +184,30 @@ Guardrails:
 - Keep amounts as `bigint` once they leave the UI layer.
 - Ensure the same connected wallet address is used as `owner`.
 
+## Event decoding
+
+Use the generated BCS event decoder for standard bet results:
+
+```ts
+import { parseFloat, parseGameDetails } from '@suigar/sdk/utils';
+
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+const gameDetails = parseGameDetails(decoded.game_details);
+const adjustedOraclePrice = parseFloat(decoded.adjusted_oracle_usd_coin_price);
+```
+
+Guardrails:
+
+- Use `event.bcs` as the event payload input when available.
+- Do not hand-decode `game_details` byte arrays in app code; use `parseGameDetails`.
+- `parseGameDetails` preserves the onchain keys and returns decoded string, number, and boolean values.
+- Metadata remains generic `VecMap<string, vector<u8>>` data; decode it according to the app's own metadata contract.
+
 ## Implementation checklist
 
 1. Confirm the target standard game id.
 2. Verify the base client already has the `suigar()` extension configured.
 3. Build the transaction with `createBetTransaction`.
 4. Serialize only if the surrounding wallet or transport path needs bytes.
-5. Keep frontend forms, backend handlers, and event decoding aligned with the same game-specific option shape.
+5. Decode `BetResultEvent` with `client.suigar.bcs.BetResultEvent` and `parseGameDetails`.
+6. Keep frontend forms, backend handlers, and event decoding aligned with the same game-specific option shape.

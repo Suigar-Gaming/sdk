@@ -3,3 +3,6 @@ node_modules
 package-lock.json
 src/contracts
 .changeset/*.md
+examples/game-integration/.next
+examples/game-integration/out
+examples/game-integration/build

@@ -15,6 +15,12 @@ The package root currently exports:
 
 Do not assume individual game builders are exported from `@suigar/sdk`.
 
+Parser helpers are exported from `@suigar/sdk/utils`:
+
+- `parseI64`
+- `parseFloat`
+- `parseGameDetails`
+
 ## Default setup
 
 Prefer the Sui client extension pattern:
@@ -62,7 +68,20 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 
 ## Event parsing
 
-Use the extension's generated BCS helpers and parse object `content`, not `objectBcs`.
+Use the extension's generated BCS helpers for emitted events:
+
+```ts
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+```
+
+Guardrails:
+
+- Parse event payload bytes from `event.bcs` when they are available.
+- Use `client.suigar.bcs.BetResultEvent` for standard bet result events.
+- Use `client.suigar.bcs.PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled` for PvP coinflip events.
+- Use `parseGameDetails(decoded.game_details)` from `@suigar/sdk/utils` instead of hand-decoding standard game detail byte arrays.
+- Use `parseFloat(decoded.unsafe_oracle_usd_coin_price)` and `parseFloat(decoded.adjusted_oracle_usd_coin_price)` to display generated Move float structs.
+- For object reads, parse object `content`, not `objectBcs`.
 
 ## Setup checklist
 

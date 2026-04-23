@@ -12,6 +12,7 @@ import {
 	buildPvPCoinflipTransaction,
 } from '../src/transactions/index.js';
 import { suigar } from '../src/client.js';
+import { encodeUtf8 } from './utils.js';
 
 const TEST_CONFIG = {
 	packageIds: {
@@ -183,7 +184,7 @@ describe('shared transaction helpers', () => {
 			keys: ['referrer', 'label'],
 			values: [
 				Array.from(Buffer.from(normalizeSuiAddress('0x123').slice(2), 'hex')),
-				Array.from(new TextEncoder().encode('vip')),
+				encodeUtf8('vip'),
 			],
 		});
 	});
@@ -229,9 +230,7 @@ describe('coinflip transaction wrapper', () => {
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
 		expect(options.arguments[5]).toEqual(['label']);
-		expect(options.arguments[6]).toEqual([
-			Array.from(new TextEncoder().encode('vip')),
-		]);
+		expect(options.arguments[6]).toEqual([encodeUtf8('vip')]);
 		expect(options.arguments[7]).toBe('0x789');
 	});
 });
@@ -466,11 +465,10 @@ describe('pvp coinflip transaction wrapper', () => {
 		buildPvPCoinflipTransactionWithMock('join', {
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
-			stake: 1000,
 			gameId: '0x999',
-			extraObjectId: '0x888',
 			metadata: { label: 'vip' },
 			config: TEST_CONFIG,
+			betCoin: (tx: Transaction) => Promise.resolve(tx.coin({ balance: 1000 })),
 		});
 
 		const options = getFirstMockArg<{
@@ -480,10 +478,8 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.package).toBe('0x3');
 		expect(options.arguments[0]).toBe('0x999');
 		expect(options.arguments[1]).toBe('0x456');
-		expect(options.arguments[4]).toEqual([
-			Array.from(new TextEncoder().encode('vip')),
-		]);
-		expect(options.arguments[5]).toBe('0x888');
+		expect(options.arguments[4]).toEqual([encodeUtf8('vip')]);
+		expect(options.arguments[5]).toBe('0x789');
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {

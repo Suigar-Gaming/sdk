@@ -1,0 +1,47 @@
+{
+	"name": "game-integration",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"predev": "npm --prefix ../.. run build:ci",
+		"dev": "next dev",
+		"prebuild": "npm --prefix ../.. run build:ci",
+		"build": "next build",
+		"prestart": "npm --prefix ../.. run build:ci",
+		"start": "next start",
+		"lint": "eslint . --fix",
+		"pretypecheck": "npm --prefix ../.. run build:ci",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@mysten/dapp-kit-core": "^1.3.0",
+		"@mysten/dapp-kit-react": "^2.0.1",
+		"@mysten/sui": "^2.16.0",
+		"@radix-ui/react-progress": "^1.1.8",
+		"@radix-ui/react-select": "^2.2.6",
+		"@radix-ui/react-separator": "^1.1.8",
+		"@radix-ui/react-slot": "^1.2.4",
+		"@radix-ui/react-switch": "^1.2.6",
+		"@radix-ui/react-tabs": "^1.1.13",
+		"@suigar/sdk": "file:../..",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"lucide-react": "^1.9.0",
+		"next": "16.2.4",
+		"next-themes": "^0.4.6",
+		"react": "19.2.5",
+		"react-dom": "19.2.5",
+		"sonner": "^2.0.7",
+		"tailwind-merge": "^3.5.0"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^24",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"eslint": "^9.39.4",
+		"eslint-config-next": "16.2.4",
+		"tailwindcss": "^4.2.4",
+		"typescript": "^5.9.3"
+	}
+}
