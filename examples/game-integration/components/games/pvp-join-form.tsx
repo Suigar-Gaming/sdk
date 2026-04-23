@@ -1,6 +1,5 @@
 'use client';
 
-import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { PvPJoinFormValues } from '@/lib/suigar-app';
@@ -22,7 +21,6 @@ export function PvPJoinForm({
 					onChange={(event) => onChange({ gameId: event.target.value })}
 				/>
 			</div>
-			<SharedGameFields value={value} onChange={onChange} />
 		</div>
 	);
 }

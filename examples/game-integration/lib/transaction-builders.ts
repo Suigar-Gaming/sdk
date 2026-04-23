@@ -165,12 +165,6 @@ export function buildPvPTransaction<K extends PvPAction>(
 	coinKey: SupportedCoinKey,
 	coinType: string,
 ) {
-	const { baseOptions, codeLines } = buildSharedOptions(
-		owner,
-		coinType,
-		coinKey,
-		form,
-	);
 	const txApi = client.suigar.tx as {
 		createPvPCoinflipTransaction: (
 			action: PvPAction,
@@ -181,6 +175,12 @@ export function buildPvPTransaction<K extends PvPAction>(
 	switch (action) {
 		case 'create': {
 			const typedForm = form as PvPCreateFormValues;
+			const { baseOptions, codeLines } = buildSharedOptions(
+				owner,
+				coinType,
+				coinKey,
+				typedForm,
+			);
 			baseOptions.side = typedForm.side;
 			baseOptions.isPrivate = typedForm.isPrivate;
 			codeLines.push(`side: '${typedForm.side}',`);
@@ -195,8 +195,16 @@ export function buildPvPTransaction<K extends PvPAction>(
 		}
 		case 'join': {
 			const typedForm = form as PvPJoinFormValues;
-			baseOptions.gameId = typedForm.gameId.trim();
-			codeLines.push(`gameId: '${typedForm.gameId.trim()}',`);
+			const baseOptions: Record<string, unknown> = {
+				owner,
+				coinType,
+				gameId: typedForm.gameId.trim(),
+			};
+			const codeLines = [
+				`owner: '${owner}',`,
+				`coinType: '${coinType}',`,
+				`gameId: '${typedForm.gameId.trim()}',`,
+			];
 			return {
 				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
 				code: toCodeBlock(
@@ -207,8 +215,16 @@ export function buildPvPTransaction<K extends PvPAction>(
 		}
 		case 'cancel': {
 			const typedForm = form as PvPCancelFormValues;
-			baseOptions.gameId = typedForm.gameId.trim();
-			codeLines.push(`gameId: '${typedForm.gameId.trim()}',`);
+			const baseOptions: Record<string, unknown> = {
+				owner,
+				coinType,
+				gameId: typedForm.gameId.trim(),
+			};
+			const codeLines = [
+				`owner: '${owner}',`,
+				`coinType: '${coinType}',`,
+				`gameId: '${typedForm.gameId.trim()}',`,
+			];
 			return {
 				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
 				code: toCodeBlock(

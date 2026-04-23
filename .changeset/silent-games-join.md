@@ -2,6 +2,4 @@
 '@suigar/sdk': minor
 ---
 
-Use configured price info for PvP coinflip join.
-
-- Join uses the configured price info object id for the provided coin type.
+Update PvP coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id.

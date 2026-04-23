@@ -47,11 +47,11 @@ export type PvPCreateFormValues = SharedFields & {
 	isPrivate: boolean;
 };
 
-export type PvPJoinFormValues = SharedFields & {
+export type PvPJoinFormValues = {
 	gameId: string;
 };
 
-export type PvPCancelFormValues = SharedFields & {
+export type PvPCancelFormValues = {
 	gameId: string;
 };
 
@@ -128,11 +128,9 @@ export const DEFAULT_PVP_FORMS: PvPForms = {
 		isPrivate: false,
 	},
 	join: {
-		...DEFAULT_SHARED_FIELDS,
 		gameId: '0xYOUR_GAME_ID',
 	},
 	cancel: {
-		...DEFAULT_SHARED_FIELDS,
 		gameId: '0xYOUR_GAME_ID',
 	},
 };

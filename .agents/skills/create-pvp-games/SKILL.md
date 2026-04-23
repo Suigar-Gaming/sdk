@@ -70,7 +70,6 @@ Required fields:
 - `owner`
 - `coinType`
 - `gameId`
-- `stake`
 
 Optional fields:
 
@@ -86,12 +85,12 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
 	owner,
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME',
-	stake: 1_000_000_000n,
 });
 ```
 
 Guardrails:
 
+- Join derives the stake from `gameId`.
 - Join uses the configured price info object id for `coinType`.
 
 ## Cancel Game
