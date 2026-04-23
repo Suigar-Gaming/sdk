@@ -22,14 +22,6 @@ export function PvPJoinForm({
 					onChange={(event) => onChange({ gameId: event.target.value })}
 				/>
 			</div>
-			<div className="space-y-2">
-				<Label htmlFor="extraObjectId">Extra object ID</Label>
-				<Input
-					id="extraObjectId"
-					value={value.extraObjectId}
-					onChange={(event) => onChange({ extraObjectId: event.target.value })}
-				/>
-			</div>
 			<SharedGameFields value={value} onChange={onChange} />
 		</div>
 	);

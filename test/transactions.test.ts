@@ -468,7 +468,6 @@ describe('pvp coinflip transaction wrapper', () => {
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			gameId: '0x999',
-			extraObjectId: '0x888',
 			metadata: { label: 'vip' },
 			config: TEST_CONFIG,
 		});
@@ -483,7 +482,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.arguments[4]).toEqual([
 			Array.from(new TextEncoder().encode('vip')),
 		]);
-		expect(options.arguments[5]).toBe('0x888');
+		expect(options.arguments[5]).toBe('0x789');
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {

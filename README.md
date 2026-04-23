@@ -246,7 +246,6 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
-	extraObjectId: '0xEXTRA_OBJECT_ID',
 	stake: 1_000_000_000n,
 });
 ```
@@ -261,6 +260,8 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 });
 ```
 
+Join uses the configured price info object id for `coinType`.
+
 PvP shared options:
 
 - `owner: string`
@@ -273,7 +274,7 @@ PvP shared options:
 Action-specific options:
 
 - `create`: `stake`, `side`, `isPrivate?`
-- `join`: `gameId`, `extraObjectId`, `stake`
+- `join`: `gameId`, `stake`
 - `cancel`: `gameId`
 
 ## `bcs`

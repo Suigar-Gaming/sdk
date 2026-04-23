@@ -196,9 +196,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 		case 'join': {
 			const typedForm = form as PvPJoinFormValues;
 			baseOptions.gameId = typedForm.gameId.trim();
-			baseOptions.extraObjectId = typedForm.extraObjectId.trim();
 			codeLines.push(`gameId: '${typedForm.gameId.trim()}',`);
-			codeLines.push(`extraObjectId: '${typedForm.extraObjectId.trim()}',`);
 			return {
 				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
 				code: toCodeBlock(

@@ -71,7 +71,6 @@ Required fields:
 - `coinType`
 - `gameId`
 - `stake`
-- `extraObjectId`
 
 Optional fields:
 
@@ -88,14 +87,12 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME',
 	stake: 1_000_000_000n,
-	extraObjectId: '0xEXTRA',
 });
 ```
 
 Guardrails:
 
-- The current join ABI requires both `gameId` and `extraObjectId`.
-- Do not guess `extraObjectId`; treat it as a first-class input from the surrounding flow.
+- Join uses the configured price info object id for `coinType`.
 
 ## Cancel Game
 
@@ -132,10 +129,8 @@ Guardrails:
 ## Critical guardrails
 
 - Do not model PvP coinflip with `createBetTransaction`; use `createPvPCoinflipTransaction`.
-- The current join ABI needs both `gameId` and `extraObjectId`.
 - Preserve the caller's selected side on `create`.
-- Treat lobby ids, game ids, and extra object ids as explicit product inputs.
-- Keep coin type and stake semantics aligned between create and join flows unless the product enforces validation outside the SDK.
+- Treat lobby ids and game ids as explicit product inputs.
 
 ## Event decoding
 
@@ -164,7 +159,7 @@ Guardrails:
 
 1. Confirm whether the feature is create, join, or cancel.
 2. Wire the flow to `createPvPCoinflipTransaction`.
-3. Pass the full action-specific shape, especially `extraObjectId` for joins.
+3. For join or cancel, pass `gameId` and provide the transaction `coinType`.
 4. Parse emitted PvP events with the generated BCS helpers.
 5. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
 6. Keep frontend or backend state aligned with onchain ids and privacy flags.

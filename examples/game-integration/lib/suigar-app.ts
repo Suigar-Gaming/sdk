@@ -49,7 +49,6 @@ export type PvPCreateFormValues = SharedFields & {
 
 export type PvPJoinFormValues = SharedFields & {
 	gameId: string;
-	extraObjectId: string;
 };
 
 export type PvPCancelFormValues = SharedFields & {
@@ -131,7 +130,6 @@ export const DEFAULT_PVP_FORMS: PvPForms = {
 	join: {
 		...DEFAULT_SHARED_FIELDS,
 		gameId: '0xYOUR_GAME_ID',
-		extraObjectId: '0xYOUR_EXTRA_OBJECT_ID',
 	},
 	cancel: {
 		...DEFAULT_SHARED_FIELDS,

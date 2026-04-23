@@ -39,5 +39,4 @@ The example app automatically runs `npm --prefix ../.. run build:ci` before `dev
 
 - The app is fixed to `testnet`.
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation.
-- PvP join still requires both `gameId` and `extraObjectId`, matching the current SDK and contract ABI.
 - Full decoded event payloads are also logged to the browser console.
