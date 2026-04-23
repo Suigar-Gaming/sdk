@@ -53,8 +53,6 @@ export type BuildJoinPvPCoinflipTransactionOptions =
 	SharedPvPCoinflipTransactionOptions & {
 		gameId: string;
 		stake: number | bigint;
-		// Required by the current join_game ABI in addition to gameId.
-		extraObjectId: string;
 	};
 
 export type BuildCancelPvPCoinflipTransactionOptions =

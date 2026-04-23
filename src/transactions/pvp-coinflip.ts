@@ -16,6 +16,7 @@ import type {
 	BuildPvPCoinflipTransactionOptions,
 	PvPCoinflipAction,
 } from '../types/index.js';
+import { resolvePriceInfoObjectId } from '../utils/config.js';
 import { encodeBetMetadata } from '../utils/metadata.js';
 import { toBigIntAmount } from '../utils/shared.js';
 import { createBaseGameTransaction } from './shared.js';
@@ -60,6 +61,10 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 		case 'join': {
 			const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
+			const priceInfoObjectId = resolvePriceInfoObjectId(
+				joinOptions.config,
+				normalizedCoinType,
+			);
 			const stake = toBigIntAmount(joinOptions.stake, 'stake');
 			const betCoin = tx.coin({
 				type: normalizedCoinType,
@@ -77,7 +82,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 						betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
-						joinOptions.extraObjectId,
+						priceInfoObjectId,
 					],
 				}),
 			);
