@@ -86,4 +86,12 @@ describe('parseGameDetails', () => {
 			),
 		).toEqual({ pvp_result: 'heads' });
 	});
+
+	it('parses raw UTF-8 pvp coinflip result details', () => {
+		expect(
+			parseGameDetails(
+				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
+			),
+		).toEqual({ pvp_result: 'loss' });
+	});
 });

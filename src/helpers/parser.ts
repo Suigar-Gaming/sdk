@@ -16,6 +16,7 @@ const bcsU8 = bcs.u8();
 const bcsU64 = bcs.u64();
 const bcsBool = bcs.bool();
 const bcsString = bcs.string();
+const textDecoder = new TextDecoder();
 
 const GAME_DETAIL_BCS = {
 	u8: bcsU8,
@@ -64,16 +65,34 @@ function normalizeGameDetailValue(
 	return parsed as ParsedGameDetailValue;
 }
 
+function parseStringGameDetail(value: number[]): string {
+	const bytes = Uint8Array.from(value);
+
+	try {
+		return bcsString.parse(bytes);
+	} catch {
+		return textDecoder.decode(bytes);
+	}
+}
+
+function parseGameDetail(
+	valueType: GameDetailValueType,
+	value: number[],
+): ParsedGameDetailValue {
+	if (valueType === 'string') {
+		return parseStringGameDetail(value);
+	}
+
+	const parsed = GAME_DETAIL_BCS[valueType].parse(Uint8Array.from(value));
+	return normalizeGameDetailValue(valueType, parsed);
+}
+
 export function parseGameDetails(
 	gameDetails: BetResultGameDetails,
 ): ParsedGameDetails {
 	return gameDetails.contents.reduce<ParsedGameDetails>((details, entry) => {
 		const valueType = GAME_DETAILS_SCHEMA[entry.key] ?? 'string';
-		const parsed = GAME_DETAIL_BCS[valueType].parse(
-			Uint8Array.from(entry.value),
-		);
-
-		details[entry.key] = normalizeGameDetailValue(valueType, parsed);
+		details[entry.key] = parseGameDetail(valueType, entry.value);
 		return details;
 	}, {});
 }
