@@ -4,8 +4,22 @@
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
+import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
+import * as balance from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/balance.js';
 import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 const $moduleName = '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip';
+export const Game = new MoveStruct({ name: `${$moduleName}::Game<phantom T0>`, fields: {
+        id: bcs.Address,
+        creator: bcs.Address,
+        creator_is_tails: bcs.bool(),
+        is_private: bcs.bool(),
+        creator_metadata: vec_map.VecMap(bcs.string(), bcs.vector(bcs.u8())),
+        joiner: bcs.Address,
+        winner: bcs.Address,
+        stake_per_player: bcs.u64(),
+        house_edge_bps: bcs.u64(),
+        stake_pot: balance.Balance
+    } });
 export const GameCreatedEvent = new MoveStruct({ name: `${$moduleName}::GameCreatedEvent<phantom T0>`, fields: {
         game_id: bcs.Address,
         creator: bcs.Address,

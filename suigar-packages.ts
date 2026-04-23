@@ -39,7 +39,12 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 	pvp_coinflip: {
 		package: TESTNET_PACKAGE_IDS.pvpCoinflip,
 		packageName: 'pvp-coinflip',
-		types: ['GameCreatedEvent', 'GameResolvedEvent', 'GameCancelledEvent'],
+		types: [
+			'Game',
+			'GameCreatedEvent',
+			'GameResolvedEvent',
+			'GameCancelledEvent',
+		],
 		functions: ['create_game', 'join_game', 'cancel_game'],
 	},
 	range: {
