@@ -99,6 +99,30 @@ class SuigarClient {
 	}
 
 	/**
+	 * Fetches and parses a PvP coinflip game object from chain.
+	 *
+	 * This resolves the raw object through the configured client, requires the
+	 * object's `content` to be present, and decodes that content with the
+	 * generated `PvPCoinflipGame` BCS parser.
+	 *
+	 * @param gameId On-chain object id of the PvP coinflip game.
+	 * @returns Parsed PvP coinflip game state.
+	 * @throws Error If the object cannot be decoded because no content was returned.
+	 */
+	async resolvePvPConflipGame(gameId: string) {
+		const { object } = await this.#client.core.getObject({
+			objectId: gameId,
+			include: { content: true },
+		});
+
+		if (!object.content) {
+			throw new Error('Unable to resolve PvP coinflip from game object');
+		}
+
+		return Game.parse(object.content);
+	}
+
+	/**
 	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
 	 *
 	 * These can be used to parse the `content` field of on-chain objects and events into structured data with the
@@ -199,7 +223,7 @@ class SuigarClient {
 					const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
 					return buildPvPCoinflipTransaction('join', {
 						...joinOptions,
-						betCoin: this.#createPvPBetCoin(joinOptions),
+						betCoin: this.#createPvPCoinflipBetCoin(joinOptions),
 						config: this.#config,
 					});
 				}
@@ -214,27 +238,16 @@ class SuigarClient {
 		},
 	};
 
-	#createPvPBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
+	#createPvPCoinflipBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
 		return async (tx: Transaction) => {
-			const stake = await this.#resolvePvPStake(options.gameId);
+			const { stake_per_player } = await this.resolvePvPConflipGame(
+				options.gameId,
+			);
 			return tx.coin({
 				type: options.coinType,
-				balance: stake,
+				balance: BigInt(stake_per_player),
 				useGasCoin: options.allowGasCoinShortcut,
 			});
 		};
-	}
-
-	async #resolvePvPStake(gameId: string) {
-		const { object } = await this.#client.core.getObject({
-			objectId: gameId,
-			include: { content: true },
-		});
-
-		if (!object.content) {
-			throw new Error('Unable to resolve PvP coinflip stake from game object');
-		}
-
-		return BigInt(Game.parse(object.content).stake_per_player);
 	}
 }
