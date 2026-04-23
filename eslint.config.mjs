@@ -13,6 +13,7 @@ export default tseslint.config(
 		ignores: [
 			'dist/**',
 			'node_modules/**',
+			'examples/game-integration/**',
 			'src/contracts/**',
 			'.changeset/*.md',
 		],

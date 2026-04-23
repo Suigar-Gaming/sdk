@@ -83,8 +83,16 @@
 		"vitest": "^4.1.5"
 	},
 	"lint-staged": {
-		"*.{ts,tsx,js,mjs,cjs}": [
+		"{src,test,scripts}/**/*.{ts,tsx,js,mjs,cjs}": [
 			"eslint --fix",
+			"prettier --write"
+		],
+		"./*.{ts,tsx,js,mjs,cjs}": [
+			"eslint --fix",
+			"prettier --write"
+		],
+		"examples/game-integration/**/*.{ts,tsx,js,mjs,cjs}": [
+			"npm --prefix examples/game-integration exec eslint -- --fix",
 			"prettier --write"
 		],
 		"*.{json,md,yml,yaml}": "prettier --write"

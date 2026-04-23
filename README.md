@@ -370,3 +370,22 @@ npm run build
 npm run typecheck
 npm test
 ```
+
+## Example App
+
+This repository now includes a Next.js integration example in [examples/game-integration](/Users/lucas/Documents/Github/suigar-sdk/examples/game-integration).
+
+It demonstrates:
+
+- standard game transactions through `client.suigar.tx.createBetTransaction(...)`
+- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`
+- wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
+- supported coin selection from `client.suigar.getConfig()`
+- decoding `BetResultEvent` and PvP events into a persistent event log
+
+Run it from the repo root with:
+
+```bash
+npm --prefix examples/game-integration install
+npm --prefix examples/game-integration run dev
+```
