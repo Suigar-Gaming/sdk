@@ -3,6 +3,7 @@
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
+import { toBase64 } from '@mysten/sui/utils';
 import {
 	BuildCoinflipTransactionOptions,
 	BuildGameOptions,
@@ -33,7 +34,6 @@ import {
 	GameCreatedEvent,
 	GameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip';
-import { toBase64 } from '@mysten/sui/utils';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
