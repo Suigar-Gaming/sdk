@@ -25,6 +25,9 @@ const TEST_CONFIG = {
 		range: '0x4',
 		wheel: '0x5',
 	},
+	registryIds: {
+		pvpCoinflip: '0xregistry',
+	},
 	coinTypes: {
 		sui: normalizeStructTag('0x2::sui::SUI'),
 		usdc: normalizeStructTag('0xusdc::coin::USDC'),

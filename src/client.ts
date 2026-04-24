@@ -1,9 +1,13 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ClientWithCoreApi } from '@mysten/sui/client';
+import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
-import { toBase64 } from '@mysten/sui/utils';
+import {
+	normalizeStructTag,
+	parseStructTag,
+	toBase64,
+} from '@mysten/sui/utils';
 import {
 	BuildCoinflipTransactionOptions,
 	BuildCancelPvPCoinflipTransactionOptions,
@@ -109,6 +113,21 @@ export class SuigarClient {
 		return toBase64(bytes);
 	}
 
+	async getPvPCoinflipGames(
+		options: Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'> = {
+			limit: 50,
+		},
+	) {
+		const { dynamicFields } = await this.#client.core.listDynamicFields({
+			parentId: this.#config.packageIds.pvpCoinflip,
+			...options,
+		});
+
+		return await Promise.all(
+			dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
+		);
+	}
+
 	/**
 	 * Fetches and parses a PvP coinflip game object from chain.
 	 *
@@ -130,7 +149,10 @@ export class SuigarClient {
 			throw new Error('Unable to resolve PvP coinflip from game object');
 		}
 
-		return Game.parse(object.content);
+		return {
+			...Game.parse(object.content),
+			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
+		};
 	}
 
 	/**
