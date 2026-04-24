@@ -1,6 +1,6 @@
 'use client';
 
-import { LIMBO_MULTIPLIER_SCALE } from '@suigar/sdk/utils';
+import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '@suigar/sdk/utils';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ export function LimboForm({
 	const effectiveScale =
 		configuredScale && Number.isFinite(configuredScale) && configuredScale > 0
 			? configuredScale
-			: LIMBO_MULTIPLIER_SCALE;
+			: DEFAULT_LIMBO_MULTIPLIER_SCALE;
 
 	return (
 		<div className="space-y-6">
@@ -52,8 +52,8 @@ export function LimboForm({
 						placeholder="defaults to SDK scale"
 					/>
 					<p className="text-xs text-muted-foreground">
-						Leave empty to use the SDK default scale of {LIMBO_MULTIPLIER_SCALE}
-						.
+						Leave empty to use the SDK default scale of{' '}
+						{DEFAULT_LIMBO_MULTIPLIER_SCALE}.
 					</p>
 				</div>
 			</div>

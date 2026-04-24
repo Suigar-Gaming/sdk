@@ -46,8 +46,7 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `DEFAULT_GAS_BUDGET_MIST`
 - `RANGE_POINT_LIMIT`
 - `DEFAULT_RANGE_SCALE`
-- `LIMBO_MULTIPLIER_SCALE`
-- `RANGE_FIXED_POINT_SCALE`
+- `DEFAULT_LIMBO_MULTIPLIER_SCALE`
 
 Internal config and metadata helpers stay under `src/helpers/*` and are not part of the intended public import surface.
 

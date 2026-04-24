@@ -3,14 +3,14 @@
 
 import { play } from '../contracts/range/range.js';
 import type { BuildRangeTransactionOptions, WithPartner } from '../types';
-import { RANGE_FIXED_POINT_SCALE } from '../utils/index.js';
+import { DEFAULT_RANGE_SCALE } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildRangeTransaction(
 	options: WithPartner<BuildRangeTransactionOptions>,
 ) {
-	const scale = options.scale ?? RANGE_FIXED_POINT_SCALE;
+	const scale = options.scale ?? DEFAULT_RANGE_SCALE;
 	const leftPoint = Math.round(options.leftPoint * scale);
 	const rightPoint = Math.round(options.rightPoint * scale);
 

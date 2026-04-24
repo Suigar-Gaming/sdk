@@ -39,10 +39,9 @@ Utility exports are available from the utils subpath:
 ```ts
 import {
 	DEFAULT_GAS_BUDGET_MIST,
+	DEFAULT_LIMBO_MULTIPLIER_SCALE,
 	DEFAULT_RANGE_SCALE,
-	LIMBO_MULTIPLIER_SCALE,
 	RANGE_POINT_LIMIT,
-	RANGE_FIXED_POINT_SCALE,
 	parseFloat,
 	parseGameDetails,
 	parseI64,
@@ -285,10 +284,10 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 Notes:
 
 - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
-- with the default limbo scale `100`, a target multiplier of `2.5` becomes `250` onchain
+- with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` onchain
 - range converts each point with `Math.round(value * scale)`
-- range points are bounded by the contract limit `100_000_000` after scaling
-- with the default range scale `1_000_000`, valid UI values are `0` to `100`
+- range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
+- with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
 - if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
 - do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
 - plinko and wheel `configId` must fit in `u8`
