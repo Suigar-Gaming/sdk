@@ -451,11 +451,19 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								className="inline-flex min-w-0 items-center gap-2"
 							>
 								<Image
+									src="/logo/icon.svg"
+									alt="Suigar"
+									width={36}
+									height={36}
+									className="h-8 w-8 md:hidden"
+									priority
+								/>
+								<Image
 									src="/logo/suigar-logo-full.svg"
 									alt="Suigar"
 									width={132}
 									height={36}
-									className="h-8 w-auto md:h-10"
+									className="hidden h-8 w-auto md:block md:h-10"
 									priority
 								/>
 							</Link>
@@ -464,14 +472,14 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						<div className="flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto">
 							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
 							{currentAccount ? (
-								<div className="w-[9.25rem] shrink-0 md:w-[9.75rem]">
+								<div className="shrink-0">
 									<Select
 										value={selectedCoin}
 										onValueChange={(value) =>
 											setSelectedCoin(value as SupportedCoinKey)
 										}
 									>
-										<SelectTrigger className="h-8 rounded-full border-border/70 bg-background/55 px-2 text-xs md:h-9 md:px-2.5 md:text-sm">
+										<SelectTrigger className="w-auto min-w-0 rounded-full border-border/70 bg-background/55">
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -500,7 +508,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									</Select>
 								</div>
 							) : null}
-							<div className="wallet-compact shrink-0">
+							<div className="shrink-0">
 								<ConnectButton />
 							</div>
 						</div>
