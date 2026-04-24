@@ -17,6 +17,7 @@ export function PvPJoinForm({
 				<Label htmlFor="pvpGameId">Game ID</Label>
 				<Input
 					id="pvpGameId"
+					placeholder="Select a lobby card or paste a game id"
 					value={value.gameId}
 					onChange={(event) => onChange({ gameId: event.target.value })}
 				/>

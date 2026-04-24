@@ -17,6 +17,7 @@ export function PvPCancelForm({
 				<Label htmlFor="cancelGameId">Game ID</Label>
 				<Input
 					id="cancelGameId"
+					placeholder="Select one of your lobbies or paste a game id"
 					value={value.gameId}
 					onChange={(event) => onChange({ gameId: event.target.value })}
 				/>
