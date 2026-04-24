@@ -208,6 +208,10 @@ the Move flow removes it from the registry and deletes the live `Game` object.
 Use this when a product needs the current set of open PvP coinflip matches for
 browsing or lobby views.
 
+By default, failures to resolve an individual game are skipped so one broken or
+already-deleted registry entry does not reject the full lookup. Pass
+`rejectOnError: true` if you want the call to reject instead.
+
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
 
@@ -215,6 +219,13 @@ for (const game of games) {
 	console.log(game.id);
 	console.log(game.coinType);
 }
+```
+
+```ts
+const games = await client.suigar.getPvPCoinflipGames({
+	limit: 20,
+	rejectOnError: true,
+});
 ```
 
 ### `resolvePvPConflipGame(gameId)`
@@ -246,7 +257,7 @@ console.log(game.is_private);
 > - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolved` to read the final result
 
 > [!TIP]
-> Prefer this helper over manual object parsing when you only need the parsed state for a live PvP game object.
+> Prefer this helper over manual object parsing when you only need the parsed state for a live PvP coinflip game object.
 
 ## `tx`
 
@@ -537,7 +548,7 @@ This repository now includes a Next.js integration example in [examples/game-int
 It demonstrates:
 
 - standard game transactions through `client.suigar.tx.createBetTransaction(...)`
-- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP game selector ready for future PvP games
+- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP coinflip action selector
 - wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
 - supported coin selection from `client.suigar.getConfig()`
 - connected-wallet balance display for each supported coin in the example app
