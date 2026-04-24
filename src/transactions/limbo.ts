@@ -3,7 +3,7 @@
 
 import { play } from '../contracts/limbo/limbo.js';
 import type { BuildLimboTransactionOptions, WithPartner } from '../types';
-import { LIMBO_MULTIPLIER_SCALE } from '../utils/shared.js';
+import { LIMBO_MULTIPLIER_SCALE } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

@@ -3,7 +3,7 @@
 
 import { play } from '../contracts/range/range.js';
 import type { BuildRangeTransactionOptions, WithPartner } from '../types';
-import { RANGE_FIXED_POINT_SCALE } from '../utils/shared.js';
+import { RANGE_FIXED_POINT_SCALE } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

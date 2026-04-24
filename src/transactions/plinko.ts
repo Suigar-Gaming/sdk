@@ -3,7 +3,7 @@
 
 import { play } from '../contracts/plinko/plinko.js';
 import type { BuildPlinkoTransactionOptions, WithPartner } from '../types';
-import { toU8Number } from '../utils/shared.js';
+import { toU8Number } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

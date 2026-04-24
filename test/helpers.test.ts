@@ -3,7 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { parseGameDetails } from '../src/helpers/index.js';
+import { parseGameDetails } from '../src/utils/index.js';
 import { BetResultGameDetails } from '../src/types/index.js';
 import { encodeFloat, encodeString, writeU64 } from './utils.js';
 

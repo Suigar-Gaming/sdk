@@ -23,7 +23,7 @@ import {
 	SuiNetwork,
 	WithPartner,
 } from './types';
-import { resolveSuigarConfig } from './utils';
+import { resolveSuigarConfig } from './helpers/index.js';
 import {
 	buildCoinflipTransaction,
 	buildLimboTransaction,
