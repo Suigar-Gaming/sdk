@@ -17,6 +17,7 @@ import {
 	useDAppKit,
 } from '@mysten/dapp-kit-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { CoinIcon } from '@/components/coins';
 import { CodeSample } from '@/components/code-sample';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/games/coinflip-form';
@@ -49,6 +50,7 @@ import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
 	DEFAULT_PVP_FORMS,
 	DEFAULT_STANDARD_FORMS,
+	COIN_DECIMALS,
 	isPvPAction,
 	isStandardGame,
 } from '@/lib/suigar-app';
@@ -82,6 +84,67 @@ const PVP_ACTION_OPTIONS = [
 ] as const satisfies ReadonlyArray<{ value: PvPAction; label: string }>;
 
 const PREVIEW_OWNER = `0x${'0'.repeat(64)}`;
+
+type CoinBalanceState = {
+	balance: string | null;
+	isLoading: boolean;
+	error: string | null;
+};
+
+function formatBalance(balance: bigint, decimals: number) {
+	const divisor = BigInt(10) ** BigInt(decimals);
+	const whole = balance / divisor;
+	const fraction = balance % divisor;
+	const paddedFraction = fraction.toString().padStart(decimals, '0');
+	const formattedWhole = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+	const fractionDigits = paddedFraction.slice(0, 2).padEnd(2, '0');
+
+	return `${formattedWhole},${fractionDigits}`;
+}
+
+function getCoinDisplayAmount({
+	currentAccount,
+	balanceOwner,
+	balanceState,
+}: {
+	currentAccount: ReturnType<typeof useCurrentAccount>;
+	balanceOwner: string | null;
+	balanceState: CoinBalanceState;
+}) {
+	if (!currentAccount) {
+		return '--,--';
+	}
+
+	if (
+		(balanceOwner !== currentAccount.address && !balanceState.error) ||
+		balanceState.isLoading ||
+		balanceState.error
+	) {
+		return '--,--';
+	}
+
+	return balanceState.balance ?? '0,00';
+}
+
+function CoinSelectLabel({
+	coinKey,
+	amount,
+}: {
+	coinKey: SupportedCoinKey;
+	amount: string;
+}) {
+	return (
+		<div className="flex min-w-0 items-center gap-1 whitespace-nowrap">
+			<CoinIcon coinKey={coinKey} className="size-5 shrink-0" />
+			<span className="min-w-0 truncate font-medium tabular-nums text-foreground">
+				{amount}
+			</span>
+			<span className="shrink-0 text-[0.65rem] text-muted-foreground md:text-[0.7rem]">
+				{coinKey.toUpperCase()}
+			</span>
+		</div>
+	);
+}
 
 function usePersistentForms<T>(key: string, initialValue: T) {
 	const [value, setValue] = React.useState<T>(() => {
@@ -150,15 +213,6 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const currentClient = useCurrentClient();
 	const currentAccount = useCurrentAccount();
 	const { addRows } = useEventLog();
-	const suigarClient = currentClient as typeof currentClient & {
-		suigar: {
-			getConfig: () => {
-				coinTypes: Record<SupportedCoinKey, string>;
-			};
-			tx: unknown;
-			bcs: unknown;
-		};
-	};
 
 	const [standardForms, setStandardForms] = usePersistentForms<StandardForms>(
 		'suigar-example-standard-forms-v2',
@@ -184,23 +238,92 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		return isPvPAction(queryAction) ? queryAction : 'create';
 	}, [searchParams]);
 
-	const coinTypes = suigarClient.suigar.getConfig().coinTypes;
-	const coinOptions = Object.entries(coinTypes) as Array<
-		[SupportedCoinKey, string]
-	>;
+	const coinTypes = currentClient.suigar.getConfig().coinTypes;
+	const coinOptions = React.useMemo(
+		() => Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>,
+		[coinTypes],
+	);
 	const effectiveSelectedCoin = coinTypes[selectedCoin]
 		? selectedCoin
 		: (coinOptions[0]?.[0] ?? 'sui');
 	const coinType = coinTypes[effectiveSelectedCoin];
 	const previewOwner = currentAccount?.address ?? PREVIEW_OWNER;
 	const visibleStatus = currentAccount ? status : null;
+	const [coinBalances, setCoinBalances] = React.useState<
+		Record<SupportedCoinKey, CoinBalanceState>
+	>({
+		sui: { balance: null, isLoading: false, error: null },
+		usdc: { balance: null, isLoading: false, error: null },
+	});
+	const [balanceOwner, setBalanceOwner] = React.useState<string | null>(null);
+	const [balanceRefreshKey, setBalanceRefreshKey] = React.useState(0);
+
+	React.useEffect(() => {
+		if (!currentAccount) {
+			return;
+		}
+
+		let cancelled = false;
+
+		const fetchBalances = async () => {
+			const results = await Promise.all(
+				coinOptions.map(async ([coinKey, value]) => {
+					try {
+						const response = await currentClient.getBalance({
+							owner: currentAccount.address,
+							coinType: value,
+						});
+						return [
+							coinKey,
+							{
+								balance: formatBalance(
+									BigInt(response.balance.balance),
+									COIN_DECIMALS[coinKey],
+								),
+								isLoading: false,
+								error: null,
+							},
+						] as const;
+					} catch (balanceError) {
+						return [
+							coinKey,
+							{
+								balance: null,
+								isLoading: false,
+								error: parseError(balanceError),
+							},
+						] as const;
+					}
+				}),
+			);
+
+			if (cancelled) {
+				return;
+			}
+
+			setBalanceOwner(currentAccount.address);
+			setCoinBalances((current) => {
+				const next = { ...current };
+				for (const [coinKey, state] of results) {
+					next[coinKey] = state;
+				}
+				return next;
+			});
+		};
+
+		void fetchBalances();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
 
 	let currentCode = '';
 	try {
 		currentCode =
 			mode === 'standard'
 				? buildStandardTransaction(
-						suigarClient,
+						currentClient,
 						standardGame,
 						standardForms[standardGame],
 						previewOwner,
@@ -208,7 +331,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						coinType,
 					).code
 				: buildPvPTransaction(
-						suigarClient,
+						currentClient,
 						pvpAction,
 						pvpForms[pvpAction],
 						previewOwner,
@@ -260,7 +383,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			const buildResult =
 				mode === 'standard'
 					? buildStandardTransaction(
-							suigarClient,
+							currentClient,
 							standardGame,
 							standardForms[standardGame],
 							owner,
@@ -268,7 +391,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							coinType,
 						)
 					: buildPvPTransaction(
-							suigarClient,
+							currentClient,
 							pvpAction,
 							pvpForms[pvpAction],
 							owner,
@@ -300,13 +423,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			}
 
 			const rows = parseSuigarEvents(
-				suigarClient,
+				currentClient,
 				digest,
 				finalResult.Transaction.events,
 			);
 			if (rows.length > 0) {
 				addRows(rows);
 			}
+
+			setBalanceRefreshKey((current) => current + 1);
 		} catch (executionError) {
 			setError(parseError(executionError));
 		} finally {
@@ -337,32 +462,47 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						</div>
 
 						<div className="flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto">
-							<span className="hidden shrink-0 rounded-full border border-border/70 bg-background/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground sm:inline-flex">
-								testnet
-							</span>
-							<div className="w-[9.5rem] shrink-0 md:w-[10rem]">
-								<Select
-									value={selectedCoin}
-									onValueChange={(value) =>
-										setSelectedCoin(value as SupportedCoinKey)
-									}
-								>
-									<SelectTrigger className="h-8 rounded-full border-border/70 bg-background/55 px-3 text-xs md:h-9 md:px-3.5 md:text-sm">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{coinOptions.map(([key, value]) => (
-											<SelectItem key={key} value={key}>
-												{key.toUpperCase()} · {value.split('::').at(-1)}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
+							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
+							{currentAccount ? (
+								<div className="w-[9.25rem] shrink-0 md:w-[9.75rem]">
+									<Select
+										value={selectedCoin}
+										onValueChange={(value) =>
+											setSelectedCoin(value as SupportedCoinKey)
+										}
+									>
+										<SelectTrigger className="h-8 rounded-full border-border/70 bg-background/55 px-2 text-xs md:h-9 md:px-2.5 md:text-sm">
+											<CoinSelectLabel
+												coinKey={effectiveSelectedCoin}
+												amount={getCoinDisplayAmount({
+													currentAccount,
+													balanceOwner,
+													balanceState: coinBalances[effectiveSelectedCoin],
+												})}
+											/>
+										</SelectTrigger>
+										<SelectContent>
+											{coinOptions.map(([key]) => {
+												return (
+													<SelectItem key={key} value={key}>
+														<CoinSelectLabel
+															coinKey={key}
+															amount={getCoinDisplayAmount({
+																currentAccount,
+																balanceOwner,
+																balanceState: coinBalances[key],
+															})}
+														/>
+													</SelectItem>
+												);
+											})}
+										</SelectContent>
+									</Select>
+								</div>
+							) : null}
 							<div className="wallet-compact shrink-0">
 								<ConnectButton />
 							</div>
-							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
 						</div>
 					</nav>
 				</div>
