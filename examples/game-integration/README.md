@@ -46,6 +46,14 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 The example app automatically runs `npm --prefix ../.. run build:ci` before `dev`, `build`, and `start` so the local `@suigar/sdk` package stays in sync.
 
+## GitHub Pages
+
+The repository includes `.github/workflows/deploy-game-integration-pages.yml` to build this app when files under `examples/game-integration/` change.
+
+- Pull requests run the Pages build as a validation step.
+- Pushes to `main` build and deploy the static export to GitHub Pages.
+- The workflow sets the Next.js `basePath` from `GITHUB_REPOSITORY`, so the exported site works under the repository path such as `/sdk/`.
+
 ## Notes
 
 - The app is fixed to `testnet`.

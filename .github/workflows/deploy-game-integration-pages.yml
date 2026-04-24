@@ -1,0 +1,72 @@
+name: Deploy Game Integration Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy-game-integration-pages.yml'
+      - 'examples/game-integration/**'
+  pull_request:
+    paths:
+      - '.github/workflows/deploy-game-integration-pages.yml'
+      - 'examples/game-integration/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: game-integration-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install SDK dependencies
+        run: npm install
+
+      - name: Install Next.js Game Integration App dependencies
+        run: npm install
+        working-directory: examples/game-integration
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Build example site
+        run: npm run build
+        working-directory: examples/game-integration
+        env:
+          GITHUB_PAGES: 'true'
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: examples/game-integration/out
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
