@@ -133,6 +133,8 @@ Guardrails:
 - Do not model PvP coinflip with `createBetTransaction`; use `createPvPCoinflipTransaction`.
 - Preserve the caller's selected side on `create`.
 - Treat lobby ids and game ids as explicit product inputs.
+- `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning.
+- If the product needs partner attribution, configure `suigar({ partner })` on the extension and let the SDK append that metadata automatically.
 
 ## Event decoding
 

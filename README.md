@@ -74,7 +74,9 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
 ```ts
-const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({ partner: 'my-partner' }),
+);
 
 client.suigar;
 ```
@@ -103,6 +105,12 @@ client.games.bcs;
 Supported override areas:
 
 - `name`
+- `partner`
+
+If `partner` is configured, the SDK automatically writes it into the onchain
+metadata vec-map. Transaction builder options may also include `metadata`, but
+reserved keys such as `partner` and `referrer` are ignored with a warning when
+provided manually.
 
 ## Runtime Surface
 
@@ -207,6 +215,8 @@ Shared behavior:
 - `betCount` defaults to `1`
 - `sender` overrides the transaction sender
 - `metadata` is encoded into `keys` and `values` byte arrays
+- `partner` configured via `suigar({ partner })` is appended automatically to metadata
+- `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `owner`
 
@@ -291,7 +301,7 @@ PvP shared options:
 
 - `owner: string`
 - `coinType: string`
-- `metadata?: ...`
+- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
 - `sender?: string`
 - `allowGasCoinShortcut?: boolean`
@@ -406,6 +416,9 @@ const gameDetails = parseGameDetails(decoded.game_details);
 ```
 
 `parseGameDetails` preserves the onchain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
+
+When the extension is configured with `partner`, decoded event `metadata` will
+contain that `partner` entry.
 
 Important:
 

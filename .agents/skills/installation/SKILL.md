@@ -35,6 +35,14 @@ const client = new SuiGrpcClient({
 }).$extend(suigar());
 ```
 
+If the app needs partner attribution on all supported bet flows, configure it at extension registration time:
+
+```ts
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({ partner: 'my-partner' }),
+);
+```
+
 If the app uses a custom extension name, preserve it consistently:
 
 ```ts
@@ -50,6 +58,7 @@ client.casino;
 - Prefer the SDK's resolved supported coin types from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
 - Do not invent package-root exports that do not exist.
 - Keep wallet address ownership explicit and pass the same connected account through the integration.
+- If partner attribution is required, set `suigar({ partner })` once at extension registration time instead of passing `partner` through transaction `metadata`.
 
 ## Serialization pattern
 
