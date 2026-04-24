@@ -41,15 +41,15 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `parseI64`
 - `parseFloat`
 - `parseGameDetails`
-- `encodeBetMetadata`
-- `resolveSuigarConfig`
-- `resolveGamePackageId`
-- `resolvePriceInfoObjectId`
 - `toBigIntAmount`
 - `toU8Number`
 - `DEFAULT_GAS_BUDGET_MIST`
+- `RANGE_POINT_LIMIT`
+- `DEFAULT_RANGE_SCALE`
 - `LIMBO_MULTIPLIER_SCALE`
 - `RANGE_FIXED_POINT_SCALE`
+
+Internal config and metadata helpers stay under `src/helpers/*` and are not part of the intended public import surface.
 
 ## Default setup
 

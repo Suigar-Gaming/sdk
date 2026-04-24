@@ -47,4 +47,6 @@ The example app automatically runs `npm --prefix ../.. run build:ci` before `dev
 
 - The app is fixed to `testnet`.
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation where the selected action requires a stake.
+- Limbo uses the exported SDK default multiplier scale, so the form shows how `targetMultiplier` is converted with `Math.round(targetMultiplier * scale)`.
+- Range point inputs are human values, not pre-scaled integers. The form derives the allowed max from the exported SDK constants `RANGE_POINT_LIMIT / scale`, so the default SDK scale allows `0` to `100`.
 - Full decoded event payloads are also logged to the browser console.

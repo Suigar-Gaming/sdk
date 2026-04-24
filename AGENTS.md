@@ -72,7 +72,8 @@ npm run release
   - `transactions/` - transaction builders for standard and PvP games
   - `contracts/` - generated Move bindings and BCS helpers
   - `types/` - public option and config types
-  - `utils/` - config resolution, metadata encoding, and shared helpers
+  - `utils/` - public parser, constants, and numeric helpers exposed through `@suigar/sdk/utils`
+  - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `test/` - Vitest coverage for config resolution and transaction builders
 - `dist/` - generated build output
@@ -89,6 +90,7 @@ npm run release
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
    The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
+   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, `RANGE_FIXED_POINT_SCALE`, and `LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
@@ -113,7 +115,8 @@ Key files:
 | Extension and client API    | `src/client.ts`         |
 | Standard game builders      | `src/transactions/*.ts` |
 | Generated contracts and BCS | `src/contracts/**`      |
-| Config and metadata helpers | `src/utils/*.ts`        |
+| Public utility exports      | `src/utils/*.ts`        |
+| Internal helper modules     | `src/helpers/*.ts`      |
 
 #### Standard vs PvP Flows
 
@@ -130,7 +133,7 @@ When making changes:
 
 #### Config Resolution
 
-Config is normalized in `src/utils/config.ts`. This layer is responsible for:
+Config is normalized in `src/helpers/config.ts`. This layer is responsible for:
 
 - resolving network-scoped package ids
 - normalizing the configured supported coin types for the active network
@@ -146,6 +149,7 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - Use `cashStake` only when the withdrawn balance should differ from the logical stake.
 - Prefer `bigint` for all non-UI amount handling.
 - Pass plain application values to `metadata` and let the SDK encode them into byte arrays.
+- Prefer importing public constants and numeric helpers from `@suigar/sdk/utils` instead of duplicating SDK defaults in downstream apps.
 
 ### Testing Conventions
 
@@ -171,6 +175,7 @@ Documentation is part of the deliverable:
 
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
 - At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
+- If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
 

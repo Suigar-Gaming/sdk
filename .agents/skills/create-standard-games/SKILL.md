@@ -144,15 +144,17 @@ const tx = client.suigar.tx.createBetTransaction('range', {
 	owner,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
-	leftPoint: 0.95,
-	rightPoint: 1.05,
+	leftPoint: 25,
+	rightPoint: 75,
 	outOfRange: false,
 });
 ```
 
 Guardrails:
 
-- Keep `leftPoint` and `rightPoint` ordered and product-valid before building the transaction.
+- Keep `leftPoint` and `rightPoint` ordered before building the transaction.
+- Do not pre-scale range points in app code; pass human values and let the SDK apply the selected scale once.
+- Range points must stay within the contract cap after scaling. With the default scale `1_000_000`, valid UI values are `0` to `100`.
 - Let the SDK convert fixed-point values using the selected scale.
 
 ## Wheel

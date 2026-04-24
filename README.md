@@ -23,7 +23,7 @@ The package ships three public entrypoints:
 
 - `@suigar/sdk` for the extension factory and runtime client class
 - `@suigar/sdk/games` for game-specific public types
-- `@suigar/sdk/utils` for parser, config, metadata, and amount helpers
+- `@suigar/sdk/utils` for public parser, constants, and numeric helpers
 
 The package root exposes the extension factory and client class:
 
@@ -39,15 +39,13 @@ Utility exports are available from the utils subpath:
 ```ts
 import {
 	DEFAULT_GAS_BUDGET_MIST,
+	DEFAULT_RANGE_SCALE,
 	LIMBO_MULTIPLIER_SCALE,
+	RANGE_POINT_LIMIT,
 	RANGE_FIXED_POINT_SCALE,
-	encodeBetMetadata,
 	parseFloat,
 	parseGameDetails,
 	parseI64,
-	resolveGamePackageId,
-	resolvePriceInfoObjectId,
-	resolveSuigarConfig,
 	toBigIntAmount,
 	toU8Number,
 } from '@suigar/sdk/utils';
@@ -278,8 +276,8 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
-	leftPoint: 0.95,
-	rightPoint: 1.05,
+	leftPoint: 25,
+	rightPoint: 75,
 	outOfRange: false,
 });
 ```
@@ -287,7 +285,12 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 Notes:
 
 - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
+- with the default limbo scale `100`, a target multiplier of `2.5` becomes `250` onchain
 - range converts each point with `Math.round(value * scale)`
+- range points are bounded by the contract limit `100_000_000` after scaling
+- with the default range scale `1_000_000`, valid UI values are `0` to `100`
+- if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
+- do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
 - plinko and wheel `configId` must fit in `u8`
 
 ### PvP Coinflip
