@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { SharedFields } from '@/lib/suigar-app';
+import type { SharedFields } from '@/lib/suigar-types';
 
 type SharedGameFieldsProps<T extends SharedFields> = {
 	value: T;

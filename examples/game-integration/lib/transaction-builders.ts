@@ -14,7 +14,7 @@ import type {
 	RangeFormValues,
 	SupportedCoinKey,
 	WheelFormValues,
-} from '@/lib/suigar-app';
+} from '@/lib/suigar-types';
 import {
 	COIN_DECIMALS,
 	parseOptionalNumber,

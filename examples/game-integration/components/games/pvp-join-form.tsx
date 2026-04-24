@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { PvPJoinFormValues } from '@/lib/suigar-app';
+import type { PvPJoinFormValues } from '@/lib/suigar-types';
 
 export function PvPJoinForm({
 	value,

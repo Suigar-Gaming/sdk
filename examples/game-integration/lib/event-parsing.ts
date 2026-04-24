@@ -1,4 +1,4 @@
-import type { EventLogRow } from '@/lib/suigar-app';
+import type { EventLogRow } from '@/lib/suigar-types';
 import { fromBase64 } from '@mysten/sui/utils';
 import type { SuigarClient } from '@suigar/sdk';
 import {
