@@ -125,20 +125,38 @@ export class SuigarClient {
 	 * browsing or lobby views.
 	 *
 	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
-	 * @returns Parsed unresolved PvP coinflip game objects for the requested registry page.
+	 * Pass `rejectOnError: true` to fail the whole lookup when any referenced game
+	 * cannot be resolved. By default, failed game resolutions are skipped and only
+	 * successfully parsed unresolved games are returned.
+	 * @returns Parsed unresolved PvP coinflip game objects for the requested
+	 * registry page. When `rejectOnError` is `false`, entries that fail
+	 * `resolvePvPConflipGame()` are omitted from the returned array.
 	 */
 	async getPvPCoinflipGames(
-		options: Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'> = {
+		options: Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'> & {
+			rejectOnError?: boolean;
+		} = {
 			limit: 50,
 		},
 	) {
+		const { rejectOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			parentId: this.#config.registryIds.pvpCoinflip,
-			...options,
+			...listOptions,
 		});
 
-		return await Promise.all(
+		if (rejectOnError) {
+			return Promise.all(
+				dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
+			);
+		}
+
+		const settledGames = await Promise.allSettled(
 			dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
+		);
+
+		return settledGames.flatMap((result) =>
+			result.status === 'fulfilled' ? [result.value] : [],
 		);
 	}
 

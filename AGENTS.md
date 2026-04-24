@@ -124,6 +124,7 @@ There are two transaction families and they must not be mixed:
 
 - **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
 - **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
+- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; by default this skips individual `resolvePvPConflipGame()` failures and only rejects when `rejectOnError: true` is passed.
 
 When making changes:
 

@@ -1,11 +1,14 @@
 ---
 name: create-pvp-games
-description: Use when building or fixing AI-generated multiplayer casino flows on top of @suigar/sdk, especially PvP game creation, joins, cancellations, lobby flows, match handling, and settlement features.
+description: Use when building or fixing AI-generated PvP game flows on top of @suigar/sdk, especially match creation, joins, cancellations, lobby flows, match handling, and settlement features.
 ---
 
 # Create PvP Games
 
-Use this skill for multiplayer PvP flows built on the SDK.
+Use this skill for PvP game flows built on the SDK.
+
+Today, the concrete PvP runtime surface in this SDK is PvP coinflip, so the
+transaction builders and runtime helpers below are coinflip-specific.
 
 ## Public entrypoint
 
@@ -22,7 +25,9 @@ client.suigar.bcs.PvPCoinflipGame;
 
 `getPvPCoinflipGames()` lists unresolved matches by reading the PvP registry for
 the active network. Joined and resolved games are removed from that registry and
-their live `Game` objects are deleted.
+their live `Game` objects are deleted. By default, individual resolution
+failures are skipped so one stale registry entry does not reject the full
+lookup. Pass `rejectOnError: true` when the caller wants strict rejection.
 
 ## PvP Coinflip
 
@@ -154,7 +159,7 @@ Use:
 - `client.suigar.bcs.PvPCoinflipGameCancelled`
 
 Use `getPvPCoinflipGames()` when you need the current unresolved lobby from the
-registry, and use the resolver when you need the current onchain PvP game
+registry, and use the resolver when you need the current onchain PvP coinflip game
 object for a specific `gameId` and not just transaction events:
 
 ```ts
@@ -164,6 +169,13 @@ for (const game of games) {
 	console.log(game.id);
 	console.log(game.coinType);
 }
+```
+
+```ts
+const games = await client.suigar.getPvPCoinflipGames({
+	limit: 20,
+	rejectOnError: true,
+});
 ```
 
 ```ts
@@ -186,6 +198,7 @@ const gameDetails = parseGameDetails(decoded.game_details);
 Guardrails:
 
 - `getPvPCoinflipGames()` only returns unresolved games because registry membership is the live pending-state signal.
+- `getPvPCoinflipGames()` skips per-game resolution failures by default; use `rejectOnError: true` when the product should fail the whole lookup instead.
 - Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
 - `resolvePvPConflipGame(gameId)` is for live pending game objects; after join and resolution, inspect `PvPCoinflipGameResolved` or other emitted events instead of expecting the `Game` object to remain onchain.
 - Use `event.bcs` as the event payload input when available.
