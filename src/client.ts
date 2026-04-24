@@ -113,13 +113,27 @@ export class SuigarClient {
 		return toBase64(bytes);
 	}
 
+	/**
+	 * Lists unresolved PvP coinflip games from the configured registry and resolves
+	 * each entry into parsed onchain game state.
+	 *
+	 * This fetches dynamic fields from the PvP coinflip registry object, then loads
+	 * each referenced game object through `resolvePvPConflipGame()`. Registry
+	 * membership is the unresolved-state signal: when a game is joined and resolved,
+	 * the Move flow removes it from the registry and deletes the live `Game` object.
+	 * Use this when a product needs the current set of open PvP coinflip matches for
+	 * browsing or lobby views.
+	 *
+	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
+	 * @returns Parsed unresolved PvP coinflip game objects for the requested registry page.
+	 */
 	async getPvPCoinflipGames(
 		options: Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'> = {
 			limit: 50,
 		},
 	) {
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
-			parentId: this.#config.packageIds.pvpCoinflip,
+			parentId: this.#config.registryIds.pvpCoinflip,
 			...options,
 		});
 
@@ -129,14 +143,17 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Fetches and parses a PvP coinflip game object from chain.
+	 * Fetches a PvP coinflip game object from chain and parses it into the SDK's
+	 * normalized runtime shape.
 	 *
 	 * This resolves the raw object through the configured client, requires the
-	 * object's `content` to be present, and decodes that content with the
-	 * generated `PvPCoinflipGame` BCS parser.
+	 * object's `content` to be present, decodes that content with the generated
+	 * `PvPCoinflipGame` BCS parser, and normalizes the generic coin type into a
+	 * standard struct tag string. Use this when a product needs the current state
+	 * of a specific PvP coinflip match before rendering join, cancel, or result UI.
 	 *
 	 * @param gameId On-chain object id of the PvP coinflip game.
-	 * @returns Parsed PvP coinflip game state.
+	 * @returns Parsed PvP coinflip game state with a normalized `coinType`.
 	 * @throws Error If the object cannot be decoded because no content was returned.
 	 */
 	async resolvePvPConflipGame(gameId: string) {
