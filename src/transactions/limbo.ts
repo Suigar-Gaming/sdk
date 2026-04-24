@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { play } from '../contracts/limbo/limbo.js';
-import type { BuildLimboTransactionOptions } from '../types';
+import type { BuildLimboTransactionOptions, WithPartner } from '../types';
 import { LIMBO_MULTIPLIER_SCALE } from '../utils/shared.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
-export function buildLimboTransaction(options: BuildLimboTransactionOptions) {
+export function buildLimboTransaction(
+	options: WithPartner<BuildLimboTransactionOptions>,
+) {
 	const scale = options.scale ?? LIMBO_MULTIPLIER_SCALE;
 	const numerator = Math.round(options.targetMultiplier * scale);
 

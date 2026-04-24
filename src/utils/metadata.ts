@@ -1,16 +1,17 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeSuiAddress } from '@mysten/sui/utils';
+import { isValidSuiAddress, normalizeSuiAddress } from '@mysten/sui/utils';
 
 import type { BetMetadataInput, EncodedBetMetadata } from '../types';
 
-const ADDRESS_METADATA_KEYS = new Set(['referrer', 'partner']);
+const ADDRESS_METADATA_KEYS = new Set(['partner']);
+const RESERVED_METADATA_KEYS = new Set([...ADDRESS_METADATA_KEYS, 'referrer']);
 const textEncoder = new TextEncoder();
 
 const parseHexAddress = (value: string): Uint8Array | null => {
 	const trimmed = value.trim();
-	if (!trimmed) return null;
+	if (!trimmed || !isValidSuiAddress(trimmed)) return null;
 
 	try {
 		const normalized = normalizeSuiAddress(trimmed).slice(2);
@@ -27,33 +28,54 @@ const parseHexAddress = (value: string): Uint8Array | null => {
 	}
 };
 
+const encodeMetadataValue = (
+	key: string,
+	value: string | number | boolean | bigint | Uint8Array | number[],
+) => {
+	if (value instanceof Uint8Array) {
+		return Array.from(value);
+	}
+
+	if (Array.isArray(value)) {
+		return value;
+	}
+
+	if (typeof value === 'string' && ADDRESS_METADATA_KEYS.has(key)) {
+		return Array.from(parseHexAddress(value) ?? textEncoder.encode(value));
+	}
+
+	return Array.from(textEncoder.encode(String(value)));
+};
+
 export function encodeBetMetadata(
 	metadata?: BetMetadataInput | null,
+	partner?: string,
 ): EncodedBetMetadata {
 	const keys: string[] = [];
 	const values: number[][] = [];
 
 	for (const [key, value] of Object.entries(metadata ?? {})) {
-		if (value === undefined || value === null) {
+		if (RESERVED_METADATA_KEYS.has(key)) {
+			console.warn(
+				`Metadata key "${key}" is reserved and will be ignored when parsing metadata.`,
+			);
 			continue;
 		}
 
-		let encodedValue: number[];
-		if (value instanceof Uint8Array) {
-			encodedValue = Array.from(value);
-		} else if (Array.isArray(value)) {
-			encodedValue = value;
-		} else if (typeof value === 'string' && ADDRESS_METADATA_KEYS.has(key)) {
-			encodedValue = Array.from(
-				parseHexAddress(value) ?? textEncoder.encode(value),
-			);
-		} else {
-			encodedValue = Array.from(textEncoder.encode(String(value)));
+		if (value == null) {
+			continue;
 		}
 
 		keys.push(key);
-		values.push(encodedValue);
+		values.push(encodeMetadataValue(key, value));
 	}
 
-	return { keys, values };
+	if (!partner?.trim()) {
+		return { keys, values };
+	}
+
+	return {
+		keys: [...keys, 'partner'],
+		values: [...values, encodeMetadataValue('partner', partner)],
+	};
 }

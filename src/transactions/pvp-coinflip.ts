@@ -15,27 +15,29 @@ import type {
 	BuildPvPCoinflipTransactionOptions,
 	PvPCoinflipAction,
 	ResolvedJoinPvPCoinflipTransactionOptions,
+	WithPartner,
 } from '../types/index.js';
 import { resolvePriceInfoObjectId } from '../utils/config.js';
 import { encodeBetMetadata } from '../utils/metadata.js';
 import { toBigIntAmount } from '../utils/shared.js';
 import { createBaseGameTransaction } from './shared.js';
 
-type InternalPvPCoinflipTransactionOptions<Action extends PvPCoinflipAction> =
-	Action extends 'join'
-		? ResolvedJoinPvPCoinflipTransactionOptions
-		: BuildPvPCoinflipTransactionOptions<Action>;
+type PvPCoinflipTransactionOptionsWithPartner<
+	Action extends PvPCoinflipAction,
+> = Action extends 'join'
+	? WithPartner<ResolvedJoinPvPCoinflipTransactionOptions>
+	: WithPartner<BuildPvPCoinflipTransactionOptions<Action>>;
 
 export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 	action: Action,
-	options: InternalPvPCoinflipTransactionOptions<Action>,
+	options: PvPCoinflipTransactionOptionsWithPartner<Action>,
 ): Transaction {
 	const tx = createBaseGameTransaction({
 		...options,
 		game: 'pvp-coinflip',
 	});
 	const normalizedCoinType = normalizeStructTag(options.coinType);
-	const encodedMetadata = encodeBetMetadata(options.metadata);
+	const encodedMetadata = encodeBetMetadata(options.metadata, options.partner);
 
 	switch (action) {
 		case 'create': {

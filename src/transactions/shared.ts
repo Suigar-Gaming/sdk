@@ -12,6 +12,7 @@ import type {
 	Game,
 	SharedBetTransactionOptions,
 	SuigarConfig,
+	WithPartner,
 } from '../types';
 import { encodeBetMetadata } from '../utils/metadata.js';
 import {
@@ -42,12 +43,14 @@ export type CreateBaseGameTransactionOptions = {
 	gasBudget?: number | bigint;
 };
 
-export type BuildSharedBetTransactionOptions = SharedBetTransactionOptions & {
-	game: Game;
-	buildRewardCoin: (
-		context: BuildSharedBetTransactionContext,
-	) => TransactionResult;
-};
+export type BuildSharedBetTransactionOptions = WithPartner<
+	SharedBetTransactionOptions & {
+		game: Game;
+		buildRewardCoin: (
+			context: BuildSharedBetTransactionContext,
+		) => TransactionResult;
+	}
+>;
 
 export function createBaseGameTransaction({
 	config,
@@ -74,6 +77,7 @@ export function buildSharedStandardGameBetCall({
 	cashStake,
 	betCount,
 	metadata,
+	partner,
 	allowGasCoinShortcut = true,
 	buildRewardCoin,
 }: BuildSharedBetTransactionOptions): (tx: Transaction) => TransactionArgument {
@@ -83,7 +87,7 @@ export function buildSharedStandardGameBetCall({
 		const resolvedStake = toBigIntAmount(stake, 'stake');
 		const resolvedCashStake = toBigIntAmount(cashStake ?? stake, 'cashStake');
 		const resolvedBetCount = toBigIntAmount(betCount ?? 1, 'betCount');
-		const encodedMetadata = encodeBetMetadata(metadata);
+		const encodedMetadata = encodeBetMetadata(metadata, partner);
 		const priceInfoObjectId = resolvePriceInfoObjectId(
 			config,
 			normalizedCoinType,

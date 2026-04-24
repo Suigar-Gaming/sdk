@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { play } from '../contracts/wheel/wheel.js';
-import type { BuildWheelTransactionOptions } from '../types';
+import type { BuildWheelTransactionOptions, WithPartner } from '../types';
 import { toU8Number } from '../utils/shared.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
-export function buildWheelTransaction(options: BuildWheelTransactionOptions) {
+export function buildWheelTransaction(
+	options: WithPartner<BuildWheelTransactionOptions>,
+) {
 	const configId = toU8Number(options.configId, 'configId');
 
 	return buildSharedStandardGameBetTransaction({
