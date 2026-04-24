@@ -3,12 +3,20 @@
 Next.js example app for the Suigar SDK. It uses:
 
 - `@suigar/sdk`
+- `@suigar/sdk/games`
+- `@suigar/sdk/utils`
 - `@mysten/dapp-kit-core`
 - `@mysten/dapp-kit-react`
 - `@mysten/sui`
 - Suigar-inspired UI and theme tokens based on the frontend app
 
 ## What it covers
+
+The example reflects the current package export split:
+
+- runtime integration through `@suigar/sdk`
+- game option types through `@suigar/sdk/games`
+- parsing helpers through `@suigar/sdk/utils`
 
 - Standard game route: `/standard?game=coinflip`
 - PvP route: `/pvp?game=pvp-coinflip&action=create`

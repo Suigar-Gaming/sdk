@@ -7,6 +7,7 @@ Read `AGENTS.md` first for:
 - repository structure
 - `npm` build, test, and release commands
 - Suigar client architecture
+- current public package exports for `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`
 - Suigar-specific SDK rules
 - repo-local skills in `.agents/skills/`
 

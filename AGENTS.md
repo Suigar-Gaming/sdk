@@ -87,7 +87,8 @@ npm run release
 ### Key Patterns
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
-2. **Public root exports**: The package root exports `suigar`. Do not invent additional root exports.
+2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
+   The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
@@ -100,7 +101,7 @@ The SDK is organized around a client extension plus typed transaction builders. 
 
 The integration has three practical layers:
 
-1. **Public SDK surface** - `suigar()` exposed from the package root.
+1. **Public SDK surface** - `suigar()` and `SuigarClient` exposed from the package root, with additional public subpaths for `games` and `utils`.
 2. **Client extension implementation** - `src/client.ts` registers the extension on top of a `ClientWithCoreApi` and exposes serialization, BCS helpers, and transaction builders.
 3. **Transaction and contract layer** - `src/transactions/` consumes network-resolved config, normalizes user input, and invokes generated Move wrappers from `src/contracts/`.
 
