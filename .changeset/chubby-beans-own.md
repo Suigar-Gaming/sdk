@@ -1,5 +1,5 @@
 ---
-'@suigar/sdk': minor
+'@suigar/sdk': patch
 ---
 
 Add BCS parser helpers and a Next.js game integration example app.
