@@ -549,9 +549,11 @@ It demonstrates:
 
 - standard game transactions through `client.suigar.tx.createBetTransaction(...)`
 - PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP coinflip action selector
+- unresolved PvP lobby browsing through `client.suigar.getPvPCoinflipGames(...)`, rendered as compact join/cancel cards filtered by the connected wallet
 - wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
 - supported coin selection from `client.suigar.getConfig()`
 - connected-wallet balance display for each supported coin in the example app
+- privacy badges and copyable PvP game ids in the lobby UI
 - decoding `BetResultEvent` and PvP events into a persistent event log
 - parsing `BetResultEvent.game_details` with `parseGameDetails`
 

@@ -25,8 +25,9 @@ The example reflects the current package export split:
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
+- Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, filtered by whether the connected wallet owns the unresolved game, with compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
-- Wallet sign-and-execute via the new Mysten dApp Kit
+- A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled`
 - Oracle price formatting with `parseFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
 - Shared persistent event table across route and game changes
