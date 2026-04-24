@@ -35,6 +35,10 @@ Supported game ids:
 - `sender?: string`
 - `allowGasCoinShortcut?: boolean`
 
+Extension-level option:
+
+- `suigar({ partner?: string })` appends `partner` metadata automatically to all supported bet flows.
+
 ## Game-specific options
 
 - `coinflip`: `side: 'heads' | 'tails'`
@@ -181,6 +185,8 @@ Guardrails:
 - Use `cashStake` only when the withdrawn coin amount must differ from the game stake.
 - `betCount` defaults to `1`; do not reimplement batching unless the product requires custom behavior.
 - Pass plain application values in `metadata`; let the SDK encode them.
+- Do not set `metadata.partner` or `metadata.referrer`; those keys are reserved and the SDK ignores them with a warning.
+- If the product needs partner attribution, configure `suigar({ partner })` once on the client extension instead of passing it per transaction.
 - Keep amounts as `bigint` once they leave the UI layer.
 - Ensure the same connected wallet address is used as `owner`.
 

@@ -8,6 +8,10 @@ import type { CoinSide } from './game.type';
 import type { SharedBetTransactionOptions } from './shared-bet-transaction-options.type';
 import type { SuigarConfig } from './suigar-config.type';
 
+export type WithPartner<T> = T & {
+	partner?: string;
+};
+
 export type BuildCoinflipTransactionOptions = SharedBetTransactionOptions & {
 	side: CoinSide;
 };

@@ -150,6 +150,7 @@ describe('shared transaction helpers', () => {
 			: never | undefined;
 
 		const tx = new Transaction();
+		const partner = normalizeSuiAddress('0x123');
 		const reward = buildSharedStandardGameBetCall({
 			config: TEST_CONFIG,
 			game: 'coinflip',
@@ -160,9 +161,9 @@ describe('shared transaction helpers', () => {
 			cashStake: 2500,
 			betCount: 3,
 			metadata: {
-				referrer: '0x123',
 				label: 'vip',
 			},
+			partner,
 			allowGasCoinShortcut: false,
 			buildRewardCoin: (resolvedContext) => {
 				context = resolvedContext;
@@ -181,12 +182,51 @@ describe('shared transaction helpers', () => {
 		expect(context!.betCount).toBe(3n);
 		expect(context!.priceInfoObjectId).toBe('0x789');
 		expect(context!.metadata).toEqual({
-			keys: ['referrer', 'label'],
+			keys: ['label', 'partner'],
 			values: [
-				Array.from(Buffer.from(normalizeSuiAddress('0x123').slice(2), 'hex')),
 				encodeUtf8('vip'),
+				Array.from(Buffer.from(partner.slice(2), 'hex')),
 			],
 		});
+	});
+
+	it('warns and skips reserved metadata keys', async () => {
+		const { buildSharedStandardGameBetCall } =
+			await import('../src/transactions/shared.js');
+		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+		buildSharedStandardGameBetCall({
+			config: TEST_CONFIG,
+			game: 'coinflip',
+			owner: '0x123',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			metadata: {
+				referrer: '0x123',
+				partner: 'manual',
+				label: 'vip',
+			},
+			buildRewardCoin: (resolvedContext) => {
+				expect(resolvedContext.metadata).toEqual({
+					keys: ['label'],
+					values: [encodeUtf8('vip')],
+				});
+				return resolvedContext.tx.object(
+					'0x777',
+				) as unknown as TransactionResult;
+			},
+		})(new Transaction());
+
+		expect(warn).toHaveBeenCalledTimes(2);
+		expect(warn).toHaveBeenNthCalledWith(
+			1,
+			'Metadata key "referrer" is reserved and will be ignored when parsing metadata.',
+		);
+		expect(warn).toHaveBeenNthCalledWith(
+			2,
+			'Metadata key "partner" is reserved and will be ignored when parsing metadata.',
+		);
+		warn.mockRestore();
 	});
 });
 
@@ -212,6 +252,7 @@ describe('coinflip transaction wrapper', () => {
 			betCount: 2,
 			side: 'tails',
 			metadata: { label: 'vip' },
+			partner: 'vip',
 			config: TEST_CONFIG,
 		});
 
@@ -229,8 +270,11 @@ describe('coinflip transaction wrapper', () => {
 		expect(options.arguments[1]).toBe(1000n);
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
-		expect(options.arguments[5]).toEqual(['label']);
-		expect(options.arguments[6]).toEqual([encodeUtf8('vip')]);
+		expect(options.arguments[5]).toEqual(['label', 'partner']);
+		expect(options.arguments[6]).toEqual([
+			encodeUtf8('vip'),
+			encodeUtf8('vip'),
+		]);
 		expect(options.arguments[7]).toBe('0x789');
 	});
 });
@@ -431,6 +475,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			side: 'tails',
 			isPrivate: true,
 			metadata: { label: 'vip' },
+			partner: 'vip',
 			config: TEST_CONFIG,
 		});
 
@@ -446,7 +491,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.arguments[0]).toBe('0x456');
 		expect(options.arguments[2]).toBe(true);
 		expect(options.arguments[3]).toBe(true);
-		expect(options.arguments[4]).toEqual(['label']);
+		expect(options.arguments[4]).toEqual(['label', 'partner']);
 	});
 
 	it('passes join action arguments into the generated helper', async () => {
@@ -467,6 +512,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
 			metadata: { label: 'vip' },
+			partner: 'vip',
 			config: TEST_CONFIG,
 			betCoin: (tx: Transaction) => Promise.resolve(tx.coin({ balance: 1000 })),
 		});
@@ -478,7 +524,11 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.package).toBe('0x3');
 		expect(options.arguments[0]).toBe('0x999');
 		expect(options.arguments[1]).toBe('0x456');
-		expect(options.arguments[4]).toEqual([encodeUtf8('vip')]);
+		expect(options.arguments[3]).toEqual(['label', 'partner']);
+		expect(options.arguments[4]).toEqual([
+			encodeUtf8('vip'),
+			encodeUtf8('vip'),
+		]);
 		expect(options.arguments[5]).toBe('0x789');
 	});
 
@@ -572,6 +622,96 @@ describe('SuigarClient', () => {
 
 		expect(client.suigar).toBeDefined();
 		expect(client.suigar.serializeTransactionToBase64).toBeTypeOf('function');
+	});
+
+	it('injects the configured partner into standard-game metadata', async () => {
+		const play = vi.fn((_: unknown) => {
+			return (tx: Transaction) => tx.object('0x777');
+		});
+
+		vi.resetModules();
+		await loadTransactionModuleWithMock(
+			'../src/contracts/coinflip/coinflip.js',
+			{ play },
+			'../src/transactions/coinflip.js',
+		);
+		vi.doMock(
+			'../src/contracts/pvp-coinflip/pvp_coinflip.js',
+			async (importOriginal) => await importOriginal(),
+		);
+		const { suigar: mockedSuigar } = await import('../src/client.js');
+
+		class TestClient extends CoreClient {
+			constructor() {
+				super({ network: 'testnet', base: undefined as never });
+			}
+
+			getObjects = async () => ({ objects: [] });
+			listCoins = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			listOwnedObjects = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getBalance = async () => ({
+				balance: {
+					coinType: '0x2::sui::SUI',
+					balance: '0',
+					coinBalance: '0',
+					addressBalance: '0',
+				},
+			});
+			listBalances = async () => ({
+				balances: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getCoinMetadata = async () => ({ coinMetadata: null });
+			getTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			executeTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			simulateTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			getReferenceGasPrice = async () => ({
+				referenceGasPrice: '0',
+				price: '1',
+			});
+			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
+			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
+			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
+			listDynamicFields = async () => ({
+				dynamicFields: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			resolveTransactionPlugin = () => async () => {};
+			verifyZkLoginSignature = async () => ({ success: true }) as never;
+			getMoveFunction = async () => ({ function: null }) as never;
+			defaultNameServiceName = async () => ({ address: null }) as never;
+		}
+
+		const client = new TestClient().$extend(mockedSuigar({ partner: 'vip' }));
+		const coinType = client.suigar.getConfig().coinTypes.sui;
+		client.suigar.tx.createBetTransaction('coinflip', {
+			owner: '0x123',
+			coinType,
+			stake: 1000,
+			side: 'heads',
+		});
+
+		const options = getFirstMockArg<{
+			arguments: unknown[];
+		}>(play);
+		expect(options.arguments[5]).toEqual(['partner']);
+		expect(options.arguments[6]).toEqual([encodeUtf8('vip')]);
 	});
 
 	it('exposes both standard and pvp transaction factories', () => {

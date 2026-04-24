@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { play } from '../contracts/coinflip/coinflip.js';
-import type { BuildCoinflipTransactionOptions } from '../types';
+import type { BuildCoinflipTransactionOptions, WithPartner } from '../types';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildCoinflipTransaction(
-	options: BuildCoinflipTransactionOptions,
+	options: WithPartner<BuildCoinflipTransactionOptions>,
 ) {
 	return buildSharedStandardGameBetTransaction({
 		...options,

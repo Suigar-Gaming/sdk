@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { play } from '../contracts/range/range.js';
-import type { BuildRangeTransactionOptions } from '../types';
+import type { BuildRangeTransactionOptions, WithPartner } from '../types';
 import { RANGE_FIXED_POINT_SCALE } from '../utils/shared.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
-export function buildRangeTransaction(options: BuildRangeTransactionOptions) {
+export function buildRangeTransaction(
+	options: WithPartner<BuildRangeTransactionOptions>,
+) {
 	const scale = options.scale ?? RANGE_FIXED_POINT_SCALE;
 	const leftPoint = Math.round(options.leftPoint * scale);
 	const rightPoint = Math.round(options.rightPoint * scale);

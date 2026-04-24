@@ -4,7 +4,7 @@ import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import type { RangeFormValues } from '@/lib/suigar-app';
+import type { RangeFormValues } from '@/lib/suigar-types';
 
 export function RangeForm({
 	value,

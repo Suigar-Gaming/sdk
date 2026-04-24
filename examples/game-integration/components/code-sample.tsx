@@ -1,7 +1,7 @@
 'use client';
 
 import { Copy, FileCode2 } from 'lucide-react';
-import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -12,12 +12,11 @@ import {
 } from '@/components/ui/card';
 
 export function CodeSample({ code }: { code: string }) {
-	const [copied, setCopied] = useState(false);
-
 	async function handleCopy() {
 		await navigator.clipboard.writeText(code);
-		setCopied(true);
-		window.setTimeout(() => setCopied(false), 1200);
+		toast.success('Copied to clipboard', {
+			description: 'The full transaction block code was copied.',
+		});
 	}
 
 	return (
@@ -35,7 +34,7 @@ export function CodeSample({ code }: { code: string }) {
 				</div>
 				<Button variant="outline" size="sm" onClick={handleCopy}>
 					<Copy className="size-4" />
-					{copied ? 'Copied' : 'Copy'}
+					Copy
 				</Button>
 			</CardHeader>
 			<CardContent>

@@ -3,6 +3,7 @@
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
+	partner?: string;
 }
 
 export type SuigarCoin = 'sui' | 'usdc';

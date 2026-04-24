@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { EventLogRow } from '@/lib/suigar-app';
+import type { EventLogRow } from '@/lib/suigar-types';
 
 type EventLogContextValue = {
 	rows: EventLogRow[];

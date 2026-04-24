@@ -9,7 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import type { CoinflipFormValues } from '@/lib/suigar-app';
+import type { CoinflipFormValues } from '@/lib/suigar-types';
 
 export function CoinflipForm({
 	value,

@@ -28,6 +28,11 @@
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		},
+		"./games": {
+			"types": "./dist/games.d.ts",
+			"import": "./dist/games.js",
+			"require": "./dist/games.cjs"
+		},
 		"./utils": {
 			"types": "./dist/utils.d.ts",
 			"import": "./dist/utils.js",

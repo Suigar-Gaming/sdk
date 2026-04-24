@@ -1,5 +1,6 @@
-import type { EventLogRow } from '@/lib/suigar-app';
+import type { EventLogRow } from '@/lib/suigar-types';
 import { fromBase64 } from '@mysten/sui/utils';
+import type { SuigarClient } from '@suigar/sdk';
 import {
 	parseFloat as parseMoveFloat,
 	parseGameDetails,
@@ -15,29 +16,12 @@ type ParsedEvent = {
 	type?: string;
 };
 
-type SuigarClientLike = {
-	suigar: {
-		bcs: unknown;
-	};
-};
-
-type BcsApi = {
-	BetResultEvent: { parse: (bytes: Uint8Array) => Record<string, unknown> };
-	PvPCoinflipGameCreated: {
-		parse: (bytes: Uint8Array) => Record<string, unknown>;
-	};
-	PvPCoinflipGameResolved: {
-		parse: (bytes: Uint8Array) => Record<string, unknown>;
-	};
-	PvPCoinflipGameCancelled: {
-		parse: (bytes: Uint8Array) => Record<string, unknown>;
-	};
-};
+type BcsApi = SuigarClient['bcs'];
 
 const textDecoder = new TextDecoder();
 
-function asBcsApi(client: SuigarClientLike) {
-	return client.suigar.bcs as BcsApi;
+function asBcsApi(client: { suigar: SuigarClient }) {
+	return client.suigar.bcs;
 }
 
 function bytesFromEvent(event: unknown) {
@@ -257,7 +241,7 @@ function createEventRow(
 }
 
 export function parseSuigarEvents(
-	client: SuigarClientLike,
+	client: { suigar: SuigarClient },
 	digest: string,
 	events: unknown[] | undefined,
 ) {

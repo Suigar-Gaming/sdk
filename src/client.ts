@@ -21,6 +21,7 @@ import {
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuiNetwork,
+	WithPartner,
 } from './types';
 import { resolveSuigarConfig } from './utils';
 import {
@@ -41,22 +42,32 @@ import {
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
+	partner,
 }: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
 		register: (client: ClientWithCoreApi) => {
-			return new SuigarClient({ client });
+			return new SuigarClient({ client, partner });
 		},
 	};
 }
 
-class SuigarClient {
+export class SuigarClient {
 	#client: ClientWithCoreApi;
 
 	#config: SuigarConfig;
 
-	constructor({ client }: { client: ClientWithCoreApi }) {
+	#partner: string | undefined;
+
+	constructor({
+		client,
+		partner,
+	}: {
+		client: ClientWithCoreApi;
+		partner?: string;
+	}) {
 		this.#client = client;
+		this.#partner = partner;
 
 		const network = this.#client.network as SuiNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
@@ -177,27 +188,32 @@ class SuigarClient {
 					return buildCoinflipTransaction({
 						...options,
 						config: this.#config,
-					} as BuildCoinflipTransactionOptions);
+						partner: this.#partner,
+					} as WithPartner<BuildCoinflipTransactionOptions>);
 				case 'limbo':
 					return buildLimboTransaction({
 						...options,
 						config: this.#config,
-					} as BuildLimboTransactionOptions);
+						partner: this.#partner,
+					} as WithPartner<BuildLimboTransactionOptions>);
 				case 'plinko':
 					return buildPlinkoTransaction({
 						...options,
 						config: this.#config,
-					} as BuildPlinkoTransactionOptions);
+						partner: this.#partner,
+					} as WithPartner<BuildPlinkoTransactionOptions>);
 				case 'range':
 					return buildRangeTransaction({
 						...options,
 						config: this.#config,
-					} as BuildRangeTransactionOptions);
+						partner: this.#partner,
+					} as WithPartner<BuildRangeTransactionOptions>);
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,
 						config: this.#config,
-					} as BuildWheelTransactionOptions);
+						partner: this.#partner,
+					} as WithPartner<BuildWheelTransactionOptions>);
 				default:
 					throw new Error(`Unsupported game: ${gameId}`);
 			}
@@ -218,6 +234,7 @@ class SuigarClient {
 					return buildPvPCoinflipTransaction('create', {
 						...(options as BuildCreatePvPCoinflipTransactionOptions),
 						config: this.#config,
+						partner: this.#partner,
 					});
 				case 'join': {
 					const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
@@ -225,12 +242,14 @@ class SuigarClient {
 						...joinOptions,
 						betCoin: this.#createPvPCoinflipBetCoin(joinOptions),
 						config: this.#config,
+						partner: this.#partner,
 					});
 				}
 				case 'cancel':
 					return buildPvPCoinflipTransaction('cancel', {
 						...(options as BuildCancelPvPCoinflipTransactionOptions),
 						config: this.#config,
+						partner: this.#partner,
 					});
 				default:
 					throw new Error(`Unsupported PvP coinflip action: ${action}`);

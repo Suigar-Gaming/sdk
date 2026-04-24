@@ -19,20 +19,56 @@ This SDK targets Sui TypeScript SDK 2.0+ only. Follow the official [Sui 2.0 migr
 
 ## What This Package Exposes
 
-The package root currently exposes the extension factory:
+The package ships three public entrypoints:
+
+- `@suigar/sdk` for the extension factory and runtime client class
+- `@suigar/sdk/games` for game-specific public types
+- `@suigar/sdk/utils` for parser, config, metadata, and amount helpers
+
+The package root exposes the extension factory and client class:
 
 ```ts
-import { suigar } from '@suigar/sdk';
+import { suigar, SuigarClient } from '@suigar/sdk';
 ```
 
 It does not export the individual transaction builders from the package root.
-It also does not export `SuigarClient` as a public root symbol.
+Those stay on the registered extension instance under `client.suigar.tx`.
 
-Parser and helper utilities are available from the single utils subpath:
+Utility exports are available from the utils subpath:
 
 ```ts
-import { parseFloat, parseGameDetails, parseI64 } from '@suigar/sdk/utils';
+import {
+	DEFAULT_GAS_BUDGET_MIST,
+	LIMBO_MULTIPLIER_SCALE,
+	RANGE_FIXED_POINT_SCALE,
+	encodeBetMetadata,
+	parseFloat,
+	parseGameDetails,
+	parseI64,
+	resolveGamePackageId,
+	resolvePriceInfoObjectId,
+	resolveSuigarConfig,
+	toBigIntAmount,
+	toU8Number,
+} from '@suigar/sdk/utils';
 ```
+
+Game-specific type exports are available from the dedicated `games` subpath:
+
+```ts
+import type {
+	BuildCoinflipTransactionOptions,
+	CoinSide,
+} from '@suigar/sdk/games';
+import type {
+	BuildCreatePvPCoinflipTransactionOptions,
+	PvPCoinflipAction,
+} from '@suigar/sdk/games';
+```
+
+Current game-type subpath exports:
+
+- `@suigar/sdk/games`: `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
@@ -74,7 +110,9 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
 ```ts
-const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({ partner: 'my-partner' }),
+);
 
 client.suigar;
 ```
@@ -103,6 +141,12 @@ client.games.bcs;
 Supported override areas:
 
 - `name`
+- `partner`
+
+If `partner` is configured, the SDK automatically writes it into the onchain
+metadata vec-map. Transaction builder options may also include `metadata`, but
+reserved keys such as `partner` and `referrer` are ignored with a warning when
+provided manually.
 
 ## Runtime Surface
 
@@ -207,6 +251,8 @@ Shared behavior:
 - `betCount` defaults to `1`
 - `sender` overrides the transaction sender
 - `metadata` is encoded into `keys` and `values` byte arrays
+- `partner` configured via `suigar({ partner })` is appended automatically to metadata
+- `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `owner`
 
@@ -291,7 +337,7 @@ PvP shared options:
 
 - `owner: string`
 - `coinType: string`
-- `metadata?: ...`
+- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
 - `sender?: string`
 - `allowGasCoinShortcut?: boolean`
@@ -406,6 +452,9 @@ const gameDetails = parseGameDetails(decoded.game_details);
 ```
 
 `parseGameDetails` preserves the onchain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
+
+When the extension is configured with `partner`, decoded event `metadata` will
+contain that `partner` entry.
 
 Important:
 

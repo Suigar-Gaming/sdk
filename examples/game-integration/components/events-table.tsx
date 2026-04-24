@@ -11,6 +11,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@/components/ui/table';
 import { compactAddress } from '@/lib/suigar-app';
 
 function CopyableValue({
@@ -74,71 +82,85 @@ export function EventsTable() {
 			<CardContent className="min-h-[12rem]">
 				<div className="overflow-hidden rounded-2xl border border-border/70">
 					<div className="max-h-[28rem] overflow-auto">
-						<table className="w-full min-w-[44rem] text-sm md:min-w-full">
-							<thead className="bg-muted/50 text-left text-muted-foreground">
-								<tr>
-									<th className="px-4 py-3 font-medium">Type</th>
-									<th className="px-4 py-3 font-medium">Date</th>
-									<th className="px-4 py-3 font-medium">Digest</th>
-									<th className="px-4 py-3 font-medium">Game ID</th>
-									<th className="px-4 py-3 font-medium">Player</th>
-									<th className="px-4 py-3 font-medium">Details</th>
-								</tr>
-							</thead>
-							<tbody>
+						<Table className="min-w-[44rem] bg-background md:min-w-full">
+							<TableHeader className="bg-accent">
+								<TableRow className="hover:bg-transparent">
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Type
+									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Date
+									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Digest
+									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Game ID
+									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Player
+									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">
+										Details
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
 								{rows.length === 0 ? (
-									<tr>
-										<td
+									<TableRow>
+										<TableCell
 											colSpan={6}
-											className="px-4 py-10 text-center text-muted-foreground"
+											className="py-10 text-center text-muted-foreground"
 										>
 											Execute a transaction to start filling the shared event
 											log.
-										</td>
-									</tr>
+										</TableCell>
+									</TableRow>
 								) : (
 									rows.map((row) => (
-										<tr
+										<TableRow
 											key={row.id}
-											className="border-t border-border/70 align-top"
+											className="align-top odd:bg-accent/35 even:bg-card/55"
 										>
-											<td className="px-4 py-3 font-medium">{row.eventType}</td>
-											<td className="px-4 py-3 text-muted-foreground">
+											<TableCell className="font-medium">
+												{row.eventType}
+											</TableCell>
+											<TableCell className="text-muted-foreground">
 												{new Date(row.timestamp).toLocaleString()}
-											</td>
-											<td className="px-4 py-3 text-xs">
+											</TableCell>
+											<TableCell className="text-xs">
 												<CopyableValue
 													label="digest"
 													value={row.digest}
 													onCopied={handleCopied}
 												/>
-											</td>
-											<td className="px-4 py-3 text-xs">
+											</TableCell>
+											<TableCell className="text-xs">
 												<CopyableValue
 													label="game id"
 													value={row.gameId}
 													onCopied={handleCopied}
 												/>
-											</td>
-											<td className="px-4 py-3 text-xs text-muted-foreground">
+											</TableCell>
+											<TableCell className="text-xs text-muted-foreground">
 												<CopyableValue
 													label="player"
 													value={row.actor}
 													onCopied={handleCopied}
 												/>
-											</td>
-											<td className="px-4 py-3 text-muted-foreground">
+											</TableCell>
+											<TableCell className="text-muted-foreground">
 												<ul className="list-disc space-y-1 pl-4">
 													{row.details.split(' | ').map((detail) => (
 														<li key={detail}>{detail}</li>
 													))}
 												</ul>
-											</td>
-										</tr>
+											</TableCell>
+										</TableRow>
 									))
 								)}
-							</tbody>
-						</table>
+							</TableBody>
+						</Table>
 					</div>
 				</div>
 			</CardContent>

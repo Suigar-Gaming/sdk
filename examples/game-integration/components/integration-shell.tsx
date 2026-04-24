@@ -51,12 +51,14 @@ import {
 	DEFAULT_STANDARD_FORMS,
 	isPvPAction,
 	isStandardGame,
-	type PvPAction,
-	type PvPForms,
-	type StandardForms,
-	type StandardGameId,
-	type SupportedCoinKey,
 } from '@/lib/suigar-app';
+import type {
+	PvPAction,
+	PvPForms,
+	StandardForms,
+	StandardGameId,
+	SupportedCoinKey,
+} from '@/lib/suigar-types';
 import {
 	buildPvPTransaction,
 	buildStandardTransaction,

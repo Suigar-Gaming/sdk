@@ -5,6 +5,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
 	entry: {
+		games: 'src/games.ts',
 		index: 'src/index.ts',
 		utils: 'src/helpers/index.ts',
 	},

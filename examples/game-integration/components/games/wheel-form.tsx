@@ -3,7 +3,7 @@
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { WheelFormValues } from '@/lib/suigar-app';
+import type { WheelFormValues } from '@/lib/suigar-types';
 
 export function WheelForm({
 	value,

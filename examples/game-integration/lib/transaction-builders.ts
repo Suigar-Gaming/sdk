@@ -1,4 +1,4 @@
-import type { Transaction } from '@mysten/sui/transactions';
+import type { SuigarClient } from '@suigar/sdk';
 import type {
 	CoinflipFormValues,
 	PvPAction,
@@ -14,18 +14,14 @@ import type {
 	RangeFormValues,
 	SupportedCoinKey,
 	WheelFormValues,
-} from '@/lib/suigar-app';
+} from '@/lib/suigar-types';
 import {
 	COIN_DECIMALS,
 	parseOptionalNumber,
 	toAtomicAmount,
 } from '@/lib/suigar-app';
 
-type SuigarClientLike = {
-	suigar: {
-		tx: unknown;
-	};
-};
+type TxApi = SuigarClient['tx'];
 
 function buildSharedOptions(
 	owner: string,
@@ -57,7 +53,7 @@ function toCodeBlock(factoryLine: string, codeLines: string[]) {
 }
 
 export function buildStandardTransaction<K extends StandardGameId>(
-	client: SuigarClientLike,
+	client: { suigar: SuigarClient },
 	gameId: K,
 	form: StandardForms[K],
 	owner: string,
@@ -70,25 +66,14 @@ export function buildStandardTransaction<K extends StandardGameId>(
 		coinKey,
 		form,
 	);
-	const txApi = client.suigar.tx as {
-		createBetTransaction: (
-			gameId: StandardGameId,
-			options: unknown,
-		) => Transaction;
-	};
+	const txApi: TxApi = client.suigar.tx;
 
 	switch (gameId) {
 		case 'coinflip': {
 			const typedForm = form as CoinflipFormValues;
 			baseOptions.side = typedForm.side;
 			codeLines.push(`side: '${typedForm.side}',`);
-			return {
-				transaction: txApi.createBetTransaction(gameId, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'limbo': {
 			const typedForm = form as LimboFormValues;
@@ -101,25 +86,13 @@ export function buildStandardTransaction<K extends StandardGameId>(
 				baseOptions.scale = scale;
 				codeLines.push(`scale: ${scale},`);
 			}
-			return {
-				transaction: txApi.createBetTransaction(gameId, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'plinko': {
 			const typedForm = form as PlinkoFormValues;
 			baseOptions.configId = Number(typedForm.configId);
 			codeLines.push(`configId: ${Number(typedForm.configId)},`);
-			return {
-				transaction: txApi.createBetTransaction(gameId, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'range': {
 			const typedForm = form as RangeFormValues;
@@ -134,104 +107,89 @@ export function buildStandardTransaction<K extends StandardGameId>(
 				baseOptions.scale = scale;
 				codeLines.push(`scale: ${scale},`);
 			}
-			return {
-				transaction: txApi.createBetTransaction(gameId, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'wheel': {
 			const typedForm = form as WheelFormValues;
 			baseOptions.configId = Number(typedForm.configId);
 			codeLines.push(`configId: ${Number(typedForm.configId)},`);
-			return {
-				transaction: txApi.createBetTransaction(gameId, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 	}
+
+	return {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		transaction: txApi.createBetTransaction(gameId, baseOptions as any),
+		code: toCodeBlock(
+			`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
+			codeLines,
+		),
+	};
 }
 
 export function buildPvPTransaction<K extends PvPAction>(
-	client: SuigarClientLike,
+	client: { suigar: SuigarClient },
 	action: K,
 	form: PvPForms[K],
 	owner: string,
 	coinKey: SupportedCoinKey,
 	coinType: string,
 ) {
-	const txApi = client.suigar.tx as {
-		createPvPCoinflipTransaction: (
-			action: PvPAction,
-			options: unknown,
-		) => Transaction;
-	};
+	const txApi: TxApi = client.suigar.tx;
+	let baseOptions: Record<string, unknown>;
+	let codeLines: string[];
 
 	switch (action) {
 		case 'create': {
 			const typedForm = form as PvPCreateFormValues;
-			const { baseOptions, codeLines } = buildSharedOptions(
+			({ baseOptions, codeLines } = buildSharedOptions(
 				owner,
 				coinType,
 				coinKey,
 				typedForm,
-			);
+			));
 			baseOptions.side = typedForm.side;
 			baseOptions.isPrivate = typedForm.isPrivate;
 			codeLines.push(`side: '${typedForm.side}',`);
 			codeLines.push(`isPrivate: ${typedForm.isPrivate},`);
-			return {
-				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'join': {
 			const typedForm = form as PvPJoinFormValues;
-			const baseOptions: Record<string, unknown> = {
+			baseOptions = {
 				owner,
 				coinType,
 				gameId: typedForm.gameId.trim(),
 			};
-			const codeLines = [
+			codeLines = [
 				`owner: '${owner}',`,
 				`coinType: '${coinType}',`,
 				`gameId: '${typedForm.gameId.trim()}',`,
 			];
-			return {
-				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 		case 'cancel': {
 			const typedForm = form as PvPCancelFormValues;
-			const baseOptions: Record<string, unknown> = {
+			baseOptions = {
 				owner,
 				coinType,
 				gameId: typedForm.gameId.trim(),
 			};
-			const codeLines = [
+			codeLines = [
 				`owner: '${owner}',`,
 				`coinType: '${coinType}',`,
 				`gameId: '${typedForm.gameId.trim()}',`,
 			];
-			return {
-				transaction: txApi.createPvPCoinflipTransaction(action, baseOptions),
-				code: toCodeBlock(
-					`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
-					codeLines,
-				),
-			};
+			break;
 		}
 	}
+
+	return {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		transaction: txApi.createPvPCoinflipTransaction(action, baseOptions as any),
+		code: toCodeBlock(
+			`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
+			codeLines,
+		),
+	};
 }

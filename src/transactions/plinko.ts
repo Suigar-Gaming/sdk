@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { play } from '../contracts/plinko/plinko.js';
-import type { BuildPlinkoTransactionOptions } from '../types';
+import type { BuildPlinkoTransactionOptions, WithPartner } from '../types';
 import { toU8Number } from '../utils/shared.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
-export function buildPlinkoTransaction(options: BuildPlinkoTransactionOptions) {
+export function buildPlinkoTransaction(
+	options: WithPartner<BuildPlinkoTransactionOptions>,
+) {
 	const configId = toU8Number(options.configId, 'configId');
 
 	return buildSharedStandardGameBetTransaction({

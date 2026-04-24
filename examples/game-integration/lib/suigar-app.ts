@@ -1,4 +1,11 @@
-import type { Transaction } from '@mysten/sui/transactions';
+import type {
+	PvPAction,
+	PvPForms,
+	StandardGameId,
+	StandardForms,
+	SharedFields,
+	SupportedCoinKey,
+} from '@/lib/suigar-types';
 
 export const STANDARD_GAMES = [
 	'coinflip',
@@ -9,81 +16,6 @@ export const STANDARD_GAMES = [
 ] as const;
 
 export const PVP_ACTIONS = ['create', 'join', 'cancel'] as const;
-
-export type StandardGameId = (typeof STANDARD_GAMES)[number];
-export type PvPAction = (typeof PVP_ACTIONS)[number];
-export type SupportedCoinKey = 'sui' | 'usdc';
-
-export type SharedFields = {
-	stake: string;
-};
-
-export type CoinflipFormValues = SharedFields & {
-	side: 'heads' | 'tails';
-};
-
-export type LimboFormValues = SharedFields & {
-	targetMultiplier: string;
-	scale: string;
-};
-
-export type PlinkoFormValues = SharedFields & {
-	configId: string;
-};
-
-export type RangeFormValues = SharedFields & {
-	leftPoint: string;
-	rightPoint: string;
-	outOfRange: boolean;
-	scale: string;
-};
-
-export type WheelFormValues = SharedFields & {
-	configId: string;
-};
-
-export type PvPCreateFormValues = SharedFields & {
-	side: 'heads' | 'tails';
-	isPrivate: boolean;
-};
-
-export type PvPJoinFormValues = {
-	gameId: string;
-};
-
-export type PvPCancelFormValues = {
-	gameId: string;
-};
-
-export type StandardForms = {
-	coinflip: CoinflipFormValues;
-	limbo: LimboFormValues;
-	plinko: PlinkoFormValues;
-	range: RangeFormValues;
-	wheel: WheelFormValues;
-};
-
-export type PvPForms = {
-	create: PvPCreateFormValues;
-	join: PvPJoinFormValues;
-	cancel: PvPCancelFormValues;
-};
-
-export type EventLogRow = {
-	id: string;
-	timestamp: string;
-	eventType: string;
-	digest: string;
-	gameId?: string;
-	actor?: string;
-	details: string;
-	raw: unknown;
-};
-
-export type BuildResult = {
-	transaction: Transaction;
-	code: string;
-};
 
 export const COIN_DECIMALS: Record<SupportedCoinKey, number> = {
 	sui: 9,
@@ -136,11 +68,11 @@ export const DEFAULT_PVP_FORMS: PvPForms = {
 };
 
 export function isStandardGame(value: string | null): value is StandardGameId {
-	return STANDARD_GAMES.includes(value as StandardGameId);
+	return STANDARD_GAMES.includes(value as (typeof STANDARD_GAMES)[number]);
 }
 
 export function isPvPAction(value: string | null): value is PvPAction {
-	return PVP_ACTIONS.includes(value as PvPAction);
+	return PVP_ACTIONS.includes(value as (typeof PVP_ACTIONS)[number]);
 }
 
 export function parseOptionalNumber(value: string) {

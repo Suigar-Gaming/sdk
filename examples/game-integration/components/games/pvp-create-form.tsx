@@ -10,7 +10,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import type { PvPCreateFormValues } from '@/lib/suigar-app';
+import type { PvPCreateFormValues } from '@/lib/suigar-types';
 
 export function PvPCreateForm({
 	value,
