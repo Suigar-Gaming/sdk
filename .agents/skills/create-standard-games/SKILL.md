@@ -37,7 +37,7 @@ Supported game ids:
 
 Extension-level option:
 
-- `suigar({ partner?: string })` appends `partner` metadata automatically to all supported bet flows.
+- `suigar({ partner?: string })` appends the partner wallet address to `partner` metadata automatically across all supported bet flows.
 
 ## Game-specific options
 
@@ -188,7 +188,8 @@ Guardrails:
 - `betCount` defaults to `1`; do not reimplement batching unless the product requires custom behavior.
 - Pass plain application values in `metadata`; let the SDK encode them.
 - Do not set `metadata.partner` or `metadata.referrer`; those keys are reserved and the SDK ignores them with a warning.
-- If the product needs partner attribution, configure `suigar({ partner })` once on the client extension instead of passing it per transaction.
+- If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` once on the client extension instead of passing it per transaction.
+- Treat `partner` as a wallet address, not a slug, label, or display string.
 - Keep amounts as `bigint` once they leave the UI layer.
 - Ensure the same connected wallet address is used as `owner`.
 

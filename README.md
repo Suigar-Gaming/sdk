@@ -106,13 +106,23 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
+### Partner Setup
+
+> [!IMPORTANT]
+> `partner` is the partner wallet address. Configure it once when you
+> register the extension so the SDK can append that wallet address to supported
+> bet metadata automatically.
+
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
-	suigar({ partner: 'my-partner' }),
+	suigar({ partner: '0xpartner_wallet_address' }),
 );
 
 client.suigar;
 ```
+
+Do not pass a partner slug, label, or display name here. Use the wallet
+address that should receive partner attribution onchain.
 
 You can rename the extension:
 
@@ -140,10 +150,10 @@ Supported override areas:
 - `name`
 - `partner`
 
-If `partner` is configured, the SDK automatically writes it into the onchain
-metadata vec-map. Transaction builder options may also include `metadata`, but
-reserved keys such as `partner` and `referrer` are ignored with a warning when
-provided manually.
+If `partner` is configured, the SDK automatically writes that partner wallet
+address into the onchain metadata vec-map. Transaction builder options may also
+include `metadata`, but reserved keys such as `partner` and `referrer` are
+ignored with a warning when provided manually.
 
 ## Runtime Surface
 
@@ -200,11 +210,13 @@ console.log(game.stake_per_player);
 console.log(game.is_private);
 ```
 
-Notes:
+> [!NOTE]
+>
+> - it throws if the object response does not include decodable `content`
+> - the PvP join builder uses this internally to derive the required join stake
 
-- it throws if the object response does not include decodable `content`
-- the PvP join builder uses this internally to derive the required join stake
-- prefer this helper over manual object parsing when you only need the parsed game
+> [!TIP]
+> Prefer this helper over manual object parsing when you only need the parsed game.
 
 ## `tx`
 
@@ -248,7 +260,7 @@ Shared behavior:
 - `betCount` defaults to `1`
 - `sender` overrides the transaction sender
 - `metadata` is encoded into `keys` and `values` byte arrays
-- `partner` configured via `suigar({ partner })` is appended automatically to metadata
+- `partner` configured via `suigar({ partner })` is appended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `owner`
@@ -281,16 +293,19 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 });
 ```
 
-Notes:
+> [!NOTE]
+>
+> - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
+> - with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` onchain
+> - range converts each point with `Math.round(value * scale)`
+> - range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
+> - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
+> - plinko and wheel `configId` must fit in `u8`
 
-- limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
-- with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` onchain
-- range converts each point with `Math.round(value * scale)`
-- range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
-- with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-- if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
-- do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
-- plinko and wheel `configId` must fit in `u8`
+> [!TIP]
+>
+> - if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
+> - do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
 
 ### PvP Coinflip
 
@@ -374,18 +389,16 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 Use the BCS helper directly when you already fetched the object with `content`:
 
 ```ts
-const objectResult = await client.core.getObject({
+const { object } = await client.core.getObject({
 	objectId: '0xGAME_ID',
 	include: { content: true },
 });
 
-if (!objectResult.object.content) {
+if (!object.content) {
 	throw new Error('Missing game content');
 }
 
-const parsed = client.suigar.bcs.PvPCoinflipGame.parse(
-	objectResult.object.content,
-);
+const parsed = client.suigar.bcs.PvPCoinflipGame.parse(object.content);
 ```
 
 If you only need the parsed game object, prefer the convenience method:
@@ -456,17 +469,20 @@ const gameDetails = parseGameDetails(decoded.game_details);
 `parseGameDetails` preserves the onchain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
 When the extension is configured with `partner`, decoded event `metadata` will
-contain that `partner` entry.
+contain that partner wallet address under the `partner` entry.
 
-Important:
+> [!IMPORTANT]
+>
+> - execute or wait for the transaction with `include: { events: true }`
+> - unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
+> - parse emitted events from the unwrapped transaction result
+> - use `event.bcs` for consistent decoding across transports
+> - use `parseGameDetails(decoded.game_details)` instead of hand-decoding standard game detail byte arrays
 
-- execute or wait for the transaction with `include: { events: true }`
-- unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
-- parse emitted events from the unwrapped transaction result
-- use `event.bcs` for consistent decoding across transports
-- use `parseGameDetails(decoded.game_details)` instead of hand-decoding standard game detail byte arrays
-- `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
-- these helpers decode the event payload itself, not a full transaction response
+> [!TIP]
+>
+> - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
+> - these helpers decode the event payload itself, not a full transaction response
 
 ### Parse PvP Coinflip Event Data
 

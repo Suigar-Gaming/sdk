@@ -149,6 +149,8 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - Use `cashStake` only when the withdrawn balance should differ from the logical stake.
 - Prefer `bigint` for all non-UI amount handling.
 - Pass plain application values to `metadata` and let the SDK encode them into byte arrays.
+- Treat the extension-level `partner` option as a partner wallet address, not a label or slug.
+- When partner attribution is required, configure `suigar({ partner: '<wallet-address>' })` once during extension setup instead of passing partner data through transaction metadata.
 - Prefer importing public constants and numeric helpers from `@suigar/sdk/utils` instead of duplicating SDK defaults in downstream apps.
 
 ### Testing Conventions
