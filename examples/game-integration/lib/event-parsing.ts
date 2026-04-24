@@ -20,10 +20,6 @@ type BcsApi = SuigarClient['bcs'];
 
 const textDecoder = new TextDecoder();
 
-function asBcsApi(client: { suigar: SuigarClient }) {
-	return client.suigar.bcs;
-}
-
 function bytesFromEvent(event: unknown) {
 	if (typeof event !== 'object' || event === null) {
 		return undefined;
@@ -245,9 +241,8 @@ export function parseSuigarEvents(
 	digest: string,
 	events: unknown[] | undefined,
 ) {
-	const bcsApi = asBcsApi(client);
 	const rows = (events ?? [])
-		.map((event) => createEventRow(bcsApi, digest, event))
+		.map((event) => createEventRow(client.suigar.bcs, digest, event))
 		.filter((row): row is EventLogRow => row !== null);
 
 	return rows;
