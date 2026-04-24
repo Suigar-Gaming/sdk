@@ -1,3 +1,4 @@
+import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
 	PvPAction,
 	PvPForms,
@@ -42,8 +43,8 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	},
 	range: {
 		...DEFAULT_SHARED_FIELDS,
-		leftPoint: '0.95',
-		rightPoint: '1.05',
+		leftPoint: '25',
+		rightPoint: '75',
 		outOfRange: false,
 		scale: '',
 	},
@@ -78,6 +79,12 @@ export function isPvPAction(value: string | null): value is PvPAction {
 export function parseOptionalNumber(value: string) {
 	const trimmed = value.trim().replace(',', '.');
 	return trimmed ? Number(trimmed) : undefined;
+}
+
+export function getRangePointMax(scale?: number) {
+	const effectiveScale =
+		scale && Number.isFinite(scale) && scale > 0 ? scale : DEFAULT_RANGE_SCALE;
+	return RANGE_POINT_LIMIT / effectiveScale;
 }
 
 export function toAtomicAmount(value: string, decimals: number) {
