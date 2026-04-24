@@ -52,7 +52,7 @@ export function suigar<const Name = 'suigar'>({
 	};
 }
 
-class SuigarClient {
+export class SuigarClient {
 	#client: ClientWithCoreApi;
 
 	#config: SuigarConfig;

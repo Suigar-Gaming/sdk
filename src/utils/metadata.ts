@@ -3,13 +3,17 @@
 
 import { isValidSuiAddress, normalizeSuiAddress } from '@mysten/sui/utils';
 
-import type { BetMetadataInput, EncodedBetMetadata } from '../types';
+import type {
+	BetMetadataInput,
+	BetMetadataValue,
+	EncodedBetMetadata,
+} from '../types';
 
 const ADDRESS_METADATA_KEYS = new Set(['partner']);
 const RESERVED_METADATA_KEYS = new Set([...ADDRESS_METADATA_KEYS, 'referrer']);
 const textEncoder = new TextEncoder();
 
-const parseHexAddress = (value: string): Uint8Array | null => {
+function parseHexAddress(value: string): Uint8Array | null {
 	const trimmed = value.trim();
 	if (!trimmed || !isValidSuiAddress(trimmed)) return null;
 
@@ -26,12 +30,9 @@ const parseHexAddress = (value: string): Uint8Array | null => {
 	} catch {
 		return null;
 	}
-};
+}
 
-const encodeMetadataValue = (
-	key: string,
-	value: string | number | boolean | bigint | Uint8Array | number[],
-) => {
+function encodeMetadataValue(key: string, value: BetMetadataValue) {
 	if (value instanceof Uint8Array) {
 		return Array.from(value);
 	}
@@ -45,10 +46,10 @@ const encodeMetadataValue = (
 	}
 
 	return Array.from(textEncoder.encode(String(value)));
-};
+}
 
 export function encodeBetMetadata(
-	metadata?: BetMetadataInput | null,
+	metadata?: BetMetadataInput,
 	partner?: string,
 ): EncodedBetMetadata {
 	const keys: string[] = [];
