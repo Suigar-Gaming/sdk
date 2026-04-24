@@ -23,7 +23,7 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
 	title: 'Suigar SDK Game Integration',
 	description:
-		'Interactive Next.js example showing standard and PvP Suigar SDK transactions with dApp Kit.',
+		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
 	icons: {
 		icon: '/icon.png',
 		apple: '/icon.png',

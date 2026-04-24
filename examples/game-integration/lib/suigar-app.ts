@@ -1,6 +1,7 @@
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
 	PvPAction,
+	PvPGameId,
 	PvPForms,
 	StandardGameId,
 	StandardForms,
@@ -15,6 +16,8 @@ export const STANDARD_GAMES = [
 	'range',
 	'wheel',
 ] as const;
+
+export const PVP_GAMES = ['pvp-coinflip'] as const;
 
 export const PVP_ACTIONS = ['create', 'join', 'cancel'] as const;
 
@@ -70,6 +73,10 @@ export const DEFAULT_PVP_FORMS: PvPForms = {
 
 export function isStandardGame(value: string | null): value is StandardGameId {
 	return STANDARD_GAMES.includes(value as (typeof STANDARD_GAMES)[number]);
+}
+
+export function isPvPGame(value: string | null): value is PvPGameId {
+	return PVP_GAMES.includes(value as (typeof PVP_GAMES)[number]);
 }
 
 export function isPvPAction(value: string | null): value is PvPAction {

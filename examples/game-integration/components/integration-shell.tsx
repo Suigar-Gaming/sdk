@@ -4,9 +4,11 @@ import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+	CirclePlus,
 	CheckCircle2,
 	Gamepad2,
 	LoaderCircle,
+	ShieldX,
 	SendHorizontal,
 	Swords,
 } from 'lucide-react';
@@ -17,6 +19,7 @@ import {
 	useDAppKit,
 } from '@mysten/dapp-kit-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { CoinIcon } from '@/components/coins';
 import { CodeSample } from '@/components/code-sample';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/games/coinflip-form';
@@ -49,12 +52,15 @@ import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
 	DEFAULT_PVP_FORMS,
 	DEFAULT_STANDARD_FORMS,
+	COIN_DECIMALS,
 	isPvPAction,
+	isPvPGame,
 	isStandardGame,
 } from '@/lib/suigar-app';
 import type {
 	PvPAction,
 	PvPForms,
+	PvPGameId,
 	StandardForms,
 	StandardGameId,
 	SupportedCoinKey,
@@ -76,12 +82,81 @@ const STANDARD_GAME_OPTIONS = [
 ] as const satisfies ReadonlyArray<{ value: StandardGameId; label: string }>;
 
 const PVP_ACTION_OPTIONS = [
-	{ value: 'create', label: 'Create' },
-	{ value: 'join', label: 'Join' },
-	{ value: 'cancel', label: 'Cancel' },
-] as const satisfies ReadonlyArray<{ value: PvPAction; label: string }>;
+	{ value: 'create', label: 'Create', icon: CirclePlus },
+	{ value: 'join', label: 'Join', icon: Swords },
+	{ value: 'cancel', label: 'Cancel', icon: ShieldX },
+] as const satisfies ReadonlyArray<{
+	value: PvPAction;
+	label: string;
+	icon: React.ComponentType<{ className?: string }>;
+}>;
+
+const PVP_GAME_OPTIONS = [
+	{ value: 'pvp-coinflip', label: 'PvP Coinflip' },
+] as const satisfies ReadonlyArray<{ value: PvPGameId; label: string }>;
 
 const PREVIEW_OWNER = `0x${'0'.repeat(64)}`;
+
+type CoinBalanceState = {
+	balance: string | null;
+	isLoading: boolean;
+	error: string | null;
+};
+
+function formatBalance(balance: bigint, decimals: number) {
+	const divisor = BigInt(10) ** BigInt(decimals);
+	const whole = balance / divisor;
+	const fraction = balance % divisor;
+	const paddedFraction = fraction.toString().padStart(decimals, '0');
+	const formattedWhole = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+	const fractionDigits = paddedFraction.slice(0, 2).padEnd(2, '0');
+
+	return `${formattedWhole},${fractionDigits}`;
+}
+
+function getCoinDisplayAmount({
+	currentAccount,
+	balanceOwner,
+	balanceState,
+}: {
+	currentAccount: ReturnType<typeof useCurrentAccount>;
+	balanceOwner: string | null;
+	balanceState: CoinBalanceState;
+}) {
+	if (!currentAccount) {
+		return '--,--';
+	}
+
+	if (
+		(balanceOwner !== currentAccount.address && !balanceState.error) ||
+		balanceState.isLoading ||
+		balanceState.error
+	) {
+		return '--,--';
+	}
+
+	return balanceState.balance ?? '0,00';
+}
+
+function CoinSelectLabel({
+	coinKey,
+	amount,
+}: {
+	coinKey: SupportedCoinKey;
+	amount: string;
+}) {
+	return (
+		<div className="flex min-w-0 items-center gap-1 whitespace-nowrap">
+			<CoinIcon coinKey={coinKey} className="size-5 shrink-0" />
+			<span className="min-w-0 truncate font-medium tabular-nums text-foreground">
+				{amount}
+			</span>
+			<span className="shrink-0 text-[0.65rem] text-muted-foreground md:text-[0.7rem]">
+				{coinKey.toUpperCase()}
+			</span>
+		</div>
+	);
+}
 
 function usePersistentForms<T>(key: string, initialValue: T) {
 	const [value, setValue] = React.useState<T>(() => {
@@ -150,15 +225,6 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const currentClient = useCurrentClient();
 	const currentAccount = useCurrentAccount();
 	const { addRows } = useEventLog();
-	const suigarClient = currentClient as typeof currentClient & {
-		suigar: {
-			getConfig: () => {
-				coinTypes: Record<SupportedCoinKey, string>;
-			};
-			tx: unknown;
-			bcs: unknown;
-		};
-	};
 
 	const [standardForms, setStandardForms] = usePersistentForms<StandardForms>(
 		'suigar-example-standard-forms-v2',
@@ -184,23 +250,97 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		return isPvPAction(queryAction) ? queryAction : 'create';
 	}, [searchParams]);
 
-	const coinTypes = suigarClient.suigar.getConfig().coinTypes;
-	const coinOptions = Object.entries(coinTypes) as Array<
-		[SupportedCoinKey, string]
-	>;
+	const pvpGame = React.useMemo<PvPGameId>(() => {
+		const queryGame = searchParams.get('game');
+		return isPvPGame(queryGame) ? queryGame : 'pvp-coinflip';
+	}, [searchParams]);
+
+	const coinTypes = currentClient.suigar.getConfig().coinTypes;
+	const coinOptions = React.useMemo(
+		() => Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>,
+		[coinTypes],
+	);
 	const effectiveSelectedCoin = coinTypes[selectedCoin]
 		? selectedCoin
 		: (coinOptions[0]?.[0] ?? 'sui');
 	const coinType = coinTypes[effectiveSelectedCoin];
 	const previewOwner = currentAccount?.address ?? PREVIEW_OWNER;
 	const visibleStatus = currentAccount ? status : null;
+	const [coinBalances, setCoinBalances] = React.useState<
+		Record<SupportedCoinKey, CoinBalanceState>
+	>({
+		sui: { balance: null, isLoading: false, error: null },
+		usdc: { balance: null, isLoading: false, error: null },
+	});
+	const [balanceOwner, setBalanceOwner] = React.useState<string | null>(null);
+	const [balanceRefreshKey, setBalanceRefreshKey] = React.useState(0);
+
+	React.useEffect(() => {
+		if (!currentAccount) {
+			return;
+		}
+
+		let cancelled = false;
+
+		const fetchBalances = async () => {
+			const results = await Promise.all(
+				coinOptions.map(async ([coinKey, value]) => {
+					try {
+						const response = await currentClient.getBalance({
+							owner: currentAccount.address,
+							coinType: value,
+						});
+						return [
+							coinKey,
+							{
+								balance: formatBalance(
+									BigInt(response.balance.balance),
+									COIN_DECIMALS[coinKey],
+								),
+								isLoading: false,
+								error: null,
+							},
+						] as const;
+					} catch (balanceError) {
+						return [
+							coinKey,
+							{
+								balance: null,
+								isLoading: false,
+								error: parseError(balanceError),
+							},
+						] as const;
+					}
+				}),
+			);
+
+			if (cancelled) {
+				return;
+			}
+
+			setBalanceOwner(currentAccount.address);
+			setCoinBalances((current) => {
+				const next = { ...current };
+				for (const [coinKey, state] of results) {
+					next[coinKey] = state;
+				}
+				return next;
+			});
+		};
+
+		void fetchBalances();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
 
 	let currentCode = '';
 	try {
 		currentCode =
 			mode === 'standard'
 				? buildStandardTransaction(
-						suigarClient,
+						currentClient,
 						standardGame,
 						standardForms[standardGame],
 						previewOwner,
@@ -208,7 +348,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						coinType,
 					).code
 				: buildPvPTransaction(
-						suigarClient,
+						currentClient,
 						pvpAction,
 						pvpForms[pvpAction],
 						previewOwner,
@@ -260,7 +400,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			const buildResult =
 				mode === 'standard'
 					? buildStandardTransaction(
-							suigarClient,
+							currentClient,
 							standardGame,
 							standardForms[standardGame],
 							owner,
@@ -268,7 +408,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							coinType,
 						)
 					: buildPvPTransaction(
-							suigarClient,
+							currentClient,
 							pvpAction,
 							pvpForms[pvpAction],
 							owner,
@@ -300,13 +440,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			}
 
 			const rows = parseSuigarEvents(
-				suigarClient,
+				currentClient,
 				digest,
 				finalResult.Transaction.events,
 			);
 			if (rows.length > 0) {
 				addRows(rows);
 			}
+
+			setBalanceRefreshKey((current) => current + 1);
 		} catch (executionError) {
 			setError(parseError(executionError));
 		} finally {
@@ -326,43 +468,66 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								className="inline-flex min-w-0 items-center gap-2"
 							>
 								<Image
+									src="/logo/icon.svg"
+									alt="Suigar"
+									width={36}
+									height={36}
+									className="h-8 w-8 md:hidden"
+									priority
+								/>
+								<Image
 									src="/logo/suigar-logo-full.svg"
 									alt="Suigar"
 									width={132}
 									height={36}
-									className="h-8 w-auto md:h-10"
+									className="hidden h-8 w-auto md:block md:h-10"
 									priority
 								/>
 							</Link>
 						</div>
 
 						<div className="flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto">
-							<span className="hidden shrink-0 rounded-full border border-border/70 bg-background/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground sm:inline-flex">
-								testnet
-							</span>
-							<div className="w-[9.5rem] shrink-0 md:w-[10rem]">
-								<Select
-									value={selectedCoin}
-									onValueChange={(value) =>
-										setSelectedCoin(value as SupportedCoinKey)
-									}
-								>
-									<SelectTrigger className="h-8 rounded-full border-border/70 bg-background/55 px-3 text-xs md:h-9 md:px-3.5 md:text-sm">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										{coinOptions.map(([key, value]) => (
-											<SelectItem key={key} value={key}>
-												{key.toUpperCase()} · {value.split('::').at(-1)}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-							<div className="wallet-compact shrink-0">
+							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
+							{currentAccount ? (
+								<div className="shrink-0">
+									<Select
+										value={selectedCoin}
+										onValueChange={(value) =>
+											setSelectedCoin(value as SupportedCoinKey)
+										}
+									>
+										<SelectTrigger className="w-auto min-w-0 rounded-full border-border/70 bg-background/55">
+											<CoinSelectLabel
+												coinKey={effectiveSelectedCoin}
+												amount={getCoinDisplayAmount({
+													currentAccount,
+													balanceOwner,
+													balanceState: coinBalances[effectiveSelectedCoin],
+												})}
+											/>
+										</SelectTrigger>
+										<SelectContent>
+											{coinOptions.map(([key]) => {
+												return (
+													<SelectItem key={key} value={key}>
+														<CoinSelectLabel
+															coinKey={key}
+															amount={getCoinDisplayAmount({
+																currentAccount,
+																balanceOwner,
+																balanceState: coinBalances[key],
+															})}
+														/>
+													</SelectItem>
+												);
+											})}
+										</SelectContent>
+									</Select>
+								</div>
+							) : null}
+							<div className="shrink-0">
 								<ConnectButton />
 							</div>
-							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
 						</div>
 					</nav>
 				</div>
@@ -431,28 +596,51 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												</Select>
 											</div>
 										) : (
-											<div className="flex flex-wrap gap-2">
-												{PVP_ACTION_OPTIONS.map((action) => (
-													<Button
-														key={action.value}
-														type="button"
-														size="sm"
-														variant={
-															pvpAction === action.value ? 'default' : 'outline'
+											<div className="flex flex-wrap items-center gap-2">
+												<div className="w-full sm:w-[13rem]">
+													<Select
+														value={pvpGame}
+														onValueChange={(value) =>
+															updateQuery('game', value)
 														}
-														onClick={() => {
-															updateQuery('game', 'pvp-coinflip');
-															updateQuery('action', action.value);
-														}}
-														className={cn(
-															'justify-start rounded-full',
-															pvpAction === action.value && 'shadow-none',
-														)}
 													>
-														<Swords className="size-4" />
-														{action.label}
-													</Button>
-												))}
+														<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent>
+															{PVP_GAME_OPTIONS.map((game) => (
+																<SelectItem key={game.value} value={game.value}>
+																	{game.label}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+												</div>
+												<div className="flex flex-wrap gap-2">
+													{PVP_ACTION_OPTIONS.map((action) => (
+														<Button
+															key={action.value}
+															type="button"
+															size="sm"
+															variant={
+																pvpAction === action.value
+																	? 'default'
+																	: 'outline'
+															}
+															onClick={() => {
+																updateQuery('game', pvpGame);
+																updateQuery('action', action.value);
+															}}
+															className={cn(
+																'justify-start rounded-full',
+																pvpAction === action.value && 'shadow-none',
+															)}
+														>
+															<action.icon className="size-4" />
+															{action.label}
+														</Button>
+													))}
+												</div>
 											</div>
 										)}
 									</div>
@@ -470,7 +658,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 						<SectionShell
-							title={mode === 'standard' ? 'Game controls' : 'PvP controls'}
+							title={
+								mode === 'standard' ? 'Game controls' : 'PvP Coinflip controls'
+							}
 							icon={
 								mode === 'standard' ? (
 									<Gamepad2 className="size-5 text-secondary dark:text-primary" />
@@ -481,7 +671,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							description={
 								mode === 'standard'
 									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
-									: 'Create, join, or cancel PvP coinflip games while keeping the exact transaction builder visible.'
+									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
 							}
 						>
 							<div className="space-y-6">
