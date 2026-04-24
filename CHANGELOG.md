@@ -1,5 +1,28 @@
 # @suigar/sdk
 
+## 2.0.0-beta.4
+
+### Patch Changes
+
+- 6daa819: Add BCS parser helpers and a Next.js game integration example app.
+  - expose parser helpers through `@suigar/sdk/utils`
+  - add `parseGameDetails` for decoding `BetResultEvent.game_details`
+  - document generated BCS event decoding and game detail parsing guidance
+  - add a testnet-only `examples/game-integration` app for standard and PvP Suigar transactions
+  - integrate Mysten dApp Kit wallet connection, signing, and execution
+  - add live transaction code previews and shared decoded event logging with SDK parser helpers
+  - add Suigar-themed responsive UI, supported coin selection, and human-readable stake handling
+  - update PvP coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id
+
+- b89d0b4: Add a public `@suigar/sdk/games` export subpath for shared game option types, and export `SuigarClient` from the package root.
+- bf1f71b: Add `registryIds` to `SuigarConfig` and resolve it from the network config registry map.
+
+  Document the PvP coinflip runtime helpers more clearly by describing
+  registry-backed unresolved game discovery through `getPvPCoinflipGames()` and
+  the normalized live-game lookup behavior of `resolvePvPConflipGame()`.
+
+- 4861f55: Add public utility exports for shared scaling constants in `@suigar/sdk/utils`, including `RANGE_POINT_LIMIT` and `DEFAULT_RANGE_SCALE`. Update the SDK example app and documentation to use the exported constants and document limbo/range scaling behavior more clearly.
+
 ## 2.0.0-beta.3
 
 ### Patch Changes

@@ -4,5 +4,12 @@
 	"initialVersions": {
 		"@suigar/sdk": "2.0.0-beta.1"
 	},
-	"changesets": ["cute-trams-live", "sweet-stars-brush"]
+	"changesets": [
+		"chubby-beans-own",
+		"cute-trams-live",
+		"green-apes-travel",
+		"green-spoons-smoke",
+		"metal-plums-rest",
+		"sweet-stars-brush"
+	]
 }
