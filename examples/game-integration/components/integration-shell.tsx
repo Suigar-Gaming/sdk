@@ -3,15 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-	CirclePlus,
-	CheckCircle2,
-	Gamepad2,
-	LoaderCircle,
-	ShieldX,
-	SendHorizontal,
-	Swords,
-} from 'lucide-react';
+import { CirclePlus, Gamepad2, ShieldX, Swords } from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	useCurrentAccount,
@@ -21,6 +13,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { CoinIcon } from '@/components/coins';
 import { CodeSample } from '@/components/code-sample';
+import { ExecuteTransactionCard } from '@/components/execute-transaction';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/games/coinflip-form';
 import { LimboForm } from '@/components/games/limbo-form';
@@ -28,11 +21,11 @@ import { PlinkoForm } from '@/components/games/plinko-form';
 import { PvPCancelForm } from '@/components/games/pvp-cancel-form';
 import { PvPCreateForm } from '@/components/games/pvp-create-form';
 import { PvPJoinForm } from '@/components/games/pvp-join-form';
+import { PvPLobbyPicker } from '@/components/games/pvp-lobby-picker';
 import { RangeForm } from '@/components/games/range-form';
 import { WheelForm } from '@/components/games/wheel-form';
 import { useEventLog } from '@/components/providers/event-log-provider';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -59,6 +52,7 @@ import {
 } from '@/lib/suigar-app';
 import type {
 	PvPAction,
+	PvPCoinflipLobbyGame,
 	PvPForms,
 	PvPGameId,
 	StandardForms,
@@ -112,6 +106,17 @@ function formatBalance(balance: bigint, decimals: number) {
 	const fractionDigits = paddedFraction.slice(0, 2).padEnd(2, '0');
 
 	return `${formattedWhole},${fractionDigits}`;
+}
+
+function resolveCoinKeyForType(
+	coinType: string,
+	coinTypes: Record<SupportedCoinKey, string>,
+) {
+	return (
+		(Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>).find(
+			([, configuredCoinType]) => configuredCoinType === coinType,
+		)?.[0] ?? null
+	);
 }
 
 function getCoinDisplayAmount({
@@ -239,6 +244,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [status, setStatus] = React.useState<string | null>(null);
 	const [error, setError] = React.useState<string | null>(null);
 	const [isExecuting, setIsExecuting] = React.useState(false);
+	const [pvpLobbyGames, setPvPLobbyGames] = React.useState<
+		PvPCoinflipLobbyGame[]
+	>([]);
+	const [pvpLobbyError, setPvPLobbyError] = React.useState<string | null>(null);
+	const [isPvPLobbyLoading, setIsPvPLobbyLoading] = React.useState(false);
+	const [pvpLobbyRefreshKey, setPvPLobbyRefreshKey] = React.useState(0);
 
 	const standardGame = React.useMemo<StandardGameId>(() => {
 		const queryGame = searchParams.get('game');
@@ -335,6 +346,65 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		};
 	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
 
+	React.useEffect(() => {
+		if (mode !== 'pvp' || !currentAccount) {
+			return;
+		}
+
+		let cancelled = false;
+
+		const fetchPvPLobbies = async () => {
+			setIsPvPLobbyLoading(true);
+			setPvPLobbyError(null);
+
+			try {
+				const games = await currentClient.suigar.getPvPCoinflipGames({
+					limit: 50,
+				});
+
+				if (!cancelled) {
+					setPvPLobbyGames(games);
+				}
+			} catch (lobbyError) {
+				if (!cancelled) {
+					setPvPLobbyGames([]);
+					setPvPLobbyError(parseError(lobbyError));
+				}
+			} finally {
+				if (!cancelled) {
+					setIsPvPLobbyLoading(false);
+				}
+			}
+		};
+
+		void fetchPvPLobbies();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [currentAccount, currentClient, mode, pvpLobbyRefreshKey]);
+
+	const normalizedCurrentAccount =
+		currentAccount?.address.toLowerCase() ?? null;
+	const joinLobbyGames = React.useMemo(
+		() =>
+			normalizedCurrentAccount
+				? pvpLobbyGames.filter(
+						(game) => game.creator.toLowerCase() !== normalizedCurrentAccount,
+					)
+				: [],
+		[pvpLobbyGames, normalizedCurrentAccount],
+	);
+	const cancelLobbyGames = React.useMemo(
+		() =>
+			normalizedCurrentAccount
+				? pvpLobbyGames.filter(
+						(game) => game.creator.toLowerCase() === normalizedCurrentAccount,
+					)
+				: [],
+		[pvpLobbyGames, normalizedCurrentAccount],
+	);
+
 	let currentCode = '';
 	try {
 		currentCode =
@@ -383,6 +453,19 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			...current,
 			[action]: { ...current[action], ...patch },
 		}));
+	}
+
+	function handleSelectPvPLobby(
+		action: 'join' | 'cancel',
+		game: PvPCoinflipLobbyGame,
+	) {
+		updatePvPForm(action, { gameId: game.id });
+		const matchingCoinKey = resolveCoinKeyForType(game.coinType, coinTypes);
+		if (matchingCoinKey) {
+			setSelectedCoin(matchingCoinKey);
+		}
+		setError(null);
+		setStatus(null);
 	}
 
 	async function handleExecute() {
@@ -449,6 +532,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			}
 
 			setBalanceRefreshKey((current) => current + 1);
+			setPvPLobbyRefreshKey((current) => current + 1);
 		} catch (executionError) {
 			setError(parseError(executionError));
 		} finally {
@@ -535,7 +619,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 			<div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-3 pb-6 pt-20 md:px-5 md:pt-24 lg:px-8">
 				<main className="mt-2 flex flex-1 flex-col gap-6">
-					<section className="relative overflow-hidden rounded-[1.5rem] border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)] md:rounded-[2rem] md:px-5 md:py-5">
+					<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)] md:rounded-4xl md:px-5 md:py-5">
 						<div className="relative flex flex-col gap-4">
 							<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 								<div className="space-y-2">
@@ -721,16 +805,72 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											/>
 										) : null}
 										{pvpAction === 'join' ? (
-											<PvPJoinForm
-												value={pvpForms.join}
-												onChange={(patch) => updatePvPForm('join', patch)}
-											/>
+											<>
+												<PvPLobbyPicker
+													title="Open lobbies to join"
+													description="Only unresolved PvP games created by other wallets are shown here. Selecting one fills the join form and switches the selected coin when needed."
+													games={joinLobbyGames}
+													selectedGameId={pvpForms.join.gameId}
+													isLoading={isPvPLobbyLoading}
+													error={pvpLobbyError}
+													isWalletConnected={Boolean(currentAccount)}
+													coinTypes={coinTypes}
+													formatAmount={formatBalance}
+													getCoinDecimals={(value) => {
+														const matchingCoinKey = resolveCoinKeyForType(
+															value,
+															coinTypes,
+														);
+														return matchingCoinKey
+															? COIN_DECIMALS[matchingCoinKey]
+															: 9;
+													}}
+													onRefresh={() =>
+														setPvPLobbyRefreshKey((current) => current + 1)
+													}
+													onSelectGame={(game) =>
+														handleSelectPvPLobby('join', game)
+													}
+												/>
+												<PvPJoinForm
+													value={pvpForms.join}
+													onChange={(patch) => updatePvPForm('join', patch)}
+												/>
+											</>
 										) : null}
 										{pvpAction === 'cancel' ? (
-											<PvPCancelForm
-												value={pvpForms.cancel}
-												onChange={(patch) => updatePvPForm('cancel', patch)}
-											/>
+											<>
+												<PvPLobbyPicker
+													title="Your unresolved lobbies"
+													description="Only PvP games created by the connected wallet are shown here. Selecting one fills the cancel form and keeps execution tied to that on-chain game."
+													games={cancelLobbyGames}
+													selectedGameId={pvpForms.cancel.gameId}
+													isLoading={isPvPLobbyLoading}
+													error={pvpLobbyError}
+													isWalletConnected={Boolean(currentAccount)}
+													coinTypes={coinTypes}
+													formatAmount={formatBalance}
+													getCoinDecimals={(value) => {
+														const matchingCoinKey = resolveCoinKeyForType(
+															value,
+															coinTypes,
+														);
+														return matchingCoinKey
+															? COIN_DECIMALS[matchingCoinKey]
+															: 9;
+													}}
+													onRefresh={() =>
+														setPvPLobbyRefreshKey((current) => current + 1)
+													}
+													onSelectGame={(game) =>
+														handleSelectPvPLobby('cancel', game)
+													}
+												/>
+												<PvPCancelForm
+													value={pvpForms.cancel}
+													onChange={(patch) => updatePvPForm('cancel', patch)}
+												/>
+											</>
 										) : null}
 									</>
 								)}
@@ -748,49 +888,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						<div className="flex flex-col gap-6">
 							<CodeSample code={currentCode} />
 
-							<Card>
-								<CardHeader>
-									<CardTitle className="flex items-center gap-2">
-										<SendHorizontal className="size-5 text-secondary dark:text-primary" />
-										Execute transaction
-									</CardTitle>
-									<CardDescription>
-										The connected wallet signs and submits the same transaction
-										shown in the code block.
-									</CardDescription>
-								</CardHeader>
-								<CardContent className="space-y-4">
-									<div className="flex flex-col items-center gap-4">
-										<Button
-											size="lg"
-											onClick={handleExecute}
-											disabled={isExecuting || !currentAccount}
-										>
-											{isExecuting ? (
-												<LoaderCircle className="size-4 animate-spin" />
-											) : (
-												<Swords className="size-4" />
-											)}
-											Sign and execute transaction
-										</Button>
-										{visibleStatus ? (
-											<Alert variant="success" className="w-full">
-												<CheckCircle2 />
-												<AlertTitle>Executed</AlertTitle>
-												<AlertDescription className="font-mono text-xs text-foreground break-all">
-													{visibleStatus}
-												</AlertDescription>
-											</Alert>
-										) : null}
-									</div>
-
-									{error ? (
-										<div className="rounded-2xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-											{error}
-										</div>
-									) : null}
-								</CardContent>
-							</Card>
+							<ExecuteTransactionCard
+								onExecute={handleExecute}
+								isExecuting={isExecuting}
+								status={visibleStatus}
+								error={error}
+							/>
 						</div>
 					</div>
 

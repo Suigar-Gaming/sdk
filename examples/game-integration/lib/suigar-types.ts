@@ -1,3 +1,4 @@
+import type { SuigarClient } from '@suigar/sdk';
 import type { Transaction } from '@mysten/sui/transactions';
 import type { CoinSide, PvPCoinflipAction } from '@suigar/sdk/games';
 
@@ -62,6 +63,10 @@ export type PvPForms = {
 	join: PvPJoinFormValues;
 	cancel: PvPCancelFormValues;
 };
+
+export type PvPCoinflipLobbyGame = Awaited<
+	ReturnType<SuigarClient['getPvPCoinflipGames']>
+>[number];
 
 export type EventLogRow = {
 	id: string;

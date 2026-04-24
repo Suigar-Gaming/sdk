@@ -25,6 +25,9 @@
 	--destructive: #dd4c6e;
 	--destructive-shadow: #a52b49;
 	--destructive-foreground: #30000b;
+	--success: #2cbb87;
+	--success-shadow: #1e835f;
+	--success-foreground: #032415;
 	--border: #72bbe2;
 	--border-shadow: #4a88b3;
 	--input: #72bbe2;
@@ -59,6 +62,9 @@
 	--destructive: #ff5f74;
 	--destructive-shadow: #c81d3a;
 	--destructive-foreground: #130104;
+	--success: #45c480;
+	--success-shadow: #2a8c57;
+	--success-foreground: #03150a;
 	--border: #1f2d47;
 	--border-shadow: #101a30;
 	--input: #1f2d47;
@@ -92,6 +98,9 @@
 	--color-destructive: var(--destructive);
 	--color-destructive-shadow: var(--destructive-shadow);
 	--color-destructive-foreground: var(--destructive-foreground);
+	--color-success: var(--success);
+	--color-success-shadow: var(--success-shadow);
+	--color-success-foreground: var(--success-foreground);
 	--color-border: var(--border);
 	--color-border-shadow: var(--border-shadow);
 	--color-input: var(--input);
