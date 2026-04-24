@@ -507,7 +507,7 @@ This repository now includes a Next.js integration example in [examples/game-int
 It demonstrates:
 
 - standard game transactions through `client.suigar.tx.createBetTransaction(...)`
-- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`
+- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP game selector ready for future PvP games
 - wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
 - supported coin selection from `client.suigar.getConfig()`
 - connected-wallet balance display for each supported coin in the example app

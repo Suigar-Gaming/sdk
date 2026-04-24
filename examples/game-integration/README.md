@@ -23,7 +23,8 @@ The example reflects the current package export split:
 - Query-param game selection
 - Shared supported-coin selector using `client.suigar.getConfig().coinTypes`
 - Connected-wallet balance cards for every supported coin type
-- Per-game form components for standard and PvP flows
+- Per-game form components for standard and PvP Coinflip flows
+- PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Live transaction-builder code preview
 - Wallet sign-and-execute via the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled`

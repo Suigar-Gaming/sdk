@@ -1,9 +1,10 @@
 import type { Transaction } from '@mysten/sui/transactions';
 import type { CoinSide, PvPCoinflipAction } from '@suigar/sdk/games';
 
-import { STANDARD_GAMES } from '@/lib/suigar-app';
+import { PVP_GAMES, STANDARD_GAMES } from '@/lib/suigar-app';
 
 export type StandardGameId = (typeof STANDARD_GAMES)[number];
+export type PvPGameId = (typeof PVP_GAMES)[number];
 export type PvPAction = PvPCoinflipAction;
 export type SupportedCoinKey = 'sui' | 'usdc';
 

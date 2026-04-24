@@ -140,7 +140,7 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover;
 	color: var(--foreground);
-	font-family: var(--font-sans), sans-serif;
+	font-family: var(--font-serif), var(--font-sans), sans-serif;
 	letter-spacing: 0.015em;
 }
 

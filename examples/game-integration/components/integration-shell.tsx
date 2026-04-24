@@ -4,9 +4,11 @@ import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+	CirclePlus,
 	CheckCircle2,
 	Gamepad2,
 	LoaderCircle,
+	ShieldX,
 	SendHorizontal,
 	Swords,
 } from 'lucide-react';
@@ -52,11 +54,13 @@ import {
 	DEFAULT_STANDARD_FORMS,
 	COIN_DECIMALS,
 	isPvPAction,
+	isPvPGame,
 	isStandardGame,
 } from '@/lib/suigar-app';
 import type {
 	PvPAction,
 	PvPForms,
+	PvPGameId,
 	StandardForms,
 	StandardGameId,
 	SupportedCoinKey,
@@ -78,10 +82,18 @@ const STANDARD_GAME_OPTIONS = [
 ] as const satisfies ReadonlyArray<{ value: StandardGameId; label: string }>;
 
 const PVP_ACTION_OPTIONS = [
-	{ value: 'create', label: 'Create' },
-	{ value: 'join', label: 'Join' },
-	{ value: 'cancel', label: 'Cancel' },
-] as const satisfies ReadonlyArray<{ value: PvPAction; label: string }>;
+	{ value: 'create', label: 'Create', icon: CirclePlus },
+	{ value: 'join', label: 'Join', icon: Swords },
+	{ value: 'cancel', label: 'Cancel', icon: ShieldX },
+] as const satisfies ReadonlyArray<{
+	value: PvPAction;
+	label: string;
+	icon: React.ComponentType<{ className?: string }>;
+}>;
+
+const PVP_GAME_OPTIONS = [
+	{ value: 'pvp-coinflip', label: 'PvP Coinflip' },
+] as const satisfies ReadonlyArray<{ value: PvPGameId; label: string }>;
 
 const PREVIEW_OWNER = `0x${'0'.repeat(64)}`;
 
@@ -236,6 +248,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const pvpAction = React.useMemo<PvPAction>(() => {
 		const queryAction = searchParams.get('action');
 		return isPvPAction(queryAction) ? queryAction : 'create';
+	}, [searchParams]);
+
+	const pvpGame = React.useMemo<PvPGameId>(() => {
+		const queryGame = searchParams.get('game');
+		return isPvPGame(queryGame) ? queryGame : 'pvp-coinflip';
 	}, [searchParams]);
 
 	const coinTypes = currentClient.suigar.getConfig().coinTypes;
@@ -579,28 +596,51 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												</Select>
 											</div>
 										) : (
-											<div className="flex flex-wrap gap-2">
-												{PVP_ACTION_OPTIONS.map((action) => (
-													<Button
-														key={action.value}
-														type="button"
-														size="sm"
-														variant={
-															pvpAction === action.value ? 'default' : 'outline'
+											<div className="flex flex-wrap items-center gap-2">
+												<div className="w-full sm:w-[13rem]">
+													<Select
+														value={pvpGame}
+														onValueChange={(value) =>
+															updateQuery('game', value)
 														}
-														onClick={() => {
-															updateQuery('game', 'pvp-coinflip');
-															updateQuery('action', action.value);
-														}}
-														className={cn(
-															'justify-start rounded-full',
-															pvpAction === action.value && 'shadow-none',
-														)}
 													>
-														<Swords className="size-4" />
-														{action.label}
-													</Button>
-												))}
+														<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent>
+															{PVP_GAME_OPTIONS.map((game) => (
+																<SelectItem key={game.value} value={game.value}>
+																	{game.label}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+												</div>
+												<div className="flex flex-wrap gap-2">
+													{PVP_ACTION_OPTIONS.map((action) => (
+														<Button
+															key={action.value}
+															type="button"
+															size="sm"
+															variant={
+																pvpAction === action.value
+																	? 'default'
+																	: 'outline'
+															}
+															onClick={() => {
+																updateQuery('game', pvpGame);
+																updateQuery('action', action.value);
+															}}
+															className={cn(
+																'justify-start rounded-full',
+																pvpAction === action.value && 'shadow-none',
+															)}
+														>
+															<action.icon className="size-4" />
+															{action.label}
+														</Button>
+													))}
+												</div>
 											</div>
 										)}
 									</div>
@@ -618,7 +658,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 						<SectionShell
-							title={mode === 'standard' ? 'Game controls' : 'PvP controls'}
+							title={
+								mode === 'standard' ? 'Game controls' : 'PvP Coinflip controls'
+							}
 							icon={
 								mode === 'standard' ? (
 									<Gamepad2 className="size-5 text-secondary dark:text-primary" />
@@ -629,7 +671,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							description={
 								mode === 'standard'
 									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
-									: 'Create, join, or cancel PvP coinflip games while keeping the exact transaction builder visible.'
+									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
 							}
 						>
 							<div className="space-y-6">
