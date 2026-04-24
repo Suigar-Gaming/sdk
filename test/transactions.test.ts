@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { CoreClient } from '@mysten/sui/client';
+import { CoreClient, type SuiClientTypes } from '@mysten/sui/client';
 import type { TransactionResult } from '@mysten/sui/transactions';
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -24,6 +24,9 @@ const TEST_CONFIG = {
 		pvpCoinflip: '0x3',
 		range: '0x4',
 		wheel: '0x5',
+	},
+	registryIds: {
+		pvpCoinflip: '0xregistry',
 	},
 	coinTypes: {
 		sui: normalizeStructTag('0x2::sui::SUI'),
@@ -53,6 +56,19 @@ async function loadTransactionModuleWithMock<
 
 function getFirstMockArg<T>(mock: { mock: { calls: unknown[][] } }): T {
 	return mock.mock.calls[0]?.[0] as T;
+}
+
+function createDynamicField(childId: string): SuiClientTypes.DynamicFieldInfo {
+	return {
+		fieldId: `${childId}-field`,
+		name: {
+			type: 'address',
+			value: childId,
+		},
+		type: 'DynamicObject',
+		valueType: '0x2::object::ID',
+		childId,
+	};
 }
 
 describe('transaction builders', () => {
@@ -778,5 +794,91 @@ describe('SuigarClient', () => {
 		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(
 			'function',
 		);
+	});
+
+	it('returns pvp coinflip games from the unresolved registry entries', async () => {
+		class TestClient extends CoreClient {
+			constructor() {
+				super({ network: 'testnet', base: undefined as never });
+			}
+
+			getObjects = async () => ({ objects: [] });
+			listCoins = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			listOwnedObjects = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getBalance = async () => ({
+				balance: {
+					coinType: '0x2::sui::SUI',
+					balance: '0',
+					coinBalance: '0',
+					addressBalance: '0',
+				},
+			});
+			listBalances = async () => ({
+				balances: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getCoinMetadata = async () => ({ coinMetadata: null });
+			getTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			executeTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			simulateTransaction = async () => {
+				throw new Error('not implemented');
+			};
+			getReferenceGasPrice = async () => ({
+				referenceGasPrice: '0',
+				price: '1',
+			});
+			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
+			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
+			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
+			listDynamicFields = async () => ({
+				dynamicFields: [
+					createDynamicField('0xopen'),
+					createDynamicField('0xpending'),
+				],
+				hasNextPage: false,
+				cursor: null,
+			});
+			resolveTransactionPlugin = () => async () => {};
+			verifyZkLoginSignature = async () => ({ success: true }) as never;
+			getMoveFunction = async () => ({ function: null }) as never;
+			defaultNameServiceName = async () => ({ address: null }) as never;
+		}
+
+		const client = new TestClient().$extend(suigar());
+		vi.spyOn(client.suigar, 'resolvePvPConflipGame').mockImplementation(
+			async (gameId: string) =>
+				({
+					id: gameId,
+					creator: '0xcreator',
+					creator_is_tails: false,
+					is_private: false,
+					creator_metadata: { contents: [] },
+					joiner: '0xjoiner',
+					winner: '0xwinner',
+					stake_per_player: '1',
+					house_edge_bps: '100',
+					stake_pot: { value: '2' },
+					coinType: '0x2::sui::SUI',
+				}) as never,
+		);
+
+		const games = await client.suigar.getPvPCoinflipGames();
+
+		expect(games).toHaveLength(2);
+		expect(games[0]?.id).toBe('0xopen');
+		expect(games[1]?.id).toBe('0xpending');
 	});
 });

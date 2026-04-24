@@ -9,7 +9,12 @@ import {
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
 } from '../src/helpers/index.js';
-import { COIN_TYPES, PACKAGE_IDS, PRICE_INFO_OBJECT_IDS } from '../src/configs';
+import {
+	COIN_TYPES,
+	PACKAGE_IDS,
+	PRICE_INFO_OBJECT_IDS,
+	REGISTRY_IDS,
+} from '../src/configs';
 
 describe('resolveSuigarConfig', () => {
 	it('resolves internal package ids and default coin types', () => {
@@ -24,6 +29,9 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
 		expect(config.packageIds.plinko).toBe(PACKAGE_IDS.testnet.plinko);
+		expect(config.registryIds.pvpCoinflip).toBe(
+			REGISTRY_IDS.testnet.pvpCoinflip,
+		);
 	});
 
 	it('uses the selected network package map', () => {
@@ -31,6 +39,7 @@ describe('resolveSuigarConfig', () => {
 
 		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
+		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
 		expect(config.priceInfoObjectIds).toEqual(PRICE_INFO_OBJECT_IDS.mainnet);
 	});
 

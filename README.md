@@ -74,6 +74,7 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 
 client.suigar.serializeTransactionToBase64(...);
 client.suigar.getConfig();
+client.suigar.getPvPCoinflipGames(...);
 client.suigar.resolvePvPConflipGame(...);
 client.suigar.bcs;
 client.suigar.tx;
@@ -161,6 +162,7 @@ The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
 - `serializeTransactionToBase64(transaction, options?)`
+- `getPvPCoinflipGames(options?)`
 - `resolvePvPConflipGame(gameId)`
 - `bcs`
 - `tx`
@@ -175,6 +177,7 @@ resolved package ids or supported coin mappings for the active client network.
 It includes:
 
 - `packageIds`
+- `registryIds`
 - `coinTypes`
 - `priceInfoObjectIds`
 
@@ -193,19 +196,45 @@ Use this when you need a transport-safe payload for a wallet, API, or external s
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
 
+### `getPvPCoinflipGames(options?)`
+
+Lists unresolved PvP coinflip games from the configured PvP registry.
+
+This reads the registry dynamic fields for the active network and resolves each
+entry into parsed game state through `resolvePvPConflipGame()`. Registry
+membership is the unresolved-state signal: once a match is joined and resolved,
+the Move flow removes it from the registry and deletes the live `Game` object.
+
+Use this when a product needs the current set of open PvP coinflip matches for
+browsing or lobby views.
+
+```ts
+const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
+
+for (const game of games) {
+	console.log(game.id);
+	console.log(game.coinType);
+}
+```
+
 ### `resolvePvPConflipGame(gameId)`
 
-Fetches a PvP coinflip game object from chain and parses its `content` into the
-generated `PvPCoinflipGame` shape.
+Fetches a PvP coinflip game object from chain and parses it into the SDK's
+normalized runtime shape.
 
-Use this when a product needs the live onchain match state before rendering a
-lobby, gating join or cancel actions, or inspecting the resolved stake and
-privacy flag for a game.
+This requires the object's `content`, decodes it with the generated
+`PvPCoinflipGame` parser, and normalizes the generic coin type into a standard
+struct tag string.
+
+Use this when a product needs the live onchain match state for a specific
+pending match before rendering join or cancel actions, or inspecting the stake
+and privacy flag for a game.
 
 ```ts
 const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID');
 
-console.log(game.owner);
+console.log(game.creator);
+console.log(game.coinType);
 console.log(game.stake_per_player);
 console.log(game.is_private);
 ```
@@ -214,9 +243,10 @@ console.log(game.is_private);
 >
 > - it throws if the object response does not include decodable `content`
 > - the PvP join builder uses this internally to derive the required join stake
+> - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolved` to read the final result
 
 > [!TIP]
-> Prefer this helper over manual object parsing when you only need the parsed game.
+> Prefer this helper over manual object parsing when you only need the parsed state for a live PvP game object.
 
 ## `tx`
 
