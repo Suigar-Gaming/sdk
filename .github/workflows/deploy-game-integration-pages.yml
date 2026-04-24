@@ -35,10 +35,10 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install root dependencies
+      - name: Install SDK dependencies
         run: npm install
 
-      - name: Install example dependencies
+      - name: Install Next.js Game Integration App dependencies
         run: npm install
         working-directory: examples/game-integration
 
