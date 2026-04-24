@@ -7,7 +7,7 @@ export default defineConfig({
 	entry: {
 		games: 'src/games.ts',
 		index: 'src/index.ts',
-		utils: 'src/helpers/index.ts',
+		utils: 'src/utils/index.ts',
 	},
 	format: ['esm', 'cjs'],
 	dts: true,

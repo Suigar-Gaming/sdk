@@ -41,15 +41,14 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `parseI64`
 - `parseFloat`
 - `parseGameDetails`
-- `encodeBetMetadata`
-- `resolveSuigarConfig`
-- `resolveGamePackageId`
-- `resolvePriceInfoObjectId`
 - `toBigIntAmount`
 - `toU8Number`
 - `DEFAULT_GAS_BUDGET_MIST`
-- `LIMBO_MULTIPLIER_SCALE`
-- `RANGE_FIXED_POINT_SCALE`
+- `RANGE_POINT_LIMIT`
+- `DEFAULT_RANGE_SCALE`
+- `DEFAULT_LIMBO_MULTIPLIER_SCALE`
+
+Internal config and metadata helpers stay under `src/helpers/*` and are not part of the intended public import surface.
 
 ## Default setup
 
@@ -65,13 +64,19 @@ const client = new SuiGrpcClient({
 }).$extend(suigar());
 ```
 
-If the app needs partner attribution on all supported bet flows, configure it at extension registration time:
+> [!IMPORTANT]
+> `partner` is a wallet address. If the app needs partner attribution on all
+> supported bet flows, configure that wallet address at extension registration
+> time:
 
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
-	suigar({ partner: 'my-partner' }),
+	suigar({ partner: '0xpartner_wallet_address' }),
 );
 ```
+
+> Do not pass a partner slug, label, or display name. Use the wallet address
+> that should be recorded onchain.
 
 If the app uses a custom extension name, preserve it consistently:
 
@@ -88,7 +93,7 @@ client.casino;
 - Prefer the SDK's resolved supported coin types from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
 - Do not invent package exports that do not exist or move runtime builders out of `client.suigar.tx`.
 - Keep wallet address ownership explicit and pass the same connected account through the integration.
-- If partner attribution is required, set `suigar({ partner })` once at extension registration time instead of passing `partner` through transaction `metadata`.
+- If partner attribution is required, set `suigar({ partner: '<wallet-address>' })` once at extension registration time instead of passing `partner` through transaction `metadata`.
 
 ## Serialization pattern
 

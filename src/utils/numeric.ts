@@ -1,10 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-export const DEFAULT_GAS_BUDGET_MIST = 50_000_000;
-export const RANGE_FIXED_POINT_SCALE = 1_000_000;
-export const LIMBO_MULTIPLIER_SCALE = 100;
-
 export function toBigIntAmount(
 	value: bigint | number,
 	fieldName: string,

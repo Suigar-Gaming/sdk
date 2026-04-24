@@ -3,14 +3,14 @@
 
 import { play } from '../contracts/limbo/limbo.js';
 import type { BuildLimboTransactionOptions, WithPartner } from '../types';
-import { LIMBO_MULTIPLIER_SCALE } from '../utils/shared.js';
+import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildLimboTransaction(
 	options: WithPartner<BuildLimboTransactionOptions>,
 ) {
-	const scale = options.scale ?? LIMBO_MULTIPLIER_SCALE;
+	const scale = options.scale ?? DEFAULT_LIMBO_MULTIPLIER_SCALE;
 	const numerator = Math.round(options.targetMultiplier * scale);
 
 	return buildSharedStandardGameBetTransaction({

@@ -37,7 +37,7 @@ Supported game ids:
 
 Extension-level option:
 
-- `suigar({ partner?: string })` appends `partner` metadata automatically to all supported bet flows.
+- `suigar({ partner?: string })` appends the partner wallet address to `partner` metadata automatically across all supported bet flows.
 
 ## Game-specific options
 
@@ -144,15 +144,17 @@ const tx = client.suigar.tx.createBetTransaction('range', {
 	owner,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
-	leftPoint: 0.95,
-	rightPoint: 1.05,
+	leftPoint: 25,
+	rightPoint: 75,
 	outOfRange: false,
 });
 ```
 
 Guardrails:
 
-- Keep `leftPoint` and `rightPoint` ordered and product-valid before building the transaction.
+- Keep `leftPoint` and `rightPoint` ordered before building the transaction.
+- Do not pre-scale range points in app code; pass human values and let the SDK apply the selected scale once.
+- Range points must stay within the contract cap after scaling. With the default scale `1_000_000`, valid UI values are `0` to `100`.
 - Let the SDK convert fixed-point values using the selected scale.
 
 ## Wheel
@@ -186,7 +188,8 @@ Guardrails:
 - `betCount` defaults to `1`; do not reimplement batching unless the product requires custom behavior.
 - Pass plain application values in `metadata`; let the SDK encode them.
 - Do not set `metadata.partner` or `metadata.referrer`; those keys are reserved and the SDK ignores them with a warning.
-- If the product needs partner attribution, configure `suigar({ partner })` once on the client extension instead of passing it per transaction.
+- If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` once on the client extension instead of passing it per transaction.
+- Treat `partner` as a wallet address, not a slug, label, or display string.
 - Keep amounts as `bigint` once they leave the UI layer.
 - Ensure the same connected wallet address is used as `owner`.
 

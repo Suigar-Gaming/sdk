@@ -14,12 +14,12 @@ import type {
 	SuigarConfig,
 	WithPartner,
 } from '../types';
-import { encodeBetMetadata } from '../utils/metadata.js';
 import {
 	assertConfiguredBetGame,
+	encodeBetMetadata,
 	resolvePriceInfoObjectId,
-} from '../utils/config.js';
-import { DEFAULT_GAS_BUDGET_MIST, toBigIntAmount } from '../utils/shared.js';
+} from '../helpers/index.js';
+import { DEFAULT_GAS_BUDGET_MIST, toBigIntAmount } from '../utils/index.js';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 
 export type BuildSharedBetTransactionContext = {

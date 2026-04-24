@@ -25,6 +25,14 @@ import type {
 	CoinSide,
 	PvPCoinflipAction,
 } from '../src/games.js';
+import {
+	DEFAULT_GAS_BUDGET_MIST,
+	DEFAULT_LIMBO_MULTIPLIER_SCALE,
+	DEFAULT_RANGE_SCALE,
+	RANGE_POINT_LIMIT,
+	toBigIntAmount,
+	toU8Number,
+} from '../src/utils/index.js';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import packageJson from '../package.json';
@@ -35,6 +43,19 @@ describe('public source subpath modules', () => {
 
 		expect(module).toBeDefined();
 		expect(Object.keys(module)).toEqual([]);
+	});
+
+	it('loads the utils subpath module', async () => {
+		const module = await import('../src/utils/index.js');
+
+		expect(module).toBeDefined();
+		expect(DEFAULT_GAS_BUDGET_MIST).toBeTypeOf('bigint');
+		expect(DEFAULT_GAS_BUDGET_MIST).toBe(50_000_000n);
+		expect(RANGE_POINT_LIMIT).toBe(100_000_000);
+		expect(DEFAULT_RANGE_SCALE).toBe(1_000_000);
+		expect(DEFAULT_LIMBO_MULTIPLIER_SCALE).toBe(100);
+		expect(toBigIntAmount(1, 'stake')).toBe(1n);
+		expect(toU8Number(255, 'configId')).toBe(255);
 	});
 
 	it('exposes only the intended package subpaths', () => {

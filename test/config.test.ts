@@ -8,7 +8,7 @@ import {
 	resolveGamePackageId,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
-} from '../src/utils/config.js';
+} from '../src/helpers/index.js';
 import { COIN_TYPES, PACKAGE_IDS, PRICE_INFO_OBJECT_IDS } from '../src/configs';
 
 describe('resolveSuigarConfig', () => {

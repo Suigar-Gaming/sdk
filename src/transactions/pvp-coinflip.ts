@@ -17,9 +17,11 @@ import type {
 	ResolvedJoinPvPCoinflipTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { resolvePriceInfoObjectId } from '../utils/config.js';
-import { encodeBetMetadata } from '../utils/metadata.js';
-import { toBigIntAmount } from '../utils/shared.js';
+import {
+	encodeBetMetadata,
+	resolvePriceInfoObjectId,
+} from '../helpers/index.js';
+import { toBigIntAmount } from '../utils/index.js';
 import { createBaseGameTransaction } from './shared.js';
 
 type PvPCoinflipTransactionOptionsWithPartner<
