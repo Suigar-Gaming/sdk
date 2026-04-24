@@ -32,8 +32,6 @@
 	--ring: #ffd238;
 	--ring-shadow: #b67a09;
 	--radius: 1rem;
-	--font-serif: var(--font-serif);
-	--font-mono: var(--font-mono);
 }
 
 .dark {
@@ -104,8 +102,6 @@
 	--radius-md: calc(var(--radius) - 0.25rem);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 0.5rem);
-	--font-sans: var(--font-sans);
-	--font-mono: var(--font-mono);
 }
 
 * {
@@ -140,7 +136,7 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover;
 	color: var(--foreground);
-	font-family: var(--font-serif), var(--font-sans), sans-serif;
+	font-family: var(--font-sans), sans-serif;
 	letter-spacing: 0.015em;
 }
 
