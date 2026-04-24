@@ -24,10 +24,6 @@ export const metadata: Metadata = {
 	title: 'Suigar SDK Game Integration',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
-	icons: {
-		icon: '/icon.png',
-		apple: '/icon.png',
-	},
 };
 
 export default function RootLayout({
