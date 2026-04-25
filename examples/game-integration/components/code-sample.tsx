@@ -16,7 +16,7 @@ export function CodeSample({ code }: { code: string }) {
 	async function handleCopy() {
 		await navigator.clipboard.writeText(code);
 		toast.success('Copied to clipboard', {
-			description: 'The full transaction block code was copied.',
+			description: 'The transaction block code was copied.',
 		});
 	}
 

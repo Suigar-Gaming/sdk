@@ -909,15 +909,18 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			</div>
 
 			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
-				<Button asChild className="rounded-full shadow-lg">
+				<Button
+					asChild
+					className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
+				>
 					<a
 						href="https://docs.suigar.com/sdk"
 						target="_blank"
 						rel="noreferrer"
 						aria-label="Open SDK documentation"
-						title="SDK docs"
+						title="SDK Docs"
 					>
-						<BookOpenText className="size-5" />
+						<BookOpenText className="size-5 md:size-6" />
 						SDK Docs
 					</a>
 				</Button>

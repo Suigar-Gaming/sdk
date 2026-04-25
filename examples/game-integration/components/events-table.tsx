@@ -22,6 +22,10 @@ import {
 } from '@/components/ui/table';
 import { compactAddress } from '@/lib/suigar-app';
 
+function toTitleCase(value: string) {
+	return value.replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
 function CopyableValue({
 	label,
 	value,
@@ -45,8 +49,8 @@ function CopyableValue({
 			type="button"
 			className="cursor-pointer font-mono underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
 			onClick={copyValue}
-			title={`Copy full ${label}`}
-			aria-label={`Copy full ${label}`}
+			title={`Copy ${label}`}
+			aria-label={`Copy ${label}`}
 		>
 			{compactAddress(value)}
 		</button>
@@ -57,8 +61,10 @@ export function EventsTable() {
 	const { rows, clearRows } = useEventLog();
 
 	function handleCopied(label: string) {
+		const titleCaseLabel = toTitleCase(label);
+
 		toast.success('Copied to clipboard', {
-			description: `Full ${label} copied.`,
+			description: `${titleCaseLabel} copied.`,
 		});
 	}
 
