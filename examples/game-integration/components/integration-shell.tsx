@@ -63,6 +63,7 @@ import {
 	buildPvPTransaction,
 	buildStandardTransaction,
 } from '@/lib/transaction-builders';
+import { withBasePath } from '@/lib/paths';
 import { cn } from '@/lib/utils';
 
 type Mode = 'standard' | 'pvp';
@@ -552,7 +553,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								className="inline-flex min-w-0 items-center gap-2"
 							>
 								<Image
-									src="/logo/icon.svg"
+									src={withBasePath('/logo/icon.svg')}
 									alt="Suigar"
 									width={36}
 									height={36}
@@ -560,7 +561,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									priority
 								/>
 								<Image
-									src="/logo/suigar-logo-full.svg"
+									src={withBasePath('/logo/suigar-logo-full.svg')}
 									alt="Suigar"
 									width={132}
 									height={36}
