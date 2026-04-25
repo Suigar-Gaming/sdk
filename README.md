@@ -109,10 +109,9 @@ Creates a named Sui client extension. By default, it registers under `client.sui
 
 ### Partner Setup
 
-> [!IMPORTANT]
-> `partner` is the partner wallet address. Configure it once when you
-> register the extension so the SDK can append that wallet address to supported
-> bet metadata automatically.
+> **Important:** `partner` is the partner wallet address. Configure it once
+> when you register the extension so the SDK can append that wallet address to
+> supported bet metadata automatically.
 
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
@@ -250,14 +249,14 @@ console.log(game.stake_per_player);
 console.log(game.is_private);
 ```
 
-> [!NOTE]
+> **Note:**
 >
 > - it throws if the object response does not include decodable `content`
 > - the PvP join builder uses this internally to derive the required join stake
 > - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolved` to read the final result
 
-> [!TIP]
-> Prefer this helper over manual object parsing when you only need the parsed state for a live PvP coinflip game object.
+> **Tip:** Prefer this helper over manual object parsing when you only need the
+> parsed state for a live PvP coinflip game object.
 
 ## `tx`
 
@@ -334,7 +333,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 });
 ```
 
-> [!NOTE]
+> **Note:**
 >
 > - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
 > - with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` onchain
@@ -343,7 +342,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 > - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
 > - plinko and wheel `configId` must fit in `u8`
 
-> [!TIP]
+> **Tip:**
 >
 > - if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
 > - do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
@@ -512,7 +511,7 @@ const gameDetails = parseGameDetails(decoded.game_details);
 When the extension is configured with `partner`, decoded event `metadata` will
 contain that partner wallet address under the `partner` entry.
 
-> [!IMPORTANT]
+> **Important:**
 >
 > - execute or wait for the transaction with `include: { events: true }`
 > - unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
@@ -520,7 +519,7 @@ contain that partner wallet address under the `partner` entry.
 > - use `event.bcs` for consistent decoding across transports
 > - use `parseGameDetails(decoded.game_details)` instead of hand-decoding standard game detail byte arrays
 
-> [!TIP]
+> **Tip:**
 >
 > - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
 > - these helpers decode the event payload itself, not a full transaction response
