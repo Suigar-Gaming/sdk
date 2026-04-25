@@ -12,6 +12,10 @@ export type WithPartner<T> = T & {
 	partner?: string;
 };
 
+export type WithThrowOnError<T = object> = T & {
+	throwOnError?: boolean;
+};
+
 export type BuildCoinflipTransactionOptions = SharedBetTransactionOptions & {
 	side: CoinSide;
 };

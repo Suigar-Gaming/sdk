@@ -27,7 +27,7 @@ client.suigar.bcs.PvPCoinflipGame;
 the active network. Joined and resolved games are removed from that registry and
 their live `Game` objects are deleted. By default, individual resolution
 failures are skipped so one stale registry entry does not reject the full
-lookup. Pass `rejectOnError: true` when the caller wants strict rejection.
+lookup. Pass `throwOnError: true` when the caller wants strict rejection.
 
 ## PvP Coinflip
 
@@ -174,7 +174,7 @@ for (const game of games) {
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({
 	limit: 20,
-	rejectOnError: true,
+	throwOnError: true,
 });
 ```
 
@@ -198,7 +198,7 @@ const gameDetails = parseGameDetails(decoded.game_details);
 Guardrails:
 
 - `getPvPCoinflipGames()` only returns unresolved games because registry membership is the live pending-state signal.
-- `getPvPCoinflipGames()` skips per-game resolution failures by default; use `rejectOnError: true` when the product should fail the whole lookup instead.
+- `getPvPCoinflipGames()` skips per-game resolution failures by default; use `throwOnError: true` when the product should fail the whole lookup instead.
 - Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
 - `resolvePvPConflipGame(gameId)` is for live pending game objects; after join and resolution, inspect `PvPCoinflipGameResolved` or other emitted events instead of expecting the `Game` object to remain onchain.
 - Use `event.bcs` as the event payload input when available.

@@ -209,7 +209,7 @@ browsing or lobby views.
 
 By default, failures to resolve an individual game are skipped so one broken or
 already-deleted registry entry does not reject the full lookup. Pass
-`rejectOnError: true` if you want the call to reject instead.
+`throwOnError: true` if you want the call to reject instead.
 
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
@@ -223,7 +223,7 @@ for (const game of games) {
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({
 	limit: 20,
-	rejectOnError: true,
+	throwOnError: true,
 });
 ```
 

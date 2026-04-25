@@ -124,7 +124,7 @@ There are two transaction families and they must not be mixed:
 
 - **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
 - **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
-- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; by default this skips individual `resolvePvPConflipGame()` failures and only rejects when `rejectOnError: true` is passed.
+- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; by default this skips individual `resolvePvPConflipGame()` failures and only rejects when `throwOnError: true` is passed.
 
 When making changes:
 
@@ -177,7 +177,9 @@ This is a core invariant: standard game transactions must fail clearly when the 
 Documentation is part of the deliverable:
 
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
-- At minimum, review `README.md`, `AGENTS.md`, and any other user-facing markdown that describes the changed behavior.
+- At minimum, review `README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
+- Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
+- When a repo-local skill is mirrored under `.claude/skills`, keep the mirrored copy aligned in the same task.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.

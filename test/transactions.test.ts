@@ -883,7 +883,7 @@ describe('SuigarClient', () => {
 		expect(games[1]?.id).toBe('0xpending');
 	});
 
-	it('skips unresolved PvP coinflip games when rejectOnError is false', async () => {
+	it('skips unresolved PvP coinflip games when throwOnError is false', async () => {
 		class TestClient extends CoreClient {
 			constructor() {
 				super({ network: 'testnet', base: undefined as never });
@@ -974,7 +974,7 @@ describe('SuigarClient', () => {
 		expect(games.map((game) => game.id)).toEqual(['0xopen', '0xpending']);
 	});
 
-	it('rejects unresolved PvP coinflip games when rejectOnError is true', async () => {
+	it('rejects unresolved PvP coinflip games when throwOnError is true', async () => {
 		class TestClient extends CoreClient {
 			constructor() {
 				super({ network: 'testnet', base: undefined as never });
@@ -1038,7 +1038,7 @@ describe('SuigarClient', () => {
 		);
 
 		await expect(
-			client.suigar.getPvPCoinflipGames({ rejectOnError: true }),
+			client.suigar.getPvPCoinflipGames({ throwOnError: true }),
 		).rejects.toThrow('boom');
 	});
 });
