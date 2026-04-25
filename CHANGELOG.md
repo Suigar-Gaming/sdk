@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.6
+
+### Patch Changes
+
+- ef6bcd4: Rename getPvPCoinflipGames option from rejectOnError to throwOnError.
+
 ## 2.0.0-beta.5
 
 ### Patch Changes
