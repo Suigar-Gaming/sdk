@@ -12,14 +12,14 @@ function Switch({
 		<SwitchPrimitive.Root
 			data-slot="switch"
 			className={cn(
-				'peer inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-transparent bg-muted transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/60 data-[state=checked]:bg-primary',
+				'peer inline-flex h-6 w-10 shrink-0 items-center rounded-full border border-transparent bg-input/70 p-0.5 shadow-xs transition-colors outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ring/60 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted/85',
 				className,
 			)}
 			{...props}
 		>
 			<SwitchPrimitive.Thumb
 				data-slot="switch-thumb"
-				className="pointer-events-none block size-5 rounded-full bg-white shadow-sm ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+				className="pointer-events-none block size-5 rounded-full bg-white shadow-sm ring-0 transition-transform data-[state=checked]:translate-x-4"
 			/>
 		</SwitchPrimitive.Root>
 	);

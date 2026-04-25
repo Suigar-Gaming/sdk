@@ -1,7 +1,7 @@
 'use client';
 
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { PvPJoinFormValues } from '@/lib/suigar-types';
 
 export function PvPJoinForm({
@@ -13,15 +13,15 @@ export function PvPJoinForm({
 }) {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-2">
-				<Label htmlFor="pvpGameId">Game ID</Label>
+			<Field>
+				<FieldLabel htmlFor="pvpGameId">Game ID</FieldLabel>
 				<Input
 					id="pvpGameId"
 					placeholder="Select a lobby card or paste a game id"
 					value={value.gameId}
 					onChange={(event) => onChange({ gameId: event.target.value })}
 				/>
-			</div>
+			</Field>
 		</div>
 	);
 }

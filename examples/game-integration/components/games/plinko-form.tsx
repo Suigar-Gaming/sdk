@@ -1,8 +1,8 @@
 'use client';
 
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { PlinkoFormValues } from '@/lib/suigar-types';
 
 export function PlinkoForm({
@@ -14,8 +14,8 @@ export function PlinkoForm({
 }) {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-2">
-				<Label htmlFor="plinkoConfigId">Board config ID</Label>
+			<Field>
+				<FieldLabel htmlFor="plinkoConfigId">Board config ID</FieldLabel>
 				<Input
 					id="plinkoConfigId"
 					type="number"
@@ -23,7 +23,7 @@ export function PlinkoForm({
 					value={value.configId}
 					onChange={(event) => onChange({ configId: event.target.value })}
 				/>
-			</div>
+			</Field>
 			<SharedGameFields value={value} onChange={onChange} />
 		</div>
 	);
