@@ -64,10 +64,9 @@ const client = new SuiGrpcClient({
 }).$extend(suigar());
 ```
 
-> [!IMPORTANT]
-> `partner` is a wallet address. If the app needs partner attribution on all
-> supported bet flows, configure that wallet address at extension registration
-> time:
+> **Important:** `partner` is a wallet address. If the app needs partner
+> attribution on all supported bet flows, configure that wallet address at
+> extension registration time:
 
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
