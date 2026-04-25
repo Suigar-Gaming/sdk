@@ -3,7 +3,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CirclePlus, Gamepad2, ShieldX, Swords } from 'lucide-react';
+import {
+	BookOpenText,
+	CirclePlus,
+	Gamepad2,
+	ShieldX,
+	Swords,
+} from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	useCurrentAccount,
@@ -900,6 +906,21 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 					<EventsTable />
 				</main>
+			</div>
+
+			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
+				<Button asChild className="rounded-full shadow-lg">
+					<a
+						href="https://docs.suigar.com/sdk"
+						target="_blank"
+						rel="noreferrer"
+						aria-label="Open SDK documentation"
+						title="SDK docs"
+					>
+						<BookOpenText className="size-5" />
+						SDK Docs
+					</a>
+				</Button>
 			</div>
 		</div>
 	);

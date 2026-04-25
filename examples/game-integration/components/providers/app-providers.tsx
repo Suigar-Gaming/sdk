@@ -12,7 +12,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 			<DAppKitProvider dAppKit={dAppKit}>
 				<EventLogProvider>{children}</EventLogProvider>
 			</DAppKitProvider>
-			<Toaster position="bottom-right" richColors />
+			<Toaster richColors />
 		</ThemeProvider>
 	);
 }
