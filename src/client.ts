@@ -26,6 +26,7 @@ import {
 	SuigarExtensionOptions,
 	SuiNetwork,
 	WithPartner,
+	WithThrowOnError,
 } from './types';
 import { resolveSuigarConfig } from './helpers/index.js';
 import {
@@ -133,9 +134,9 @@ export class SuigarClient {
 	 * `resolvePvPConflipGame()` are omitted from the returned array.
 	 */
 	async getPvPCoinflipGames(
-		options: Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'> & {
-			throwOnError?: boolean;
-		} = {
+		options: WithThrowOnError<
+			Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>
+		> = {
 			limit: 50,
 		},
 	) {
