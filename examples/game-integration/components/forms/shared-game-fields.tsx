@@ -1,7 +1,7 @@
 'use client';
 
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { SharedFields } from '@/lib/suigar-types';
 
 type SharedGameFieldsProps<T extends SharedFields> = {
@@ -14,8 +14,8 @@ export function SharedGameFields<T extends SharedFields>({
 	onChange,
 }: SharedGameFieldsProps<T>) {
 	return (
-		<div className="space-y-2">
-			<Label htmlFor="stake">Stake</Label>
+		<Field>
+			<FieldLabel htmlFor="stake">Stake</FieldLabel>
 			<Input
 				id="stake"
 				type="number"
@@ -27,6 +27,6 @@ export function SharedGameFields<T extends SharedFields>({
 				}
 				placeholder="1"
 			/>
-		</div>
+		</Field>
 	);
 }

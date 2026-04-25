@@ -3,7 +3,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CirclePlus, Gamepad2, ShieldX, Swords } from 'lucide-react';
+import {
+	BookOpenText,
+	CirclePlus,
+	Gamepad2,
+	ShieldX,
+	Swords,
+} from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	useCurrentAccount,
@@ -63,6 +69,7 @@ import {
 	buildPvPTransaction,
 	buildStandardTransaction,
 } from '@/lib/transaction-builders';
+import { withBasePath } from '@/lib/paths';
 import { cn } from '@/lib/utils';
 
 type Mode = 'standard' | 'pvp';
@@ -552,7 +559,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								className="inline-flex min-w-0 items-center gap-2"
 							>
 								<Image
-									src="/logo/icon.svg"
+									src={withBasePath('/logo/icon.svg')}
 									alt="Suigar"
 									width={36}
 									height={36}
@@ -560,7 +567,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									priority
 								/>
 								<Image
-									src="/logo/suigar-logo-full.svg"
+									src={withBasePath('/logo/suigar-logo-full.svg')}
 									alt="Suigar"
 									width={132}
 									height={36}
@@ -899,6 +906,24 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 					<EventsTable />
 				</main>
+			</div>
+
+			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
+				<Button
+					asChild
+					className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
+				>
+					<a
+						href="https://docs.suigar.com/sdk"
+						target="_blank"
+						rel="noreferrer"
+						aria-label="Open SDK documentation"
+						title="SDK Docs"
+					>
+						<BookOpenText className="size-5 md:size-6" />
+						SDK Docs
+					</a>
+				</Button>
 			</div>
 		</div>
 	);

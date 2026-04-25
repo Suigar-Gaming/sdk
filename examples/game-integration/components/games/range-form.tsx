@@ -2,8 +2,15 @@
 
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import {
+	Field,
+	FieldCode,
+	FieldDescription,
+	FieldGroup,
+	FieldLabel,
+	FieldTitle,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { getRangePointMax, parseOptionalNumber } from '@/lib/suigar-app';
 import type { RangeFormValues } from '@/lib/suigar-types';
@@ -24,9 +31,9 @@ export function RangeForm({
 
 	return (
 		<div className="space-y-6">
-			<div className="grid gap-4 md:grid-cols-2">
-				<div className="space-y-2">
-					<Label htmlFor="leftPoint">Left point</Label>
+			<FieldGroup className="grid gap-4 md:grid-cols-2">
+				<Field>
+					<FieldLabel htmlFor="leftPoint">Left point</FieldLabel>
 					<Input
 						id="leftPoint"
 						type="number"
@@ -36,12 +43,14 @@ export function RangeForm({
 						value={value.leftPoint}
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
-					<p className="text-xs text-muted-foreground">
-						Allowed range: 0 to {maxPoint} with scale {effectiveScale}.
-					</p>
-				</div>
-				<div className="space-y-2">
-					<Label htmlFor="rightPoint">Right point</Label>
+					<FieldDescription>
+						Allowed range: <FieldCode>0</FieldCode> to{' '}
+						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
+						<FieldCode>{String(effectiveScale)}</FieldCode>.
+					</FieldDescription>
+				</Field>
+				<Field>
+					<FieldLabel htmlFor="rightPoint">Right point</FieldLabel>
 					<Input
 						id="rightPoint"
 						type="number"
@@ -51,15 +60,15 @@ export function RangeForm({
 						value={value.rightPoint}
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
-					<p className="text-xs text-muted-foreground">
-						The SDK sends `Math.round(point * scale)`, so larger scales reduce
-						the allowed frontend range.
-					</p>
-				</div>
-			</div>
-			<div className="grid gap-4 md:grid-cols-2">
-				<div className="space-y-2">
-					<Label htmlFor="rangeScale">Scale (optional)</Label>
+					<FieldDescription>
+						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
+						larger scales reduce the allowed frontend range.
+					</FieldDescription>
+				</Field>
+			</FieldGroup>
+			<FieldGroup className="grid gap-4 md:grid-cols-2">
+				<Field>
+					<FieldLabel htmlFor="rangeScale">Scale (optional)</FieldLabel>
 					<Input
 						id="rangeScale"
 						type="number"
@@ -69,26 +78,27 @@ export function RangeForm({
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
 					/>
-					<p className="text-xs text-muted-foreground">
-						Leave empty to use the SDK default scale of {DEFAULT_RANGE_SCALE},
-						which allows points from 0 to 100.
-					</p>
-				</div>
-				<div className="flex items-end">
-					<div className="flex w-full items-center justify-between rounded-xl border border-border/70 bg-background/40 px-4 py-3">
-						<div>
-							<p className="text-sm font-medium">Out of range</p>
-							<p className="text-xs text-muted-foreground">
-								Flip the win condition outside the interval.
-							</p>
+					<FieldDescription>
+						Leave empty to use the SDK default scale of{' '}
+						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
+						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>.
+					</FieldDescription>
+				</Field>
+				<div className="flex h-full w-full items-start md:justify-start">
+					<Field className="w-full rounded-xl border border-border/70 bg-background/40 px-4 py-3 md:max-w-sm">
+						<div className="flex items-center justify-between gap-3">
+							<FieldTitle>Out of range</FieldTitle>
+							<Switch
+								checked={value.outOfRange}
+								onCheckedChange={(checked) => onChange({ outOfRange: checked })}
+							/>
 						</div>
-						<Switch
-							checked={value.outOfRange}
-							onCheckedChange={(checked) => onChange({ outOfRange: checked })}
-						/>
-					</div>
+						<FieldDescription>
+							Flip the win condition outside the interval.
+						</FieldDescription>
+					</Field>
 				</div>
-			</div>
+			</FieldGroup>
 			<SharedGameFields value={value} onChange={onChange} />
 		</div>
 	);

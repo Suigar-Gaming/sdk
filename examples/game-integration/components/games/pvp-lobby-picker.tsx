@@ -10,6 +10,7 @@ import type {
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -167,16 +168,11 @@ export function PvPLobbyPicker({
 													</span>
 												</p>
 											</div>
-											<div
-												className={cn(
-													'rounded-full border px-2 py-0.5 text-[0.62rem] font-medium uppercase tracking-[0.14em]',
-													game.is_private
-														? 'border-destructive/45 bg-destructive/10 text-destructive'
-														: 'border-success/45 bg-success/12 text-success',
-												)}
+											<Badge
+												variant={game.is_private ? 'destructive' : 'success'}
 											>
 												{game.is_private ? 'Private' : 'Public'}
-											</div>
+											</Badge>
 										</div>
 
 										<div className="flex items-center justify-between gap-3">

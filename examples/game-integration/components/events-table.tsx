@@ -6,6 +6,7 @@ import { useEventLog } from '@/components/providers/event-log-provider';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
+	CardAction,
 	CardContent,
 	CardDescription,
 	CardHeader,
@@ -20,6 +21,10 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { compactAddress } from '@/lib/suigar-app';
+
+function toTitleCase(value: string) {
+	return value.replace(/\b\w/g, (character) => character.toUpperCase());
+}
 
 function CopyableValue({
 	label,
@@ -44,8 +49,8 @@ function CopyableValue({
 			type="button"
 			className="cursor-pointer font-mono underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
 			onClick={copyValue}
-			title={`Copy full ${label}`}
-			aria-label={`Copy full ${label}`}
+			title={`Copy ${label}`}
+			aria-label={`Copy ${label}`}
 		>
 			{compactAddress(value)}
 		</button>
@@ -56,14 +61,16 @@ export function EventsTable() {
 	const { rows, clearRows } = useEventLog();
 
 	function handleCopied(label: string) {
+		const titleCaseLabel = toTitleCase(label);
+
 		toast.success('Copied to clipboard', {
-			description: `Full ${label} copied.`,
+			description: `${titleCaseLabel} copied.`,
 		});
 	}
 
 	return (
 		<Card className="border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-			<CardHeader className="flex-row items-start justify-between gap-4">
+			<CardHeader>
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
 						<ListTree className="size-5 text-secondary dark:text-primary" />
@@ -74,10 +81,12 @@ export function EventsTable() {
 						whenever you want a fresh log.
 					</CardDescription>
 				</div>
-				<Button variant="outline" size="sm" onClick={clearRows}>
-					<Trash2 className="size-4" />
-					Clear
-				</Button>
+				<CardAction>
+					<Button variant="outline" size="sm" onClick={clearRows}>
+						<Trash2 className="size-4" />
+						Clear
+					</Button>
+				</CardAction>
 			</CardHeader>
 			<CardContent className="min-h-[12rem]">
 				<div className="overflow-hidden rounded-2xl border border-border/70">

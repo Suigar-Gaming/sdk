@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Bagel_Fat_One, IBM_Plex_Mono, Urbanist } from 'next/font/google';
 import { AppProviders } from '@/components/providers/app-providers';
+import { withBasePath } from '@/lib/paths';
 import './globals.css';
 
 const sans = Urbanist({
@@ -24,6 +25,10 @@ export const metadata: Metadata = {
 	title: 'Suigar SDK Game Integration',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
+	icons: {
+		icon: withBasePath('/icon.png'),
+		apple: withBasePath('/icon.png'),
+	},
 };
 
 export default function RootLayout({

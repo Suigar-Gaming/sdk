@@ -1,7 +1,7 @@
 'use client';
 
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
-import { Label } from '@/components/ui/label';
+import { Field, FieldLabel } from '@/components/ui/field';
 import {
 	Select,
 	SelectContent,
@@ -20,8 +20,8 @@ export function CoinflipForm({
 }) {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-2">
-				<Label>Side</Label>
+			<Field>
+				<FieldLabel>Side</FieldLabel>
 				<Select
 					value={value.side}
 					onValueChange={(side) =>
@@ -36,7 +36,7 @@ export function CoinflipForm({
 						<SelectItem value="tails">Tails</SelectItem>
 					</SelectContent>
 				</Select>
-			</div>
+			</Field>
 			<SharedGameFields value={value} onChange={onChange} />
 		</div>
 	);
