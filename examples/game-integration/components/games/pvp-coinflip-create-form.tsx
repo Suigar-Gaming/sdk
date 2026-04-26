@@ -16,14 +16,14 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import type { PvPCreateFormValues } from '@/lib/suigar-types';
+import type { PvPCoinflipCreateFormValues } from '@/lib/suigar-types';
 
-export function PvPCreateForm({
+export function PvPCoinflipCreateForm({
 	value,
 	onChange,
 }: {
-	value: PvPCreateFormValues;
-	onChange: (patch: Partial<PvPCreateFormValues>) => void;
+	value: PvPCoinflipCreateFormValues;
+	onChange: (patch: Partial<PvPCoinflipCreateFormValues>) => void;
 }) {
 	return (
 		<div className="space-y-6">
@@ -33,7 +33,7 @@ export function PvPCreateForm({
 					<Select
 						value={value.side}
 						onValueChange={(side) =>
-							onChange({ side: side as PvPCreateFormValues['side'] })
+							onChange({ side: side as PvPCoinflipCreateFormValues['side'] })
 						}
 					>
 						<SelectTrigger>

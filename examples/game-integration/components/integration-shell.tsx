@@ -24,9 +24,9 @@ import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/games/coinflip-form';
 import { LimboForm } from '@/components/games/limbo-form';
 import { PlinkoForm } from '@/components/games/plinko-form';
-import { PvPCancelForm } from '@/components/games/pvp-cancel-form';
-import { PvPCreateForm } from '@/components/games/pvp-create-form';
-import { PvPJoinForm } from '@/components/games/pvp-join-form';
+import { PvPCoinflipCancelForm } from '@/components/games/pvp-coinflip-cancel-form';
+import { PvPCoinflipCreateForm } from '@/components/games/pvp-coinflip-create-form';
+import { PvPCoinflipJoinForm } from '@/components/games/pvp-coinflip-join-form';
 import { PvPLobbyPicker } from '@/components/games/pvp-lobby-picker';
 import { RangeForm } from '@/components/games/range-form';
 import { WheelForm } from '@/components/games/wheel-form';
@@ -65,7 +65,7 @@ import {
 import type {
 	PvPAction,
 	PvPCoinflipLobbyGame,
-	PvPForms,
+	PvPCoinflipForms,
 	PvPGameId,
 	StandardForms,
 	StandardGameId,
@@ -267,7 +267,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		'suigar-example-standard-forms-v2',
 		DEFAULT_STANDARD_FORMS,
 	);
-	const [pvpForms, setPvpForms] = usePersistentForms<PvPForms>(
+	const [pvpForms, setPvpForms] = usePersistentForms<PvPCoinflipForms>(
 		'suigar-example-pvp-forms-v2',
 		DEFAULT_PVP_FORMS,
 	);
@@ -532,7 +532,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 	function updatePvPForm<K extends PvPAction>(
 		action: K,
-		patch: Partial<PvPForms[K]>,
+		patch: Partial<PvPCoinflipForms[K]>,
 	) {
 		setPvpForms((current) => ({
 			...current,
@@ -897,7 +897,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								) : (
 									<>
 										{pvpAction === 'create' ? (
-											<PvPCreateForm
+											<PvPCoinflipCreateForm
 												value={pvpForms.create}
 												onChange={(patch) => updatePvPForm('create', patch)}
 											/>
@@ -948,7 +948,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														handleSelectPvPLobby('join', game)
 													}
 												/>
-												<PvPJoinForm value={pvpForms.join} />
+												<PvPCoinflipJoinForm value={pvpForms.join} />
 											</>
 										) : null}
 										{pvpAction === 'cancel' ? (
@@ -983,7 +983,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														handleSelectPvPLobby('cancel', game)
 													}
 												/>
-												<PvPCancelForm value={pvpForms.cancel} />
+												<PvPCoinflipCancelForm value={pvpForms.cancel} />
 											</>
 										) : null}
 									</>

@@ -2,10 +2,10 @@ import type { SuigarClient } from '@suigar/sdk';
 import type {
 	CoinflipFormValues,
 	PvPAction,
-	PvPCancelFormValues,
-	PvPCreateFormValues,
-	PvPForms,
-	PvPJoinFormValues,
+	PvPCoinflipCancelFormValues,
+	PvPCoinflipCreateFormValues,
+	PvPCoinflipForms,
+	PvPCoinflipJoinFormValues,
 	SharedFields,
 	StandardForms,
 	StandardGameId,
@@ -130,7 +130,7 @@ export function buildStandardTransaction<K extends StandardGameId>(
 export function buildPvPTransaction<K extends PvPAction>(
 	client: { suigar: SuigarClient },
 	action: K,
-	form: PvPForms[K],
+	form: PvPCoinflipForms[K],
 	owner: string,
 	coinKey: SupportedCoinKey,
 	coinType: string,
@@ -141,7 +141,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 
 	switch (action) {
 		case 'create': {
-			const typedForm = form as PvPCreateFormValues;
+			const typedForm = form as PvPCoinflipCreateFormValues;
 			({ baseOptions, codeLines } = buildSharedOptions(
 				owner,
 				coinType,
@@ -155,7 +155,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 			break;
 		}
 		case 'join': {
-			const typedForm = form as PvPJoinFormValues;
+			const typedForm = form as PvPCoinflipJoinFormValues;
 			baseOptions = {
 				owner,
 				coinType,
@@ -169,7 +169,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 			break;
 		}
 		case 'cancel': {
-			const typedForm = form as PvPCancelFormValues;
+			const typedForm = form as PvPCoinflipCancelFormValues;
 			baseOptions = {
 				owner,
 				coinType,
