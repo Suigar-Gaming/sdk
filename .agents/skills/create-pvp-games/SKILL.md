@@ -154,9 +154,9 @@ Use:
 - `client.suigar.getPvPCoinflipGames(options?)`
 - `client.suigar.resolvePvPConflipGame(gameId)`
 - `client.suigar.bcs.PvPCoinflipGame`
-- `client.suigar.bcs.PvPCoinflipGameCreated`
-- `client.suigar.bcs.PvPCoinflipGameResolved`
-- `client.suigar.bcs.PvPCoinflipGameCancelled`
+- `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
+- `client.suigar.bcs.PvPCoinflipGameResolvedEvent`
+- `client.suigar.bcs.PvPCoinflipGameCancelledEvent`
 
 Use `getPvPCoinflipGames()` when you need the current unresolved lobby from the
 registry, and use the resolver when you need the current onchain PvP coinflip game
@@ -200,7 +200,7 @@ Guardrails:
 - `getPvPCoinflipGames()` only returns unresolved games because registry membership is the live pending-state signal.
 - `getPvPCoinflipGames()` skips per-game resolution failures by default; use `throwOnError: true` when the product should fail the whole lookup instead.
 - Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
-- `resolvePvPConflipGame(gameId)` is for live pending game objects; after join and resolution, inspect `PvPCoinflipGameResolved` or other emitted events instead of expecting the `Game` object to remain onchain.
+- `resolvePvPConflipGame(gameId)` is for live pending game objects; after join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain onchain.
 - Use `event.bcs` as the event payload input when available.
 - Do not route PvP coinflip transaction creation through standard bet builders.
 - Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.

@@ -28,8 +28,8 @@ The example reflects the current package export split:
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
 - A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
-- Decoding of `BetResultEvent`, `PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled`
-- Oracle price formatting with `parseFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
+- Decoding of `BetResultEvent`, `PvPCoinflipGameCreatedEvent`, `PvPCoinflipGameResolvedEvent`, and `PvPCoinflipGameCancelledEvent`
+- Oracle price formatting with `fromMoveFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
 - Shared persistent event table across route and game changes
 
 ## Run it
