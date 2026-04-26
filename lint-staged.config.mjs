@@ -5,7 +5,7 @@ export default {
 	],
 	'./*.{ts,tsx,js,mjs,cjs}': ['eslint --fix', 'prettier --write'],
 	'examples/game-integration/**/*.{ts,tsx,js,mjs,cjs}': [
-		'npm --prefix examples/game-integration run lint',
+		'eslint --fix',
 		'prettier --write',
 	],
 	'*.{json,md,yml,yaml}': 'prettier --write',
