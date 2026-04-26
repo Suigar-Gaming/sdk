@@ -2,7 +2,7 @@ import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
 	PvPAction,
 	PvPGameId,
-	PvPForms,
+	PvPCoinflipForms,
 	StandardGameId,
 	StandardForms,
 	SharedFields,
@@ -57,7 +57,7 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	},
 };
 
-export const DEFAULT_PVP_FORMS: PvPForms = {
+export const DEFAULT_PVP_FORMS: PvPCoinflipForms = {
 	create: {
 		...DEFAULT_SHARED_FIELDS,
 		side: 'tails',

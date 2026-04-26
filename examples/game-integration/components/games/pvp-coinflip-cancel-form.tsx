@@ -2,16 +2,20 @@
 
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import type { PvPJoinFormValues } from '@/lib/suigar-types';
+import type { PvPCoinflipCancelFormValues } from '@/lib/suigar-types';
 
-export function PvPJoinForm({ value }: { value: PvPJoinFormValues }) {
+export function PvPCoinflipCancelForm({
+	value,
+}: {
+	value: PvPCoinflipCancelFormValues;
+}) {
 	return (
 		<div className="space-y-6">
 			<Field>
-				<FieldLabel htmlFor="pvpGameId">Game ID</FieldLabel>
+				<FieldLabel htmlFor="cancelGameId">Game ID</FieldLabel>
 				<Input
-					id="pvpGameId"
-					placeholder="Select a lobby card to fill the game id"
+					id="cancelGameId"
+					placeholder="Select one of your lobbies to fill the game id"
 					value={value.gameId}
 					readOnly
 					aria-readonly="true"

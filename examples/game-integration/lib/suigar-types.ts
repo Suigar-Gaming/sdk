@@ -37,16 +37,16 @@ export type WheelFormValues = SharedFields & {
 	configId: string;
 };
 
-export type PvPCreateFormValues = SharedFields & {
+export type PvPCoinflipCreateFormValues = SharedFields & {
 	side: CoinSide;
 	isPrivate: boolean;
 };
 
-export type PvPJoinFormValues = {
+export type PvPCoinflipJoinFormValues = {
 	gameId: string;
 };
 
-export type PvPCancelFormValues = {
+export type PvPCoinflipCancelFormValues = {
 	gameId: string;
 };
 
@@ -58,10 +58,10 @@ export type StandardForms = {
 	wheel: WheelFormValues;
 };
 
-export type PvPForms = {
-	create: PvPCreateFormValues;
-	join: PvPJoinFormValues;
-	cancel: PvPCancelFormValues;
+export type PvPCoinflipForms = {
+	create: PvPCoinflipCreateFormValues;
+	join: PvPCoinflipJoinFormValues;
+	cancel: PvPCoinflipCancelFormValues;
 };
 
 export type PvPCoinflipLobbyGame = Awaited<
