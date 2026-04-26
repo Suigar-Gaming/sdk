@@ -41,12 +41,18 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import {
+	FieldDescription,
+	FieldGroup,
+	FieldLabel,
+} from '@/components/ui/field';
+import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
 	DEFAULT_PVP_FORMS,
@@ -204,6 +210,25 @@ function parseError(error: unknown) {
 	return 'Unknown error';
 }
 
+function buildPvPPreviewFallback(
+	action: 'join' | 'cancel',
+	{
+		owner,
+		coinType,
+	}: {
+		owner: string;
+		coinType: string;
+	},
+) {
+	return [
+		`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}', {`,
+		`\towner: '${owner}',`,
+		`\tcoinType: '${coinType}',`,
+		`\tgameId: '0xGAME_ID',`,
+		`});`,
+	].join('\n');
+}
+
 function SectionShell({
 	title,
 	description,
@@ -257,6 +282,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [pvpLobbyError, setPvPLobbyError] = React.useState<string | null>(null);
 	const [isPvPLobbyLoading, setIsPvPLobbyLoading] = React.useState(false);
 	const [pvpLobbyRefreshKey, setPvPLobbyRefreshKey] = React.useState(0);
+	const [showPrivateJoinLobbies, setShowPrivateJoinLobbies] =
+		React.useState(false);
 
 	const standardGame = React.useMemo<StandardGameId>(() => {
 		const queryGame = searchParams.get('game');
@@ -292,6 +319,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	});
 	const [balanceOwner, setBalanceOwner] = React.useState<string | null>(null);
 	const [balanceRefreshKey, setBalanceRefreshKey] = React.useState(0);
+	const previousModeRef = React.useRef<Mode>(mode);
+	const previousStandardGameRef = React.useRef<StandardGameId>(standardGame);
+	const previousPvPGameRef = React.useRef<PvPGameId>(pvpGame);
+	const previousPvPActionRef = React.useRef<PvPAction>(pvpAction);
 
 	React.useEffect(() => {
 		if (!currentAccount) {
@@ -354,7 +385,39 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
 
 	React.useEffect(() => {
-		if (mode !== 'pvp' || !currentAccount) {
+		const previousMode = previousModeRef.current;
+		const previousStandardGame = previousStandardGameRef.current;
+		const previousPvPGame = previousPvPGameRef.current;
+		const previousPvPAction = previousPvPActionRef.current;
+
+		const modeChanged = previousMode !== mode;
+		const standardGameChanged = previousStandardGame !== standardGame;
+		const pvpGameChanged = previousPvPGame !== pvpGame;
+		const pvpActionChanged = previousPvPAction !== pvpAction;
+
+		if (modeChanged || (mode === 'standard' && standardGameChanged)) {
+			setStandardForms(DEFAULT_STANDARD_FORMS);
+			setStatus(null);
+			setError(null);
+		}
+
+		if (
+			modeChanged ||
+			(mode === 'pvp' && (pvpGameChanged || pvpActionChanged))
+		) {
+			setPvpForms(DEFAULT_PVP_FORMS);
+			setStatus(null);
+			setError(null);
+		}
+
+		previousModeRef.current = mode;
+		previousStandardGameRef.current = standardGame;
+		previousPvPGameRef.current = pvpGame;
+		previousPvPActionRef.current = pvpAction;
+	}, [mode, pvpAction, pvpGame, setPvpForms, setStandardForms, standardGame]);
+
+	React.useEffect(() => {
+		if (mode !== 'pvp') {
 			return;
 		}
 
@@ -389,18 +452,24 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [currentAccount, currentClient, mode, pvpLobbyRefreshKey]);
+	}, [currentClient, mode, pvpLobbyRefreshKey]);
 
 	const normalizedCurrentAccount =
 		currentAccount?.address.toLowerCase() ?? null;
 	const joinLobbyGames = React.useMemo(
 		() =>
-			normalizedCurrentAccount
-				? pvpLobbyGames.filter(
-						(game) => game.creator.toLowerCase() !== normalizedCurrentAccount,
-					)
-				: [],
-		[pvpLobbyGames, normalizedCurrentAccount],
+			pvpLobbyGames.filter((game) => {
+				if (!showPrivateJoinLobbies && game.is_private) {
+					return false;
+				}
+
+				if (!normalizedCurrentAccount) {
+					return true;
+				}
+
+				return game.creator.toLowerCase() !== normalizedCurrentAccount;
+			}),
+		[pvpLobbyGames, normalizedCurrentAccount, showPrivateJoinLobbies],
 	);
 	const cancelLobbyGames = React.useMemo(
 		() =>
@@ -411,6 +480,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				: [],
 		[pvpLobbyGames, normalizedCurrentAccount],
 	);
+	const isMissingPvPGameSelection =
+		mode === 'pvp' &&
+		(pvpAction === 'join' || pvpAction === 'cancel') &&
+		!pvpForms[pvpAction].gameId.trim();
 
 	let currentCode = '';
 	try {
@@ -424,14 +497,19 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						effectiveSelectedCoin,
 						coinType,
 					).code
-				: buildPvPTransaction(
-						currentClient,
-						pvpAction,
-						pvpForms[pvpAction],
-						previewOwner,
-						effectiveSelectedCoin,
-						coinType,
-					).code;
+				: isMissingPvPGameSelection
+					? buildPvPPreviewFallback(pvpAction, {
+							owner: previewOwner,
+							coinType,
+						})
+					: buildPvPTransaction(
+							currentClient,
+							pvpAction,
+							pvpForms[pvpAction],
+							previewOwner,
+							effectiveSelectedCoin,
+							coinType,
+						).code;
 	} catch (buildError) {
 		currentCode = `// Unable to build sample code yet\n// ${parseError(buildError)}`;
 	}
@@ -486,6 +564,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		setIsExecuting(true);
 
 		try {
+			if (mode === 'pvp' && isMissingPvPGameSelection) {
+				throw new Error(
+					`Select a PvP lobby card before trying to ${pvpAction} a game.`,
+				);
+			}
+
 			const owner = currentAccount.address;
 			const buildResult =
 				mode === 'standard'
@@ -536,6 +620,13 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			);
 			if (rows.length > 0) {
 				addRows(rows);
+			}
+
+			if (mode === 'pvp' && (pvpAction === 'join' || pvpAction === 'cancel')) {
+				setPvpForms((current) => ({
+					...current,
+					[pvpAction]: { ...DEFAULT_PVP_FORMS[pvpAction] },
+				}));
 			}
 
 			setBalanceRefreshKey((current) => current + 1);
@@ -813,14 +904,32 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										) : null}
 										{pvpAction === 'join' ? (
 											<>
+												<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
+													<FieldGroup className="items-center justify-between gap-3">
+														<div className="space-y-1">
+															<FieldLabel htmlFor="join-private-lobbies">
+																Show private lobbies
+															</FieldLabel>
+															<FieldDescription>
+																Public unresolved lobbies stay visible even when
+																the wallet is disconnected.
+															</FieldDescription>
+														</div>
+														<Switch
+															id="join-private-lobbies"
+															checked={showPrivateJoinLobbies}
+															onCheckedChange={setShowPrivateJoinLobbies}
+														/>
+													</FieldGroup>
+												</div>
 												<PvPLobbyPicker
 													title="Open lobbies to join"
-													description="Only unresolved PvP games created by other wallets are shown here. Selecting one fills the join form and switches the selected coin when needed."
+													description="Unresolved PvP lobbies are shown here. Selecting one fills the join form and switches the selected coin when needed."
 													games={joinLobbyGames}
 													selectedGameId={pvpForms.join.gameId}
 													isLoading={isPvPLobbyLoading}
 													error={pvpLobbyError}
-													isWalletConnected={Boolean(currentAccount)}
+													emptyMessage="No matching unresolved PvP lobbies were found."
 													coinTypes={coinTypes}
 													formatAmount={formatBalance}
 													getCoinDecimals={(value) => {
@@ -839,10 +948,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														handleSelectPvPLobby('join', game)
 													}
 												/>
-												<PvPJoinForm
-													value={pvpForms.join}
-													onChange={(patch) => updatePvPForm('join', patch)}
-												/>
+												<PvPJoinForm value={pvpForms.join} />
 											</>
 										) : null}
 										{pvpAction === 'cancel' ? (
@@ -854,7 +960,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 													selectedGameId={pvpForms.cancel.gameId}
 													isLoading={isPvPLobbyLoading}
 													error={pvpLobbyError}
-													isWalletConnected={Boolean(currentAccount)}
+													emptyMessage={
+														currentAccount
+															? 'No matching unresolved PvP lobbies were found.'
+															: 'Connect a wallet to load the unresolved PvP lobbies you can cancel.'
+													}
 													coinTypes={coinTypes}
 													formatAmount={formatBalance}
 													getCoinDecimals={(value) => {
@@ -873,10 +983,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														handleSelectPvPLobby('cancel', game)
 													}
 												/>
-												<PvPCancelForm
-													value={pvpForms.cancel}
-													onChange={(patch) => updatePvPForm('cancel', patch)}
-												/>
+												<PvPCancelForm value={pvpForms.cancel} />
 											</>
 										) : null}
 									</>
