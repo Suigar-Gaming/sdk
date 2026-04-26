@@ -19,7 +19,7 @@ import {
 	encodeBetMetadata,
 	resolvePriceInfoObjectId,
 } from '../helpers/index.js';
-import { DEFAULT_GAS_BUDGET_MIST, toBigIntAmount } from '../utils/index.js';
+import { DEFAULT_GAS_BUDGET_MIST, toBigInt } from '../utils/index.js';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 
 export type BuildSharedBetTransactionContext = {
@@ -84,9 +84,9 @@ export function buildSharedStandardGameBetCall({
 	return (tx: Transaction) => {
 		const normalizedOwner = normalizeSuiAddress(sender ?? owner);
 		const normalizedCoinType = normalizeStructTag(coinType);
-		const resolvedStake = toBigIntAmount(stake, 'stake');
-		const resolvedCashStake = toBigIntAmount(cashStake ?? stake, 'cashStake');
-		const resolvedBetCount = toBigIntAmount(betCount ?? 1, 'betCount');
+		const resolvedStake = toBigInt(stake);
+		const resolvedCashStake = toBigInt(cashStake ?? stake);
+		const resolvedBetCount = toBigInt(betCount ?? 1);
 		const encodedMetadata = encodeBetMetadata(metadata, partner);
 		const priceInfoObjectId = resolvePriceInfoObjectId(
 			config,

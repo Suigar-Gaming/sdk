@@ -30,8 +30,10 @@ import {
 	DEFAULT_LIMBO_MULTIPLIER_SCALE,
 	DEFAULT_RANGE_SCALE,
 	RANGE_POINT_LIMIT,
-	toBigIntAmount,
-	toU8Number,
+	fromMoveFloat,
+	fromMoveI64,
+	toBigInt,
+	toU8,
 } from '../src/utils/index.js';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
@@ -54,8 +56,12 @@ describe('public source subpath modules', () => {
 		expect(RANGE_POINT_LIMIT).toBe(100_000_000);
 		expect(DEFAULT_RANGE_SCALE).toBe(1_000_000);
 		expect(DEFAULT_LIMBO_MULTIPLIER_SCALE).toBe(100);
-		expect(toBigIntAmount(1, 'stake')).toBe(1n);
-		expect(toU8Number(255, 'configId')).toBe(255);
+		expect(fromMoveI64({ bits: '0' })).toBe(0);
+		expect(
+			fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
+		).toBe(0);
+		expect(toBigInt(1)).toBe(1n);
+		expect(toU8(255)).toBe(255);
 	});
 
 	it('exposes only the intended package subpaths', () => {

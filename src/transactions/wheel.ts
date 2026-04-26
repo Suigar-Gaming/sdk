@@ -3,14 +3,14 @@
 
 import { play } from '../contracts/wheel/wheel.js';
 import type { BuildWheelTransactionOptions, WithPartner } from '../types';
-import { toU8Number } from '../utils/index.js';
+import { toU8 } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildWheelTransaction(
 	options: WithPartner<BuildWheelTransactionOptions>,
 ) {
-	const configId = toU8Number(options.configId, 'configId');
+	const configId = toU8(options.configId);
 
 	return buildSharedStandardGameBetTransaction({
 		...options,

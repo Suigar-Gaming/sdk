@@ -1,10 +1,7 @@
 import type { EventLogRow } from '@/lib/suigar-types';
 import { fromBase64 } from '@mysten/sui/utils';
 import type { SuigarClient } from '@suigar/sdk';
-import {
-	parseFloat as parseMoveFloat,
-	parseGameDetails,
-} from '@suigar/sdk/utils';
+import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
 import { bigintToString } from '@/lib/suigar-app';
 
 type ParsedEvent = {
@@ -98,7 +95,7 @@ function formatOraclePrice(value: unknown) {
 		return 'n/a';
 	}
 
-	const parsed = parseMoveFloat(value as Parameters<typeof parseMoveFloat>[0]);
+	const parsed = fromMoveFloat(value as Parameters<typeof fromMoveFloat>[0]);
 	if (!Number.isFinite(parsed)) {
 		return 'n/a';
 	}
@@ -160,7 +157,7 @@ function createGameCreatedRow(
 	digest: string,
 	bytes: Uint8Array,
 ) {
-	const payload = bcsApi.PvPCoinflipGameCreated.parse(bytes);
+	const payload = bcsApi.PvPCoinflipGameCreatedEvent.parse(bytes);
 	const side = payload.creator_is_tails ? 'tails' : 'heads';
 	const details = [
 		`creator side: ${side}`,
@@ -168,8 +165,8 @@ function createGameCreatedRow(
 		`private: ${payload.is_private}`,
 	].join(' | ');
 
-	console.log('Suigar PvPCoinflipGameCreated', payload);
-	return createRow(digest, 'PvPCoinflipGameCreated', payload, details, {
+	console.log('Suigar PvPCoinflipGameCreatedEvent', payload);
+	return createRow(digest, 'PvPCoinflipGameCreatedEvent', payload, details, {
 		gameId: String(payload.game_id),
 		actor: String(payload.creator),
 	});
@@ -180,15 +177,15 @@ function createGameResolvedRow(
 	digest: string,
 	bytes: Uint8Array,
 ) {
-	const payload = bcsApi.PvPCoinflipGameResolved.parse(bytes);
+	const payload = bcsApi.PvPCoinflipGameResolvedEvent.parse(bytes);
 	const details = [
 		`winner: ${String(payload.winner)}`,
 		`pot: ${bigintToString(payload.total_pot)}`,
 		`payout: ${bigintToString(payload.payout_amount)}`,
 	].join(' | ');
 
-	console.log('Suigar PvPCoinflipGameResolved', payload);
-	return createRow(digest, 'PvPCoinflipGameResolved', payload, details, {
+	console.log('Suigar PvPCoinflipGameResolvedEvent', payload);
+	return createRow(digest, 'PvPCoinflipGameResolvedEvent', payload, details, {
 		gameId: String(payload.game_id),
 		actor: String(payload.winner),
 	});
@@ -199,14 +196,14 @@ function createGameCancelledRow(
 	digest: string,
 	bytes: Uint8Array,
 ) {
-	const payload = bcsApi.PvPCoinflipGameCancelled.parse(bytes);
+	const payload = bcsApi.PvPCoinflipGameCancelledEvent.parse(bytes);
 	const details = [
 		`stake: ${bigintToString(payload.stake_per_player)}`,
 		`private: ${payload.is_private}`,
 	].join(' | ');
 
-	console.log('Suigar PvPCoinflipGameCancelled', payload);
-	return createRow(digest, 'PvPCoinflipGameCancelled', payload, details, {
+	console.log('Suigar PvPCoinflipGameCancelledEvent', payload);
+	return createRow(digest, 'PvPCoinflipGameCancelledEvent', payload, details, {
 		gameId: String(payload.game_id),
 		actor: String(payload.creator),
 	});
