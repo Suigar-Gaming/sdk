@@ -96,7 +96,7 @@ export function EventsTable() {
 	const { rows, clearRows } = useEventLog();
 
 	function toTransactionUrl(digest: string) {
-		return `https://testnet.suivision.xyz/txblock/${digest}?tab=changes`;
+		return `https://testnet.suivision.xyz/txblock/${digest}?tab=Changes`;
 	}
 
 	function toAccountUrl(address: string) {
