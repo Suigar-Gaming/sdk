@@ -21,7 +21,7 @@ import {
 	encodeBetMetadata,
 	resolvePriceInfoObjectId,
 } from '../helpers/index.js';
-import { toBigIntAmount } from '../utils/index.js';
+import { toBigInt } from '../utils/index.js';
 import { createBaseGameTransaction } from './shared.js';
 
 type PvPCoinflipTransactionOptionsWithPartner<
@@ -44,7 +44,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 	switch (action) {
 		case 'create': {
 			const createOptions = options as BuildCreatePvPCoinflipTransactionOptions;
-			const stake = toBigIntAmount(createOptions.stake, 'stake');
+			const stake = toBigInt(createOptions.stake);
 			const betCoin = tx.coin({
 				type: normalizedCoinType,
 				balance: stake,

@@ -12,6 +12,8 @@ import {
 	type GameDetailValueType,
 } from '../types';
 
+type MoveFloat = ReturnType<(typeof Float)['parse']>;
+
 const bcsU8 = bcs.u8();
 const bcsU64 = bcs.u64();
 const bcsBool = bcs.bool();
@@ -26,9 +28,7 @@ const GAME_DETAIL_BCS = {
 	string: bcsString,
 } as const;
 
-export function parseI64(
-	i64: ReturnType<(typeof Float)['parse']>['exp'],
-): number {
+export function fromMoveI64(i64: MoveFloat['exp']): number {
 	try {
 		const value = BigInt(i64.bits ?? 0);
 		const maxPositive = 1n << 63n;
@@ -40,12 +40,12 @@ export function parseI64(
 	}
 }
 
-export function parseFloat(float: ReturnType<(typeof Float)['parse']>): number {
+export function fromMoveFloat(float: MoveFloat): number {
 	const mantissa = BigInt(float.mant);
 	if (mantissa === 0n) {
 		return 0;
 	}
-	const exponent = parseI64(float.exp) - 52;
+	const exponent = fromMoveI64(float.exp) - 52;
 	const magnitude = Number(mantissa) * Math.pow(2, exponent);
 	return float.is_negative ? -magnitude : magnitude;
 }
@@ -55,7 +55,7 @@ function normalizeGameDetailValue(
 	parsed: unknown,
 ): ParsedGameDetailValue {
 	if (valueType === 'float') {
-		return parseFloat(parsed as ReturnType<(typeof Float)['parse']>);
+		return fromMoveFloat(parsed as MoveFloat);
 	}
 
 	if (valueType === 'u64') {

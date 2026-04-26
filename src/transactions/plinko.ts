@@ -3,14 +3,14 @@
 
 import { play } from '../contracts/plinko/plinko.js';
 import type { BuildPlinkoTransactionOptions, WithPartner } from '../types';
-import { toU8Number } from '../utils/index.js';
+import { toU8 } from '../utils/index.js';
 
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildPlinkoTransaction(
 	options: WithPartner<BuildPlinkoTransactionOptions>,
 ) {
-	const configId = toU8Number(options.configId, 'configId');
+	const configId = toU8(options.configId);
 
 	return buildSharedStandardGameBetTransaction({
 		...options,

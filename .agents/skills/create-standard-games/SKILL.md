@@ -198,11 +198,13 @@ Guardrails:
 Use the generated BCS event decoder for standard bet results:
 
 ```ts
-import { parseFloat, parseGameDetails } from '@suigar/sdk/utils';
+import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
 
 const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
 const gameDetails = parseGameDetails(decoded.game_details);
-const adjustedOraclePrice = parseFloat(decoded.adjusted_oracle_usd_coin_price);
+const adjustedOraclePrice = fromMoveFloat(
+	decoded.adjusted_oracle_usd_coin_price,
+);
 ```
 
 Guardrails:

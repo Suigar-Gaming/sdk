@@ -38,11 +38,11 @@ Game-specific public types are exported from `@suigar/sdk/games`:
 
 Parser and helper utilities are exported from `@suigar/sdk/utils`:
 
-- `parseI64`
-- `parseFloat`
+- `fromMoveI64`
+- `fromMoveFloat`
 - `parseGameDetails`
-- `toBigIntAmount`
-- `toU8Number`
+- `toBigInt`
+- `toU8`
 - `DEFAULT_GAS_BUDGET_MIST`
 - `RANGE_POINT_LIMIT`
 - `DEFAULT_RANGE_SCALE`
@@ -121,9 +121,9 @@ Guardrails:
 
 - Parse event payload bytes from `event.bcs` when they are available.
 - Use `client.suigar.bcs.BetResultEvent` for standard bet result events.
-- Use `client.suigar.bcs.PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled` for PvP coinflip events.
+- Use `client.suigar.bcs.PvPCoinflipGameCreatedEvent`, `PvPCoinflipGameResolvedEvent`, and `PvPCoinflipGameCancelledEvent` for PvP coinflip events.
 - Use `parseGameDetails(decoded.game_details)` from `@suigar/sdk/utils` instead of hand-decoding standard game detail byte arrays.
-- Use `parseFloat(decoded.unsafe_oracle_usd_coin_price)` and `parseFloat(decoded.adjusted_oracle_usd_coin_price)` to display generated Move float structs.
+- Use `fromMoveFloat(decoded.unsafe_oracle_usd_coin_price)` and `fromMoveFloat(decoded.adjusted_oracle_usd_coin_price)` to display generated Move float structs.
 - For object reads, parse object `content`, not `objectBcs`.
 
 ## Setup checklist

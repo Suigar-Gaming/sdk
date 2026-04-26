@@ -42,11 +42,11 @@ import {
 	DEFAULT_LIMBO_MULTIPLIER_SCALE,
 	DEFAULT_RANGE_SCALE,
 	RANGE_POINT_LIMIT,
-	parseFloat,
+	fromMoveFloat,
+	fromMoveI64,
 	parseGameDetails,
-	parseI64,
-	toBigIntAmount,
-	toU8Number,
+	toBigInt,
+	toU8,
 } from '@suigar/sdk/utils';
 ```
 
@@ -253,7 +253,7 @@ console.log(game.is_private);
 >
 > - it throws if the object response does not include decodable `content`
 > - the PvP join builder uses this internally to derive the required join stake
-> - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolved` to read the final result
+> - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolvedEvent` to read the final result
 
 > **Tip:** Prefer this helper over manual object parsing when you only need the
 > parsed state for a live PvP coinflip game object.
@@ -413,15 +413,15 @@ Current exposed helpers:
 
 - `PvPCoinflipGame`
 - `BetResultEvent`
-- `PvPCoinflipGameCreated`
-- `PvPCoinflipGameResolved`
-- `PvPCoinflipGameCancelled`
+- `PvPCoinflipGameCreatedEvent`
+- `PvPCoinflipGameResolvedEvent`
+- `PvPCoinflipGameCancelledEvent`
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
 - `PvPCoinflipGame` parses a PvP coinflip game object's `content`
-- `parseI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
-- `parseFloat(float)` converts a generated Move `Float` struct to a JavaScript number
+- `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
+- `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
@@ -528,9 +528,9 @@ contain that partner wallet address under the `partner` entry.
 
 Use the matching helper for each PvP coinflip event payload found in `transactionResult.events`:
 
-- `client.suigar.bcs.PvPCoinflipGameCreated`
-- `client.suigar.bcs.PvPCoinflipGameResolved`
-- `client.suigar.bcs.PvPCoinflipGameCancelled`
+- `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
+- `client.suigar.bcs.PvPCoinflipGameResolvedEvent`
+- `client.suigar.bcs.PvPCoinflipGameCancelledEvent`
 
 ## Development
 
