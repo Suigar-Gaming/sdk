@@ -16,7 +16,7 @@ import {
 	useCurrentClient,
 	useDAppKit,
 } from '@mysten/dapp-kit-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { CoinIcon } from '@/components/coins';
 import { CodeSample } from '@/components/code-sample';
 import { ExecuteTransactionCard } from '@/components/execute-transaction';
@@ -210,6 +210,21 @@ function parseError(error: unknown) {
 	return 'Unknown error';
 }
 
+function getStandardGameFromParams(params: URLSearchParams) {
+	const queryGame = params.get('game');
+	return isStandardGame(queryGame) ? queryGame : 'coinflip';
+}
+
+function getPvPActionFromParams(params: URLSearchParams) {
+	const queryAction = params.get('action');
+	return isPvPAction(queryAction) ? queryAction : 'create';
+}
+
+function getPvPGameFromParams(params: URLSearchParams) {
+	const queryGame = params.get('game');
+	return isPvPGame(queryGame) ? queryGame : 'pvp-coinflip';
+}
+
 function buildPvPPreviewFallback(
 	action: 'join' | 'cancel',
 	{
@@ -255,8 +270,6 @@ function SectionShell({
 }
 
 function IntegrationContent({ mode }: { mode: Mode }) {
-	const router = useRouter();
-	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const dAppKit = useDAppKit();
 	const currentClient = useCurrentClient();
@@ -285,20 +298,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [showPrivateJoinLobbies, setShowPrivateJoinLobbies] =
 		React.useState(false);
 
-	const standardGame = React.useMemo<StandardGameId>(() => {
-		const queryGame = searchParams.get('game');
-		return isStandardGame(queryGame) ? queryGame : 'coinflip';
-	}, [searchParams]);
-
-	const pvpAction = React.useMemo<PvPAction>(() => {
-		const queryAction = searchParams.get('action');
-		return isPvPAction(queryAction) ? queryAction : 'create';
-	}, [searchParams]);
-
-	const pvpGame = React.useMemo<PvPGameId>(() => {
-		const queryGame = searchParams.get('game');
-		return isPvPGame(queryGame) ? queryGame : 'pvp-coinflip';
-	}, [searchParams]);
+	const [standardGame, setStandardGame] = React.useState<StandardGameId>(() =>
+		getStandardGameFromParams(searchParams),
+	);
+	const [pvpAction, setPvPAction] = React.useState<PvPAction>(() =>
+		getPvPActionFromParams(searchParams),
+	);
+	const [pvpGame, setPvPGame] = React.useState<PvPGameId>(() =>
+		getPvPGameFromParams(searchParams),
+	);
 
 	const coinTypes = currentClient.suigar.getConfig().coinTypes;
 	const coinOptions = React.useMemo(
@@ -323,6 +331,22 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const previousStandardGameRef = React.useRef<StandardGameId>(standardGame);
 	const previousPvPGameRef = React.useRef<PvPGameId>(pvpGame);
 	const previousPvPActionRef = React.useRef<PvPAction>(pvpAction);
+
+	React.useEffect(() => {
+		if (typeof window === 'undefined') {
+			return;
+		}
+
+		const syncFromLocation = () => {
+			const params = new URLSearchParams(window.location.search);
+			setStandardGame(getStandardGameFromParams(params));
+			setPvPAction(getPvPActionFromParams(params));
+			setPvPGame(getPvPGameFromParams(params));
+		};
+
+		window.addEventListener('popstate', syncFromLocation);
+		return () => window.removeEventListener('popstate', syncFromLocation);
+	}, []);
 
 	React.useEffect(() => {
 		if (!currentAccount) {
@@ -515,9 +539,16 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}
 
 	function updateQuery(key: string, value: string) {
-		const params = new URLSearchParams(searchParams.toString());
+		if (typeof window === 'undefined') {
+			return;
+		}
+
+		const currentUrl = new URL(window.location.href);
+		const params = new URLSearchParams(currentUrl.search);
 		params.set(key, value);
-		router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+		const nextSearch = params.toString();
+		const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ''}${currentUrl.hash}`;
+		window.history.replaceState(window.history.state, '', nextUrl);
 	}
 
 	function updateStandardForm<K extends StandardGameId>(
@@ -642,7 +673,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		<div className="min-h-screen">
 			<div className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5 md:pt-4 lg:px-8">
 				<div className="mx-auto max-w-[1500px]">
-					<nav className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] sm:px-4 md:rounded-[1.5rem] md:py-2.5">
+					<nav className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] sm:px-4 md:rounded-3xl md:py-2.5">
 						<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full px-1 py-1">
 							<Link
 								href="/standard?game=coinflip"
@@ -763,7 +794,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											<div className="w-full sm:w-[12rem]">
 												<Select
 													value={standardGame}
-													onValueChange={(value) => updateQuery('game', value)}
+													onValueChange={(value) => {
+														setStandardGame(value as StandardGameId);
+														updateQuery('game', value);
+													}}
 												>
 													<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
 														<SelectValue />
@@ -782,9 +816,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												<div className="w-full sm:w-[13rem]">
 													<Select
 														value={pvpGame}
-														onValueChange={(value) =>
-															updateQuery('game', value)
-														}
+														onValueChange={(value) => {
+															setPvPGame(value as PvPGameId);
+															updateQuery('game', value);
+														}}
 													>
 														<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
 															<SelectValue />
@@ -810,6 +845,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 																	: 'outline'
 															}
 															onClick={() => {
+																setPvPAction(action.value);
 																updateQuery('game', pvpGame);
 																updateQuery('action', action.value);
 															}}
