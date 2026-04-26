@@ -1,6 +1,6 @@
 'use client';
 
-import { ListTree, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, ListTree, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEventLog } from '@/components/providers/event-log-provider';
 import { Button } from '@/components/ui/button';
@@ -29,36 +29,79 @@ function toTitleCase(value: string) {
 function CopyableValue({
 	label,
 	value,
+	explorerHref,
 	onCopied,
 }: {
 	label: string;
 	value?: string;
+	explorerHref?: string;
 	onCopied: (label: string) => void;
 }) {
 	if (!value) {
 		return <span>{compactAddress(value)}</span>;
 	}
 
+	const displayValue = value;
+
 	async function copyValue() {
-		await navigator.clipboard.writeText(value!);
-		onCopied(label);
+		try {
+			await navigator.clipboard.writeText(displayValue);
+			onCopied(label);
+		} catch {
+			toast.error('Unable to copy to clipboard', {
+				description: `Could not copy ${label}.`,
+			});
+		}
 	}
 
 	return (
-		<button
-			type="button"
-			className="cursor-pointer font-mono underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-			onClick={copyValue}
-			title={`Copy ${label}`}
-			aria-label={`Copy ${label}`}
-		>
-			{compactAddress(value)}
-		</button>
+		<div className="flex items-center gap-2">
+			<span className="font-mono text-muted-foreground">
+				{compactAddress(displayValue)}
+			</span>
+			<Button
+				type="button"
+				variant="outline"
+				size="icon-sm"
+				className="h-7 w-7 rounded-full text-muted-foreground"
+				onClick={copyValue}
+				title={`Copy ${label}`}
+				aria-label={`Copy ${label}`}
+			>
+				<Copy className="size-3.5" />
+			</Button>
+			{explorerHref ? (
+				<Button
+					asChild
+					variant="outline"
+					size="icon-sm"
+					className="h-7 w-7 rounded-full text-muted-foreground"
+				>
+					<a
+						href={explorerHref}
+						target="_blank"
+						rel="noreferrer"
+						title={`Open ${label} in SuiVision`}
+						aria-label={`Open ${label} in SuiVision`}
+					>
+						<ExternalLink className="size-3.5" />
+					</a>
+				</Button>
+			) : null}
+		</div>
 	);
 }
 
 export function EventsTable() {
 	const { rows, clearRows } = useEventLog();
+
+	function toTransactionUrl(digest: string) {
+		return `https://testnet.suivision.xyz/txblock/${digest}?tab=changes`;
+	}
+
+	function toAccountUrl(address: string) {
+		return `https://testnet.suivision.xyz/account/${address}`;
+	}
 
 	function handleCopied(label: string) {
 		const titleCaseLabel = toTitleCase(label);
@@ -141,6 +184,7 @@ export function EventsTable() {
 												<CopyableValue
 													label="digest"
 													value={row.digest}
+													explorerHref={toTransactionUrl(row.digest)}
 													onCopied={handleCopied}
 												/>
 											</TableCell>
@@ -155,6 +199,9 @@ export function EventsTable() {
 												<CopyableValue
 													label="player"
 													value={row.actor}
+													explorerHref={
+														row.actor ? toAccountUrl(row.actor) : undefined
+													}
 													onCopied={handleCopied}
 												/>
 											</TableCell>

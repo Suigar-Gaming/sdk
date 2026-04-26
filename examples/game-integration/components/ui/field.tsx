@@ -80,7 +80,7 @@ function FieldLabel({ className, ...props }: React.ComponentProps<'label'>) {
 		<Label
 			data-slot="field-label"
 			className={cn(
-				'leading-none group-data-[disabled]/field:opacity-60',
+				'leading-none group-data-disabled/field:opacity-60',
 				className,
 			)}
 			{...props}
@@ -93,7 +93,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
 		<p
 			data-slot="field-description"
 			className={cn(
-				'text-xs leading-5 text-muted-foreground group-data-[disabled]/field:opacity-60',
+				'text-xs leading-5 text-muted-foreground group-data-disabled/field:opacity-60',
 				className,
 			)}
 			{...props}
@@ -111,9 +111,9 @@ function FieldError({ className, ...props }: React.ComponentProps<'p'>) {
 	);
 }
 
-function FieldCode({ className, ...props }: React.ComponentProps<'pre'>) {
+function FieldCode({ className, ...props }: React.ComponentProps<'code'>) {
 	return (
-		<pre
+		<code
 			data-slot="field-code"
 			className={cn(
 				'inline-flex rounded-sm bg-background/60 px-1 py-0.5 font-mono text-[0.85em] leading-none text-foreground',
