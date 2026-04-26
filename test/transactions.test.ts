@@ -392,7 +392,7 @@ describe('plinko transaction wrapper', () => {
 				configId: 256,
 				config: TEST_CONFIG,
 			}),
-		).toThrow('configId must be an integer between 0 and 255');
+		).toThrow('Value must be an integer between 0 and 255');
 	});
 });
 
@@ -467,7 +467,7 @@ describe('wheel transaction wrapper', () => {
 				configId: -1,
 				config: TEST_CONFIG,
 			}),
-		).toThrow('configId must be an integer between 0 and 255');
+		).toThrow('Value must be an integer between 0 and 255');
 	});
 });
 
@@ -972,6 +972,73 @@ describe('SuigarClient', () => {
 
 		expect(games).toHaveLength(2);
 		expect(games.map((game) => game.id)).toEqual(['0xopen', '0xpending']);
+	});
+
+	it('exposes the generated BCS helpers under their current event keys', async () => {
+		class TestClient extends CoreClient {
+			constructor() {
+				super({ network: 'testnet', base: undefined as never });
+			}
+
+			getObjects = async () => ({ objects: [] });
+			listCoins = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			listOwnedObjects = async () => ({
+				objects: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getBalance = async () => ({
+				balance: {
+					coinType: '0x2::sui::SUI',
+					balance: '0',
+					coinBalance: '0',
+					addressBalance: '0',
+				},
+			});
+			listBalances = async () => ({
+				balances: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			getCoinMetadata = async () => ({ coinMetadata: null });
+			getTransaction = async () => {
+				throw new Error('Not implemented.');
+			};
+			executeTransaction = async () => {
+				throw new Error('Not implemented.');
+			};
+			simulateTransaction = async () => {
+				throw new Error('Not implemented.');
+			};
+			getReferenceGasPrice = async () => ({
+				referenceGasPrice: '0',
+				price: '1',
+			});
+			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
+			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
+			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
+			listDynamicFields = async () => ({
+				dynamicFields: [],
+				hasNextPage: false,
+				cursor: null,
+			});
+			resolveTransactionPlugin = () => async () => {};
+			verifyZkLoginSignature = async () => ({ success: true }) as never;
+			getMoveFunction = async () => ({ function: null }) as never;
+			defaultNameServiceName = async () => ({ address: null }) as never;
+		}
+
+		const client = new TestClient().$extend(suigar());
+
+		expect(client.suigar.bcs.PvPCoinflipGame).toBeDefined();
+		expect(client.suigar.bcs.BetResultEvent).toBeDefined();
+		expect(client.suigar.bcs.PvPCoinflipGameCreatedEvent).toBeDefined();
+		expect(client.suigar.bcs.PvPCoinflipGameResolvedEvent).toBeDefined();
+		expect(client.suigar.bcs.PvPCoinflipGameCancelledEvent).toBeDefined();
 	});
 
 	it('rejects unresolved PvP coinflip games when throwOnError is true', async () => {

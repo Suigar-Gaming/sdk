@@ -39,10 +39,10 @@ import {
 } from './transactions';
 import { BetResultEvent } from './contracts/core/core';
 import {
-	Game,
-	GameCancelledEvent,
-	GameCreatedEvent,
-	GameResolvedEvent,
+	Game as PvPCoinflipGame,
+	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
+	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
+	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip';
 
 export function suigar<const Name = 'suigar'>({
@@ -186,7 +186,7 @@ export class SuigarClient {
 		}
 
 		return {
-			...Game.parse(object.content),
+			...PvPCoinflipGame.parse(object.content),
 			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
 		};
 	}
@@ -206,7 +206,7 @@ export class SuigarClient {
 		/**
 		 * Object representing the state of a PvP coinflip game, as stored on-chain.
 		 */
-		PvPCoinflipGame: Game,
+		PvPCoinflipGame,
 		// Events
 		/**
 		 * Event emitted at the end of a standard game (e.g., Coinflip, Limbo), containing the result and payout information.
@@ -215,15 +215,15 @@ export class SuigarClient {
 		/**
 		 * Event emitted when a PvP Coinflip game is created, containing the game configuration and initial state.
 		 */
-		PvPCoinflipGameCreated: GameCreatedEvent,
+		PvPCoinflipGameCreatedEvent,
 		/**
 		 * Event emitted when a PvP Coinflip game is resolved, containing the final outcome.
 		 */
-		PvPCoinflipGameResolved: GameResolvedEvent,
+		PvPCoinflipGameResolvedEvent,
 		/**
 		 * Event emitted when a PvP Coinflip game is cancelled.
 		 */
-		PvPCoinflipGameCancelled: GameCancelledEvent,
+		PvPCoinflipGameCancelledEvent,
 	};
 
 	/**
