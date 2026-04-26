@@ -7,9 +7,10 @@
 		"dev": "next dev",
 		"prebuild": "npm --prefix ../.. run build:ci",
 		"build": "next build",
+		"format": "prettier --write .",
 		"prestart": "npm --prefix ../.. run build:ci",
 		"start": "next start",
-		"lint": "eslint . --fix",
+		"lint": "eslint . --fix && npm run format",
 		"pretypecheck": "npm --prefix ../.. run build:ci",
 		"typecheck": "tsc --noEmit"
 	},
@@ -39,8 +40,10 @@
 		"@types/node": "^24",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"eslint": "^9.39.4",
+		"eslint": "^10.2.1",
 		"eslint-config-next": "16.2.4",
+		"eslint-config-prettier": "^10.1.8",
+		"prettier": "^3.8.3",
 		"tailwindcss": "^4.2.4",
 		"typescript": "^5.9.3"
 	}

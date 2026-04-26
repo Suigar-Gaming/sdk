@@ -25,7 +25,7 @@ The example reflects the current package export split:
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
-- Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, filtered by whether the connected wallet owns the unresolved game, with compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
+- Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
 - A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreated`, `PvPCoinflipGameResolved`, and `PvPCoinflipGameCancelled`
@@ -46,13 +46,21 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 The example app automatically runs `npm --prefix ../.. run build:ci` before `dev`, `build`, and `start` so the local `@suigar/sdk` package stays in sync.
 
+Useful local checks:
+
+```bash
+npm --prefix examples/game-integration run format
+npm --prefix examples/game-integration run lint
+npm --prefix examples/game-integration run typecheck
+```
+
 ## GitHub Pages
 
 The repository includes `.github/workflows/deploy-game-integration-pages.yml` to build this app when files under `examples/game-integration/` change.
 
 - Pull requests run the Pages build as a validation step.
 - Pushes to `main` build and deploy the static export to GitHub Pages.
-- The workflow sets the Next.js `basePath` from `GITHUB_REPOSITORY`, so the exported site works under the repository path such as `/sdk/`.
+- The workflow can override the Next.js `basePath` through `PAGES_BASE_PATH`. Leave it empty for a custom domain served from the root, or set it to `/sdk` when publishing under the repository path.
 - Public asset URLs used in `next/image` and metadata should go through `withBasePath()` from [`lib/paths.ts`](/Users/lucas/Documents/Github/suigar-sdk/examples/game-integration/lib/paths.ts) so they resolve correctly both locally and on GitHub Pages.
 
 ## Notes

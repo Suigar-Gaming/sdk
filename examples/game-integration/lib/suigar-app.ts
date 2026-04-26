@@ -64,10 +64,10 @@ export const DEFAULT_PVP_FORMS: PvPForms = {
 		isPrivate: false,
 	},
 	join: {
-		gameId: '0xYOUR_GAME_ID',
+		gameId: '',
 	},
 	cancel: {
-		gameId: '0xYOUR_GAME_ID',
+		gameId: '',
 	},
 };
 

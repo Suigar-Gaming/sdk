@@ -27,7 +27,7 @@ type Props = {
 	selectedGameId: string;
 	isLoading: boolean;
 	error: string | null;
-	isWalletConnected: boolean;
+	emptyMessage: string;
 	coinTypes: Record<SupportedCoinKey, string>;
 	formatAmount: (amount: bigint, decimals: number) => string;
 	getCoinDecimals: (coinType: string) => number;
@@ -58,7 +58,7 @@ export function PvPLobbyPicker({
 	selectedGameId,
 	isLoading,
 	error,
-	isWalletConnected,
+	emptyMessage,
 	coinTypes,
 	formatAmount,
 	getCoinDecimals,
@@ -107,25 +107,19 @@ export function PvPLobbyPicker({
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-3">
-				{!isWalletConnected ? (
-					<div className="rounded-2xl border border-dashed border-border/70 bg-background/50 px-4 py-5 text-sm text-muted-foreground">
-						Connect a wallet to load the unresolved PvP lobbies for this action.
-					</div>
-				) : null}
-
-				{isWalletConnected && error ? (
+				{error ? (
 					<div className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
 						{error}
 					</div>
 				) : null}
 
-				{isWalletConnected && !error && games.length === 0 && !isLoading ? (
+				{!error && games.length === 0 && !isLoading ? (
 					<div className="rounded-2xl border border-dashed border-border/70 bg-background/50 px-4 py-5 text-sm text-muted-foreground">
-						No matching unresolved PvP lobbies were found.
+						{emptyMessage}
 					</div>
 				) : null}
 
-				{isWalletConnected && games.length > 0 ? (
+				{games.length > 0 ? (
 					<div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
 						{games.map((game) => {
 							const creatorSide = game.creator_is_tails ? 'tails' : 'heads';
