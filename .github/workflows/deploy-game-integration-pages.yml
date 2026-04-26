@@ -51,6 +51,7 @@ jobs:
         working-directory: examples/game-integration
         env:
           GITHUB_PAGES: 'true'
+          PAGES_BASE_PATH: ''
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
