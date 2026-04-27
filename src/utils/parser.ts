@@ -14,18 +14,14 @@ import {
 
 type MoveFloat = ReturnType<(typeof Float)['parse']>;
 
-const bcsU8 = bcs.u8();
-const bcsU64 = bcs.u64();
-const bcsBool = bcs.bool();
-const bcsString = bcs.string();
 const textDecoder = new TextDecoder();
 
 const GAME_DETAIL_BCS = {
-	u8: bcsU8,
-	u64: bcsU64,
-	bool: bcsBool,
+	u8: bcs.U8,
+	u64: bcs.U64,
+	bool: bcs.Bool,
 	float: Float,
-	string: bcsString,
+	string: bcs.String,
 } as const;
 
 export function fromMoveI64(i64: MoveFloat['exp']): number {
@@ -69,7 +65,7 @@ function parseStringGameDetail(value: number[]): string {
 	const bytes = Uint8Array.from(value);
 
 	try {
-		return bcsString.parse(bytes);
+		return bcs.String.parse(bytes);
 	} catch {
 		return textDecoder.decode(bytes);
 	}
