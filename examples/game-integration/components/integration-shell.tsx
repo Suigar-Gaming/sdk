@@ -636,7 +636,6 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			const finalResult = await currentClient.waitForTransaction({
 				digest,
 				include: {
-					effects: true,
 					events: true,
 				},
 			});
