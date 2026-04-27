@@ -24,20 +24,20 @@ import {
 type TxApi = SuigarClient['tx'];
 
 function buildSharedOptions(
-	owner: string,
+	playerAddress: string,
 	coinType: string,
 	coinKey: SupportedCoinKey,
 	fields: SharedFields,
 ) {
 	const atomicStake = toAtomicAmount(fields.stake, COIN_DECIMALS[coinKey]);
 	const baseOptions: Record<string, unknown> = {
-		owner,
+		playerAddress,
 		coinType,
 		stake: atomicStake,
 	};
 
 	const codeLines = [
-		`owner: '${owner}',`,
+		`playerAddress: '${playerAddress}',`,
 		`coinType: '${coinType}',`,
 		`stake: ${atomicStake.toString()}n,`,
 	];
@@ -56,12 +56,12 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	client: { suigar: SuigarClient },
 	gameId: K,
 	form: StandardForms[K],
-	owner: string,
+	playerAddress: string,
 	coinKey: SupportedCoinKey,
 	coinType: string,
 ) {
 	const { baseOptions, codeLines } = buildSharedOptions(
-		owner,
+		playerAddress,
 		coinType,
 		coinKey,
 		form,
@@ -131,7 +131,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 	client: { suigar: SuigarClient },
 	action: K,
 	form: PvPCoinflipForms[K],
-	owner: string,
+	playerAddress: string,
 	coinKey: SupportedCoinKey,
 	coinType: string,
 ) {
@@ -143,7 +143,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 		case 'create': {
 			const typedForm = form as PvPCoinflipCreateFormValues;
 			({ baseOptions, codeLines } = buildSharedOptions(
-				owner,
+				playerAddress,
 				coinType,
 				coinKey,
 				typedForm,
@@ -157,12 +157,12 @@ export function buildPvPTransaction<K extends PvPAction>(
 		case 'join': {
 			const typedForm = form as PvPCoinflipJoinFormValues;
 			baseOptions = {
-				owner,
+				playerAddress,
 				coinType,
 				gameId: typedForm.gameId.trim(),
 			};
 			codeLines = [
-				`owner: '${owner}',`,
+				`playerAddress: '${playerAddress}',`,
 				`coinType: '${coinType}',`,
 				`gameId: '${typedForm.gameId.trim()}',`,
 			];
@@ -171,12 +171,12 @@ export function buildPvPTransaction<K extends PvPAction>(
 		case 'cancel': {
 			const typedForm = form as PvPCoinflipCancelFormValues;
 			baseOptions = {
-				owner,
+				playerAddress,
 				coinType,
 				gameId: typedForm.gameId.trim(),
 			};
 			codeLines = [
-				`owner: '${owner}',`,
+				`playerAddress: '${playerAddress}',`,
 				`coinType: '${coinType}',`,
 				`gameId: '${typedForm.gameId.trim()}',`,
 			];
