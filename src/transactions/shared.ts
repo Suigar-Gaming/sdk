@@ -9,10 +9,12 @@ import { Transaction } from '@mysten/sui/transactions';
 
 import type {
 	EncodedBetMetadata,
+	BaseTransactionOptions,
 	Game,
 	SharedBetTransactionOptions,
-	SuigarConfig,
 	WithPartner,
+	StakeTransactionOptions,
+	CoinTransactionOptions,
 } from '../types';
 import {
 	assertConfiguredBetGame,
@@ -22,25 +24,27 @@ import {
 import { DEFAULT_GAS_BUDGET_MIST, toBigInt } from '../utils/index.js';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 
-export type BuildSharedBetTransactionContext = {
-	tx: Transaction;
-	config: SuigarConfig;
-	owner: string;
-	coinType: string;
-	stake: bigint;
-	cashStake: bigint;
-	betCount: bigint;
-	metadata: EncodedBetMetadata;
-	priceInfoObjectId: string;
-	betCoin: TransactionResult;
+type StrictStakeTransactionOptions = {
+	[K in keyof StakeTransactionOptions]-?: Exclude<
+		StakeTransactionOptions[K],
+		number
+	>;
 };
 
-export type CreateBaseGameTransactionOptions = {
-	config: SuigarConfig;
+export type BuildSharedBetTransactionContext = Pick<
+	BaseTransactionOptions,
+	'config' | 'owner'
+> &
+	Pick<CoinTransactionOptions, 'coinType'> &
+	StrictStakeTransactionOptions & {
+		tx: Transaction;
+		metadata: EncodedBetMetadata;
+		priceInfoObjectId: string;
+		betCoin: TransactionResult;
+	};
+
+export type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
 	game: Game;
-	owner: string;
-	sender?: string;
-	gasBudget?: number | bigint;
 };
 
 export type BuildSharedBetTransactionOptions = WithPartner<
