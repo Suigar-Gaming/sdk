@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { CoreClient, type SuiClientTypes } from '@mysten/sui/client';
-import type { TransactionResult } from '@mysten/sui/transactions';
-import { Transaction } from '@mysten/sui/transactions';
+import { Transaction, type TransactionResult } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

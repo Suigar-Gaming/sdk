@@ -1,11 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type {
-	TransactionArgument,
-	TransactionResult,
+import {
+	Transaction,
+	type TransactionArgument,
+	type TransactionResult,
 } from '@mysten/sui/transactions';
-import { Transaction } from '@mysten/sui/transactions';
 
 import type {
 	EncodedBetMetadata,
