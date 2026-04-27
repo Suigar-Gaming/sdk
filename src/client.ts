@@ -118,8 +118,8 @@ export class SuigarClient {
 	 * Lists unresolved PvP coinflip games from the configured registry and resolves
 	 * each entry into parsed onchain game state.
 	 *
-	 * This fetches dynamic fields from the PvP coinflip registry object, then loads
-	 * each referenced game object through `resolvePvPConflipGame()`. Registry
+	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
+	 * loads the referenced game objects through `client.core.getObjects()`. Registry
 	 * membership is the unresolved-state signal: when a game is joined and resolved,
 	 * the Move flow removes it from the registry and deletes the live `Game` object.
 	 * Use this when a product needs the current set of open PvP coinflip matches for
@@ -146,18 +146,30 @@ export class SuigarClient {
 			...listOptions,
 		});
 
+		const { objects } = await this.#client.core.getObjects({
+			objectIds: dynamicFields.map(({ childId }) => childId),
+			include: {
+				content: true,
+			},
+		});
+
+		const resolvedGames = objects.map((object) => {
+			try {
+				return this.#resolvePvPCoinflipGameObject(object);
+			} catch (error) {
+				return error instanceof Error ? error : new Error(String(error));
+			}
+		});
+
 		if (throwOnError) {
-			return Promise.all(
-				dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
-			);
+			const firstError = resolvedGames.find((game) => game instanceof Error);
+			if (firstError) {
+				throw firstError;
+			}
 		}
 
-		const settledGames = await Promise.allSettled(
-			dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
-		);
-
-		return settledGames.flatMap((result) =>
-			result.status === 'fulfilled' ? [result.value] : [],
+		return resolvedGames.flatMap((game) =>
+			game instanceof Error ? [] : [game],
 		);
 	}
 
@@ -181,14 +193,7 @@ export class SuigarClient {
 			include: { content: true },
 		});
 
-		if (!object.content) {
-			throw new Error('Unable to resolve PvP coinflip from game object');
-		}
-
-		return {
-			...PvPCoinflipGame.parse(object.content),
-			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
-		};
+		return this.#resolvePvPCoinflipGameObject(object);
 	}
 
 	/**
@@ -325,6 +330,25 @@ export class SuigarClient {
 				balance: BigInt(stake_per_player),
 				useGasCoin: options.allowGasCoinShortcut,
 			});
+		};
+	}
+
+	#resolvePvPCoinflipGameObject(
+		object: SuiClientTypes.Object<{ content: true }> | Error,
+	) {
+		if (object instanceof Error) {
+			throw object;
+		}
+
+		if (!object.content) {
+			throw new Error(
+				'Unable to resolve PvP coinflip game from retrieved object',
+			);
+		}
+
+		return {
+			...PvPCoinflipGame.parse(object.content),
+			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
 		};
 	}
 }
