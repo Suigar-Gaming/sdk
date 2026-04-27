@@ -200,16 +200,19 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 Lists unresolved PvP coinflip games from the configured PvP registry.
 
 This reads the registry dynamic fields for the active network and resolves each
-entry into parsed game state through `resolvePvPConflipGame()`. Registry
+entry into parsed game state through a bulk `client.core.getObjects()` lookup. Registry
 membership is the unresolved-state signal: once a match is joined and resolved,
 the Move flow removes it from the registry and deletes the live `Game` object.
 
 Use this when a product needs the current set of open PvP coinflip matches for
 browsing or lobby views.
 
-By default, failures to resolve an individual game are skipped so one broken or
+By default, per-object fetch or parse failures are skipped so one broken or
 already-deleted registry entry does not reject the full lookup. Pass
 `throwOnError: true` if you want the call to reject instead.
+
+Any supported `listDynamicFields()` options such as `limit`, `cursor`, or
+`signal` can be passed through `options`.
 
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
@@ -227,14 +230,15 @@ const games = await client.suigar.getPvPCoinflipGames({
 });
 ```
 
-### `resolvePvPConflipGame(gameId)`
+### `resolvePvPConflipGame(gameId, options?)`
 
 Fetches a PvP coinflip game object from chain and parses it into the SDK's
 normalized runtime shape.
 
 This requires the object's `content`, decodes it with the generated
 `PvPCoinflipGame` parser, and normalizes the generic coin type into a standard
-struct tag string.
+struct tag string. You can optionally pass through `getObject()` options such as
+`signal`.
 
 Use this when a product needs the live onchain match state for a specific
 pending match before rendering join or cancel actions, or inspecting the stake
@@ -247,6 +251,14 @@ console.log(game.creator);
 console.log(game.coinType);
 console.log(game.stake_per_player);
 console.log(game.is_private);
+```
+
+```ts
+const controller = new AbortController();
+
+const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID', {
+	signal: controller.signal,
+});
 ```
 
 > **Note:**

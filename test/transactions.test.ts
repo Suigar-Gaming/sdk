@@ -10,7 +10,8 @@ import {
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
 } from '../src/transactions/index.js';
-import { suigar } from '../src/client.js';
+import { Game as GeneratedPvPCoinflipGame } from '../src/contracts/pvp-coinflip/pvp_coinflip.js';
+import { suigar, type SuigarClient } from '../src/client.js';
 import { encodeUtf8 } from './utils.js';
 
 const TEST_CONFIG = {
@@ -69,6 +70,221 @@ function createDynamicField(childId: string): SuiClientTypes.DynamicFieldEntry {
 		$kind: 'DynamicObject',
 		childId,
 	};
+}
+
+function createPvPCoinflipGameObject(
+	gameId: string,
+): SuiClientTypes.Object<{ content: true }> {
+	return {
+		objectId: gameId,
+		version: '1',
+		digest: `${gameId}-digest`,
+		owner: {
+			$kind: 'AddressOwner',
+			AddressOwner: '0xowner',
+		},
+		type: `${TEST_CONFIG.packageIds.pvpCoinflip}::pvp_coinflip::Game<0x2::sui::SUI>`,
+		content: new Uint8Array([1]),
+		previousTransaction: undefined,
+		objectBcs: undefined,
+		json: undefined,
+		display: undefined,
+	};
+}
+
+function createPvPCoinflipGameObjectWithoutContent(
+	gameId: string,
+): SuiClientTypes.Object {
+	return {
+		objectId: gameId,
+		version: '1',
+		digest: `${gameId}-digest`,
+		owner: {
+			$kind: 'AddressOwner',
+			AddressOwner: '0xowner',
+		},
+		type: `${TEST_CONFIG.packageIds.pvpCoinflip}::pvp_coinflip::Game<0x2::sui::SUI>`,
+		content: undefined,
+		previousTransaction: undefined,
+		objectBcs: undefined,
+		json: undefined,
+		display: undefined,
+	};
+}
+
+type ParsedPvPCoinflipGame = ReturnType<typeof GeneratedPvPCoinflipGame.parse>;
+
+function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
+	return {
+		id: gameId,
+		creator: '0xcreator',
+		creator_is_tails: false,
+		is_private: false,
+		creator_metadata: { contents: [] },
+		joiner: '0xjoiner',
+		winner: '0xwinner',
+		stake_per_player: '1',
+		house_edge_bps: '100',
+		stake_pot: { value: '2' },
+	} as ParsedPvPCoinflipGame;
+}
+
+type SuigarTestClient = TestClient & { suigar: SuigarClient };
+
+class TestClient extends CoreClient {
+	mockObjects: Array<
+		Error | SuiClientTypes.Object | SuiClientTypes.Object<{ content: true }>
+	> = [];
+
+	mockDynamicFields: SuiClientTypes.DynamicFieldEntry[] = [];
+
+	constructor() {
+		super({ network: 'testnet', base: undefined as never });
+	}
+
+	getObjects: CoreClient['getObjects'] = async <
+		Include extends SuiClientTypes.ObjectInclude,
+	>(
+		_options: SuiClientTypes.GetObjectsOptions<Include>,
+	) => ({
+		objects: this
+			.mockObjects as SuiClientTypes.GetObjectsResponse<Include>['objects'],
+	});
+
+	listCoins: CoreClient['listCoins'] = async () => ({
+		objects: [],
+		hasNextPage: false,
+		cursor: null,
+	});
+
+	listOwnedObjects: CoreClient['listOwnedObjects'] = async <
+		Include extends SuiClientTypes.ObjectInclude,
+	>(
+		_options: SuiClientTypes.ListOwnedObjectsOptions<Include>,
+	) => ({
+		objects: [] as SuiClientTypes.Object<Include>[],
+		hasNextPage: false,
+		cursor: null,
+	});
+
+	getBalance: CoreClient['getBalance'] = async () => ({
+		balance: {
+			coinType: '0x2::sui::SUI',
+			balance: '0',
+			coinBalance: '0',
+			addressBalance: '0',
+		},
+	});
+
+	listBalances: CoreClient['listBalances'] = async () => ({
+		balances: [],
+		hasNextPage: false,
+		cursor: null,
+	});
+
+	getCoinMetadata: CoreClient['getCoinMetadata'] = async () => ({
+		coinMetadata: null,
+	});
+
+	getTransaction: CoreClient['getTransaction'] = async () => {
+		throw new Error('Not implemented.');
+	};
+
+	executeTransaction: CoreClient['executeTransaction'] = async () => {
+		throw new Error('Not implemented.');
+	};
+
+	simulateTransaction: CoreClient['simulateTransaction'] = async () => {
+		throw new Error('Not implemented.');
+	};
+
+	getReferenceGasPrice: CoreClient['getReferenceGasPrice'] = async () => ({
+		referenceGasPrice: '0',
+		price: '1',
+	});
+
+	getCurrentSystemState: CoreClient['getCurrentSystemState'] = async () =>
+		({
+			systemState: {
+				systemStateVersion: '1',
+				epoch: '1',
+				protocolVersion: '1',
+				referenceGasPrice: '1',
+				epochStartTimestampMs: '0',
+				safeMode: false,
+				safeModeStorageRewards: '0',
+				safeModeComputationRewards: '0',
+				safeModeStorageRebates: '0',
+				safeModeNonRefundableStorageFee: '0',
+				parameters: {
+					epochDurationMs: '0',
+					stakeSubsidyStartEpoch: '0',
+					maxValidatorCount: '0',
+					minValidatorJoiningStake: '0',
+					validatorLowStakeThreshold: '0',
+					validatorLowStakeGracePeriod: '0',
+				},
+				storageFund: {
+					totalObjectStorageRebates: '0',
+					nonRefundableBalance: '0',
+				},
+				stakeSubsidy: {
+					balance: '0',
+					distributionCounter: '0',
+					currentDistributionAmount: '0',
+					stakeSubsidyPeriodLength: '0',
+					stakeSubsidyDecreaseRate: 0,
+				},
+			},
+		}) satisfies SuiClientTypes.GetCurrentSystemStateResponse;
+
+	getProtocolConfig: CoreClient['getProtocolConfig'] = async () =>
+		({ protocolConfig: {} }) as SuiClientTypes.GetProtocolConfigResponse;
+
+	getChainIdentifier: CoreClient['getChainIdentifier'] = async () =>
+		({
+			chainIdentifier: 'testnet',
+		}) satisfies SuiClientTypes.GetChainIdentifierResponse;
+
+	listDynamicFields: CoreClient['listDynamicFields'] = async () => ({
+		dynamicFields: this.mockDynamicFields,
+		hasNextPage: false,
+		cursor: null,
+	});
+
+	resolveTransactionPlugin: CoreClient['resolveTransactionPlugin'] =
+		() => async () => {};
+
+	verifyZkLoginSignature: CoreClient['verifyZkLoginSignature'] = async () =>
+		({ success: true }) as SuiClientTypes.ZkLoginVerifyResponse;
+
+	getMoveFunction: CoreClient['getMoveFunction'] = async () =>
+		({ function: null }) as SuiClientTypes.GetMoveFunctionResponse;
+
+	defaultNameServiceName: CoreClient['defaultNameServiceName'] = async () =>
+		({
+			data: {
+				name: null,
+			},
+		}) satisfies SuiClientTypes.DefaultNameServiceNameResponse;
+}
+
+function createSuigarTestClient({
+	objects = [],
+	dynamicFields = [],
+	partner,
+}: {
+	objects?: SuigarTestClient['mockObjects'];
+	dynamicFields?: SuiClientTypes.DynamicFieldEntry[];
+	partner?: string;
+} = {}): SuigarTestClient {
+	const client = new TestClient();
+	client.mockObjects = objects;
+	client.mockDynamicFields = dynamicFields;
+
+	return (
+		partner ? client.$extend(suigar({ partner })) : client.$extend(suigar())
+	) as SuigarTestClient;
 }
 
 describe('transaction builders', () => {
@@ -575,64 +791,7 @@ describe('pvp coinflip transaction wrapper', () => {
 
 describe('SuigarClient', () => {
 	it('creates an extension-compatible client surface', () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
+		const client = createSuigarTestClient();
 
 		expect(client.suigar).toBeDefined();
 		expect(client.suigar.serializeTransactionToBase64).toBeTypeOf('function');
@@ -654,65 +813,9 @@ describe('SuigarClient', () => {
 			async (importOriginal) => await importOriginal(),
 		);
 		const { suigar: mockedSuigar } = await import('../src/client.js');
-
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(mockedSuigar({ partner: 'vip' }));
+		const client = new TestClient().$extend(
+			mockedSuigar({ partner: 'vip' }),
+		) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coinTypes.sui;
 		client.suigar.tx.createBetTransaction('coinflip', {
 			playerAddress: '0x123',
@@ -729,64 +832,7 @@ describe('SuigarClient', () => {
 	});
 
 	it('exposes both standard and pvp transaction factories', () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
+		const client = createSuigarTestClient();
 
 		expect(client.suigar.tx.createBetTransaction).toBeTypeOf('function');
 		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(
@@ -795,241 +841,81 @@ describe('SuigarClient', () => {
 	});
 
 	it('returns pvp coinflip games from the unresolved registry entries', async () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [
-					createDynamicField('0xopen'),
-					createDynamicField('0xpending'),
-				],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
-		vi.spyOn(client.suigar, 'resolvePvPConflipGame').mockImplementation(
-			async (gameId: string) =>
-				({
-					id: gameId,
-					creator: '0xcreator',
-					creator_is_tails: false,
-					is_private: false,
-					creator_metadata: { contents: [] },
-					joiner: '0xjoiner',
-					winner: '0xwinner',
-					stake_per_player: '1',
-					house_edge_bps: '100',
-					stake_pot: { value: '2' },
-					coinType: '0x2::sui::SUI',
-				}) as never,
-		);
+		const client = createSuigarTestClient({
+			objects: [
+				createPvPCoinflipGameObject('0xopen'),
+				createPvPCoinflipGameObject('0xpending'),
+			],
+			dynamicFields: [
+				createDynamicField('0xopen'),
+				createDynamicField('0xpending'),
+			],
+		});
+		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
+		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
+			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
 		expect(games).toHaveLength(2);
 		expect(games[0]?.id).toBe('0xopen');
 		expect(games[1]?.id).toBe('0xpending');
+		expect(resolveSpy).not.toHaveBeenCalled();
+	});
+
+	it('forwards signal from getPvPCoinflipGames options into getObjects', async () => {
+		const client = createSuigarTestClient({
+			objects: [createPvPCoinflipGameObject('0xopen')],
+			dynamicFields: [createDynamicField('0xopen')],
+		});
+		const controller = new AbortController();
+		const getObjectsSpy = vi.spyOn(client, 'getObjects');
+		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
+			createParsedPvPCoinflipGame('0xopen'),
+		);
+
+		await client.suigar.getPvPCoinflipGames({
+			limit: 1,
+			signal: controller.signal,
+		});
+
+		expect(getObjectsSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				objectIds: ['0xopen'],
+				signal: controller.signal,
+				include: { content: true },
+			}),
+		);
 	});
 
 	it('skips unresolved PvP coinflip games when throwOnError is false', async () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [
-					createDynamicField('0xopen'),
-					createDynamicField('0xbroken'),
-					createDynamicField('0xpending'),
-				],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
-		vi.spyOn(client.suigar, 'resolvePvPConflipGame').mockImplementation(
-			async (gameId: string) => {
-				if (gameId === '0xbroken') {
-					throw new Error('boom');
-				}
-
-				return {
-					id: gameId,
-					creator: '0xcreator',
-					creator_is_tails: false,
-					is_private: false,
-					creator_metadata: { contents: [] },
-					joiner: '0xjoiner',
-					winner: '0xwinner',
-					stake_per_player: '1',
-					house_edge_bps: '100',
-					stake_pot: { value: '2' },
-					coinType: '0x2::sui::SUI',
-				} as never;
-			},
-		);
+		const client = createSuigarTestClient({
+			objects: [
+				createPvPCoinflipGameObject('0xopen'),
+				new Error('boom'),
+				createPvPCoinflipGameObject('0xpending'),
+			],
+			dynamicFields: [
+				createDynamicField('0xopen'),
+				createDynamicField('0xbroken'),
+				createDynamicField('0xpending'),
+			],
+		});
+		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
+		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
+			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
 		expect(games).toHaveLength(2);
 		expect(games.map((game) => game.id)).toEqual(['0xopen', '0xpending']);
+		expect(resolveSpy).not.toHaveBeenCalled();
 	});
 
 	it('exposes the generated BCS helpers under their current event keys', async () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
+		const client = createSuigarTestClient();
 
 		expect(client.suigar.bcs.PvPCoinflipGame).toBeDefined();
 		expect(client.suigar.bcs.BetResultEvent).toBeDefined();
@@ -1039,70 +925,50 @@ describe('SuigarClient', () => {
 	});
 
 	it('rejects unresolved PvP coinflip games when throwOnError is true', async () => {
-		class TestClient extends CoreClient {
-			constructor() {
-				super({ network: 'testnet', base: undefined as never });
-			}
-
-			getObjects = async () => ({ objects: [] });
-			listCoins = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			listOwnedObjects = async () => ({
-				objects: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getBalance = async () => ({
-				balance: {
-					coinType: '0x2::sui::SUI',
-					balance: '0',
-					coinBalance: '0',
-					addressBalance: '0',
-				},
-			});
-			listBalances = async () => ({
-				balances: [],
-				hasNextPage: false,
-				cursor: null,
-			});
-			getCoinMetadata = async () => ({ coinMetadata: null });
-			getTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			executeTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			simulateTransaction = async () => {
-				throw new Error('Not implemented.');
-			};
-			getReferenceGasPrice = async () => ({
-				referenceGasPrice: '0',
-				price: '1',
-			});
-			getCurrentSystemState = async () => ({ epoch: '1' }) as never;
-			getProtocolConfig = async () => ({ protocolConfig: {} }) as never;
-			getChainIdentifier = async () => ({ chain: 'testnet' }) as never;
-			listDynamicFields = async () => ({
-				dynamicFields: [createDynamicField('0xbroken')],
-				hasNextPage: false,
-				cursor: null,
-			});
-			resolveTransactionPlugin = () => async () => {};
-			verifyZkLoginSignature = async () => ({ success: true }) as never;
-			getMoveFunction = async () => ({ function: null }) as never;
-			defaultNameServiceName = async () => ({ address: null }) as never;
-		}
-
-		const client = new TestClient().$extend(suigar());
-		vi.spyOn(client.suigar, 'resolvePvPConflipGame').mockRejectedValue(
-			new Error('boom'),
-		);
+		const client = createSuigarTestClient({
+			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
+			dynamicFields: [createDynamicField('0xbroken')],
+		});
+		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
 
 		await expect(
 			client.suigar.getPvPCoinflipGames({ throwOnError: true }),
-		).rejects.toThrow('boom');
+		).rejects.toThrow(
+			'Unable to resolve PvP coinflip game from retrieved object',
+		);
+		expect(resolveSpy).not.toHaveBeenCalled();
+	});
+
+	it('rejects resolving a PvP coinflip game when the retrieved object has no content', async () => {
+		const client = createSuigarTestClient({
+			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
+		});
+
+		await expect(
+			client.suigar.resolvePvPConflipGame('0xbroken'),
+		).rejects.toThrow(
+			'Unable to resolve PvP coinflip game from retrieved object',
+		);
+	});
+
+	it('forwards getObject options when resolving a PvP coinflip game', async () => {
+		const client = createSuigarTestClient({
+			objects: [createPvPCoinflipGameObject('0xopen')],
+		});
+		const controller = new AbortController();
+		const getObjectSpy = vi.spyOn(client, 'getObject');
+		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
+			createParsedPvPCoinflipGame('0xopen'),
+		);
+
+		await client.suigar.resolvePvPConflipGame('0xopen', {
+			signal: controller.signal,
+		});
+
+		expect(getObjectSpy).toHaveBeenCalledWith({
+			objectId: '0xopen',
+			signal: controller.signal,
+			include: { content: true },
+		});
 	});
 });

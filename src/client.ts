@@ -118,20 +118,22 @@ export class SuigarClient {
 	 * Lists unresolved PvP coinflip games from the configured registry and resolves
 	 * each entry into parsed onchain game state.
 	 *
-	 * This fetches dynamic fields from the PvP coinflip registry object, then loads
-	 * each referenced game object through `resolvePvPConflipGame()`. Registry
+	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
+	 * loads the referenced game objects through `client.core.getObjects()`. Registry
 	 * membership is the unresolved-state signal: when a game is joined and resolved,
 	 * the Move flow removes it from the registry and deletes the live `Game` object.
 	 * Use this when a product needs the current set of open PvP coinflip matches for
 	 * browsing or lobby views.
 	 *
 	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
-	 * Pass `throwOnError: true` to fail the whole lookup when any referenced game
-	 * cannot be resolved. By default, failed game resolutions are skipped and only
-	 * successfully parsed unresolved games are returned.
+	 * Supported options such as `limit`, `cursor`, and `signal` are forwarded to the
+	 * underlying lookup calls. Pass `throwOnError: true` to fail the whole lookup
+	 * when any referenced game object cannot be fetched or parsed. By default,
+	 * failed per-object lookups are skipped and only successfully parsed unresolved
+	 * games are returned.
 	 * @returns Parsed unresolved PvP coinflip game objects for the requested
-	 * registry page. When `throwOnError` is `false`, entries that fail
-	 * `resolvePvPConflipGame()` are omitted from the returned array.
+	 * registry page. When `throwOnError` is `false`, entries that fail object fetch
+	 * or parse are omitted from the returned array.
 	 */
 	async getPvPCoinflipGames(
 		options: WithThrowOnError<
@@ -142,22 +144,35 @@ export class SuigarClient {
 	) {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
-			parentId: this.#config.registryIds.pvpCoinflip,
 			...listOptions,
+			parentId: this.#config.registryIds.pvpCoinflip,
+		});
+
+		const { objects } = await this.#client.core.getObjects({
+			objectIds: dynamicFields.map(({ childId }) => childId),
+			signal: listOptions.signal,
+			include: {
+				content: true,
+			},
+		});
+
+		const resolvedGames = objects.map((object) => {
+			try {
+				return this.#resolvePvPCoinflipGameObject(object);
+			} catch (error) {
+				return error instanceof Error ? error : new Error(String(error));
+			}
 		});
 
 		if (throwOnError) {
-			return Promise.all(
-				dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
-			);
+			const firstError = resolvedGames.find((game) => game instanceof Error);
+			if (firstError) {
+				throw firstError;
+			}
 		}
 
-		const settledGames = await Promise.allSettled(
-			dynamicFields.map(({ childId }) => this.resolvePvPConflipGame(childId)),
-		);
-
-		return settledGames.flatMap((result) =>
-			result.status === 'fulfilled' ? [result.value] : [],
+		return resolvedGames.flatMap((game) =>
+			game instanceof Error ? [] : [game],
 		);
 	}
 
@@ -172,23 +187,23 @@ export class SuigarClient {
 	 * of a specific PvP coinflip match before rendering join, cancel, or result UI.
 	 *
 	 * @param gameId On-chain object id of the PvP coinflip game.
+	 * @param options Optional `getObject()` options forwarded to the underlying
+	 * client lookup, excluding `objectId` and `include`. Supported options include
+	 * `signal`.
 	 * @returns Parsed PvP coinflip game state with a normalized `coinType`.
 	 * @throws Error If the object cannot be decoded because no content was returned.
 	 */
-	async resolvePvPConflipGame(gameId: string) {
+	async resolvePvPConflipGame(
+		gameId: string,
+		options: Omit<SuiClientTypes.GetObjectOptions, 'objectId' | 'include'> = {},
+	) {
 		const { object } = await this.#client.core.getObject({
+			...options,
 			objectId: gameId,
 			include: { content: true },
 		});
 
-		if (!object.content) {
-			throw new Error('Unable to resolve PvP coinflip from game object');
-		}
-
-		return {
-			...PvPCoinflipGame.parse(object.content),
-			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
-		};
+		return this.#resolvePvPCoinflipGameObject(object);
 	}
 
 	/**
@@ -325,6 +340,25 @@ export class SuigarClient {
 				balance: BigInt(stake_per_player),
 				useGasCoin: options.allowGasCoinShortcut,
 			});
+		};
+	}
+
+	#resolvePvPCoinflipGameObject(
+		object: SuiClientTypes.Object<{ content: true }> | Error,
+	) {
+		if (object instanceof Error) {
+			throw object;
+		}
+
+		if (!object.content) {
+			throw new Error(
+				'Unable to resolve PvP coinflip game from retrieved object',
+			);
+		}
+
+		return {
+			...PvPCoinflipGame.parse(object.content),
+			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
 		};
 	}
 }
