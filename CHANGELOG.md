@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- f0ea104: Align numeric utility names, Move decoding helpers, and PvP BCS event helper references with the current SDK API.
+
 ## 2.0.0-beta.6
 
 ### Patch Changes
