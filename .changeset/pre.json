@@ -5,6 +5,7 @@
 		"@suigar/sdk": "2.0.0-beta.1"
 	},
 	"changesets": [
+		"all-crews-stop",
 		"chubby-beans-own",
 		"cute-trams-live",
 		"dry-vans-doubt",
