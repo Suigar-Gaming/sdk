@@ -100,7 +100,7 @@ When the app needs a wallet-ready payload:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',

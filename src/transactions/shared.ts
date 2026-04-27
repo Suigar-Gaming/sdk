@@ -1,18 +1,20 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type {
-	TransactionArgument,
-	TransactionResult,
+import {
+	Transaction,
+	type TransactionArgument,
+	type TransactionResult,
 } from '@mysten/sui/transactions';
-import { Transaction } from '@mysten/sui/transactions';
 
 import type {
 	EncodedBetMetadata,
+	BaseTransactionOptions,
 	Game,
 	SharedBetTransactionOptions,
-	SuigarConfig,
 	WithPartner,
+	StakeTransactionOptions,
+	CoinTransactionOptions,
 } from '../types';
 import {
 	assertConfiguredBetGame,
@@ -22,25 +24,27 @@ import {
 import { DEFAULT_GAS_BUDGET_MIST, toBigInt } from '../utils/index.js';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 
-export type BuildSharedBetTransactionContext = {
-	tx: Transaction;
-	config: SuigarConfig;
-	owner: string;
-	coinType: string;
-	stake: bigint;
-	cashStake: bigint;
-	betCount: bigint;
-	metadata: EncodedBetMetadata;
-	priceInfoObjectId: string;
-	betCoin: TransactionResult;
+type StrictStakeTransactionOptions = {
+	[K in keyof StakeTransactionOptions]-?: Exclude<
+		StakeTransactionOptions[K],
+		number
+	>;
 };
 
-export type CreateBaseGameTransactionOptions = {
-	config: SuigarConfig;
+export type BuildSharedBetTransactionContext = Pick<
+	BaseTransactionOptions,
+	'config' | 'playerAddress'
+> &
+	Pick<CoinTransactionOptions, 'coinType'> &
+	StrictStakeTransactionOptions & {
+		tx: Transaction;
+		metadata: EncodedBetMetadata;
+		priceInfoObjectId: string;
+		betCoin: TransactionResult;
+	};
+
+export type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
 	game: Game;
-	owner: string;
-	sender?: string;
-	gasBudget?: number | bigint;
 };
 
 export type BuildSharedBetTransactionOptions = WithPartner<
@@ -55,14 +59,13 @@ export type BuildSharedBetTransactionOptions = WithPartner<
 export function createBaseGameTransaction({
 	config,
 	game,
-	owner,
-	sender,
+	playerAddress,
 	gasBudget,
 }: CreateBaseGameTransactionOptions): Transaction {
 	assertConfiguredBetGame(config, game);
 
 	const tx = new Transaction();
-	tx.setSenderIfNotSet(normalizeSuiAddress(sender ?? owner));
+	tx.setSenderIfNotSet(normalizeSuiAddress(playerAddress));
 	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);
 
 	return tx;
@@ -70,8 +73,7 @@ export function createBaseGameTransaction({
 
 export function buildSharedStandardGameBetCall({
 	config,
-	owner,
-	sender,
+	playerAddress,
 	coinType,
 	stake,
 	cashStake,
@@ -82,7 +84,7 @@ export function buildSharedStandardGameBetCall({
 	buildRewardCoin,
 }: BuildSharedBetTransactionOptions): (tx: Transaction) => TransactionArgument {
 	return (tx: Transaction) => {
-		const normalizedOwner = normalizeSuiAddress(sender ?? owner);
+		const normalizedPlayerAddress = normalizeSuiAddress(playerAddress);
 		const normalizedCoinType = normalizeStructTag(coinType);
 		const resolvedStake = toBigInt(stake);
 		const resolvedCashStake = toBigInt(cashStake ?? stake);
@@ -102,7 +104,7 @@ export function buildSharedStandardGameBetCall({
 		const rewardCoin = buildRewardCoin({
 			tx,
 			config,
-			owner: normalizedOwner,
+			playerAddress: normalizedPlayerAddress,
 			coinType: normalizedCoinType,
 			stake: resolvedStake,
 			cashStake: resolvedCashStake,
@@ -112,7 +114,7 @@ export function buildSharedStandardGameBetCall({
 			betCoin,
 		});
 
-		tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
+		tx.transferObjects([rewardCoin], tx.pure.address(normalizedPlayerAddress));
 		return rewardCoin;
 	};
 }
