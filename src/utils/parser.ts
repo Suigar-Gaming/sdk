@@ -26,11 +26,7 @@ const GAME_DETAIL_BCS = {
 
 export function fromMoveI64(i64: MoveFloat['exp']): number {
 	try {
-		const value = BigInt(i64.bits ?? 0);
-		const maxPositive = 1n << 63n;
-		const twoPow64 = 1n << 64n;
-		const signed = value >= maxPositive ? value - twoPow64 : value;
-		return Number(signed);
+		return Number(BigInt.asIntN(64, BigInt(i64.bits ?? 0)));
 	} catch {
 		return 0;
 	}
@@ -42,7 +38,7 @@ export function fromMoveFloat(float: MoveFloat): number {
 		return 0;
 	}
 	const exponent = fromMoveI64(float.exp) - 52;
-	const magnitude = Number(mantissa) * Math.pow(2, exponent);
+	const magnitude = Number(mantissa) * 2 ** exponent;
 	return float.is_negative ? -magnitude : magnitude;
 }
 
