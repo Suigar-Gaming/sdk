@@ -542,7 +542,7 @@ npm test
 
 ## Example App
 
-This repository now includes a Next.js integration example in [examples/game-integration](/Users/lucas/Documents/Github/suigar-sdk/examples/game-integration).
+This repository includes a Next.js integration example in [examples/game-integration](examples/game-integration).
 
 It demonstrates:
 
