@@ -211,6 +211,9 @@ By default, per-object fetch or parse failures are skipped so one broken or
 already-deleted registry entry does not reject the full lookup. Pass
 `throwOnError: true` if you want the call to reject instead.
 
+Any supported `listDynamicFields()` options such as `limit`, `cursor`, or
+`signal` can be passed through `options`.
+
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
 
@@ -227,14 +230,15 @@ const games = await client.suigar.getPvPCoinflipGames({
 });
 ```
 
-### `resolvePvPConflipGame(gameId)`
+### `resolvePvPConflipGame(gameId, options?)`
 
 Fetches a PvP coinflip game object from chain and parses it into the SDK's
 normalized runtime shape.
 
 This requires the object's `content`, decodes it with the generated
 `PvPCoinflipGame` parser, and normalizes the generic coin type into a standard
-struct tag string.
+struct tag string. You can optionally pass through `getObject()` options such as
+`signal`.
 
 Use this when a product needs the live onchain match state for a specific
 pending match before rendering join or cancel actions, or inspecting the stake
@@ -247,6 +251,14 @@ console.log(game.creator);
 console.log(game.coinType);
 console.log(game.stake_per_player);
 console.log(game.is_private);
+```
+
+```ts
+const controller = new AbortController();
+
+const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID', {
+	signal: controller.signal,
+});
 ```
 
 > **Note:**

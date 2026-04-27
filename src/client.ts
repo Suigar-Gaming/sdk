@@ -142,12 +142,13 @@ export class SuigarClient {
 	) {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
-			parentId: this.#config.registryIds.pvpCoinflip,
 			...listOptions,
+			parentId: this.#config.registryIds.pvpCoinflip,
 		});
 
 		const { objects } = await this.#client.core.getObjects({
 			objectIds: dynamicFields.map(({ childId }) => childId),
+			signal: listOptions.signal,
 			include: {
 				content: true,
 			},
@@ -187,8 +188,12 @@ export class SuigarClient {
 	 * @returns Parsed PvP coinflip game state with a normalized `coinType`.
 	 * @throws Error If the object cannot be decoded because no content was returned.
 	 */
-	async resolvePvPConflipGame(gameId: string) {
+	async resolvePvPConflipGame(
+		gameId: string,
+		options: Omit<SuiClientTypes.GetObjectOptions, 'objectId' | 'include'> = {},
+	) {
 		const { object } = await this.#client.core.getObject({
+			...options,
 			objectId: gameId,
 			include: { content: true },
 		});
