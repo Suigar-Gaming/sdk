@@ -126,12 +126,14 @@ export class SuigarClient {
 	 * browsing or lobby views.
 	 *
 	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
-	 * Pass `throwOnError: true` to fail the whole lookup when any referenced game
-	 * cannot be resolved. By default, failed game resolutions are skipped and only
-	 * successfully parsed unresolved games are returned.
+	 * Supported options such as `limit`, `cursor`, and `signal` are forwarded to the
+	 * underlying lookup calls. Pass `throwOnError: true` to fail the whole lookup
+	 * when any referenced game object cannot be fetched or parsed. By default,
+	 * failed per-object lookups are skipped and only successfully parsed unresolved
+	 * games are returned.
 	 * @returns Parsed unresolved PvP coinflip game objects for the requested
-	 * registry page. When `throwOnError` is `false`, entries that fail
-	 * `resolvePvPConflipGame()` are omitted from the returned array.
+	 * registry page. When `throwOnError` is `false`, entries that fail object fetch
+	 * or parse are omitted from the returned array.
 	 */
 	async getPvPCoinflipGames(
 		options: WithThrowOnError<
@@ -185,6 +187,9 @@ export class SuigarClient {
 	 * of a specific PvP coinflip match before rendering join, cancel, or result UI.
 	 *
 	 * @param gameId On-chain object id of the PvP coinflip game.
+	 * @param options Optional `getObject()` options forwarded to the underlying
+	 * client lookup, excluding `objectId` and `include`. Supported options include
+	 * `signal`.
 	 * @returns Parsed PvP coinflip game state with a normalized `coinType`.
 	 * @throws Error If the object cannot be decoded because no content was returned.
 	 */
