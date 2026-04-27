@@ -87,6 +87,18 @@ function parseGameDetail(
 	return normalizeGameDetailValue(valueType, parsed);
 }
 
+/**
+ * Decodes `BetResultEvent.game_details` into plain application values.
+ *
+ * Suigar stores game detail entries as `VecMap<string, vector<u8>>`, so raw BCS
+ * decoding leaves each value as bytes. This helper looks up the known schema for
+ * each key, parses the bytes into the expected runtime type, and preserves the
+ * original onchain keys in the returned object. Unknown keys fall back to
+ * string decoding so newer detail fields remain readable by default.
+ *
+ * @param gameDetails Raw `game_details` map from a decoded bet result event.
+ * @returns A plain object with the same keys and decoded string, number, or boolean values.
+ */
 export function parseGameDetails(
 	gameDetails: BetResultGameDetails,
 ): ParsedGameDetails {
