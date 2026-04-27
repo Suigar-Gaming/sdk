@@ -33,7 +33,7 @@ type StrictStakeTransactionOptions = {
 
 export type BuildSharedBetTransactionContext = Pick<
 	BaseTransactionOptions,
-	'config' | 'owner'
+	'config' | 'playerAddress'
 > &
 	Pick<CoinTransactionOptions, 'coinType'> &
 	StrictStakeTransactionOptions & {
@@ -59,14 +59,13 @@ export type BuildSharedBetTransactionOptions = WithPartner<
 export function createBaseGameTransaction({
 	config,
 	game,
-	owner,
-	sender,
+	playerAddress,
 	gasBudget,
 }: CreateBaseGameTransactionOptions): Transaction {
 	assertConfiguredBetGame(config, game);
 
 	const tx = new Transaction();
-	tx.setSenderIfNotSet(normalizeSuiAddress(sender ?? owner));
+	tx.setSenderIfNotSet(normalizeSuiAddress(playerAddress));
 	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);
 
 	return tx;
@@ -74,8 +73,7 @@ export function createBaseGameTransaction({
 
 export function buildSharedStandardGameBetCall({
 	config,
-	owner,
-	sender,
+	playerAddress,
 	coinType,
 	stake,
 	cashStake,
@@ -86,7 +84,7 @@ export function buildSharedStandardGameBetCall({
 	buildRewardCoin,
 }: BuildSharedBetTransactionOptions): (tx: Transaction) => TransactionArgument {
 	return (tx: Transaction) => {
-		const normalizedOwner = normalizeSuiAddress(sender ?? owner);
+		const normalizedPlayerAddress = normalizeSuiAddress(playerAddress);
 		const normalizedCoinType = normalizeStructTag(coinType);
 		const resolvedStake = toBigInt(stake);
 		const resolvedCashStake = toBigInt(cashStake ?? stake);
@@ -106,7 +104,7 @@ export function buildSharedStandardGameBetCall({
 		const rewardCoin = buildRewardCoin({
 			tx,
 			config,
-			owner: normalizedOwner,
+			playerAddress: normalizedPlayerAddress,
 			coinType: normalizedCoinType,
 			stake: resolvedStake,
 			cashStake: resolvedCashStake,
@@ -116,7 +114,7 @@ export function buildSharedStandardGameBetCall({
 			betCoin,
 		});
 
-		tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
+		tx.transferObjects([rewardCoin], tx.pure.address(normalizedPlayerAddress));
 		return rewardCoin;
 	};
 }

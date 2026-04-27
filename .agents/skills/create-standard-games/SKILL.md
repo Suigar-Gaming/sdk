@@ -25,14 +25,13 @@ Supported game ids:
 
 ## Shared options
 
-- `owner: string`
+- `playerAddress: string`
 - `coinType: string`
 - `stake: number | bigint`
 - `cashStake?: number | bigint`
 - `betCount?: number | bigint`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `sender?: string`
 - `allowGasCoinShortcut?: boolean`
 
 Extension-level option:
@@ -59,7 +58,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
@@ -87,7 +86,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('limbo', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	targetMultiplier: 2.5,
@@ -111,7 +110,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('plinko', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	configId: 3,
@@ -141,7 +140,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('range', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	leftPoint: 25,
@@ -169,7 +168,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('wheel', {
-	owner,
+	playerAddress,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	configId: 1,
@@ -191,7 +190,7 @@ Guardrails:
 - If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` once on the client extension instead of passing it per transaction.
 - Treat `partner` as a wallet address, not a slug, label, or display string.
 - Keep amounts as `bigint` once they leave the UI layer.
-- Ensure the same connected wallet address is used as `owner`.
+- Ensure the same connected wallet address is used as `playerAddress`.
 
 ## Event decoding
 
