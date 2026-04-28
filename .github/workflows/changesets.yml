@@ -44,7 +44,7 @@ jobs:
       - name: Create or update release PR
         uses: changesets/action@v1
         with:
-          version: npm run version-packages
+          version: npm run changeset:version
           commit: 'ci: version packages'
           title: 'ci: version packages'
         env:

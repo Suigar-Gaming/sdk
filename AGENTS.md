@@ -57,7 +57,7 @@ npm run format
 npm run changeset
 
 # Apply version updates from changesets
-npm run version-packages
+npm run changeset:version
 
 # Publish release changes
 npm run release
