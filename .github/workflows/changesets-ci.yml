@@ -65,8 +65,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Validate snapshot versioning
-        run: npm run changeset:version -- --snapshot test-do-not-publish
+      - name: Validate versioning
+        run: npm run changeset:version
 
       - name: Fail when changeset is missing
         if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
