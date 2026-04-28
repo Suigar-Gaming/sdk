@@ -1,5 +1,14 @@
 # @suigar/sdk
 
+## 2.0.0-beta.9
+
+### Patch Changes
+
+- eaf8b3a: Fix metadata encoding so partner metadata is only added when configured and hex metadata values are encoded consistently as bytes. Improve supported-coin and price-info resolution error handling for transaction configuration.
+- 9929e05: Refine Move parser helpers by simplifying BCS type usage, normalizing missing
+  `i64` and float mantissa values to `0`, and documenting the numeric conversion
+  behavior in `fromMoveI64` and `fromMoveFloat`.
+
 ## 2.0.0-beta.8
 
 ### Patch Changes
