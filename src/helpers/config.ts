@@ -65,13 +65,13 @@ export function resolvePriceInfoObjectId(
 	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
 	const objectId = config.priceInfoObjectIds[supportedCoin];
 
-	if (objectId) {
-		return objectId;
+	if (!objectId) {
+		throw new Error(
+			`Missing price info object configuration for coin type ${coinType}`,
+		);
 	}
 
-	throw new Error(
-		`Missing price info object configuration for coin type ${coinType}`,
-	);
+	return objectId;
 }
 
 function resolveSupportedCoin(
@@ -85,13 +85,13 @@ function resolveSupportedCoin(
 		([, configuredCoinType]) => configuredCoinType === coinType,
 	)?.[0];
 
-	if (supportedCoin) {
-		return supportedCoin;
+	if (!supportedCoin) {
+		throw new Error(
+			`Unsupported coin type ${coinType}. Supported coin types: ${entries
+				.map(([, configuredCoinType]) => configuredCoinType)
+				.join(', ')}`,
+		);
 	}
 
-	throw new Error(
-		`Unsupported coin type ${coinType}. Supported coin types: ${entries
-			.map(([, configuredCoinType]) => configuredCoinType)
-			.join(', ')}`,
-	);
+	return supportedCoin;
 }

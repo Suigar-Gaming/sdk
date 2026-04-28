@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { isValidSuiAddress, normalizeSuiAddress } from '@mysten/sui/utils';
+import { fromHex } from '@mysten/sui/utils';
 
 import type {
 	BetMetadataInput,
@@ -13,20 +13,9 @@ const ADDRESS_METADATA_KEYS = new Set(['partner']);
 const RESERVED_METADATA_KEYS = new Set([...ADDRESS_METADATA_KEYS, 'referrer']);
 const textEncoder = new TextEncoder();
 
-function parseHexAddress(value: string): Uint8Array | null {
-	const trimmed = value.trim();
-	if (!trimmed || !isValidSuiAddress(trimmed)) return null;
-
+function parseHexAddress(value: string): ReturnType<typeof fromHex> | null {
 	try {
-		const normalized = normalizeSuiAddress(trimmed).slice(2);
-		const bytes = new Uint8Array(normalized.length / 2);
-		for (let index = 0; index < normalized.length; index += 2) {
-			bytes[index / 2] = Number.parseInt(
-				normalized.slice(index, index + 2),
-				16,
-			);
-		}
-		return bytes;
+		return fromHex(value);
 	} catch {
 		return null;
 	}
@@ -71,12 +60,13 @@ export function encodeBetMetadata(
 		values.push(encodeMetadataValue(key, value));
 	}
 
-	if (!partner?.trim()) {
-		return { keys, values };
+	if (partner?.trim()) {
+		keys.unshift('partner');
+		values.unshift(encodeMetadataValue('partner', partner));
 	}
 
 	return {
-		keys: [...keys, 'partner'],
-		values: [...values, encodeMetadataValue('partner', partner)],
+		keys,
+		values,
 	};
 }
