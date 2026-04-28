@@ -1,17 +1,17 @@
-name: Version Packages
+name: Changesets
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
 
 concurrency:
-  group: changesets
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -44,7 +44,7 @@ jobs:
       - name: Create or update release PR
         uses: changesets/action@v1
         with:
-          version: npm run version-packages
+          version: npm run changeset:version
           commit: 'ci: version packages'
           title: 'ci: version packages'
         env:

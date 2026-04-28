@@ -57,7 +57,7 @@ npm run format
 npm run changeset
 
 # Apply version updates from changesets
-npm run version-packages
+npm run changeset:version
 
 # Publish release changes
 npm run release
@@ -169,10 +169,12 @@ This is a core invariant: standard game transactions must fail clearly when the 
 ### Development Workflow
 
 1. Update or add code in `src/`
-2. Regenerate code with `npm run codegen` if contract bindings or package sources changed
-3. Run `npm test`
-4. Run `npm run typecheck`
-5. Add a changeset when the user-visible package behavior changes
+2. If the branch modifies any file under `src/`, create a `.changeset/*.md` file once for that branch as soon as the first `src/` change is made
+3. Reuse that existing branch changeset for later `src/` edits on the same branch instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
+4. Regenerate code with `npm run codegen` if contract bindings or package sources changed
+5. Run `npm test`
+6. Run `npm run typecheck`
+7. Add or update the existing branch changeset when the user-visible package behavior changes
 
 Documentation is part of the deliverable:
 
@@ -203,6 +205,8 @@ Claude Code compatibility:
 When creating a PR:
 
 - summarize the SDK or transaction behavior change clearly
+- if the branch modifies anything under `src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first `src/` change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated `src/` edits unless multiple release notes are intentionally needed
+- PRs that change `src/` without a changeset are expected to fail merge checks and receive a PR comment
 - mention whether generated bindings changed
 - include tests run
 - if the PR was primarily written by AI, mark that in the PR description

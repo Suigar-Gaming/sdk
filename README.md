@@ -110,7 +110,7 @@ Creates a named Sui client extension. By default, it registers under `client.sui
 ### Partner Setup
 
 > **Important:** `partner` is the partner wallet address. Configure it once
-> when you register the extension so the SDK can append that wallet address to
+> when you register the extension so the SDK can prepend that wallet address to
 > supported bet metadata automatically.
 
 ```ts
@@ -310,7 +310,7 @@ Shared behavior:
 - `cashStake` controls the withdrawn balance and defaults to `stake`
 - `betCount` defaults to `1`
 - `metadata` is encoded into `keys` and `values` byte arrays
-- `partner` configured via `suigar({ partner })` is appended automatically to metadata as the partner wallet address
+- `partner` configured via `suigar({ partner })` is prepended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `playerAddress`
