@@ -203,6 +203,7 @@ Claude Code compatibility:
 When creating a PR:
 
 - summarize the SDK or transaction behavior change clearly
+- add a `.changeset/*.md` file when the PR modifies anything under `src/`; PRs that change `src/` without a changeset are expected to fail merge checks and receive a PR comment
 - mention whether generated bindings changed
 - include tests run
 - if the PR was primarily written by AI, mark that in the PR description

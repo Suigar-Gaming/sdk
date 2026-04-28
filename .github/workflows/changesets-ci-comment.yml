@@ -1,0 +1,117 @@
+name: Changesets CI Comment
+
+on:
+  workflow_run:
+    workflows:
+      - Changesets CI
+    types:
+      - completed
+
+permissions:
+  issues: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request'
+
+    steps:
+      - name: Resolve pull request number
+        id: pr
+        uses: actions/github-script@v8
+        with:
+          result-encoding: string
+          script: |
+            const pullRequest = context.payload.workflow_run.pull_requests?.[0];
+            return pullRequest ? String(pullRequest.number) : '';
+
+      - name: Check for missing changeset artifact
+        id: artifact
+        if: steps.pr.outputs.result != ''
+        uses: actions/github-script@v8
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo } = context.repo;
+            const run_id = context.payload.workflow_run.id;
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner,
+              repo,
+              run_id,
+              per_page: 100,
+            });
+
+            return artifacts.some((artifact) => artifact.name === 'missing-changeset') ? 'true' : 'false';
+
+      - name: Create or update PR comment
+        if: steps.pr.outputs.result != '' && steps.artifact.outputs.result == 'true'
+        uses: actions/github-script@v8
+        env:
+          ISSUE_NUMBER: ${{ steps.pr.outputs.result }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const marker = '<!-- codex:changesets-warning -->';
+            const body = [
+              marker,
+              'This pull request changes files under `src/` but does not include a changeset file in `.changeset/`.',
+              '',
+              'Add a changeset with `npm run changeset` so this PR can merge.',
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existingComment = comments.find((comment) => comment.body?.includes(marker));
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body,
+              });
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body,
+            });
+
+      - name: Remove outdated PR comment
+        if: steps.pr.outputs.result != '' && steps.artifact.outputs.result != 'true'
+        uses: actions/github-script@v8
+        env:
+          ISSUE_NUMBER: ${{ steps.pr.outputs.result }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const marker = '<!-- codex:changesets-warning -->';
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            for (const comment of comments.filter((comment) => comment.body?.includes(marker))) {
+              await github.rest.issues.deleteComment({
+                owner,
+                repo,
+                comment_id: comment.id,
+              });
+            }

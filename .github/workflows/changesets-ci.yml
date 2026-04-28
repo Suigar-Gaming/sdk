@@ -1,0 +1,75 @@
+name: Changesets CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Get changed src files
+        id: src-changes
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            src/**
+
+      - name: Get changed changeset files
+        id: changeset-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            .changeset/*.md
+          files_ignore: |
+            .changeset/README.md
+
+      - name: Create missing changeset note
+        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        env:
+          CHANGED_SRC_FILES: ${{ steps.src-changes.outputs.all_changed_files }}
+        run: |
+          {
+            echo "This pull request changes files under src/ but does not include a changeset file in .changeset/."
+            echo
+            echo "Add a changeset with npm run changeset so this PR can merge."
+            echo
+            echo "Files that triggered this check:"
+            for file in $CHANGED_SRC_FILES; do
+              echo "- $file"
+            done
+          } > missing-changeset.txt
+
+      - name: Upload missing changeset artifact
+        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: missing-changeset
+          path: missing-changeset.txt
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Validate snapshot versioning
+        run: npm run changeset:version -- --snapshot test-do-not-publish
+
+      - name: Fail when changeset is missing
+        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        run: |
+          echo "This pull request modifies files under src/ but does not include a changeset file in .changeset/."
+          exit 1
