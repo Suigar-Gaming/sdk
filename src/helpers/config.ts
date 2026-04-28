@@ -78,20 +78,17 @@ function resolveSupportedCoin(
 	config: SuigarConfig,
 	coinType: string,
 ): SuigarCoin {
-	const entries = Object.entries(config.coinTypes) as Array<
-		[SuigarCoin, string]
-	>;
-	const supportedCoin = entries.find(
-		([, configuredCoinType]) => configuredCoinType === coinType,
-	)?.[0];
+	const [supportedCoin] =
+		Object.entries(config.coinTypes).find(([_, value]) => value === coinType) ??
+		[];
 
 	if (!supportedCoin) {
 		throw new Error(
-			`Unsupported coin type ${coinType}. Supported coin types: ${entries
-				.map(([, configuredCoinType]) => configuredCoinType)
-				.join(', ')}`,
+			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(
+				config.coinTypes,
+			).join(', ')}`,
 		);
 	}
 
-	return supportedCoin;
+	return supportedCoin as SuigarCoin;
 }
