@@ -412,10 +412,10 @@ describe('shared transaction helpers', () => {
 		expect(context!.betCount).toBe(3n);
 		expect(context!.priceInfoObjectId).toBe('0x789');
 		expect(context!.metadata).toEqual({
-			keys: ['label', 'partner'],
+			keys: ['partner', 'label'],
 			values: [
-				encodeUtf8('vip'),
 				Array.from(Buffer.from(partner.slice(2), 'hex')),
+				encodeUtf8('vip'),
 			],
 		});
 	});
@@ -458,6 +458,36 @@ describe('shared transaction helpers', () => {
 		);
 		warn.mockRestore();
 	});
+
+	it('encodes wallet addresses in non-reserved metadata values', async () => {
+		const { buildSharedStandardGameBetCall } =
+			await import('../src/transactions/shared.js');
+		const accountManager = normalizeSuiAddress('0x456');
+
+		buildSharedStandardGameBetCall({
+			config: TEST_CONFIG,
+			game: 'coinflip',
+			playerAddress: '0x123',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			metadata: {
+				accountManager,
+				label: 'vip',
+			},
+			buildRewardCoin: (resolvedContext) => {
+				expect(resolvedContext.metadata).toEqual({
+					keys: ['accountManager', 'label'],
+					values: [
+						Array.from(Buffer.from(accountManager.slice(2), 'hex')),
+						encodeUtf8('vip'),
+					],
+				});
+				return resolvedContext.tx.object(
+					'0x777',
+				) as unknown as TransactionResult;
+			},
+		})(new Transaction());
+	});
 });
 
 describe('coinflip transaction wrapper', () => {
@@ -474,6 +504,7 @@ describe('coinflip transaction wrapper', () => {
 				{ play },
 				'../src/transactions/coinflip.js',
 			);
+		const partner = normalizeSuiAddress('0x456');
 
 		buildCoinflipTransactionWithMock({
 			playerAddress: '0x123',
@@ -482,7 +513,7 @@ describe('coinflip transaction wrapper', () => {
 			betCount: 2,
 			side: 'tails',
 			metadata: { label: 'vip' },
-			partner: 'vip',
+			partner,
 			config: TEST_CONFIG,
 		});
 
@@ -500,9 +531,9 @@ describe('coinflip transaction wrapper', () => {
 		expect(options.arguments[1]).toBe(1000n);
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
-		expect(options.arguments[5]).toEqual(['label', 'partner']);
+		expect(options.arguments[5]).toEqual(['partner', 'label']);
 		expect(options.arguments[6]).toEqual([
-			encodeUtf8('vip'),
+			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
 		expect(options.arguments[7]).toBe('0x789');
@@ -697,6 +728,7 @@ describe('pvp coinflip transaction wrapper', () => {
 				{ createGame, joinGame: vi.fn(), cancelGame: vi.fn() },
 				'../src/transactions/pvp-coinflip.js',
 			);
+		const partner = normalizeSuiAddress('0x456');
 
 		buildPvPCoinflipTransactionWithMock('create', {
 			playerAddress: '0x123',
@@ -705,7 +737,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			side: 'tails',
 			isPrivate: true,
 			metadata: { label: 'vip' },
-			partner: 'vip',
+			partner,
 			config: TEST_CONFIG,
 		});
 
@@ -721,7 +753,11 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.arguments[0]).toBe('0x456');
 		expect(options.arguments[2]).toBe(true);
 		expect(options.arguments[3]).toBe(true);
-		expect(options.arguments[4]).toEqual(['label', 'partner']);
+		expect(options.arguments[4]).toEqual(['partner', 'label']);
+		expect(options.arguments[5]).toEqual([
+			Array.from(Buffer.from(partner.slice(2), 'hex')),
+			encodeUtf8('vip'),
+		]);
 	});
 
 	it('passes join action arguments into the generated helper', async () => {
@@ -736,13 +772,14 @@ describe('pvp coinflip transaction wrapper', () => {
 				{ createGame: vi.fn(), joinGame, cancelGame: vi.fn() },
 				'../src/transactions/pvp-coinflip.js',
 			);
+		const partner = normalizeSuiAddress('0x456');
 
 		buildPvPCoinflipTransactionWithMock('join', {
 			playerAddress: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
 			metadata: { label: 'vip' },
-			partner: 'vip',
+			partner,
 			config: TEST_CONFIG,
 			betCoin: (tx: Transaction) => Promise.resolve(tx.coin({ balance: 1000 })),
 		});
@@ -754,9 +791,9 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.package).toBe('0x3');
 		expect(options.arguments[0]).toBe('0x999');
 		expect(options.arguments[1]).toBe('0x456');
-		expect(options.arguments[3]).toEqual(['label', 'partner']);
+		expect(options.arguments[3]).toEqual(['partner', 'label']);
 		expect(options.arguments[4]).toEqual([
-			encodeUtf8('vip'),
+			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
 		expect(options.arguments[5]).toBe('0x789');
@@ -813,8 +850,9 @@ describe('SuigarClient', () => {
 			async (importOriginal) => await importOriginal(),
 		);
 		const { suigar: mockedSuigar } = await import('../src/client.js');
+		const partner = normalizeSuiAddress('0x456');
 		const client = new TestClient().$extend(
-			mockedSuigar({ partner: 'vip' }),
+			mockedSuigar({ partner }),
 		) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coinTypes.sui;
 		client.suigar.tx.createBetTransaction('coinflip', {
@@ -828,7 +866,9 @@ describe('SuigarClient', () => {
 			arguments: unknown[];
 		}>(play);
 		expect(options.arguments[5]).toEqual(['partner']);
-		expect(options.arguments[6]).toEqual([encodeUtf8('vip')]);
+		expect(options.arguments[6]).toEqual([
+			Array.from(Buffer.from(partner.slice(2), 'hex')),
+		]);
 	});
 
 	it('exposes both standard and pvp transaction factories', () => {

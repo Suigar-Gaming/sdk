@@ -144,7 +144,7 @@ Guardrails:
 - Preserve the caller's selected side on `create`.
 - Treat lobby ids and game ids as explicit product inputs.
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning.
-- If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` on the extension and let the SDK append that wallet address automatically.
+- If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` on the extension and let the SDK prepend that wallet address automatically.
 - Treat `partner` as a wallet address, not a slug, label, or display string.
 
 ## Event decoding

@@ -36,7 +36,7 @@ Supported game ids:
 
 Extension-level option:
 
-- `suigar({ partner?: string })` appends the partner wallet address to `partner` metadata automatically across all supported bet flows.
+- `suigar({ partner?: string })` prepends the partner wallet address to `partner` metadata automatically across all supported bet flows.
 
 ## Game-specific options
 

@@ -9,8 +9,9 @@ import type {
 	EncodedBetMetadata,
 } from '../types';
 
-const ADDRESS_METADATA_KEYS = new Set(['partner']);
-const RESERVED_METADATA_KEYS = new Set([...ADDRESS_METADATA_KEYS, 'referrer']);
+const PARTNER_METADATA_KEY = 'partner';
+
+const RESERVED_METADATA_KEYS = new Set([PARTNER_METADATA_KEY, 'referrer']);
 const textEncoder = new TextEncoder();
 
 function parseHexAddress(value: string): ReturnType<typeof fromHex> | null {
@@ -21,7 +22,7 @@ function parseHexAddress(value: string): ReturnType<typeof fromHex> | null {
 	}
 }
 
-function encodeMetadataValue(key: string, value: BetMetadataValue) {
+function encodeMetadataValue(value: BetMetadataValue) {
 	if (value instanceof Uint8Array) {
 		return Array.from(value);
 	}
@@ -30,11 +31,9 @@ function encodeMetadataValue(key: string, value: BetMetadataValue) {
 		return value;
 	}
 
-	if (typeof value === 'string' && ADDRESS_METADATA_KEYS.has(key)) {
-		return Array.from(parseHexAddress(value) ?? textEncoder.encode(value));
-	}
-
-	return Array.from(textEncoder.encode(String(value)));
+	return Array.from(
+		parseHexAddress(String(value)) ?? textEncoder.encode(String(value)),
+	);
 }
 
 export function encodeBetMetadata(
@@ -57,12 +56,12 @@ export function encodeBetMetadata(
 		}
 
 		keys.push(key);
-		values.push(encodeMetadataValue(key, value));
+		values.push(encodeMetadataValue(value));
 	}
 
 	if (partner?.trim()) {
-		keys.unshift('partner');
-		values.unshift(encodeMetadataValue('partner', partner));
+		keys.unshift(PARTNER_METADATA_KEY);
+		values.unshift(encodeMetadataValue(partner));
 	}
 
 	return {
