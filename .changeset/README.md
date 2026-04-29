@@ -6,4 +6,4 @@ find the full documentation for it [in the changesets repository](https://github
 
 You can view a list of [common questions](https://github.com/changesets/changesets/blob/main/docs/common-questions.md) to help you get started with changesets.
 
-Add a markdown file in this directory with `npm run changeset` for any user-facing package change.
+Add a markdown file in this directory with `pnpm changeset` for any user-facing package change.

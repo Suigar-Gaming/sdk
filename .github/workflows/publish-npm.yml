@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - package.json
-      - CHANGELOG.md
+      - packages/sdk/package.json
+      - packages/sdk/CHANGELOG.md
   workflow_dispatch:
 
 permissions:
@@ -37,6 +37,9 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
+      - name: Enable pnpm
+        run: corepack enable
+
       - name: Detect release commit
         id: release
         shell: bash
@@ -48,7 +51,7 @@ jobs:
 
           changed_files="$(git diff --name-only HEAD^ HEAD)"
 
-          if grep -qx 'package.json' <<< "$changed_files" && grep -qx 'CHANGELOG.md' <<< "$changed_files"; then
+          if grep -qx 'packages/sdk/package.json' <<< "$changed_files" && grep -qx 'packages/sdk/CHANGELOG.md' <<< "$changed_files"; then
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -57,29 +60,29 @@ jobs:
 
       - name: Install dependencies
         if: steps.release.outputs.should_publish == 'true'
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build package
         if: steps.release.outputs.should_publish == 'true'
-        run: npm run build:ci
+        run: pnpm build:ci
 
       - name: Check package contents
         if: steps.release.outputs.should_publish == 'true'
-        run: npm pack --dry-run
+        run: pnpm --filter @suigar/sdk pack --dry-run
 
       - name: Read package metadata
         if: steps.release.outputs.should_publish == 'true'
         id: metadata
         shell: bash
         run: |
-          echo "package_name=$(node -p "require('./package.json').name")" >> "$GITHUB_OUTPUT"
-          echo "current_version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "package_name=$(node -p "require('./packages/sdk/package.json').name")" >> "$GITHUB_OUTPUT"
+          echo "current_version=$(node -p "require('./packages/sdk/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Publish to npm
         if: steps.release.outputs.should_publish == 'true'
         env:
           NODE_AUTH_TOKEN: ''
-        run: npm run release
+        run: pnpm release
 
       - name: Skip publish
         if: steps.release.outputs.should_publish != 'true'

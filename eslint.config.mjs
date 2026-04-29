@@ -2,8 +2,11 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 const handwrittenFiles = [
-	'src/**/*.ts',
-	'test/**/*.ts',
+	'packages/sdk/src/**/*.ts',
+	'packages/sdk/test/**/*.ts',
+	'packages/sdk/scripts/**/*.mjs',
+	'packages/sdk/*.config.{js,mjs,ts}',
+	'packages/sdk/*.ts',
 	'*.config.{js,mjs,ts}',
 	'*.ts',
 ];
@@ -12,9 +15,10 @@ export default tseslint.config(
 	{
 		ignores: [
 			'dist/**',
+			'packages/*/dist/**',
 			'node_modules/**',
-			'examples/game-integration/**',
-			'src/contracts/**',
+			'apps/playground/**',
+			'packages/sdk/src/contracts/**',
 			'.changeset/*.md',
 		],
 	},
@@ -46,7 +50,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['test/**/*.ts', 'vitest.config.ts'],
+		files: ['packages/sdk/test/**/*.ts', 'packages/sdk/vitest.config.ts'],
 		languageOptions: {
 			globals: {
 				describe: 'readonly',

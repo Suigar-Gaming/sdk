@@ -1,0 +1,74 @@
+name: Deploy Playground Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy-playground-pages.yml'
+      - 'packages/sdk/**'
+      - 'apps/playground/**'
+  pull_request:
+    paths:
+      - '.github/workflows/deploy-playground-pages.yml'
+      - 'packages/sdk/**'
+      - 'apps/playground/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: playground-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Build playground site
+        run: pnpm build
+        working-directory: apps/playground
+        env:
+          GITHUB_PAGES: 'true'
+          PAGES_BASE_PATH: ''
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/playground/out
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

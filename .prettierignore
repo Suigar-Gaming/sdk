@@ -1,8 +1,9 @@
 dist
 node_modules
 package-lock.json
-src/contracts
+pnpm-lock.yaml
+packages/sdk/src/contracts
 .changeset/*.md
-examples/game-integration/.next
-examples/game-integration/out
-examples/game-integration/build
+apps/playground/.next
+apps/playground/out
+apps/playground/build
