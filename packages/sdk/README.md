@@ -542,9 +542,9 @@ Use the matching helper for each PvP coinflip event payload found in `transactio
 ## Development
 
 ```bash
-pnpm build
-pnpm typecheck
-pnpm test
+pnpm --dir packages/sdk build
+pnpm --dir packages/sdk typecheck
+pnpm --dir packages/sdk test
 ```
 
 ## Example App

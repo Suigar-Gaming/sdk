@@ -1,0 +1,39 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"test": {
+			"dependsOn": ["^build:ci"],
+			"outputs": []
+		},
+		"typecheck": {
+			"dependsOn": ["^build:ci"],
+			"outputs": []
+		},
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**", "out/**", ".next/**"]
+		},
+		"build:ci": {
+			"dependsOn": ["^build:ci"],
+			"outputs": ["dist/**"]
+		},
+		"build:app": {
+			"dependsOn": ["^build:ci"],
+			"outputs": ["out/**", ".next/**"]
+		},
+		"dev:app": {
+			"dependsOn": ["^build:ci"],
+			"cache": false,
+			"persistent": true
+		},
+		"start:app": {
+			"dependsOn": ["^build:ci"],
+			"cache": false,
+			"persistent": true
+		},
+		"typecheck:app": {
+			"dependsOn": ["^build:ci"],
+			"outputs": []
+		}
+	}
+}

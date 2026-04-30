@@ -1,6 +1,8 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
+const tsconfigRootDir = import.meta.dirname;
+
 const handwrittenFiles = [
 	'packages/sdk/src/**/*.ts',
 	'packages/sdk/test/**/*.ts',
@@ -26,6 +28,11 @@ export default tseslint.config(
 	...tseslint.configs.recommended,
 	{
 		files: handwrittenFiles,
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir,
+			},
+		},
 		rules: {
 			'no-undef': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',

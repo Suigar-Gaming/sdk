@@ -10,9 +10,9 @@ pnpm workspace repository for Suigar TypeScript SDK packages.
 
 ```bash
 pnpm install
-pnpm build
-pnpm test
-pnpm typecheck
+pnpm --dir packages/sdk build
+pnpm --dir packages/sdk test
+pnpm --dir packages/sdk typecheck
 ```
 
-The package implementation lives in `packages/sdk`. Root scripts forward SDK build, codegen, test, and typecheck commands to the `@suigar/sdk` workspace through pnpm filters.
+The package implementation lives in `packages/sdk`. Build, codegen, test, and typecheck commands are package-level commands and should be run with `pnpm --dir packages/sdk ...`.

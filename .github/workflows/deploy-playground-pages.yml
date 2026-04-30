@@ -6,12 +6,12 @@ on:
       - main
     paths:
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'packages/sdk/**'
+      - 'packages/**'
       - 'apps/playground/**'
   pull_request:
     paths:
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'packages/sdk/**'
+      - 'packages/**'
       - 'apps/playground/**'
   workflow_dispatch:
 
@@ -48,8 +48,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build playground site
-        run: pnpm build
-        working-directory: apps/playground
+        run: pnpm turbo run build:app --filter=playground
         env:
           GITHUB_PAGES: 'true'
           PAGES_BASE_PATH: ''

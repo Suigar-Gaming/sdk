@@ -3,16 +3,16 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"predev": "pnpm --dir ../.. run build:ci",
-		"dev": "next dev",
-		"prebuild": "pnpm --dir ../.. run build:ci",
-		"build": "next build",
+		"dev": "pnpm turbo dev:app --filter=playground",
+		"dev:app": "next dev",
+		"build": "pnpm turbo build:app --filter=playground",
+		"build:app": "next build",
 		"format": "prettier --write .",
-		"prestart": "pnpm --dir ../.. run build:ci",
-		"start": "next start",
+		"start": "pnpm turbo start:app --filter=playground",
+		"start:app": "next start",
 		"lint": "eslint . --fix && pnpm run format",
-		"pretypecheck": "pnpm --dir ../.. run build:ci",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "pnpm turbo typecheck:app --filter=playground",
+		"typecheck:app": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@mysten/dapp-kit-core": "^1.3.0",

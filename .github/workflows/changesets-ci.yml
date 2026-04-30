@@ -32,7 +32,7 @@ jobs:
         uses: tj-actions/changed-files@v46
         with:
           files: |
-            packages/sdk/src/**
+            packages/*/src/**
 
       - name: Get changed changeset files
         id: changeset-files
@@ -49,7 +49,7 @@ jobs:
           CHANGED_SRC_FILES: ${{ steps.src-changes.outputs.all_changed_files }}
         run: |
           {
-            echo "This pull request changes files under packages/sdk/src/ but does not include a changeset file in .changeset/."
+            echo "This pull request changes files under packages/*/src/ but does not include a changeset file in .changeset/."
             echo
             echo "Add a changeset with pnpm changeset so this PR can merge."
             echo
@@ -74,5 +74,5 @@ jobs:
       - name: Fail when changeset is missing
         if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
         run: |
-          echo "This pull request modifies files under packages/sdk/src/ but does not include a changeset file in .changeset/."
+          echo "This pull request modifies files under packages/*/src/ but does not include a changeset file in .changeset/."
           exit 1

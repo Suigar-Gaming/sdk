@@ -5,13 +5,10 @@
 	"type": "module",
 	"packageManager": "pnpm@10.33.2",
 	"engines": {
-		"node": ">=22"
+		"node": ">=24",
+		"pnpm": ">=10.33.2"
 	},
 	"scripts": {
-		"build": "pnpm --filter @suigar/sdk build",
-		"build:ci": "pnpm --filter @suigar/sdk build:ci",
-		"clean": "pnpm --filter @suigar/sdk clean",
-		"codegen": "pnpm --filter @suigar/sdk codegen",
 		"changeset": "changeset",
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",
@@ -19,20 +16,18 @@
 		"format": "prettier --write --ignore-unknown .",
 		"lint": "eslint . --fix && pnpm run format",
 		"prepare": "husky",
-		"release": "changeset publish",
-		"test": "pnpm --filter @suigar/sdk test",
-		"typecheck": "pnpm --filter @suigar/sdk typecheck"
+		"release": "changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",
 		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-		"@types/node": "^24.0.0",
 		"eslint": "^10.2.1",
 		"eslint-config-prettier": "^10.1.8",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.4.0",
 		"prettier": "^3.8.3",
+		"turbo": "^2.5.8",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.59.1"
 	}

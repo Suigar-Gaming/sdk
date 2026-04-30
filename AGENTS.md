@@ -15,29 +15,29 @@ This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The 
 pnpm install
 
 # Generate bindings and build the package
-pnpm build
+pnpm --dir packages/sdk build
 
 # Build without regenerating contract bindings
-pnpm build:ci
+pnpm --dir packages/sdk build:ci
 
 # Regenerate Move contract bindings only
-pnpm codegen
+pnpm --dir packages/sdk codegen
 ```
 
 ### Testing
 
 ```bash
 # Run the full test suite
-pnpm test
+pnpm --dir packages/sdk test
 
 # Run type checking
-pnpm typecheck
+pnpm --dir packages/sdk typecheck
 
 # Run a specific vitest file
-pnpm --filter @suigar/sdk exec vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
 
 # Run a specific test name
-pnpm --filter @suigar/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
+pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
 ```
 
 ### Linting and Formatting
@@ -175,9 +175,9 @@ This is a core invariant: standard game transactions must fail clearly when the 
 1. Update or add SDK code in `packages/sdk/src/`
 2. If the branch modifies any file under `packages/sdk/src/`, create a `.changeset/*.md` file once for that branch as soon as the first SDK source change is made
 3. Reuse that existing branch changeset for later `packages/sdk/src/` edits on the same branch instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
-4. Regenerate code with `pnpm codegen` if contract bindings or package sources changed
-5. Run `pnpm test`
-6. Run `pnpm typecheck`
+4. Regenerate code with `pnpm --dir packages/sdk codegen` if contract bindings or package sources changed
+5. Run `pnpm --dir packages/sdk test`
+6. Run `pnpm --dir packages/sdk typecheck`
 7. Add or update the existing branch changeset when the user-visible package behavior changes
 
 Documentation is part of the deliverable:

@@ -43,7 +43,7 @@ pnpm --dir apps/playground dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-The playground resolves the workspace-local `@suigar/sdk` package through `workspace:^`. It automatically runs `pnpm --dir ../.. run build:ci` before `dev`, `build`, `start`, and `typecheck` so the SDK workspace stays in sync.
+The playground resolves the workspace-local `@suigar/sdk` package through `workspace:^`. Its `dev`, `build`, `start`, and `typecheck` commands run through Turbo so the SDK dependency graph is built first with `build:ci` before the app command starts.
 
 Useful local checks:
 

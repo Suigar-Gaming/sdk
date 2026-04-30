@@ -58,7 +58,7 @@ jobs:
             const marker = '<!-- codex:changesets-warning -->';
             const body = [
               marker,
-              'This pull request changes files under `packages/sdk/src/` but does not include a changeset file in `.changeset/`.',
+              'This pull request changes files under `packages/*/src/` but does not include a changeset file in `.changeset/`.',
               '',
               'Add a changeset with `pnpm changeset` so this PR can merge.',
             ].join('\n');
