@@ -1,30 +1,39 @@
-
 import {
 	bcs,
+	BcsEnum,
+	BcsStruct,
+	BcsTuple,
+	TypeTagSerializer,
 	type BcsType,
 	type TypeTag,
-	TypeTagSerializer,
-	BcsStruct,
-	BcsEnum,
-	BcsTuple,
 } from '@mysten/sui/bcs';
+import {
+	type ClientWithCoreApi,
+	type SuiClientTypes,
+} from '@mysten/sui/client';
+import { isArgument, type TransactionArgument } from '@mysten/sui/transactions';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
-import { type TransactionArgument, isArgument } from '@mysten/sui/transactions';
-import { type ClientWithCoreApi, type SuiClientTypes } from '@mysten/sui/client';
 
 const MOVE_STDLIB_ADDRESS = normalizeSuiAddress('0x1');
 const SUI_FRAMEWORK_ADDRESS = normalizeSuiAddress('0x2');
 
 export type RawTransactionArgument<T> = T | TransactionArgument;
 
-export type GetOptions<Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {}> =
-	SuiClientTypes.GetObjectOptions<Include> & { client: ClientWithCoreApi };
+export type GetOptions<
+	Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {},
+> = SuiClientTypes.GetObjectOptions<Include> & { client: ClientWithCoreApi };
 
-export type GetManyOptions<Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {}> =
-	SuiClientTypes.GetObjectsOptions<Include> & { client: ClientWithCoreApi };
+export type GetManyOptions<
+	Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {},
+> = SuiClientTypes.GetObjectsOptions<Include> & { client: ClientWithCoreApi };
 
-export function getPureBcsSchema(typeTag: string | TypeTag): BcsType<any> | null {
-	const parsedTag = typeof typeTag === 'string' ? TypeTagSerializer.parseFromStr(typeTag) : typeTag;
+export function getPureBcsSchema(
+	typeTag: string | TypeTag,
+): BcsType<any> | null {
+	const parsedTag =
+		typeof typeTag === 'string'
+			? TypeTagSerializer.parseFromStr(typeTag)
+			: typeTag;
 
 	if ('u8' in parsedTag) {
 		return bcs.U8;
@@ -58,7 +67,8 @@ export function getPureBcsSchema(typeTag: string | TypeTag): BcsType<any> | null
 			}
 
 			if (structTag.module === 'option' && structTag.name === 'Option') {
-				const type = getPureBcsSchema(structTag.typeParams[0]);
+				const inner = structTag.typeParams[0];
+				const type = inner ? getPureBcsSchema(inner) : null;
 				return type ? bcs.option(type) : null;
 			}
 		}
@@ -90,7 +100,7 @@ export function normalizeMoveArguments(
 	const normalizedArgs: TransactionArgument[] = [];
 
 	let index = 0;
-	for (const [i, argType] of argTypes.entries()) {
+	for (const argType of argTypes) {
 		if (argType === '0x2::clock::Clock') {
 			normalizedArgs.push((tx) => tx.object.clock());
 			continue;
@@ -138,8 +148,7 @@ export function normalizeMoveArguments(
 			continue;
 		}
 
-		const type = argTypes[i];
-		const bcsType = type === null ? null : getPureBcsSchema(type);
+		const bcsType = argType === null ? null : getPureBcsSchema(argType);
 
 		if (bcsType) {
 			const bytes = bcsType.serialize(arg as never);
@@ -152,7 +161,7 @@ export function normalizeMoveArguments(
 			continue;
 		}
 
-		throw new Error(`Invalid argument ${stringify(arg)} for type ${type}`);
+		throw new Error(`Invalid argument ${stringify(arg)} for type ${argType}`);
 	}
 
 	return normalizedArgs;
@@ -162,25 +171,39 @@ export class MoveStruct<
 	T extends Record<string, BcsType<any>>,
 	const Name extends string = string,
 > extends BcsStruct<T, Name> {
-	async get<Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {}>({
+	async get<
+		Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {},
+	>({
 		objectId,
 		...options
 	}: GetOptions<Include>): Promise<
-		SuiClientTypes.Object<Include & { content: true, json: true }> & { json: BcsStruct<T>['$inferType'] }
+		SuiClientTypes.Object<Include & { content: true; json: true }> & {
+			json: BcsStruct<T>['$inferType'];
+		}
 	> {
 		const [res] = await this.getMany<Include>({
 			...options,
 			objectIds: [objectId],
 		});
 
+		if (!res) {
+			throw new Error(`No object found for id ${objectId}`);
+		}
+
 		return res;
 	}
 
-	async getMany<Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {}>({
+	async getMany<
+		Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {},
+	>({
 		client,
 		...options
 	}: GetManyOptions<Include>): Promise<
-		Array<SuiClientTypes.Object<Include & { content: true, json: true }> & { json: BcsStruct<T>['$inferType'] }>
+		Array<
+			SuiClientTypes.Object<Include & { content: true; json: true }> & {
+				json: BcsStruct<T>['$inferType'];
+			}
+		>
 	> {
 		const response = (await client.core.getObjects({
 			...options,
