@@ -20,7 +20,6 @@ export default tseslint.config(
 			'packages/*/dist/**',
 			'node_modules/**',
 			'apps/playground/**',
-			'packages/sdk/src/contracts/**',
 			'.changeset/*.md',
 		],
 	},
@@ -44,6 +43,12 @@ export default tseslint.config(
 					caughtErrorsIgnorePattern: '^_',
 				},
 			],
+		},
+	},
+	{
+		files: ['packages/*/src/contracts/**/*.ts'],
+		rules: {
+			'@typescript-eslint/no-empty-object-type': 'off',
 		},
 	},
 	{

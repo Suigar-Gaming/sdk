@@ -567,5 +567,5 @@ Run it from the repo root with:
 
 ```bash
 pnpm install
-pnpm --dir apps/playground dev
+pnpm turbo run dev --filter='./apps/playground'
 ```

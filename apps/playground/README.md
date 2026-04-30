@@ -38,19 +38,19 @@ From the repository root:
 
 ```bash
 pnpm install
-pnpm --dir apps/playground dev
+pnpm turbo run dev --filter='./apps/playground'
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-The playground resolves the workspace-local `@suigar/sdk` package through `workspace:^`. Its `dev`, `build`, `start`, and `typecheck` commands run through Turbo so the SDK dependency graph is built first with `build:ci` before the app command starts.
+The playground resolves the workspace-local `@suigar/sdk` package through `workspace:^`. Use the root Turbo commands when you want the SDK dependency graph built first with `build:ci` before the app command starts.
 
 Useful local checks:
 
 ```bash
 pnpm --dir apps/playground format
 pnpm --dir apps/playground lint
-pnpm --dir apps/playground typecheck
+pnpm turbo run typecheck --filter='./apps/playground'
 ```
 
 ## GitHub Pages

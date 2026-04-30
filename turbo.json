@@ -5,35 +5,34 @@
 			"dependsOn": ["^build:ci"],
 			"outputs": []
 		},
+		"format": {
+			"cache": false
+		},
+		"lint": {
+			"cache": false,
+			"outputs": []
+		},
 		"typecheck": {
 			"dependsOn": ["^build:ci"],
 			"outputs": []
 		},
 		"build": {
-			"dependsOn": ["^build"],
+			"dependsOn": ["^build:ci"],
 			"outputs": ["dist/**", "out/**", ".next/**"]
 		},
 		"build:ci": {
 			"dependsOn": ["^build:ci"],
 			"outputs": ["dist/**"]
 		},
-		"build:app": {
-			"dependsOn": ["^build:ci"],
-			"outputs": ["out/**", ".next/**"]
-		},
-		"dev:app": {
+		"dev": {
 			"dependsOn": ["^build:ci"],
 			"cache": false,
 			"persistent": true
 		},
-		"start:app": {
+		"start": {
 			"dependsOn": ["^build:ci"],
 			"cache": false,
 			"persistent": true
-		},
-		"typecheck:app": {
-			"dependsOn": ["^build:ci"],
-			"outputs": []
 		}
 	}
 }

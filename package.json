@@ -13,9 +13,11 @@
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",
 		"changeset:version": "changeset version",
-		"format": "prettier --write --ignore-unknown .",
-		"lint": "eslint . --fix && pnpm run format",
+		"eslint:fix": "eslint . --fix",
+		"format": "pnpm run prettier:fix",
+		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
 		"prepare": "husky",
+		"prettier:fix": "prettier --write --ignore-unknown .",
 		"release": "changeset publish"
 	},
 	"devDependencies": {

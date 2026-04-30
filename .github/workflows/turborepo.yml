@@ -45,8 +45,11 @@ jobs:
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Lint workspace
-        run: pnpm lint
+      - name: Lint packages
+        run: pnpm turbo run lint --filter='./packages/*'
+
+      - name: Lint apps
+        run: pnpm turbo run lint --filter='./apps/*'
 
       - name: Run package tests
         run: pnpm turbo run test --filter='./packages/*'
@@ -58,7 +61,7 @@ jobs:
         run: pnpm turbo run build:ci --filter='./packages/*'
 
       - name: Run app typecheck
-        run: pnpm turbo run typecheck:app --filter='./apps/*'
+        run: pnpm turbo run typecheck --filter='./apps/*'
 
       - name: Run app builds
-        run: pnpm turbo run build:app --filter='./apps/*'
+        run: pnpm turbo run build --filter='./apps/*'

@@ -139,8 +139,8 @@ importers:
         specifier: ^2.0.3
         version: 2.0.3
       '@mysten/codegen':
-        specifier: ^0.10.0
-        version: 0.10.2
+        specifier: ^0.10.4
+        version: 0.10.4
       '@mysten/sui':
         specifier: ^2.16.0
         version: 2.16.0(typescript@5.9.3)
@@ -791,8 +791,8 @@ packages:
   '@mysten/bcs@2.0.3':
     resolution: {integrity: sha512-dwcaL4HNAsEGpU3hKUAsXgCZp9l6++e2A3THpzoYZ8e7bsy4XH1V0dXD5dIzgNcVZiZfb6ZnDMG+gdF6+1WOQA==}
 
-  '@mysten/codegen@0.10.2':
-    resolution: {integrity: sha512-vk4tw9D5JQDjqqR/TT8I30d2UJtoVNLPH4Gm34jDkRTVwKhwIOhms83VaKjLgmU576t1/qhmt14N6CbwgpVWFQ==}
+  '@mysten/codegen@0.10.4':
+    resolution: {integrity: sha512-BLv3EWtuSf1Q22FX0lHiSMQWUNNgecJicG0532NXFqCeneeF3qiDXYt4vFDkxg4+NJPzztkNJwIg0fjHj/41Kw==}
     hasBin: true
 
   '@mysten/dapp-kit-core@1.3.0':
@@ -4533,7 +4533,7 @@ snapshots:
       '@mysten/utils': 0.3.1
       '@scure/base': 2.2.0
 
-  '@mysten/codegen@0.10.2':
+  '@mysten/codegen@0.10.4':
     dependencies:
       '@mysten/bcs': 2.0.3
       '@mysten/sui': 2.16.0(typescript@5.9.3)
