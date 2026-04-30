@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/actions/setup-node-pnpm/action.yml
       - packages/**/package.json
       - packages/**/CHANGELOG.md
   workflow_dispatch:
@@ -30,14 +31,11 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: 24
+          install: 'false'
           registry-url: https://registry.npmjs.org
-
-      - name: Enable pnpm
-        run: corepack enable
 
       - name: Detect release commit
         id: release
@@ -98,7 +96,9 @@ jobs:
 
       - name: Install dependencies
         if: steps.release.outputs.should_publish == 'true'
-        run: pnpm install --frozen-lockfile
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          registry-url: https://registry.npmjs.org
 
       - name: Build packages
         if: steps.release.outputs.should_publish == 'true'

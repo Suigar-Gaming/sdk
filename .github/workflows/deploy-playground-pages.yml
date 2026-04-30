@@ -5,11 +5,13 @@ on:
     branches:
       - main
     paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
       - 'packages/**'
       - 'apps/playground/**'
   pull_request:
     paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
       - 'packages/**'
       - 'apps/playground/**'
@@ -32,16 +34,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Enable pnpm
-        run: corepack enable
-
-      - name: Install workspace dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'

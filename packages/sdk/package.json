@@ -67,7 +67,7 @@
 	},
 	"devDependencies": {
 		"@mysten/bcs": "^2.0.3",
-		"@mysten/codegen": "^0.10.0",
+		"@mysten/codegen": "^0.10.4",
 		"@mysten/sui": "^2.16.0",
 		"@types/node": "^24.0.0",
 		"tsup": "^8.5.1",

@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/turborepo.yml'
       - 'apps/**'
       - 'packages/**'
@@ -15,6 +16,7 @@ on:
       - 'turbo.json'
   pull_request:
     paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/turborepo.yml'
       - 'apps/**'
       - 'packages/**'
@@ -40,16 +42,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Enable pnpm
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Lint workspace
         run: pnpm lint
