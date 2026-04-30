@@ -46,7 +46,7 @@
 		"build": "pnpm run clean && pnpm run codegen && tsup",
 		"build:ci": "rm -rf dist && tsup",
 		"clean": "rm -rf dist src/contracts .vitest-cache",
-		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate",
+		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm run lint",
 		"eslint:fix": "eslint . --fix",
 		"format": "pnpm run prettier:fix",
 		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
