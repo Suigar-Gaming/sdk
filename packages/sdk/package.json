@@ -1,0 +1,82 @@
+{
+	"name": "@suigar/sdk",
+	"version": "2.0.0-beta.9",
+	"description": "TypeScript SDK for Suigar v2 Move contracts on Sui.",
+	"keywords": [
+		"suigar",
+		"sui",
+		"sui-sdk",
+		"typescript",
+		"move",
+		"web3",
+		"games"
+	],
+	"license": "Apache-2.0",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"README.md"
+	],
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		},
+		"./games": {
+			"types": "./dist/games.d.ts",
+			"import": "./dist/games.js",
+			"require": "./dist/games.cjs"
+		},
+		"./utils": {
+			"types": "./dist/utils.d.ts",
+			"import": "./dist/utils.js",
+			"require": "./dist/utils.cjs"
+		}
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"build": "pnpm run clean && pnpm run codegen && tsup",
+		"build:ci": "rm -rf dist && tsup",
+		"clean": "rm -rf dist src/contracts .vitest-cache",
+		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm run lint",
+		"eslint:fix": "eslint . --fix",
+		"format": "pnpm run prettier:fix",
+		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
+		"prettier:fix": "prettier --write --ignore-unknown .",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Suigar-Gaming/sdk.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"bugs": {
+		"url": "https://github.com/Suigar-Gaming/sdk/issues"
+	},
+	"homepage": "https://docs.suigar.com/sdk",
+	"peerDependencies": {
+		"@mysten/bcs": "^2.0.3",
+		"@mysten/sui": "^2.16.0"
+	},
+	"devDependencies": {
+		"@mysten/bcs": "^2.0.3",
+		"@mysten/codegen": "^0.10.4",
+		"@mysten/sui": "^2.16.0",
+		"@types/node": "^24.0.0",
+		"tsup": "^8.5.1",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.5"
+	}
+}

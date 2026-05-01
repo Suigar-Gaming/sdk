@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single-package SDK built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable package is `@suigar/sdk` under `packages/sdk`, built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -12,62 +12,63 @@ This repository contains the TypeScript SDK for Suigar v2 on Sui. It is a single
 
 ```bash
 # Initial setup
-npm install
+pnpm install
 
 # Generate bindings and build the package
-npm run build
+pnpm --dir packages/sdk build
 
 # Build without regenerating contract bindings
-npm run build:ci
+pnpm --dir packages/sdk build:ci
 
 # Regenerate Move contract bindings only
-npm run codegen
+pnpm --dir packages/sdk codegen
 ```
 
 ### Testing
 
 ```bash
 # Run the full test suite
-npm test
+pnpm --dir packages/sdk test
 
 # Run type checking
-npm run typecheck
+pnpm --dir packages/sdk typecheck
 
 # Run a specific vitest file
-npx vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
 
 # Run a specific test name
-npx vitest run -t "builds a coinflip transaction with the configured package id"
+pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
 ```
 
 ### Linting and Formatting
 
 ```bash
 # Auto-fix lint and formatting issues
-npm run lint
+pnpm lint
 
 # Format the repository
-npm run format
+pnpm format
 ```
 
 ### Package Management
 
 ```bash
 # Create a changeset
-npm run changeset
+pnpm changeset
 
 # Apply version updates from changesets
-npm run changeset:version
+pnpm changeset:version
 
 # Publish release changes
-npm run release
+pnpm release
 ```
 
 ## Architecture
 
 ### Repository Structure
 
-- `src/` - SDK source code
+- `packages/sdk/` - `@suigar/sdk` package root
+  - `src/` - SDK source code
   - `client.ts` - `suigar()` extension registration and extension client implementation
   - `transactions/` - transaction builders for standard and PvP games
   - `contracts/` - generated Move bindings and BCS helpers
@@ -75,14 +76,17 @@ npm run release
   - `utils/` - public parser, constants, and numeric helpers exposed through `@suigar/sdk/utils`
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
-- `test/` - Vitest coverage for config resolution and transaction builders
-- `dist/` - generated build output
+- `packages/sdk/test/` - Vitest coverage for config resolution and transaction builders
+- `packages/sdk/dist/` - generated build output
+- `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
+- `apps/playground/` - workspace-local Next.js integration playground
 - `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System
 
-- Uses `tsup` to emit both ESM and CJS outputs into `dist/`
-- Uses `sui-ts-codegen generate` to regenerate `src/contracts/`
+- Uses pnpm workspaces from the private `@suigar/ts-sdks` root package and `pnpm-workspace.yaml`
+- Uses `tsup` to emit both ESM and CJS outputs into `packages/sdk/dist/`
+- Uses `sui-ts-codegen generate` to regenerate `packages/sdk/src/contracts/`
 - Generated contract bindings are runtime-critical and should stay aligned with the current Suigar packages
 
 ### Key Patterns
@@ -92,7 +96,7 @@ npm run release
    The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
    Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
-4. **Generated contract wrappers**: `src/transactions/` adapts app-facing options into generated Move calls from `src/contracts/`.
+4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
 
 ### Suigar Client Architecture
@@ -104,19 +108,19 @@ The SDK is organized around a client extension plus typed transaction builders. 
 The integration has three practical layers:
 
 1. **Public SDK surface** - `suigar()` and `SuigarClient` exposed from the package root, with additional public subpaths for `games` and `utils`.
-2. **Client extension implementation** - `src/client.ts` registers the extension on top of a `ClientWithCoreApi` and exposes serialization, BCS helpers, and transaction builders.
-3. **Transaction and contract layer** - `src/transactions/` consumes network-resolved config, normalizes user input, and invokes generated Move wrappers from `src/contracts/`.
+2. **Client extension implementation** - `packages/sdk/src/client.ts` registers the extension on top of a `ClientWithCoreApi` and exposes serialization, BCS helpers, and transaction builders.
+3. **Transaction and contract layer** - `packages/sdk/src/transactions/` consumes network-resolved config, normalizes user input, and invokes generated Move wrappers from `packages/sdk/src/contracts/`.
 
 Key files:
 
-| Layer                       | File                    |
-| --------------------------- | ----------------------- |
-| Public entrypoint           | `src/index.ts`          |
-| Extension and client API    | `src/client.ts`         |
-| Standard game builders      | `src/transactions/*.ts` |
-| Generated contracts and BCS | `src/contracts/**`      |
-| Public utility exports      | `src/utils/*.ts`        |
-| Internal helper modules     | `src/helpers/*.ts`      |
+| Layer                       | File                                 |
+| --------------------------- | ------------------------------------ |
+| Public entrypoint           | `packages/sdk/src/index.ts`          |
+| Extension and client API    | `packages/sdk/src/client.ts`         |
+| Standard game builders      | `packages/sdk/src/transactions/*.ts` |
+| Generated contracts and BCS | `packages/sdk/src/contracts/**`      |
+| Public utility exports      | `packages/sdk/src/utils/*.ts`        |
+| Internal helper modules     | `packages/sdk/src/helpers/*.ts`      |
 
 #### Standard vs PvP Flows
 
@@ -125,6 +129,7 @@ There are two transaction families and they must not be mixed:
 - **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
 - **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
 - **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; this bulk-loads lobby objects with `client.core.getObjects()`, skips per-object fetch or parse failures by default, and only rejects when `throwOnError: true` is passed.
+- **Specific PvP coinflip game object lookups** should use the exported generated helper, `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })`, when a product needs one live game object outside the registry list.
 
 When making changes:
 
@@ -134,7 +139,7 @@ When making changes:
 
 #### Config Resolution
 
-Config is normalized in `src/helpers/config.ts`. This layer is responsible for:
+Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is responsible for:
 
 - resolving network-scoped package ids
 - normalizing the configured supported coin types for the active network
@@ -156,8 +161,8 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 ### Testing Conventions
 
-- `test/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
-- `test/config.test.ts` covers config resolution and defaults.
+- `packages/sdk/test/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
+- `packages/sdk/test/config.test.ts` covers config resolution and defaults.
 - When changing transaction behavior, update tests to cover package id resolution, player-address normalization, and action-specific argument mapping.
 
 ### Changeset Conventions
@@ -168,18 +173,18 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 ### Development Workflow
 
-1. Update or add code in `src/`
-2. If the branch modifies any file under `src/`, create a `.changeset/*.md` file once for that branch as soon as the first `src/` change is made
-3. Reuse that existing branch changeset for later `src/` edits on the same branch instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
-4. Regenerate code with `npm run codegen` if contract bindings or package sources changed
-5. Run `npm test`
-6. Run `npm run typecheck`
+1. Update or add SDK code in `packages/sdk/src/`
+2. If the branch modifies any file under `packages/sdk/src/`, create a `.changeset/*.md` file once for that branch as soon as the first SDK source change is made
+3. Reuse that existing branch changeset for later `packages/sdk/src/` edits on the same branch instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
+4. Regenerate code with `pnpm --dir packages/sdk codegen` if contract bindings or package sources changed
+5. Run `pnpm --dir packages/sdk test`
+6. Run `pnpm --dir packages/sdk typecheck`
 7. Add or update the existing branch changeset when the user-visible package behavior changes
 
 Documentation is part of the deliverable:
 
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
-- At minimum, review `README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
+- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
 - Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
 - When a repo-local skill is mirrored under `.claude/skills`, keep the mirrored copy aligned in the same task.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
@@ -205,8 +210,8 @@ Claude Code compatibility:
 When creating a PR:
 
 - summarize the SDK or transaction behavior change clearly
-- if the branch modifies anything under `src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first `src/` change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated `src/` edits unless multiple release notes are intentionally needed
-- PRs that change `src/` without a changeset are expected to fail merge checks and receive a PR comment
+- if the branch modifies anything under `packages/sdk/src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first SDK source change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated SDK source edits unless multiple release notes are intentionally needed
+- PRs that change `packages/sdk/src/` without a changeset are expected to fail merge checks and receive a PR comment
 - mention whether generated bindings changed
 - include tests run
 - if the PR was primarily written by AI, mark that in the PR description

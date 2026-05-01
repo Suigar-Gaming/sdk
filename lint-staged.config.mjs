@@ -1,10 +1,11 @@
 export default {
-	'{src,test,scripts}/**/*.{ts,tsx,js,mjs,cjs}': [
+	'packages/*/{src,test,scripts}/**/*.{ts,tsx,js,mjs,cjs}': [
 		'eslint --fix',
 		'prettier --write',
 	],
+	'packages/*/*.{ts,tsx,js,mjs,cjs}': ['eslint --fix', 'prettier --write'],
 	'./*.{ts,tsx,js,mjs,cjs}': ['eslint --fix', 'prettier --write'],
-	'examples/game-integration/**/*.{ts,tsx,js,mjs,cjs}': [
+	'apps/playground/**/*.{ts,tsx,js,mjs,cjs}': [
 		'eslint --fix',
 		'prettier --write',
 	],

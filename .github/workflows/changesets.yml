@@ -24,27 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Run typecheck
-        run: npm run typecheck
-
-      - name: Build package
-        run: npm run build:ci
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Create or update release PR
         uses: changesets/action@v1
         with:
-          version: npm run changeset:version
+          version: pnpm changeset:version
           commit: 'ci: version packages'
           title: 'ci: version packages'
         env:

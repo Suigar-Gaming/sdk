@@ -1,0 +1,6 @@
+autoInstallPeers: false
+packages:
+  - 'packages/*'
+  - 'apps/*'
+  - '!**/dist/**'
+  - '!**/.next/**'

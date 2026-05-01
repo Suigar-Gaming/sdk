@@ -3,10 +3,7 @@ name: Deprecate previous NPM release
 on:
   workflow_call:
     inputs:
-      package_name:
-        required: true
-        type: string
-      current_version:
+      released_packages:
         required: true
         type: string
     secrets:
@@ -21,17 +18,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: 24
+          install: 'false'
           registry-url: https://registry.npmjs.org
 
       - name: Deprecate previous release
         shell: bash
         env:
-          PACKAGE_NAME: ${{ inputs.package_name }}
-          CURRENT_VERSION: ${{ inputs.current_version }}
+          RELEASED_PACKAGES: ${{ inputs.released_packages }}
           NODE_AUTH_TOKEN: ${{ secrets.npm_deprecate_token }}
         run: |
           set -uo pipefail
@@ -41,37 +40,44 @@ jobs:
             exit 0
           fi
 
-          PREVIOUS_VERSION="$(node <<'NODE'
-          const match = process.env.CURRENT_VERSION.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-          if (!match) {
-            process.exit(0);
-          }
+          node <<'NODE'
+          const { execSync } = require('node:child_process');
 
-          const [, major, minor, patch, prerelease] = match;
-          if (prerelease) {
-            process.exit(0);
-          }
+          const releasedPackages = JSON.parse(process.env.RELEASED_PACKAGES);
 
-          const previousPatch = Number(patch) - 1;
-          if (previousPatch < 0) {
-            process.exit(0);
-          }
+          for (const { name, version } of releasedPackages) {
+            const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
+            if (!match) {
+              continue;
+            }
 
-          process.stdout.write(`${major}.${minor}.${previousPatch}`);
+            const [, major, minor, patch, prerelease] = match;
+            if (prerelease) {
+              continue;
+            }
+
+            const previousPatch = Number(patch) - 1;
+            if (previousPatch < 0) {
+              continue;
+            }
+
+            const previousVersion = `${major}.${minor}.${previousPatch}`;
+
+            try {
+              execSync(`npm view "${name}@${previousVersion}" version`, { stdio: 'ignore' });
+            } catch {
+              console.log(`Version ${name}@${previousVersion} not found on npm; skipping deprecation.`);
+              continue;
+            }
+
+            try {
+              execSync(
+                `npm deprecate "${name}@${previousVersion}" "Deprecated in favor of ${name}@${version}"`,
+                { stdio: 'inherit' },
+              );
+              console.log(`Deprecated ${name}@${previousVersion}.`);
+            } catch {
+              console.log(`Deprecation failed for ${name}@${previousVersion}; continuing without failing publish.`);
+            }
+          }
           NODE
-          )"
-
-          if [ -z "$PREVIOUS_VERSION" ]; then
-            echo "No previous release candidate for ${CURRENT_VERSION}; skipping deprecation."
-            exit 0
-          fi
-
-          if npm view "${PACKAGE_NAME}@${PREVIOUS_VERSION}" version >/dev/null 2>&1; then
-            if npm deprecate "${PACKAGE_NAME}@${PREVIOUS_VERSION}" "Deprecated in favor of ${PACKAGE_NAME}@${CURRENT_VERSION}"; then
-              echo "Deprecated ${PACKAGE_NAME}@${PREVIOUS_VERSION}."
-            else
-              echo "Deprecation failed for ${PACKAGE_NAME}@${PREVIOUS_VERSION}; continuing without failing publish."
-            fi
-          else
-            echo "Version ${PACKAGE_NAME}@${PREVIOUS_VERSION} not found on npm; skipping deprecation."
-          fi

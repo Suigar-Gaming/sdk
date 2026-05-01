@@ -1,0 +1,67 @@
+name: Turborepo
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
+      - '.github/workflows/turborepo.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+  pull_request:
+    paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
+      - '.github/workflows/turborepo.yml'
+      - 'apps/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      - name: Lint packages
+        run: pnpm turbo run lint --filter='./packages/*'
+
+      - name: Lint apps
+        run: pnpm turbo run lint --filter='./apps/*'
+
+      - name: Run package tests
+        run: pnpm turbo run test --filter='./packages/*'
+
+      - name: Run package typecheck
+        run: pnpm turbo run typecheck --filter='./packages/*'
+
+      - name: Run package builds
+        run: pnpm turbo run build:ci --filter='./packages/*'
+
+      - name: Run app typecheck
+        run: pnpm turbo run typecheck --filter='./apps/*'
+
+      - name: Run app builds
+        run: pnpm turbo run build --filter='./apps/*'

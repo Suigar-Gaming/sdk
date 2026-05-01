@@ -1,9 +1,14 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
+const tsconfigRootDir = import.meta.dirname;
+
 const handwrittenFiles = [
-	'src/**/*.ts',
-	'test/**/*.ts',
+	'packages/*/src/**/*.ts',
+	'packages/*/test/**/*.ts',
+	'packages/*/scripts/**/*.mjs',
+	'packages/*/*.config.{js,mjs,ts}',
+	'packages/*/*.ts',
 	'*.config.{js,mjs,ts}',
 	'*.ts',
 ];
@@ -12,9 +17,9 @@ export default tseslint.config(
 	{
 		ignores: [
 			'dist/**',
+			'packages/*/dist/**',
 			'node_modules/**',
-			'examples/game-integration/**',
-			'src/contracts/**',
+			'apps/playground/**',
 			'.changeset/*.md',
 		],
 	},
@@ -22,6 +27,11 @@ export default tseslint.config(
 	...tseslint.configs.recommended,
 	{
 		files: handwrittenFiles,
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir,
+			},
+		},
 		rules: {
 			'no-undef': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
@@ -36,6 +46,12 @@ export default tseslint.config(
 		},
 	},
 	{
+		files: ['packages/*/src/contracts/**/*.ts'],
+		rules: {
+			'@typescript-eslint/no-empty-object-type': 'off',
+		},
+	},
+	{
 		files: ['*.cjs'],
 		languageOptions: {
 			sourceType: 'commonjs',
@@ -46,7 +62,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['test/**/*.ts', 'vitest.config.ts'],
+		files: ['packages/*/test/**/*.ts', 'packages/*/vitest.config.ts'],
 		languageOptions: {
 			globals: {
 				describe: 'readonly',

@@ -48,7 +48,7 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `DEFAULT_RANGE_SCALE`
 - `DEFAULT_LIMBO_MULTIPLIER_SCALE`
 
-Internal config and metadata helpers stay under `src/helpers/*` and are not part of the intended public import surface.
+Internal config and metadata helpers stay under `packages/sdk/src/helpers/*` and are not part of the intended public import surface.
 
 ## Default setup
 

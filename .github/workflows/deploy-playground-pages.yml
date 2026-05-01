@@ -1,0 +1,67 @@
+name: Deploy Playground Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
+      - '.github/workflows/deploy-playground-pages.yml'
+      - 'packages/**'
+      - 'apps/playground/**'
+  pull_request:
+    paths:
+      - '.github/actions/setup-node-pnpm/action.yml'
+      - '.github/workflows/deploy-playground-pages.yml'
+      - 'packages/**'
+      - 'apps/playground/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: playground-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Build playground site
+        run: pnpm turbo run build --filter='./apps/playground'
+        env:
+          GITHUB_PAGES: 'true'
+          PAGES_BASE_PATH: ''
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/playground/out
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
