@@ -19,7 +19,6 @@ For PvP coinflip, use:
 ```ts
 client.suigar.getPvPCoinflipGames(options?);
 client.suigar.tx.createPvPCoinflipTransaction(action, options);
-client.suigar.resolvePvPConflipGame(gameId, options?);
 client.suigar.bcs.PvPCoinflipGame;
 ```
 
@@ -105,7 +104,7 @@ Guardrails:
 
 - Join derives the stake from `gameId`.
 - Join uses the configured price info object id for `coinType`.
-- Prefer `client.suigar.resolvePvPConflipGame(gameId, options?)` when product logic needs the current onchain creator, normalized `coinType`, stake, or privacy state before rendering a join flow.
+- Prefer `client.suigar.getPvPCoinflipGames(options?)` when product logic needs current lobby state before rendering join cards. For one specific live game object, use `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId: gameId })`.
 
 ## Cancel Game
 
@@ -152,15 +151,15 @@ Guardrails:
 Use:
 
 - `client.suigar.getPvPCoinflipGames(options?)`
-- `client.suigar.resolvePvPConflipGame(gameId, options?)`
 - `client.suigar.bcs.PvPCoinflipGame`
 - `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
 - `client.suigar.bcs.PvPCoinflipGameResolvedEvent`
 - `client.suigar.bcs.PvPCoinflipGameCancelledEvent`
 
 Use `getPvPCoinflipGames()` when you need the current unresolved lobby from the
-registry, and use the resolver when you need the current onchain PvP coinflip game
-object for a specific `gameId` and not just transaction events:
+registry. Use the generated `PvPCoinflipGame` helper when you need the current
+onchain PvP coinflip game object for a specific `gameId` and not just
+transaction events:
 
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
@@ -179,9 +178,12 @@ const games = await client.suigar.getPvPCoinflipGames({
 ```
 
 ```ts
-const game = await client.suigar.resolvePvPConflipGame('0xGAME');
+const game = await client.suigar.bcs.PvPCoinflipGame.get({
+	client,
+	objectId: '0xGAME',
+});
 
-if (game.is_private) {
+if (game.json.is_private) {
 	// reflect private-lobby state in the product
 }
 ```
@@ -189,7 +191,9 @@ if (game.is_private) {
 ```ts
 const controller = new AbortController();
 
-const game = await client.suigar.resolvePvPConflipGame('0xGAME', {
+const game = await client.suigar.bcs.PvPCoinflipGame.get({
+	client,
+	objectId: '0xGAME',
 	signal: controller.signal,
 });
 ```
@@ -207,8 +211,9 @@ Guardrails:
 
 - `getPvPCoinflipGames()` only returns unresolved games because registry membership is the live pending-state signal.
 - `getPvPCoinflipGames()` skips per-object fetch or parse failures by default; use `throwOnError: true` when the product should fail the whole lookup instead.
+- Use `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` when you need one specific live pending game object; it forwards supported object lookup options such as `signal`.
 - Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
-- `resolvePvPConflipGame(gameId, options?)` is for live pending game objects and forwards supported `getObject()` options such as `signal`; after join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain onchain.
+- After join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain onchain.
 - Use `event.bcs` as the event payload input when available.
 - Do not route PvP coinflip transaction creation through standard bet builders.
 - Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.
@@ -218,7 +223,7 @@ Guardrails:
 1. Confirm whether the feature is create, join, or cancel.
 2. Wire the flow to `createPvPCoinflipTransaction`.
 3. For join or cancel, pass `gameId` and provide the transaction `coinType`.
-4. If the product needs the unresolved lobby, read it with `client.suigar.getPvPCoinflipGames()`. If it needs a specific live match state, resolve it with `client.suigar.resolvePvPConflipGame(gameId, options?)`.
+4. If the product needs the unresolved lobby, read it with `client.suigar.getPvPCoinflipGames()`. If it needs a specific live match state, fetch it with `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId: gameId })`.
 5. Parse emitted PvP events with the generated BCS helpers.
 6. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
 7. Keep frontend or backend state aligned with onchain ids and privacy flags.

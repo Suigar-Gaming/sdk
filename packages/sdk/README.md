@@ -43,6 +43,7 @@ import {
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
+	parseCoinType,
 	parseGameDetails,
 	RANGE_POINT_LIMIT,
 	toBigInt,
@@ -73,7 +74,6 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 client.suigar.serializeTransactionToBase64(...);
 client.suigar.getConfig();
 client.suigar.getPvPCoinflipGames(...);
-client.suigar.resolvePvPConflipGame(...);
 client.suigar.bcs;
 client.suigar.tx;
 ```
@@ -160,7 +160,6 @@ The registered extension instance exposes the main runtime surface:
 - `getConfig()`
 - `serializeTransactionToBase64(transaction, options?)`
 - `getPvPCoinflipGames(options?)`
-- `resolvePvPConflipGame(gameId)`
 - `bcs`
 - `tx`
 
@@ -198,9 +197,10 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 Lists unresolved PvP coinflip games from the configured PvP registry.
 
 This reads the registry dynamic fields for the active network and resolves each
-entry into parsed game state through a bulk `client.core.getObjects()` lookup. Registry
-membership is the unresolved-state signal: once a match is joined and resolved,
-the Move flow removes it from the registry and deletes the live `Game` object.
+entry into parsed game state through a bulk `client.core.getObjects()` lookup.
+Registry membership is the unresolved-state signal: once a match is joined and
+resolved, the Move flow removes it from the registry and deletes the live
+`Game` object.
 
 Use this when a product needs the current set of open PvP coinflip matches for
 browsing or lobby views.
@@ -227,46 +227,6 @@ const games = await client.suigar.getPvPCoinflipGames({
 	throwOnError: true,
 });
 ```
-
-### `resolvePvPConflipGame(gameId, options?)`
-
-Fetches a PvP coinflip game object from chain and parses it into the SDK's
-normalized runtime shape.
-
-This requires the object's `content`, decodes it with the generated
-`PvPCoinflipGame` parser, and normalizes the generic coin type into a standard
-struct tag string. You can optionally pass through `getObject()` options such as
-`signal`.
-
-Use this when a product needs the live onchain match state for a specific
-pending match before rendering join or cancel actions, or inspecting the stake
-and privacy flag for a game.
-
-```ts
-const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID');
-
-console.log(game.creator);
-console.log(game.coinType);
-console.log(game.stake_per_player);
-console.log(game.is_private);
-```
-
-```ts
-const controller = new AbortController();
-
-const game = await client.suigar.resolvePvPConflipGame('0xGAME_ID', {
-	signal: controller.signal,
-});
-```
-
-> **Note:**
->
-> - it throws if the object response does not include decodable `content`
-> - the PvP join builder uses this internally to derive the required join stake
-> - after a game is joined and resolved, the live `Game` object is removed from the registry and deleted, so inspect `PvPCoinflipGameResolvedEvent` to read the final result
-
-> **Tip:** Prefer this helper over manual object parsing when you only need the
-> parsed state for a live PvP coinflip game object.
 
 ## `tx`
 
@@ -429,29 +389,20 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `PvPCoinflipGame` parses a PvP coinflip game object's `content`
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
+- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>`
 - `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
 
-Use the BCS helper directly when you already fetched the object with `content`:
+Use the generated BCS helper when you want to fetch and parse a game object:
 
 ```ts
-const { object } = await client.core.getObject({
+const game = await client.suigar.bcs.PvPCoinflipGame.get({
+	client,
 	objectId: '0xGAME_ID',
-	include: { content: true },
 });
 
-if (!object.content) {
-	throw new Error('Missing game content');
-}
-
-const parsed = client.suigar.bcs.PvPCoinflipGame.parse(object.content);
-```
-
-If you only need the parsed game object, prefer the convenience method:
-
-```ts
-const parsed = await client.suigar.resolvePvPConflipGame('0xGAME_ID');
+console.log(game.json);
 ```
 
 ### Parse Standard Bet Result Data
