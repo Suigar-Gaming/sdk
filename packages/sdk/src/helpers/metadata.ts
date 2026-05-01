@@ -13,11 +13,11 @@ const PARTNER_METADATA_KEY = 'partner';
 const RESERVED_METADATA_KEYS = new Set([PARTNER_METADATA_KEY, 'referrer']);
 const textEncoder = new TextEncoder();
 
-function parseHexAddress(value: string): ReturnType<typeof fromHex> | null {
+function encodeString(value: string) {
 	try {
 		return fromHex(value);
 	} catch {
-		return null;
+		return textEncoder.encode(value);
 	}
 }
 
@@ -30,9 +30,7 @@ function encodeMetadataValue(value: BetMetadataValue) {
 		return value;
 	}
 
-	return Array.from(
-		parseHexAddress(String(value)) ?? textEncoder.encode(String(value)),
-	);
+	return Array.from(encodeString(String(value)));
 }
 
 export function encodeBetMetadata(
