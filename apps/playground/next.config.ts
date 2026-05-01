@@ -1,24 +1,22 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
 
-const isGitHubPages = process.env.GITHUB_PAGES === 'true';
-const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1] ?? '';
 const explicitPagesBasePath = process.env.PAGES_BASE_PATH;
 
 function normalizeBasePath(value: string): string {
-	if (!value) {
+	const trimmedValue = value.trim().replace(/\/+$/, '');
+
+	if (!trimmedValue) {
 		return '';
 	}
 
-	return value.startsWith('/') ? value : `/${value}`;
+	return trimmedValue.startsWith('/') ? trimmedValue : `/${trimmedValue}`;
 }
 
 const basePath =
-	explicitPagesBasePath !== undefined
-		? normalizeBasePath(explicitPagesBasePath)
-		: isGitHubPages && repositoryName.length > 0
-			? `/${repositoryName}`
-			: '';
+	explicitPagesBasePath === undefined
+		? ''
+		: normalizeBasePath(explicitPagesBasePath);
 
 const nextConfig: NextConfig = {
 	output: 'export',
