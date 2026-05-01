@@ -18,7 +18,7 @@
 		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
 		"prepare": "husky",
 		"prettier:fix": "prettier --write --ignore-unknown .",
-		"release": "changeset publish"
+		"release": "pnpm turbo run build:ci --filter='./packages/*' && changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",
