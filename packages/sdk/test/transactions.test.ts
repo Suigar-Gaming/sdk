@@ -144,10 +144,17 @@ class TestClient extends CoreClient {
 	getObjects: CoreClient['getObjects'] = async <
 		Include extends SuiClientTypes.ObjectInclude,
 	>(
-		_options: SuiClientTypes.GetObjectsOptions<Include>,
+		options: SuiClientTypes.GetObjectsOptions<Include>,
 	) => ({
-		objects: this
-			.mockObjects as SuiClientTypes.GetObjectsResponse<Include>['objects'],
+		objects: options.objectIds.map((objectId, index) => {
+			return (
+				this.mockObjects.find((object) => {
+					return !(object instanceof Error) && object.objectId === objectId;
+				}) ??
+				this.mockObjects[index] ??
+				new Error(`No object found for id ${objectId}`)
+			);
+		}) as SuiClientTypes.GetObjectsResponse<Include>['objects'],
 	});
 
 	listCoins: CoreClient['listCoins'] = async () => ({
@@ -890,7 +897,6 @@ describe('SuigarClient', () => {
 				createDynamicField('0xpending'),
 			],
 		});
-		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
 			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
 			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
@@ -900,7 +906,6 @@ describe('SuigarClient', () => {
 		expect(games).toHaveLength(2);
 		expect(games[0]?.id).toBe('0xopen');
 		expect(games[1]?.id).toBe('0xpending');
-		expect(resolveSpy).not.toHaveBeenCalled();
 	});
 
 	it('forwards signal from getPvPCoinflipGames options into getObjects', async () => {
@@ -941,7 +946,6 @@ describe('SuigarClient', () => {
 				createDynamicField('0xpending'),
 			],
 		});
-		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
 			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
 			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
@@ -950,7 +954,6 @@ describe('SuigarClient', () => {
 
 		expect(games).toHaveLength(2);
 		expect(games.map((game) => game.id)).toEqual(['0xopen', '0xpending']);
-		expect(resolveSpy).not.toHaveBeenCalled();
 	});
 
 	it('exposes the generated BCS helpers under their current event keys', async () => {
@@ -968,44 +971,30 @@ describe('SuigarClient', () => {
 			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
 			dynamicFields: [createDynamicField('0xbroken')],
 		});
-		const resolveSpy = vi.spyOn(client.suigar, 'resolvePvPConflipGame');
-
 		await expect(
 			client.suigar.getPvPCoinflipGames({ throwOnError: true }),
 		).rejects.toThrow(
 			'Unable to resolve PvP coinflip game from retrieved object',
 		);
-		expect(resolveSpy).not.toHaveBeenCalled();
 	});
 
-	it('rejects resolving a PvP coinflip game when the retrieved object has no content', async () => {
-		const client = createSuigarTestClient({
-			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
-		});
-
-		await expect(
-			client.suigar.resolvePvPConflipGame('0xbroken'),
-		).rejects.toThrow(
-			'Unable to resolve PvP coinflip game from retrieved object',
-		);
-	});
-
-	it('forwards getObject options when resolving a PvP coinflip game', async () => {
+	it('forwards object lookup options when resolving PvP coinflip registry games', async () => {
 		const client = createSuigarTestClient({
 			objects: [createPvPCoinflipGameObject('0xopen')],
+			dynamicFields: [createDynamicField('0xopen')],
 		});
 		const controller = new AbortController();
-		const getObjectSpy = vi.spyOn(client, 'getObject');
+		const getObjectsSpy = vi.spyOn(client, 'getObjects');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
 			createParsedPvPCoinflipGame('0xopen'),
 		);
 
-		await client.suigar.resolvePvPConflipGame('0xopen', {
+		await client.suigar.getPvPCoinflipGames({
 			signal: controller.signal,
 		});
 
-		expect(getObjectSpy).toHaveBeenCalledWith({
-			objectId: '0xopen',
+		expect(getObjectsSpy).toHaveBeenCalledWith({
+			objectIds: ['0xopen'],
 			signal: controller.signal,
 			include: { content: true },
 		});

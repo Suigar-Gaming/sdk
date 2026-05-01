@@ -33,6 +33,7 @@ import {
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
+	parseCoinType,
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
@@ -59,6 +60,9 @@ describe('public source subpath modules', () => {
 		expect(
 			fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
 		).toBe(0);
+		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
+			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+		);
 		expect(toBigInt(1)).toBe(1n);
 		expect(toU8(255)).toBe(255);
 	});

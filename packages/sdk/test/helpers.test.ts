@@ -3,7 +3,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { BetResultGameDetails } from '../src/types/index.js';
-import { parseGameDetails, toBigInt, toU8 } from '../src/utils/index.js';
+import {
+	parseCoinType,
+	parseGameDetails,
+	toBigInt,
+	toU8,
+} from '../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from './utils.js';
 
 function gameDetails(
@@ -11,6 +16,25 @@ function gameDetails(
 ): BetResultGameDetails {
 	return { contents };
 }
+
+describe('parseCoinType', () => {
+	const suiCoinType =
+		'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+
+	it('extracts and normalizes the first generic coin type', () => {
+		expect(
+			parseCoinType(
+				'0x1::pvp_coinflip::Game<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
+			),
+		).toBe(suiCoinType);
+	});
+
+	it('throws when the object type does not include a generic coin type', () => {
+		expect(() => parseCoinType('0x1::pvp_coinflip::Game')).toThrow(
+			'Unable to parse coin type',
+		);
+	});
+});
 
 describe('parseGameDetails', () => {
 	it('parses coinflip detail strings and preserves event keys', () => {
