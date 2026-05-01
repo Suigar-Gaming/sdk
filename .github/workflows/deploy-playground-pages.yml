@@ -38,14 +38,14 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
 
       - name: Configure GitHub Pages
+        id: github-pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Build playground site
         run: pnpm turbo run build --filter='./apps/playground'
         env:
-          GITHUB_PAGES: 'true'
-          PAGES_BASE_PATH: ''
+          BASE_PATH: ${{ steps.github-pages.outputs.base_path }}
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'

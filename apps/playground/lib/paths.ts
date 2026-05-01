@@ -1,4 +1,14 @@
-const pagesBasePath = process.env.PAGES_BASE_PATH ?? '';
+function normalizeBasePath(value: string): string {
+	const trimmedValue = value.trim().replace(/\/+$/, '');
+
+	if (!trimmedValue) {
+		return '';
+	}
+
+	return trimmedValue.startsWith('/') ? trimmedValue : `/${trimmedValue}`;
+}
+
+export const basePath = normalizeBasePath(process.env.BASE_PATH ?? '');
 
 export function withBasePath(assetPath: string): string {
 	if (/^(?:[a-z]+:)?\/\//i.test(assetPath) || assetPath.startsWith('data:')) {
@@ -8,5 +18,5 @@ export function withBasePath(assetPath: string): string {
 	const normalizedPath = assetPath.startsWith('/')
 		? assetPath
 		: `/${assetPath}`;
-	return `${pagesBasePath}${normalizedPath}`;
+	return `${basePath}${normalizedPath}`;
 }
