@@ -1,37 +1,91 @@
 name: Deprecate previous NPM release
 
 on:
-  workflow_call:
-    inputs:
-      released_packages:
-        required: true
-        type: string
-    secrets:
-      npm_deprecate_token:
-        required: false
+  workflow_run:
+    workflows:
+      - Changesets
+    branches:
+      - main
+    types:
+      - completed
 
 permissions:
   contents: read
 
+concurrency:
+  group: deprecate-previous-release-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
 jobs:
   deprecate:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
 
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
         with:
           install: 'false'
-          registry-url: https://registry.npmjs.org
+
+      - name: Detect released packages
+        id: release
+        shell: bash
+        run: |
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const { execSync } = require('node:child_process');
+          const { readFileSync } = require('node:fs');
+          const { join } = require('node:path');
+
+          const changedFiles = execSync('git diff --name-only HEAD^ HEAD', { encoding: 'utf8' })
+            .trim()
+            .split('\n')
+            .filter(Boolean);
+
+          const pkgJsonDirs = new Set();
+          const changelogDirs = new Set();
+
+          for (const file of changedFiles) {
+            const packageJsonMatch = file.match(/^(packages\/[^/]+)\/package\.json$/);
+            if (packageJsonMatch) {
+              pkgJsonDirs.add(packageJsonMatch[1]);
+            }
+
+            const changelogMatch = file.match(/^(packages\/[^/]+)\/CHANGELOG\.md$/);
+            if (changelogMatch) {
+              changelogDirs.add(changelogMatch[1]);
+            }
+          }
+
+          const releasedDirs = [...pkgJsonDirs].filter((dir) => changelogDirs.has(dir));
+          const releasedPackages = releasedDirs.map((dir) => {
+            const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+            return {
+              dir,
+              name: pkg.name,
+              version: pkg.version,
+            };
+          });
+
+          process.stdout.write(`should_deprecate=${releasedPackages.length > 0}\n`);
+          process.stdout.write(`released_packages=${JSON.stringify(releasedPackages)}\n`);
+          NODE
+
+      - name: Skip deprecation
+        if: steps.release.outputs.should_deprecate != 'true'
+        run: echo "No published release packages detected; skipping deprecation."
 
       - name: Deprecate previous release
+        if: steps.release.outputs.should_deprecate == 'true'
         shell: bash
         env:
-          RELEASED_PACKAGES: ${{ inputs.released_packages }}
-          NODE_AUTH_TOKEN: ${{ secrets.npm_deprecate_token }}
+          RELEASED_PACKAGES: ${{ steps.release.outputs.released_packages }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_DEPRECATE_TOKEN }}
         run: |
           set -uo pipefail
 
