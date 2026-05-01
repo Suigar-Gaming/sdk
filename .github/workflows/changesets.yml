@@ -32,7 +32,7 @@ jobs:
         uses: changesets/action@v1
         with:
           version: pnpm changeset:version
-          publish: pnpm turbo run build:ci --filter='./packages/*' && pnpm release
+          publish: pnpm release
           commit: 'ci: version packages'
           title: 'ci: version packages'
         env:
