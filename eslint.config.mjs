@@ -4,11 +4,11 @@ import tseslint from 'typescript-eslint';
 const tsconfigRootDir = import.meta.dirname;
 
 const handwrittenFiles = [
-	'packages/sdk/src/**/*.ts',
-	'packages/sdk/test/**/*.ts',
-	'packages/sdk/scripts/**/*.mjs',
-	'packages/sdk/*.config.{js,mjs,ts}',
-	'packages/sdk/*.ts',
+	'packages/*/src/**/*.ts',
+	'packages/*/test/**/*.ts',
+	'packages/*/scripts/**/*.mjs',
+	'packages/*/*.config.{js,mjs,ts}',
+	'packages/*/*.ts',
 	'*.config.{js,mjs,ts}',
 	'*.ts',
 ];
@@ -62,7 +62,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['packages/sdk/test/**/*.ts', 'packages/sdk/vitest.config.ts'],
+		files: ['packages/*/test/**/*.ts', 'packages/*/vitest.config.ts'],
 		languageOptions: {
 			globals: {
 				describe: 'readonly',
