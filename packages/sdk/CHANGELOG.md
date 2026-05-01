@@ -1,5 +1,15 @@
 # @suigar/sdk
 
+## 2.0.0-beta.10
+
+### Patch Changes
+
+- 4b59c7b: Remove the `client.suigar.resolvePvPConflipGame()` client method. Use the exported generated helper `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` for one specific live PvP coinflip game object instead.
+
+  Add `parseCoinType` to `@suigar/sdk/utils` for extracting normalized coin types from generic Move object type strings.
+
+- 4b59c7b: Move the SDK into the `packages/sdk` pnpm workspace while keeping the public package API unchanged.
+
 ## 2.0.0-beta.9
 
 ### Patch Changes

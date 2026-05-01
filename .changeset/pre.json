@@ -16,8 +16,10 @@
 		"green-spoons-smoke",
 		"metal-plums-rest",
 		"odd-bees-yell",
+		"parser-get-coin-type",
 		"soft-seas-protect",
 		"solid-animals-dig",
-		"sweet-stars-brush"
+		"sweet-stars-brush",
+		"workspace-monorepo"
 	]
 }
