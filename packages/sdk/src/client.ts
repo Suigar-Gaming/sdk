@@ -3,11 +3,7 @@
 
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
-import {
-	normalizeStructTag,
-	parseStructTag,
-	toBase64,
-} from '@mysten/sui/utils';
+import { toBase64 } from '@mysten/sui/utils';
 import { BetResultEvent } from './contracts/core/core';
 import {
 	Game as PvPCoinflipGame,
@@ -44,6 +40,7 @@ import {
 	WithPartner,
 	WithThrowOnError,
 } from './types';
+import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -158,7 +155,20 @@ export class SuigarClient {
 
 		const resolvedGames = objects.map((object) => {
 			try {
-				return this.#resolvePvPCoinflipGameObject(object);
+				if (object instanceof Error) {
+					throw object;
+				}
+
+				if (!object.content) {
+					throw new Error(
+						'Unable to resolve PvP coinflip game from retrieved object',
+					);
+				}
+
+				return {
+					...PvPCoinflipGame.parse(object.content),
+					coinType: parseCoinType(object.type),
+				};
 			} catch (error) {
 				return error instanceof Error ? error : new Error(String(error));
 			}
@@ -174,36 +184,6 @@ export class SuigarClient {
 		return resolvedGames.flatMap((game) =>
 			game instanceof Error ? [] : [game],
 		);
-	}
-
-	/**
-	 * Fetches a PvP coinflip game object from chain and parses it into the SDK's
-	 * normalized runtime shape.
-	 *
-	 * This resolves the raw object through the configured client, requires the
-	 * object's `content` to be present, decodes that content with the generated
-	 * `PvPCoinflipGame` BCS parser, and normalizes the generic coin type into a
-	 * standard struct tag string. Use this when a product needs the current state
-	 * of a specific PvP coinflip match before rendering join, cancel, or result UI.
-	 *
-	 * @param gameId On-chain object id of the PvP coinflip game.
-	 * @param options Optional `getObject()` options forwarded to the underlying
-	 * client lookup, excluding `objectId` and `include`. Supported options include
-	 * `signal`.
-	 * @returns Parsed PvP coinflip game state with a normalized `coinType`.
-	 * @throws Error If the object cannot be decoded because no content was returned.
-	 */
-	async resolvePvPConflipGame(
-		gameId: string,
-		options: Omit<SuiClientTypes.GetObjectOptions, 'objectId' | 'include'> = {},
-	) {
-		const { object } = await this.#client.core.getObject({
-			...options,
-			objectId: gameId,
-			include: { content: true },
-		});
-
-		return this.#resolvePvPCoinflipGameObject(object);
 	}
 
 	/**
@@ -332,33 +312,16 @@ export class SuigarClient {
 
 	#createPvPCoinflipBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
 		return async (tx: Transaction) => {
-			const { stake_per_player } = await this.resolvePvPConflipGame(
-				options.gameId,
-			);
+			const { json } = await PvPCoinflipGame.get({
+				client: this.#client,
+				objectId: options.gameId,
+			});
+
 			return tx.coin({
 				type: options.coinType,
-				balance: BigInt(stake_per_player),
+				balance: BigInt(json.stake_per_player),
 				useGasCoin: options.allowGasCoinShortcut,
 			});
-		};
-	}
-
-	#resolvePvPCoinflipGameObject(
-		object: SuiClientTypes.Object<{ content: true }> | Error,
-	) {
-		if (object instanceof Error) {
-			throw object;
-		}
-
-		if (!object.content) {
-			throw new Error(
-				'Unable to resolve PvP coinflip game from retrieved object',
-			);
-		}
-
-		return {
-			...PvPCoinflipGame.parse(object.content),
-			coinType: normalizeStructTag(parseStructTag(object.type).typeParams[0]),
 		};
 	}
 }

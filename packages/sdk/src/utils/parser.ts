@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { bcs } from '@mysten/sui/bcs';
+import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 import { Float } from '../contracts/core/float';
 import {
 	BetResultGameDetails,
@@ -61,6 +62,25 @@ export function fromMoveFloat(float: MoveFloat): number {
 	const exponent = fromMoveI64(float.exp) - 52;
 	const magnitude = Number(mantissa) * 2 ** exponent;
 	return float.is_negative ? -magnitude : magnitude;
+}
+
+/**
+ * Extracts and normalizes the first generic coin type from a Move object type.
+ *
+ * PvP game object types encode the wager coin as their first type parameter,
+ * for example `Game<0x2::sui::SUI>`. This helper converts that generic type
+ * argument into the SDK's canonical struct tag string.
+ *
+ * @param type Fully qualified Move object type with the coin type as its first generic argument.
+ * @returns Normalized coin type struct tag.
+ */
+export function parseCoinType(type: string): string {
+	const coinType = parseStructTag(type).typeParams[0];
+	if (!coinType) {
+		throw new Error(`Unable to parse coin type from ${type}`);
+	}
+
+	return normalizeStructTag(coinType);
 }
 
 function normalizeGameDetailValue(
