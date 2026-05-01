@@ -103,10 +103,10 @@ importers:
         version: 3.5.0
     devDependencies:
       '@tailwindcss/postcss':
-        specifier: ^4
+        specifier: ^4.2.4
         version: 4.2.4
       '@types/node':
-        specifier: ^24
+        specifier: ^24.0.0
         version: 24.12.2
       '@types/react':
         specifier: ^19.2.14
