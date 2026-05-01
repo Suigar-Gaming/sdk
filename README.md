@@ -1,18 +1,255 @@
-# `@suigar/ts-sdks`
+# Suigar Typescript SDK
 
-pnpm workspace repository for Suigar TypeScript SDK packages.
+A collection of TypeScript SDKs for interacting with the Suigar contracts.
 
-## Packages
+## Docs Site
 
-- [`@suigar/sdk`](packages/sdk) - TypeScript SDK for building Suigar v2 game transactions on Sui.
+For complete Suigar SDK docs, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
 
-## Development
+This SDK builds on the Sui TypeScript SDK. For Sui client, transaction, and network APIs, visit the [Sui TypeScript SDK docs](https://sdk.mystenlabs.com/).
+
+## Suigar TypeScript SDK
+
+The publishable package in this repository is [`@suigar/sdk`](packages/sdk). It provides utility classes, types, generated Move bindings, and transaction builders for applications that build Suigar v2 game transactions on Sui.
+
+The main integration path is the `suigar()` extension on top of a Sui client such as `SuiGrpcClient`. The SDK targets Sui TypeScript SDK 2.0+ and supports standard Suigar games plus PvP coinflip flows.
+
+Public package entrypoints:
+
+- `@suigar/sdk` for `suigar()` and `SuigarClient`
+- `@suigar/sdk/games` for game option and action types
+- `@suigar/sdk/utils` for parser helpers, numeric helpers, and reusable constants
+
+## Building Locally
+
+To get started, install [pnpm](https://pnpm.io/) and run commands from the repository root:
 
 ```bash
+# Install all dependencies
 pnpm install
+
+# Generate bindings and build the SDK package
 pnpm --dir packages/sdk build
+
+# Build without regenerating contract bindings
+pnpm --dir packages/sdk build:ci
+
+# Regenerate Move contract bindings only
+pnpm --dir packages/sdk codegen
+```
+
+The package implementation lives in `packages/sdk`. Build, codegen, test, and typecheck commands should be run with `pnpm --dir packages/sdk ...`.
+
+## Testing
+
+Run the SDK test suite:
+
+```bash
 pnpm --dir packages/sdk test
+```
+
+Run TypeScript checking:
+
+```bash
 pnpm --dir packages/sdk typecheck
 ```
 
-The package implementation lives in `packages/sdk`. Build, codegen, test, and typecheck commands are package-level commands and should be run with `pnpm --dir packages/sdk ...`.
+Run a specific Vitest file:
+
+```bash
+pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
+```
+
+Run a specific test name:
+
+```bash
+pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
+```
+
+## Playground
+
+The repository includes a Next.js integration playground in [`apps/playground`](apps/playground). It demonstrates standard game transactions, PvP coinflip transactions, wallet integration, live transaction code previews, and event decoding.
+
+Run it locally:
+
+```bash
+pnpm turbo run dev --filter='./apps/playground'
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+The GitHub Pages workflow deploys the static export for `playground.suigar.com`. `PAGES_BASE_PATH` controls the Next.js `basePath`; leave it empty for the custom domain root, or set it explicitly when publishing under a repository path.
+
+## Connecting to Sui Network
+
+`SuiGrpcClient` from `@mysten/sui/grpc` is the recommended client for Sui TypeScript SDK 2.0+ integrations.
+
+Common gRPC fullnode URLs:
+
+- Localnet: `http://127.0.0.1:9000`
+- Devnet: `https://fullnode.devnet.sui.io:443`
+- Testnet: `https://fullnode.testnet.sui.io:443`
+- Mainnet: `https://fullnode.mainnet.sui.io:443`
+
+```ts
+import { SuiGrpcClient } from '@mysten/sui/grpc';
+import { suigar } from '@suigar/sdk';
+
+const client = new SuiGrpcClient({
+	network: 'testnet',
+	baseUrl: 'https://fullnode.testnet.sui.io:443',
+}).$extend(suigar());
+
+const coins = await client.core.getCoins({
+	owner: '0xcc2bd176a478baea9a0de7a24cd927661cc6e860d5bacecb9a138ef20dbab231',
+});
+```
+
+For local development, run a local Sui network with a validator, fullnode, and faucet. See the [Sui local network guide](https://docs.sui.io/build/sui-local-network).
+
+## Getting Coins From The Faucet
+
+You can request SUI from the faucet when running against devnet or localnet. For testnet, visit [faucet.sui.io](https://faucet.sui.io/).
+
+```ts
+import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
+
+await requestSuiFromFaucetV2({
+	host: getFaucetHost('devnet'),
+	recipient:
+		'0xcc2bd176a478baea9a0de7a24cd927661cc6e860d5bacecb9a138ef20dbab231',
+});
+```
+
+## Writing Suigar Transactions
+
+Standard Suigar games use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
+
+```ts
+import { SuiGrpcClient } from '@mysten/sui/grpc';
+import { suigar } from '@suigar/sdk';
+
+const client = new SuiGrpcClient({
+	network: 'testnet',
+	baseUrl: 'https://fullnode.testnet.sui.io:443',
+}).$extend(suigar());
+
+const tx = client.suigar.tx.createBetTransaction('coinflip', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	side: 'heads',
+});
+
+const base64 = await client.suigar.serializeTransactionToBase64(tx);
+console.log({ base64 });
+```
+
+Configure partner attribution once during extension setup. `partner` must be the partner wallet address.
+
+```ts
+const client = new SuiGrpcClient({
+	network: 'testnet',
+	baseUrl: 'https://fullnode.testnet.sui.io:443',
+}).$extend(suigar({ partner: '0xpartner_wallet_address' }));
+```
+
+## Standard Game APIs
+
+Use `createBetTransaction(gameId, options)` for standard games:
+
+- `coinflip`: `side: 'heads' | 'tails'`
+- `limbo`: `targetMultiplier: number`, `scale?: number`
+- `plinko`: `configId: number`
+- `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
+- `wheel`: `configId: number`
+
+Shared options include `playerAddress`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `allowGasCoinShortcut`.
+
+`stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into onchain byte arrays.
+
+```ts
+const limboTx = client.suigar.tx.createBetTransaction('limbo', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	targetMultiplier: 2.5,
+});
+
+const rangeTx = client.suigar.tx.createBetTransaction('range', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	leftPoint: 25,
+	rightPoint: 75,
+	outOfRange: false,
+});
+```
+
+## PvP Coinflip APIs
+
+PvP coinflip uses `client.suigar.tx.createPvPCoinflipTransaction(action, options)` for `create`, `join`, and `cancel`.
+
+Create a public PvP coinflip lobby:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	stake: 1_000_000_000n,
+	side: 'heads',
+	isPrivate: false,
+});
+```
+
+Join a PvP coinflip lobby:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	gameId: '0xGAME_ID',
+});
+```
+
+Cancel a PvP coinflip lobby:
+
+```ts
+const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
+	playerAddress: '0x123',
+	coinType: '0x2::sui::SUI',
+	gameId: '0xGAME_ID',
+});
+```
+
+List unresolved PvP coinflip lobbies:
+
+```ts
+const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
+```
+
+Fetch one live PvP coinflip game object with the generated BCS helper:
+
+```ts
+const game = await client.suigar.bcs.PvPCoinflipGame.get({
+	client,
+	objectId: '0xGAME_ID',
+});
+```
+
+## Reading Events
+
+Generated event decoders are available under `client.suigar.bcs`. Parser helpers such as `parseGameDetails`, `fromMoveFloat`, `fromMoveI64`, and `parseCoinType` are exported from `@suigar/sdk/utils`.
+
+```ts
+import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
+
+const parsedDetails = parseGameDetails('coinflip', event.game_details);
+const price = fromMoveFloat(event.price);
+```
+
+## Useful Package Docs
+
+- [`packages/sdk/README.md`](packages/sdk/README.md) contains the complete package API guide.
+- [`apps/playground/README.md`](apps/playground/README.md) documents the integration playground.
+- [`AGENTS.md`](AGENTS.md) documents repository conventions for AI-assisted development.

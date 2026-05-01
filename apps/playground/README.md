@@ -59,8 +59,8 @@ The repository includes `.github/workflows/deploy-playground-pages.yml` to build
 
 - Pull requests run the Pages build as a validation step.
 - Pushes to `main` build and deploy the static export to GitHub Pages.
-- The workflow can override the Next.js `basePath` through `PAGES_BASE_PATH`. Leave it empty for a custom domain served from the root, or set it to `/sdk` when publishing under the repository path.
-- Public asset URLs used in `next/image` and metadata should go through `withBasePath()` from [`lib/paths.ts`](/Users/lucas/Documents/Github/suigar-sdk/apps/playground/lib/paths.ts) so they resolve correctly both locally and on GitHub Pages.
+- The workflow can override the Next.js `basePath` through `PAGES_BASE_PATH`. It defaults to root paths for a custom domain. Set it explicitly to `/sdk` only when publishing under the repository path.
+- Public asset URLs used in `next/image` and metadata should go through `withBasePath()` from [`lib/paths.ts`](lib/paths.ts) so they resolve correctly both locally and on GitHub Pages.
 
 ## Notes
 
