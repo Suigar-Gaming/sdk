@@ -78,8 +78,6 @@ pnpm turbo run dev --filter='./apps/playground'
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-The GitHub Pages workflow deploys the static export for `playground.suigar.com`. `PAGES_BASE_PATH` controls the Next.js `basePath`; leave it empty for the custom domain root, or set it explicitly when publishing under a repository path.
-
 ## Connecting to Sui Network
 
 `SuiGrpcClient` from `@mysten/sui/grpc` is the recommended client for Sui TypeScript SDK 2.0+ integrations.
