@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -21,14 +21,14 @@ jobs:
 
       - name: Get changed src files
         id: src-changes
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             packages/*/src/**
 
       - name: Get changed changeset files
         id: changeset-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             .changeset/*.md
@@ -53,7 +53,7 @@ jobs:
 
       - name: Upload missing changeset artifact
         if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: missing-changeset
           path: missing-changeset.txt
