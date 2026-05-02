@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Resolve pull request number
         id: pr
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           result-encoding: string
           script: |
@@ -30,7 +30,7 @@ jobs:
       - name: Check for missing changeset artifact
         id: artifact
         if: steps.pr.outputs.result != ''
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           result-encoding: string
           script: |
@@ -47,7 +47,7 @@ jobs:
 
       - name: Create or update PR comment
         if: steps.pr.outputs.result != '' && steps.artifact.outputs.result == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           ISSUE_NUMBER: ${{ steps.pr.outputs.result }}
         with:
@@ -91,7 +91,7 @@ jobs:
 
       - name: Remove outdated PR comment
         if: steps.pr.outputs.result != '' && steps.artifact.outputs.result != 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           ISSUE_NUMBER: ${{ steps.pr.outputs.result }}
         with:
