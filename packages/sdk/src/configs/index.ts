@@ -3,4 +3,3 @@
 
 export * from './package';
 export * from './registry';
-export * from './settings';
