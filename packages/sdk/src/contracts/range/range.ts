@@ -12,6 +12,12 @@ import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b
 
 const $moduleName =
 	'0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416::range';
+export const RangeSettingsKey = new MoveStruct({
+	name: `${$moduleName}::RangeSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const Parameters = new MoveStruct({
 	name: `${$moduleName}::Parameters<phantom T0>`,
 	fields: {

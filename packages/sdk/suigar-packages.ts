@@ -21,25 +21,26 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 	coinflip: {
 		package: TESTNET_PACKAGE_IDS.coinflip,
 		packageName: 'coinflip',
-		types: ['Parameters'],
+		types: ['CoinFlipSettingsKey', 'Parameters'],
 		functions: ['play'],
 	},
 	limbo: {
 		package: TESTNET_PACKAGE_IDS.limbo,
 		packageName: 'limbo',
-		types: ['Parameters'],
+		types: ['LimboSettingsKey', 'Parameters'],
 		functions: ['play'],
 	},
 	plinko: {
 		package: TESTNET_PACKAGE_IDS.plinko,
 		packageName: 'plinko',
-		types: ['PlinkoConfig', 'Parameters'],
+		types: ['PlinkoSettingsKey', 'PlinkoConfig', 'Parameters'],
 		functions: ['play'],
 	},
 	pvp_coinflip: {
 		package: TESTNET_PACKAGE_IDS.pvpCoinflip,
 		packageName: 'pvp-coinflip',
 		types: [
+			'PvpCoinflipSettingsKey',
 			'Game',
 			'GameCreatedEvent',
 			'GameResolvedEvent',
@@ -51,13 +52,13 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 	range: {
 		package: TESTNET_PACKAGE_IDS.range,
 		packageName: 'range',
-		types: ['Parameters'],
+		types: ['RangeSettingsKey', 'Parameters'],
 		functions: ['play'],
 	},
 	wheel: {
 		package: TESTNET_PACKAGE_IDS.wheel,
 		packageName: 'wheel',
-		types: ['WheelConfig', 'Parameters'],
+		types: ['WheelSettingsKey', 'WheelConfig', 'Parameters'],
 		functions: ['play'],
 	},
 };

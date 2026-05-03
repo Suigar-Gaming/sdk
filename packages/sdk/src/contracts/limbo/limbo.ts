@@ -12,6 +12,12 @@ import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b
 
 const $moduleName =
 	'0x96c7841b9b32c59a219760fd656f1c3aceb53cc74a68ec9844a3a696374309f4::limbo';
+export const LimboSettingsKey = new MoveStruct({
+	name: `${$moduleName}::LimboSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const Parameters = new MoveStruct({
 	name: `${$moduleName}::Parameters<phantom T0>`,
 	fields: {

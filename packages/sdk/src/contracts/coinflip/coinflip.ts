@@ -11,6 +11,12 @@ import {
 
 const $moduleName =
 	'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip';
+export const CoinFlipSettingsKey = new MoveStruct({
+	name: `${$moduleName}::CoinFlipSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const Parameters = new MoveStruct({
 	name: `${$moduleName}::Parameters<phantom T0>`,
 	fields: {

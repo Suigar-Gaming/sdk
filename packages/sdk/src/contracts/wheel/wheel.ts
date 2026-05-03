@@ -13,6 +13,12 @@ import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b
 
 const $moduleName =
 	'0x0997852ded7e13301c42317004bc49704a893aa82997c5706cebee59053a31b7::wheel';
+export const WheelSettingsKey = new MoveStruct({
+	name: `${$moduleName}::WheelSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const WheelConfig = new MoveStruct({
 	name: `${$moduleName}::WheelConfig`,
 	fields: {
