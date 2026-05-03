@@ -84,8 +84,6 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 Common gRPC fullnode URLs:
 
-- Localnet: `http://127.0.0.1:9000`
-- Devnet: `https://fullnode.devnet.sui.io:443`
 - Testnet: `https://fullnode.testnet.sui.io:443`
 - Mainnet: `https://fullnode.mainnet.sui.io:443`
 
@@ -103,17 +101,15 @@ const coins = await client.core.getCoins({
 });
 ```
 
-For local development, run a local Sui network with a validator, fullnode, and faucet. See the [Sui local network guide](https://docs.sui.io/build/sui-local-network).
-
 ## Getting Coins From The Faucet
 
-You can request SUI from the faucet when running against devnet or localnet. For testnet, visit [faucet.sui.io](https://faucet.sui.io/).
+You can request SUI from the testnet faucet at [faucet.sui.io](https://faucet.sui.io/).
 
 ```ts
 import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
 
 await requestSuiFromFaucetV2({
-	host: getFaucetHost('devnet'),
+	host: getFaucetHost('testnet'),
 	recipient:
 		'0xcc2bd176a478baea9a0de7a24cd927661cc6e860d5bacecb9a138ef20dbab231',
 });
