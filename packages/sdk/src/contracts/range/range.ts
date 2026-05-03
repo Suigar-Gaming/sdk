@@ -1,12 +1,30 @@
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
+import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
 import {
+	MoveStruct,
 	normalizeMoveArguments,
 	type RawTransactionArgument,
 } from '../utils/index.js';
+import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 
+const $moduleName =
+	'0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416::range';
+export const Parameters = new MoveStruct({
+	name: `${$moduleName}::Parameters<phantom T0>`,
+	fields: {
+		id: bcs.Address,
+		min_stake: bcs.u64(),
+		max_stake: bcs.u64(),
+		min_zone_size: bcs.u64(),
+		max_zone_size: bcs.u64(),
+		max_number_of_games: bcs.u64(),
+		min_rtp: float.Float,
+		max_rtp: float.Float,
+	},
+});
 export interface PlayOptions {
 	package?: string;
 	arguments: [

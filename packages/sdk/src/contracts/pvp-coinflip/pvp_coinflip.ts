@@ -70,6 +70,14 @@ export const GameCancelledEvent = new MoveStruct({
 		coin_type: type_name.TypeName,
 	},
 });
+export const Parameters = new MoveStruct({
+	name: `${$moduleName}::Parameters<phantom T0>`,
+	fields: {
+		id: bcs.Address,
+		house_edge_bps: bcs.u64(),
+		min_stake: bcs.u64(),
+	},
+});
 export interface CreateGameOptions {
 	package?: string;
 	arguments: [

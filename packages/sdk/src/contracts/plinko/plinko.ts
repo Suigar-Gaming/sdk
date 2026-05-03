@@ -1,12 +1,38 @@
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
+import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
 import {
+	MoveStruct,
 	normalizeMoveArguments,
 	type RawTransactionArgument,
 } from '../utils/index.js';
+import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
+import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 
+const $moduleName =
+	'0xd3dd2200883af10811724f0bed97591ad155a02efd6332d471ff8b346030dfb7::plinko';
+export const PlinkoConfig = new MoveStruct({
+	name: `${$moduleName}::PlinkoConfig`,
+	fields: {
+		num_rows: bcs.u8(),
+		multipliers: bcs.vector(float.Float),
+		min_stake: bcs.u64(),
+		max_stake: bcs.u64(),
+		is_playable: bcs.bool(),
+	},
+});
+export const Parameters = new MoveStruct({
+	name: `${$moduleName}::Parameters<phantom T0>`,
+	fields: {
+		id: bcs.Address,
+		min_stake: bcs.u64(),
+		max_stake: bcs.u64(),
+		max_number_of_balls: bcs.u64(),
+		configs: vec_map.VecMap(bcs.u8(), PlinkoConfig),
+	},
+});
 export interface PlayOptions {
 	package?: string;
 	arguments: [
