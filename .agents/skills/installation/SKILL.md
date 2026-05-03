@@ -130,6 +130,6 @@ Guardrails:
 
 1. Install and import `@suigar/sdk`, `@mysten/sui`, and `@mysten/bcs`.
 2. Extend the existing client with `suigar()`.
-3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin types, and price info object ids.
+3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, settings ids, coin types, and price info object ids.
 4. Keep transaction serialization inside the same registered client instance.
 5. Keep the consuming app on ESM and pass the explicit `network` required by current client constructors.

@@ -8,6 +8,7 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
+	SETTINGS_IDS,
 } from '../src/configs';
 import {
 	resolveGamePackageId,
@@ -31,6 +32,10 @@ describe('resolveSuigarConfig', () => {
 		expect(config.registryIds.pvpCoinflip).toBe(
 			REGISTRY_IDS.testnet.pvpCoinflip,
 		);
+		expect(config.settingsIds.coinflip).toBe(SETTINGS_IDS.testnet.coinflip);
+		expect(config.settingsIds.pvpCoinflip).toBe(
+			SETTINGS_IDS.testnet.pvpCoinflip,
+		);
 	});
 
 	it('uses the selected network package map', () => {
@@ -39,6 +44,7 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
+		expect(config.settingsIds).toEqual(SETTINGS_IDS.mainnet);
 		expect(config.priceInfoObjectIds).toEqual(PRICE_INFO_OBJECT_IDS.mainnet);
 	});
 

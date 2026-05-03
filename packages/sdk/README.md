@@ -138,6 +138,7 @@ client.games.bcs;
 `suigar(options?)` resolves config from:
 
 - internal package ids by network
+- internal settings ids by network
 - internal supported coin types by network
 - internal price info object ids by network
 - the connected client network
@@ -168,12 +169,14 @@ The registered extension instance exposes the main runtime surface:
 Returns the resolved SDK configuration for the connected network.
 
 This is intended mainly for debugging and inspection, for example to verify the
-resolved package ids or supported coin mappings for the active client network.
+resolved package ids, settings ids, or supported coin mappings for the active
+client network.
 
 It includes:
 
 - `packageIds`
 - `registryIds`
+- `settingsIds`
 - `coinTypes`
 - `priceInfoObjectIds`
 

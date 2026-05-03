@@ -83,8 +83,8 @@ export class SuigarClient {
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * supported coin types, and price info object ids the SDK resolved for the
-	 * current client network.
+	 * registry ids, settings ids, supported coin types, and price info object ids
+	 * the SDK resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
 	 */
