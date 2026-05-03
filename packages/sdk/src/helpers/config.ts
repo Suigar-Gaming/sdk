@@ -7,21 +7,18 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
-	SETTINGS_IDS,
 } from '../configs/index.js';
 import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
 
 export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
-	const settingsIds = SETTINGS_IDS[network];
 	const coinTypes = COIN_TYPES[network];
 	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 
 	return {
 		packageIds: { ...packageIds },
 		registryIds: { ...registryIds },
-		settingsIds: { ...settingsIds },
 		coinTypes: {
 			sui: normalizeStructTag(coinTypes.sui),
 			usdc: normalizeStructTag(coinTypes.usdc),
