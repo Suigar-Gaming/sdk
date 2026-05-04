@@ -3,21 +3,23 @@
 
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 
-export function resolvePackageMoveStructName(
-	structName: string,
-	packageId: string,
-) {
+function replaceStructTagAddress(structName: string, address: string) {
 	return normalizeStructTag({
 		...parseStructTag(structName),
-		address: packageId,
+		address,
 	});
 }
 
-export function resolveTypeNameStructTag(structName: string) {
-	const parsed = parseStructTag(structName);
+export function resolveGameSettingsKeyType(
+	structName: string,
+	packageId: string,
+) {
+	return replaceStructTagAddress(structName, packageId);
+}
 
-	return normalizeStructTag({
-		...parsed,
-		address: parsed.address.replace(/^0x/, ''),
-	});
+export function resolveCoinTypeNameForTypeNameKey(structName: string) {
+	return replaceStructTagAddress(
+		structName,
+		normalizeStructTag(structName).replace(/^0x/, ''),
+	);
 }

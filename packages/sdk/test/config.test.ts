@@ -11,11 +11,11 @@ import {
 } from '../src/configs';
 import { PlinkoSettingsKey } from '../src/contracts/plinko/plinko.js';
 import {
+	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
-	resolvePackageMoveStructName,
+	resolveGameSettingsKeyType,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
-	resolveTypeNameStructTag,
 } from '../src/helpers/index.js';
 
 describe('resolveSuigarConfig', () => {
@@ -74,21 +74,30 @@ describe('resolveSuigarConfig', () => {
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
 	});
 
-	it('rewrites generated struct names with the configured package id', () => {
+	it('builds the SweetHouse settings key type with the configured game package id', () => {
 		expect(
-			resolvePackageMoveStructName(
+			resolveGameSettingsKeyType(
 				PlinkoSettingsKey.name,
 				PACKAGE_IDS.mainnet.plinko,
 			),
 		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
 	});
 
-	it('formats struct tags for Move TypeName dynamic field keys', () => {
-		expect(resolveTypeNameStructTag('0x2::sui::SUI')).toBe(
+	it('keeps settings key module and struct names when replacing the package id', () => {
+		expect(
+			resolveGameSettingsKeyType(
+				'0x123::custom_game::CustomSettingsKey',
+				'0x456',
+			),
+		).toBe('0x456::custom_game::CustomSettingsKey');
+	});
+
+	it('formats coin types for Move TypeName dynamic field key payloads', () => {
+		expect(resolveCoinTypeNameForTypeNameKey('0x2::sui::SUI')).toBe(
 			'0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
 		expect(
-			resolveTypeNameStructTag(
+			resolveCoinTypeNameForTypeNameKey(
 				'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
 			),
 		).toBe(

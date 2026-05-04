@@ -20,10 +20,10 @@ import { Parameters as RangeParameters } from './contracts/range/range';
 import { Parameters as WheelParameters } from './contracts/wheel/wheel';
 import {
 	DEFAULT_CACHE_TTL_MS,
+	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
-	resolvePackageMoveStructName,
+	resolveGameSettingsKeyType,
 	resolveSuigarConfig,
-	resolveTypeNameStructTag,
 } from './helpers/index.js';
 import {
 	buildCoinflipTransaction,
@@ -156,8 +156,8 @@ export class SuigarClient {
 	 * The SDK resolves the game settings object through the configured SweetHouse
 	 * object and then reads the per-coin `Parameters<T>` dynamic object. Results
 	 * are cached according to the extension `cacheTtl` option. Pass
-	 * `ignoreCache: true` to refresh both the settings id lookup and parameters
-	 * read, replacing the cached values.
+	 * `ignoreCache: true` to refresh the onchain read and replace the cached
+	 * value.
 	 *
 	 * @param game Game whose parameters should be loaded.
 	 * @param options Optional coin type, cache override, and abort signal.
@@ -263,7 +263,7 @@ export class SuigarClient {
 			await this.#client.core.getDynamicObjectField({
 				parentId: this.#config.packageIds.sweetHouse,
 				name: {
-					type: resolvePackageMoveStructName(
+					type: resolveGameSettingsKeyType(
 						gameDefinition.settingsKey.name,
 						resolveGamePackageId(this.#config, game),
 					),
@@ -279,7 +279,7 @@ export class SuigarClient {
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({
-					name: resolveTypeNameStructTag(coinType),
+					name: resolveCoinTypeNameForTypeNameKey(coinType),
 				}).toBytes(),
 			},
 			include: {
