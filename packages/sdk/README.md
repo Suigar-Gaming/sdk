@@ -53,10 +53,10 @@ import {
 
 Numeric helper behavior:
 
-- `toBigInt(value)` accepts `bigint`, finite `number`, and non-negative
-  integer `string` inputs and returns a normalized non-negative `bigint`
-- `toU8(value)` validates a finite integer in the inclusive `0..255` range and
-  does not coerce strings or truncate fractional numbers
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
+  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` accepts a finite integer `number` or plain integer `string` in
+  the inclusive `0..255` range and rejects booleans or fractional values
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
   JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a

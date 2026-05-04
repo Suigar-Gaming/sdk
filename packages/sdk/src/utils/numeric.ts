@@ -7,9 +7,12 @@
  * This is only used for helpers that accept raw `number` input before applying
  * additional integer or range validation.
  */
-function assertFinite(value: unknown, label: string): asserts value is number {
+function assertFiniteNumber(
+	value: unknown,
+	errorMessage: string,
+): asserts value is number {
 	if (typeof value !== 'number' || !Number.isFinite(value)) {
-		throw new Error(`${label}: ${String(value)}`);
+		throw new Error(`${errorMessage}: ${String(value)}`);
 	}
 }
 
@@ -20,29 +23,39 @@ function assertFinite(value: unknown, label: string): asserts value is number {
  * - `bigint`
  * - finite `number`
  * - base-10 integer `string`
+ * - `boolean`
  *
  * Number inputs are truncated toward zero before conversion, so `5.9` becomes
- * `5n`. String inputs are parsed through the native `BigInt(...)` constructor,
- * which means only integer strings are accepted.
+ * `5n`. String and boolean inputs are parsed through the native
+ * `BigInt(...)` constructor, so `true` becomes `1n`, `false` becomes `0n`,
+ * and only integer strings are accepted.
  *
  * @param value Value to normalize.
  * @returns A non-negative `bigint`.
- * @throws When `value` is not a bigint, finite number, or integer string.
+ * @throws When `value` is not a bigint, finite number, integer string, or
+ * boolean.
  * @throws When the normalized value is negative.
  */
 export function toBigInt(value: unknown): bigint {
 	let result: bigint;
 
 	try {
-		if (typeof value === 'bigint' || typeof value === 'string') {
+		if (
+			typeof value === 'bigint' ||
+			typeof value === 'string' ||
+			typeof value === 'boolean'
+		) {
 			result = BigInt(value);
 		} else {
-			assertFinite(value, 'Value must be a bigint, number, or integer string');
+			assertFiniteNumber(
+				value,
+				'Value must be a bigint, number, integer string, or boolean',
+			);
 			result = BigInt(Math.trunc(value));
 		}
 	} catch {
 		throw new Error(
-			`Value must be a bigint, number, or integer string: ${value}`,
+			`Value must be a bigint, number, integer string, or boolean: ${value}`,
 		);
 	}
 
@@ -65,7 +78,7 @@ export function toBigInt(value: unknown): bigint {
  * @throws When `value` is not an integer between `0` and `255`.
  */
 export function toU8(value: unknown): number {
-	assertFinite(value, 'Value must be a number');
+	assertFiniteNumber(value, 'Value must be a finite number');
 
 	if (!Number.isInteger(value) || value < 0 || value > 255) {
 		throw new Error(`Value must be an integer between 0 and 255: ${value}`);

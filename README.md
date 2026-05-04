@@ -22,10 +22,10 @@ Public package entrypoints:
 
 Utility behavior from `@suigar/sdk/utils`:
 
-- `toBigInt(value)` accepts `bigint`, finite `number`, and non-negative integer
-  `string` inputs and returns a normalized non-negative `bigint`
-- `toU8(value)` validates a finite integer in the `0..255` range without
-  coercing strings or fractional numbers
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
+  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` accepts a finite integer `number` or plain integer `string`
+  in the `0..255` range and rejects booleans or fractional values
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
   JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a

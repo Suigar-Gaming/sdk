@@ -65,6 +65,7 @@ describe('public source subpath modules', () => {
 		);
 		expect(toBigInt(1)).toBe(1n);
 		expect(toBigInt('1')).toBe(1n);
+		expect(toBigInt(true)).toBe(1n);
 		expect(toU8(255)).toBe(255);
 	});
 

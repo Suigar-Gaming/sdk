@@ -91,35 +91,37 @@ describe('parseGameDetails', () => {
 });
 
 describe('toBigInt', () => {
-	it('accepts bigint, number, and integer string inputs', () => {
+	it('accepts bigint, number, integer string, and boolean inputs', () => {
 		expect(toBigInt(5n)).toBe(5n);
 		expect(toBigInt(5)).toBe(5n);
 		expect(toBigInt(5.9)).toBe(5n);
 		expect(toBigInt('5')).toBe(5n);
 		expect(toBigInt('0005')).toBe(5n);
+		expect(toBigInt(true)).toBe(1n);
+		expect(toBigInt(false)).toBe(0n);
 	});
 
 	it('rejects unsupported input types', () => {
 		expect(() => toBigInt(null)).toThrow(
-			'Value must be a bigint, number, or integer string',
+			'Value must be a bigint, number, integer string, or boolean',
 		);
 	});
 
 	it('rejects invalid string inputs', () => {
 		expect(() => toBigInt('5.1')).toThrow(
-			'Value must be a bigint, number, or integer string',
+			'Value must be a bigint, number, integer string, or boolean',
 		);
 		expect(() => toBigInt('1e3')).toThrow(
-			'Value must be a bigint, number, or integer string',
+			'Value must be a bigint, number, integer string, or boolean',
 		);
 	});
 
 	it('rejects non-finite numbers', () => {
 		expect(() => toBigInt(Number.NaN)).toThrow(
-			'Value must be a bigint, number, or integer string',
+			'Value must be a bigint, number, integer string, or boolean',
 		);
 		expect(() => toBigInt(Number.POSITIVE_INFINITY)).toThrow(
-			'Value must be a bigint, number, or integer string',
+			'Value must be a bigint, number, integer string, or boolean',
 		);
 	});
 
@@ -142,7 +144,7 @@ describe('toU8', () => {
 	});
 
 	it('rejects non-finite numbers', () => {
-		expect(() => toU8(Number.NaN)).toThrow('Value must be a number');
+		expect(() => toU8(Number.NaN)).toThrow('Value must be a finite number');
 		expect(() => toU8(Number.NEGATIVE_INFINITY)).toThrow(
 			'Value must be a number',
 		);
