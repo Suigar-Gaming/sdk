@@ -2,7 +2,8 @@
 	"mode": "pre",
 	"tag": "beta",
 	"initialVersions": {
-		"@suigar/sdk": "2.0.0-beta.1"
+		"@suigar/sdk": "2.0.0-beta.1",
+		"@suigar/playground": "0.1.0"
 	},
 	"changesets": [
 		"all-crews-stop",
@@ -12,6 +13,7 @@
 		"fair-bears-repeat",
 		"few-moose-ring",
 		"fresh-pets-tell",
+		"game-parameters-cache",
 		"green-apes-travel",
 		"green-spoons-smoke",
 		"metal-plums-rest",
