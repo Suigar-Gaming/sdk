@@ -12,3 +12,12 @@ export function resolvePackageMoveStructName(
 		address: packageId,
 	});
 }
+
+export function resolveTypeNameStructTag(structName: string) {
+	const parsed = parseStructTag(structName);
+
+	return normalizeStructTag({
+		...parsed,
+		address: parsed.address.replace(/^0x/, ''),
+	});
+}

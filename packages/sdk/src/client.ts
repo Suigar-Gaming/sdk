@@ -23,6 +23,7 @@ import {
 	resolveGamePackageId,
 	resolvePackageMoveStructName,
 	resolveSuigarConfig,
+	resolveTypeNameStructTag,
 } from './helpers/index.js';
 import {
 	buildCoinflipTransaction,
@@ -175,16 +176,10 @@ export class SuigarClient {
 		const coinType = normalizeStructTag(
 			options.coinType ?? this.#config.coinTypes.sui,
 		);
-		const settingsId = await this.#getGameSettingsId(
-			game,
-			Boolean(options.ignoreCache),
-			options.signal,
-		);
-		return this.#getCached(
-			['parameters', this.#client.network, game, settingsId, coinType],
-			() =>
-				this.#fetchGameParameters(game, settingsId, coinType, options.signal),
-			Boolean(options.ignoreCache),
+		return this.#cache.read(
+			['parameters', this.#client.network, game, coinType],
+			() => this.#fetchGameParameters(game, coinType, options.signal),
+			{ ignoreCache: options.ignoreCache },
 		) as Promise<GameParameters<TGame>>;
 	}
 
@@ -263,106 +258,48 @@ export class SuigarClient {
 		);
 	}
 
-	async #getGameSettingsId(
-		game: Game,
-		ignoreCache: boolean,
-		signal?: AbortSignal,
-	): Promise<string> {
-		const packageId = resolveGamePackageId(this.#config, game);
-
-		return this.#getCached(
-			[
-				'settings-id',
-				this.#client.network,
-				this.#config.packageIds.sweetHouse,
-				packageId,
-				game,
-			],
-			async () => {
-				const definition = GAME_SETTINGS[game];
-				const { dynamicField } = await this.#client.core.getDynamicField({
-					parentId: this.#config.packageIds.sweetHouse,
-					name: {
-						type: resolvePackageMoveStructName(
-							definition.settingsKey.name,
-							packageId,
-						),
-						bcs: definition.settingsKey
-							.serialize({ dummy_field: false })
-							.toBytes(),
-					},
-					signal,
-				});
-
-				if (!dynamicField.childId) {
-					throw new Error(`Missing settings object id for ${game}`);
-				}
-
-				return dynamicField.childId;
-			},
-			ignoreCache,
-		);
-	}
-
 	async #fetchGameParameters<TGame extends Game>(
 		game: TGame,
-		settingsId: string,
 		coinType: string,
 		signal?: AbortSignal,
 	): Promise<GameParameters<TGame>> {
-		const definition = GAME_SETTINGS[game];
-		const response = await this.#client.core.listDynamicFields({
-			parentId: settingsId,
-			signal,
-		});
-
-		const field = response.dynamicFields.find((entry) => {
-			try {
-				return (
-					entry.$kind === 'DynamicObject' &&
-					normalizeStructTag(TypeName.parse(entry.name.bcs).name) === coinType
-				);
-			} catch {
-				return false;
-			}
-		});
-
-		if (field?.childId) {
-			const { objects } = await this.#client.core.getObjects({
-				objectIds: [field.childId],
-				include: {
-					content: true,
+		const gameDefinition = GAME_SETTINGS[game];
+		const packageId = resolveGamePackageId(this.#config, game);
+		const { object: settingsObject } =
+			await this.#client.core.getDynamicObjectField({
+				parentId: this.#config.packageIds.sweetHouse,
+				name: {
+					type: resolvePackageMoveStructName(
+						gameDefinition.settingsKey.name,
+						packageId,
+					),
+					bcs: gameDefinition.settingsKey
+						.serialize({ dummy_field: false })
+						.toBytes(),
 				},
 				signal,
 			});
-			const [object] = objects;
+		const { object } = await this.#client.core.getDynamicObjectField({
+			parentId: settingsObject.objectId,
+			name: {
+				type: TypeName.name,
+				bcs: TypeName.serialize({
+					name: resolveTypeNameStructTag(coinType),
+				}).toBytes(),
+			},
+			include: {
+				content: true,
+			},
+			signal,
+		});
 
-			if (object instanceof Error) {
-				throw object;
-			}
-
-			if (!object?.content) {
-				throw new Error(`Missing parameters object content for ${game}`);
-			}
-
-			return definition.parameters.parse(
-				object.content,
-			) as GameParameters<TGame>;
+		if (!object?.content) {
+			throw new Error(`Missing parameters object content for ${game}`);
 		}
 
-		throw new Error(`Missing ${game} parameters for coin type ${coinType}`);
-	}
-
-	#getCached<Value>(
-		key: [string, ...string[]],
-		fetcher: () => Promise<Value>,
-		ignoreCache: boolean,
-	): Promise<Value> {
-		if (ignoreCache) {
-			this.#cache.clear(key);
-		}
-
-		return Promise.resolve(this.#cache.read(key, fetcher));
+		return gameDefinition.parameters.parse(
+			object.content,
+		) as GameParameters<TGame>;
 	}
 
 	/**

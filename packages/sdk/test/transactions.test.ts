@@ -194,6 +194,9 @@ class TestClient extends CoreClient {
 
 	getDynamicFieldCalls: SuiClientTypes.GetDynamicFieldOptions[] = [];
 
+	getDynamicObjectFieldCalls: SuiClientTypes.GetDynamicObjectFieldOptions[] =
+		[];
+
 	listDynamicFieldsCalls: SuiClientTypes.ListDynamicFieldsOptions[] = [];
 
 	getObjectsCalls: SuiClientTypes.GetObjectsOptions[] = [];
@@ -353,6 +356,51 @@ class TestClient extends CoreClient {
 				digest: `${lookup.childId}-digest`,
 				previousTransaction: null,
 			},
+		};
+	};
+
+	getDynamicObjectField: CoreClient['getDynamicObjectField'] = async <
+		Include extends SuiClientTypes.ObjectInclude,
+	>(
+		options: SuiClientTypes.GetDynamicObjectFieldOptions<Include>,
+	) => {
+		this.getDynamicObjectFieldCalls.push(options);
+		const lookup = this.mockDynamicFieldLookups.find(
+			(entry) =>
+				entry.parentId === options.parentId &&
+				entry.nameType === options.name.type,
+		);
+
+		if (!lookup) {
+			throw new Error(`No dynamic object field found for ${options.name.type}`);
+		}
+
+		const object =
+			this.mockObjects.find((entry) => {
+				return !(entry instanceof Error) && entry.objectId === lookup.childId;
+			}) ??
+			({
+				objectId: lookup.childId,
+				version: '1',
+				digest: `${lookup.childId}-digest`,
+				owner: {
+					$kind: 'AddressOwner',
+					AddressOwner: '0xowner',
+				},
+				type: options.name.type,
+				previousTransaction: undefined,
+				objectBcs: undefined,
+				json: undefined,
+				display: undefined,
+			} as SuiClientTypes.Object<Include>);
+
+		if (object instanceof Error) {
+			throw object;
+		}
+
+		return {
+			object:
+				object as SuiClientTypes.GetDynamicObjectFieldResponse<Include>['object'],
 		};
 	};
 
@@ -1022,6 +1070,11 @@ describe('SuigarClient', () => {
 					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
+				{
+					parentId: '0x222',
+					nameType: TypeName.name,
+					childId: '0x111',
+				},
 			],
 		});
 
@@ -1029,13 +1082,10 @@ describe('SuigarClient', () => {
 
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
-		expect(client.getDynamicFieldCalls).toHaveLength(1);
-		expect(client.listDynamicFieldsCalls).toHaveLength(1);
-		expect(client.listDynamicFieldsCalls[0]).toEqual({
-			parentId: '0x222',
-			signal: undefined,
-		});
-		expect(client.getObjectsCalls).toHaveLength(1);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
+		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.listDynamicFieldsCalls).toHaveLength(0);
+		expect(client.getObjectsCalls).toHaveLength(0);
 	});
 
 	it('caches settings ids and game parameters until ignored', async () => {
@@ -1055,15 +1105,21 @@ describe('SuigarClient', () => {
 					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
+				{
+					parentId: '0x222',
+					nameType: TypeName.name,
+					childId: '0x111',
+				},
 			],
 		});
 
 		await client.suigar.getGameParameters('coinflip');
 		await client.suigar.getGameParameters('coinflip');
 
-		expect(client.getDynamicFieldCalls).toHaveLength(1);
-		expect(client.listDynamicFieldsCalls).toHaveLength(1);
-		expect(client.getObjectsCalls).toHaveLength(1);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
+		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.listDynamicFieldsCalls).toHaveLength(0);
+		expect(client.getObjectsCalls).toHaveLength(0);
 
 		client.mockObjects = [
 			createCoinflipParametersObject({ objectId: '0x111', minStake: 50n }),
@@ -1074,9 +1130,10 @@ describe('SuigarClient', () => {
 		});
 
 		expect(refreshed.min_stake).toBe('50');
-		expect(client.getDynamicFieldCalls).toHaveLength(2);
-		expect(client.listDynamicFieldsCalls).toHaveLength(2);
-		expect(client.getObjectsCalls).toHaveLength(2);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(4);
+		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.listDynamicFieldsCalls).toHaveLength(0);
+		expect(client.getObjectsCalls).toHaveLength(0);
 	});
 
 	it('shares game parameter cache by extension name through the base Mysten client', async () => {
@@ -1096,6 +1153,11 @@ describe('SuigarClient', () => {
 				nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 				childId: '0x222',
 			},
+			{
+				parentId: '0x222',
+				nameType: TypeName.name,
+				childId: '0x111',
+			},
 		];
 		const first = baseClient.$extend(
 			suigar({ name: 'shared' }),
@@ -1111,9 +1173,10 @@ describe('SuigarClient', () => {
 		await first.shared.getGameParameters('coinflip');
 		await second.shared.getGameParameters('coinflip');
 
-		expect(baseClient.getDynamicFieldCalls).toHaveLength(1);
-		expect(baseClient.listDynamicFieldsCalls).toHaveLength(1);
-		expect(baseClient.getObjectsCalls).toHaveLength(1);
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
+		expect(baseClient.getDynamicFieldCalls).toHaveLength(0);
+		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);
+		expect(baseClient.getObjectsCalls).toHaveLength(0);
 	});
 
 	it('returns pvp coinflip games from the unresolved registry entries', async () => {

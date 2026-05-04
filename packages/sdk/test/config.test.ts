@@ -15,6 +15,7 @@ import {
 	resolvePackageMoveStructName,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
+	resolveTypeNameStructTag,
 } from '../src/helpers/index.js';
 
 describe('resolveSuigarConfig', () => {
@@ -80,6 +81,19 @@ describe('resolveSuigarConfig', () => {
 				PACKAGE_IDS.mainnet.plinko,
 			),
 		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
+	});
+
+	it('formats struct tags for Move TypeName dynamic field keys', () => {
+		expect(resolveTypeNameStructTag('0x2::sui::SUI')).toBe(
+			'0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+		);
+		expect(
+			resolveTypeNameStructTag(
+				'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+			),
+		).toBe(
+			'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+		);
 	});
 
 	it('throws when no price info object id is configured for the requested coin type', () => {
