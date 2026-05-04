@@ -2,6 +2,7 @@
 
 import { LoaderCircle, X } from 'lucide-react';
 import * as React from 'react';
+import { CodeBlock } from '@/components/code-block';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
 import {
 	Accordion,
@@ -144,10 +145,16 @@ export function GameSettingsDialog({
 									<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
 										Stake range
 									</p>
-									<p className="mt-2 text-lg font-semibold text-foreground">
-										{activeStakeRange
-											? `${activeStakeRange.min} to ${activeStakeRange.max}`
-											: '--'}
+									<p className="mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-foreground">
+										{activeStakeRange ? (
+											<>
+												<FieldCode>{activeStakeRange.min}</FieldCode>
+												<span>to</span>
+												<FieldCode>{activeStakeRange.max}</FieldCode>
+											</>
+										) : (
+											'--'
+										)}
 									</p>
 									<p className="mt-1 text-sm text-muted-foreground">
 										{coinLabel}
@@ -186,9 +193,12 @@ export function GameSettingsDialog({
 								<AccordionItem value="request">
 									<AccordionTrigger>Lookup request</AccordionTrigger>
 									<AccordionContent>
-										<pre className="overflow-x-auto rounded-xl border border-border/70 bg-background/55 p-4 font-mono text-xs leading-6 text-foreground">
-											<FieldCode>{settingsCallPreview}</FieldCode>
-										</pre>
+										<CodeBlock
+											code={settingsCallPreview}
+											copyMode="icon"
+											copyTitle="Copy lookup request"
+											copyDescription="The lookup request was copied."
+										/>
 									</AccordionContent>
 								</AccordionItem>
 
@@ -217,9 +227,12 @@ export function GameSettingsDialog({
 												{error}
 											</div>
 										) : serializedGameSettings ? (
-											<pre className="max-h-[26rem] overflow-auto rounded-2xl border border-border/70 bg-background/55 p-4 font-mono text-xs leading-6 text-foreground">
-												{serializedGameSettings}
-											</pre>
+											<CodeBlock
+												code={serializedGameSettings}
+												copyMode="icon"
+												copyTitle="Copy raw payload"
+												copyDescription="The raw payload was copied."
+											/>
 										) : (
 											<div className="rounded-2xl border border-border/70 bg-background/40 p-5 text-sm text-muted-foreground">
 												No game settings are available yet for the current
