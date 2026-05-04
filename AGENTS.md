@@ -75,7 +75,7 @@ pnpm release
   - `types/` - public option and config types
   - `utils/` - public parser, constants, and numeric helpers exposed through `@suigar/sdk/utils`
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
-  - `configs/` - network-scoped package ids, settings ids, supported coin types, and price info object ids
+  - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `packages/sdk/test/` - Vitest coverage for config resolution and transaction builders
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
@@ -142,9 +142,9 @@ When making changes:
 Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is responsible for:
 
 - resolving network-scoped package ids
-- resolving network-scoped settings ids
 - normalizing the configured supported coin types for the active network
 - resolving price info object ids from the supported-coin mapping
+- resolving game settings object ids from the configured SweetHouse object for `getGameParameters`
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
 

@@ -3,9 +3,10 @@
 
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
-import { toBase64 } from '@mysten/sui/utils';
+import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { Parameters as CoinflipParameters } from './contracts/coinflip/coinflip';
 import { BetResultEvent } from './contracts/core/core';
+import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name';
 import { Parameters as LimboParameters } from './contracts/limbo/limbo';
 import { Parameters as PlinkoParameters } from './contracts/plinko/plinko';
 import {
@@ -17,7 +18,12 @@ import {
 } from './contracts/pvp-coinflip/pvp_coinflip';
 import { Parameters as RangeParameters } from './contracts/range/range';
 import { Parameters as WheelParameters } from './contracts/wheel/wheel';
-import { resolveSuigarConfig } from './helpers/index.js';
+import {
+	DEFAULT_CACHE_TTL_MS,
+	resolveGamePackageId,
+	resolvePackageMoveStructName,
+	resolveSuigarConfig,
+} from './helpers/index.js';
 import {
 	buildCoinflipTransaction,
 	buildLimboTransaction,
@@ -26,6 +32,7 @@ import {
 	buildRangeTransaction,
 	buildWheelTransaction,
 } from './transactions';
+import { TtlClientCache } from './ttl-cache.js';
 import {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
@@ -37,6 +44,7 @@ import {
 	BuildPvPCoinflipTransactionOptions,
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
+	Game,
 	PvPCoinflipAction,
 	StandardGame,
 	SuigarConfig,
@@ -46,16 +54,33 @@ import {
 	WithPartner,
 	WithThrowOnError,
 } from './types';
+import {
+	GAME_SETTINGS,
+	type GameParameters,
+	type GetGameParametersOptions,
+} from './types/game-settings.type.js';
 import { parseCoinType } from './utils/index.js';
+
+export type {
+	GameParameters,
+	GameParametersMap,
+	GetGameParametersOptions,
+} from './types/game-settings.type.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
 	partner,
+	cacheTtl,
 }: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
 		register: (client: ClientWithCoreApi) => {
-			return new SuigarClient({ client, partner });
+			return new SuigarClient({
+				client,
+				name: String(name),
+				partner,
+				cacheTtl,
+			});
 		},
 	};
 }
@@ -67,15 +92,28 @@ export class SuigarClient {
 
 	#partner: string | undefined;
 
+	#cache: TtlClientCache;
+
 	constructor({
 		client,
+		name,
 		partner,
+		cacheTtl,
 	}: {
 		client: ClientWithCoreApi;
+		name: string;
 		partner?: string;
+		cacheTtl?: number;
 	}) {
 		this.#client = client;
 		this.#partner = partner;
+		this.#cache = client.cache
+			.scope('@suigar/sdk')
+			.readSync([name, 'ttl-cache'], () => {
+				return new TtlClientCache({
+					ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
+				});
+			});
 
 		const network = this.#client.network as SuiNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
@@ -89,8 +127,8 @@ export class SuigarClient {
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * registry ids, settings ids, supported coin types, and price info object ids
-	 * the SDK resolved for the current client network.
+	 * registry ids, supported coin types, and price info object ids the SDK
+	 * resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
 	 */
@@ -115,6 +153,39 @@ export class SuigarClient {
 	) {
 		const bytes = await transaction.build({ ...options, client: this.#client });
 		return toBase64(bytes);
+	}
+
+	/**
+	 * Reads on-chain game parameters for the requested game.
+	 *
+	 * The SDK resolves the game settings object through the configured SweetHouse
+	 * object and then reads the per-coin `Parameters<T>` dynamic object. Results
+	 * are cached according to the extension `cacheTtl` option. Pass
+	 * `ignoreCache: true` to refresh both the settings id lookup and parameters
+	 * read, replacing the cached values.
+	 *
+	 * @param game Game whose parameters should be loaded.
+	 * @param options Optional coin type, cache override, and abort signal.
+	 * @returns Parsed game parameters typed for the requested game.
+	 */
+	async getGameParameters<TGame extends Game>(
+		game: TGame,
+		options: GetGameParametersOptions = {},
+	): Promise<GameParameters<TGame>> {
+		const coinType = normalizeStructTag(
+			options.coinType ?? this.#config.coinTypes.sui,
+		);
+		const settingsId = await this.#getGameSettingsId(
+			game,
+			Boolean(options.ignoreCache),
+			options.signal,
+		);
+		return this.#getCached(
+			['parameters', this.#client.network, game, settingsId, coinType],
+			() =>
+				this.#fetchGameParameters(game, settingsId, coinType, options.signal),
+			Boolean(options.ignoreCache),
+		) as Promise<GameParameters<TGame>>;
 	}
 
 	/**
@@ -190,6 +261,108 @@ export class SuigarClient {
 		return resolvedGames.flatMap((game) =>
 			game instanceof Error ? [] : [game],
 		);
+	}
+
+	async #getGameSettingsId(
+		game: Game,
+		ignoreCache: boolean,
+		signal?: AbortSignal,
+	): Promise<string> {
+		const packageId = resolveGamePackageId(this.#config, game);
+
+		return this.#getCached(
+			[
+				'settings-id',
+				this.#client.network,
+				this.#config.packageIds.sweetHouse,
+				packageId,
+				game,
+			],
+			async () => {
+				const definition = GAME_SETTINGS[game];
+				const { dynamicField } = await this.#client.core.getDynamicField({
+					parentId: this.#config.packageIds.sweetHouse,
+					name: {
+						type: resolvePackageMoveStructName(
+							definition.settingsKey.name,
+							packageId,
+						),
+						bcs: definition.settingsKey
+							.serialize({ dummy_field: false })
+							.toBytes(),
+					},
+					signal,
+				});
+
+				if (!dynamicField.childId) {
+					throw new Error(`Missing settings object id for ${game}`);
+				}
+
+				return dynamicField.childId;
+			},
+			ignoreCache,
+		);
+	}
+
+	async #fetchGameParameters<TGame extends Game>(
+		game: TGame,
+		settingsId: string,
+		coinType: string,
+		signal?: AbortSignal,
+	): Promise<GameParameters<TGame>> {
+		const definition = GAME_SETTINGS[game];
+		const response = await this.#client.core.listDynamicFields({
+			parentId: settingsId,
+			signal,
+		});
+
+		const field = response.dynamicFields.find((entry) => {
+			try {
+				return (
+					entry.$kind === 'DynamicObject' &&
+					normalizeStructTag(TypeName.parse(entry.name.bcs).name) === coinType
+				);
+			} catch {
+				return false;
+			}
+		});
+
+		if (field?.childId) {
+			const { objects } = await this.#client.core.getObjects({
+				objectIds: [field.childId],
+				include: {
+					content: true,
+				},
+				signal,
+			});
+			const [object] = objects;
+
+			if (object instanceof Error) {
+				throw object;
+			}
+
+			if (!object?.content) {
+				throw new Error(`Missing parameters object content for ${game}`);
+			}
+
+			return definition.parameters.parse(
+				object.content,
+			) as GameParameters<TGame>;
+		}
+
+		throw new Error(`Missing ${game} parameters for coin type ${coinType}`);
+	}
+
+	#getCached<Value>(
+		key: [string, ...string[]],
+		fetcher: () => Promise<Value>,
+		ignoreCache: boolean,
+	): Promise<Value> {
+		if (ignoreCache) {
+			this.#cache.clear(key);
+		}
+
+		return Promise.resolve(this.#cache.read(key, fetcher));
 	}
 
 	/**

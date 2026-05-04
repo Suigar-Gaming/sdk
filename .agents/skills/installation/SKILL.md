@@ -109,6 +109,22 @@ const tx = client.suigar.tx.createBetTransaction('coinflip', {
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
 
+## Onchain parameters
+
+Use `client.suigar.getGameParameters(game, options?)` when an app needs live
+onchain game bounds or RTP parameters. The SDK resolves the settings object from
+SweetHouse, then reads the per-coin `Parameters<T>` object.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+```
+
+The return type is inferred from the game id. The SDK caches settings id and
+parameters lookups for `cacheTtl`, which defaults to 30 minutes. Pass
+`ignoreCache: true` to force both lookups to refresh.
+
 ## Event parsing
 
 Use the extension's generated BCS helpers for emitted events:
@@ -130,6 +146,6 @@ Guardrails:
 
 1. Install and import `@suigar/sdk`, `@mysten/sui`, and `@mysten/bcs`.
 2. Extend the existing client with `suigar()`.
-3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, settings ids, coin types, and price info object ids.
+3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin types, and price info object ids.
 4. Keep transaction serialization inside the same registered client instance.
 5. Keep the consuming app on ESM and pass the explicit `network` required by current client constructors.

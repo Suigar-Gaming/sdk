@@ -442,6 +442,21 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}, [mode, pvpAction, pvpGame, setPvpForms, setStandardForms, standardGame]);
 
 	React.useEffect(() => {
+		async function getParams() {
+			const parameters = await currentClient.suigar.getGameParameters(
+				'coinflip',
+				{
+					coinType,
+				},
+			);
+
+			console.log(parameters);
+		}
+
+		getParams();
+	}, [currentClient, coinType]);
+
+	React.useEffect(() => {
 		if (mode !== 'pvp') {
 			return;
 		}

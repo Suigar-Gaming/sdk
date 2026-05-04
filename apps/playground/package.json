@@ -6,9 +6,9 @@
 		"dev": "next dev",
 		"build": "next build",
 		"eslint:fix": "eslint . --fix",
-		"format": "pnpm run prettier:fix",
+		"format": "pnpm prettier:fix",
 		"start": "next start",
-		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
+		"lint": "pnpm eslint:fix && pnpm prettier:fix",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"typecheck": "tsc --noEmit"
 	},

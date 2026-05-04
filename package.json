@@ -14,8 +14,8 @@
 		"changeset:beta:exit": "changeset pre exit",
 		"changeset:version": "changeset version",
 		"eslint:fix": "eslint . --fix",
-		"format": "pnpm run prettier:fix",
-		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
+		"format": "pnpm prettier:fix",
+		"lint": "pnpm eslint:fix && pnpm prettier:fix",
 		"prepare": "husky",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"release": "pnpm turbo run build:ci --filter='./packages/*' && changeset publish"

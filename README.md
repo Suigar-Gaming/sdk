@@ -148,6 +148,29 @@ const client = new SuiGrpcClient({
 }).$extend(suigar({ partner: '0xpartner_wallet_address' }));
 ```
 
+Configure SDK-managed onchain read caching with `cacheTtl`, in milliseconds.
+The default is 30 minutes.
+
+```ts
+const client = new SuiGrpcClient({ network, baseUrl }).$extend(
+	suigar({ cacheTtl: 30 * 60 * 1000 }),
+);
+```
+
+Read typed onchain game parameters with `getGameParameters(game, options?)`.
+The SDK resolves the game settings object from SweetHouse and caches both the
+settings id lookup and parameters lookup.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+
+console.log(parameters.min_stake);
+```
+
+Pass `ignoreCache: true` to refresh both lookups and update the cache.
+
 ## Standard Game APIs
 
 Use `createBetTransaction(gameId, options)` for standard games:

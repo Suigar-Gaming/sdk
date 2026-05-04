@@ -8,10 +8,11 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
-	SETTINGS_IDS,
 } from '../src/configs';
+import { PlinkoSettingsKey } from '../src/contracts/plinko/plinko.js';
 import {
 	resolveGamePackageId,
+	resolvePackageMoveStructName,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
 } from '../src/helpers/index.js';
@@ -32,10 +33,6 @@ describe('resolveSuigarConfig', () => {
 		expect(config.registryIds.pvpCoinflip).toBe(
 			REGISTRY_IDS.testnet.pvpCoinflip,
 		);
-		expect(config.settingsIds.coinflip).toBe(SETTINGS_IDS.testnet.coinflip);
-		expect(config.settingsIds.pvpCoinflip).toBe(
-			SETTINGS_IDS.testnet.pvpCoinflip,
-		);
 	});
 
 	it('uses the selected network package map', () => {
@@ -44,7 +41,6 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
-		expect(config.settingsIds).toEqual(SETTINGS_IDS.mainnet);
 		expect(config.priceInfoObjectIds).toEqual(PRICE_INFO_OBJECT_IDS.mainnet);
 	});
 
@@ -75,6 +71,15 @@ describe('resolveSuigarConfig', () => {
 		config.packageIds.range = '0x123';
 
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
+	});
+
+	it('rewrites generated struct names with the configured package id', () => {
+		expect(
+			resolvePackageMoveStructName(
+				PlinkoSettingsKey.name,
+				PACKAGE_IDS.mainnet.plinko,
+			),
+		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
 	});
 
 	it('throws when no price info object id is configured for the requested coin type', () => {

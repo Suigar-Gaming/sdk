@@ -138,7 +138,6 @@ client.games.bcs;
 `suigar(options?)` resolves config from:
 
 - internal package ids by network
-- internal settings ids by network
 - internal supported coin types by network
 - internal price info object ids by network
 - the connected client network
@@ -148,17 +147,22 @@ Supported override areas:
 
 - `name`
 - `partner`
+- `cacheTtl`
 
 If `partner` is configured, the SDK automatically writes that partner wallet
 address into the onchain metadata vec-map. Transaction builder options may also
 include `metadata`, but reserved keys such as `partner` and `referrer` are
 ignored with a warning when provided manually.
 
+`cacheTtl` controls the SDK cache for onchain config reads such as game
+parameters. It is expressed in milliseconds and defaults to 30 minutes.
+
 ## Runtime Surface
 
 The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
+- `getGameParameters(game, options?)`
 - `serializeTransactionToBase64(transaction, options?)`
 - `getPvPCoinflipGames(options?)`
 - `bcs`
@@ -169,14 +173,12 @@ The registered extension instance exposes the main runtime surface:
 Returns the resolved SDK configuration for the connected network.
 
 This is intended mainly for debugging and inspection, for example to verify the
-resolved package ids, settings ids, or supported coin mappings for the active
-client network.
+resolved package ids or supported coin mappings for the active client network.
 
 It includes:
 
 - `packageIds`
 - `registryIds`
-- `settingsIds`
 - `coinTypes`
 - `priceInfoObjectIds`
 
@@ -184,6 +186,26 @@ It includes:
 const config = client.suigar.getConfig();
 console.log(config.packageIds);
 ```
+
+### `getGameParameters(game, options?)`
+
+Returns the onchain `Parameters<T>` object for any supported game. The return
+type is inferred from `game`.
+
+The SDK resolves the game settings object from the configured SweetHouse object,
+then reads the per-coin parameters object from that settings object. Both lookups
+are cached using the extension `cacheTtl`.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+
+console.log(parameters.min_stake);
+```
+
+Pass `ignoreCache: true` to refresh the settings id and parameters lookups and
+replace the cached values.
 
 ### `serializeTransactionToBase64(transaction, options?)`
 
