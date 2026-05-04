@@ -119,7 +119,7 @@ const tx = client.suigar.tx.createBetTransaction('plinko', {
 
 Guardrails:
 
-- `configId` must match a valid onchain configuration.
+- `configId` must match a valid on-chain configuration.
 - Do not derive or randomize `configId` silently.
 
 ## Range
@@ -210,7 +210,7 @@ Guardrails:
 
 - Use `event.bcs` as the event payload input when available.
 - Do not hand-decode `game_details` byte arrays in app code; use `parseGameDetails`.
-- `parseGameDetails` preserves the onchain keys and returns decoded string, number, and boolean values.
+- `parseGameDetails` preserves the on-chain keys and returns decoded string, number, and boolean values.
 - Metadata remains generic `VecMap<string, vector<u8>>` data; decode it according to the app's own metadata contract.
 
 ## Implementation checklist

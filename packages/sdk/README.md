@@ -73,7 +73,7 @@ Numeric helper behavior:
   Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
-  preserving the original onchain keys
+  preserving the original on-chain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -147,7 +147,7 @@ client.suigar;
 ```
 
 Do not pass a partner slug, label, or display name here. Use the wallet
-address that should receive partner attribution onchain.
+address that should receive partner attribution on-chain.
 
 You can rename the extension:
 
@@ -177,11 +177,11 @@ Supported override areas:
 - `cacheTtl`
 
 If `partner` is configured, the SDK automatically writes that partner wallet
-address into the onchain metadata vec-map. Transaction builder options may also
+address into the on-chain metadata vec-map. Transaction builder options may also
 include `metadata`, but reserved keys such as `partner` and `referrer` are
 ignored with a warning when provided manually.
 
-`cacheTtl` controls the SDK cache for onchain reads such as parsed game
+`cacheTtl` controls the SDK cache for on-chain reads such as parsed game
 parameters. It is expressed in milliseconds and defaults to 30 minutes.
 
 ## Runtime Surface
@@ -216,7 +216,7 @@ console.log(config.packageIds);
 
 ### `getGameParameters(game, options?)`
 
-Returns the onchain `Parameters<T>` object for any supported game and coin type.
+Returns the on-chain `Parameters<T>` object for any supported game and coin type.
 The return type is inferred from `game`.
 
 The SDK first reads the selected game's settings object from the configured
@@ -237,7 +237,7 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 console.log(parameters.min_stake);
 ```
 
-Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+Pass `ignoreCache: true` to refresh the on-chain read and replace the cached
 value.
 
 ### `serializeTransactionToBase64(transaction, options?)`
@@ -368,7 +368,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 > **Note:**
 >
 > - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
-> - with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` onchain
+> - with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` on-chain
 > - range converts each point with `Math.round(value * scale)`
 > - range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
 > - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
@@ -534,7 +534,7 @@ const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
 const gameDetails = parseGameDetails(decoded.game_details);
 ```
 
-`parseGameDetails` preserves the onchain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
+`parseGameDetails` preserves the on-chain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
 When the extension is configured with `partner`, decoded event `metadata` will
 contain that partner wallet address under the `partner` entry.

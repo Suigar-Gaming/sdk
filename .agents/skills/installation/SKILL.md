@@ -70,7 +70,7 @@ Utility behavior:
   Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
-  preserving the original onchain keys
+  preserving the original on-chain keys
 
 Internal config and metadata helpers stay under `packages/sdk/src/helpers/*` and are not part of the intended public import surface.
 
@@ -99,7 +99,7 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(
 ```
 
 > Do not pass a partner slug, label, or display name. Use the wallet address
-> that should be recorded onchain.
+> that should be recorded on-chain.
 
 If the app uses a custom extension name, preserve it consistently:
 
@@ -133,10 +133,10 @@ const tx = client.suigar.tx.createBetTransaction('coinflip', {
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
 
-## Onchain parameters
+## On-chain parameters
 
 Use `client.suigar.getGameParameters(game, options?)` when an app needs live
-onchain game bounds or RTP parameters. The SDK first reads the selected game's
+on-chain game bounds or RTP parameters. The SDK first reads the selected game's
 settings object from SweetHouse, then reads that game's coin-specific
 `Parameters<T>` object and parses it.
 
@@ -152,7 +152,7 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 
 The return type is inferred from the game id. The SDK caches the parsed
 parameters for `cacheTtl`, which defaults to 30 minutes. Pass
-`ignoreCache: true` to force the onchain read to refresh and replace the cached
+`ignoreCache: true` to force the on-chain read to refresh and replace the cached
 value.
 
 ## Event parsing

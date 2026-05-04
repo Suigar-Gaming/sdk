@@ -150,7 +150,7 @@ export class SuigarClient {
 	 * The SDK first reads the selected game's settings object from SweetHouse,
 	 * then reads that game's coin-specific `Parameters<T>` object. Results are
 	 * cached according to the extension `cacheTtl` option. Pass
-	 * `ignoreCache: true` to refresh the onchain read and replace the cached
+	 * `ignoreCache: true` to refresh the on-chain read and replace the cached
 	 * value.
 	 *
 	 * @param game Game whose parameters should be loaded.
@@ -173,7 +173,7 @@ export class SuigarClient {
 
 	/**
 	 * Lists unresolved PvP coinflip games from the configured registry and resolves
-	 * each entry into parsed onchain game state.
+	 * each entry into parsed on-chain game state.
 	 *
 	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
 	 * loads the referenced game objects through `client.core.getObjects()`. Registry

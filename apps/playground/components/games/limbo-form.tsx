@@ -51,7 +51,7 @@ export function LimboForm({
 						scale <FieldCode>{String(effectiveScale)}</FieldCode>, a target
 						multiplier of <FieldCode>2.5</FieldCode> becomes{' '}
 						<FieldCode>{String(Math.round(2.5 * effectiveScale))}</FieldCode>{' '}
-						onchain.
+						on-chain.
 					</FieldDescription>
 					{targetMultiplierDescription}
 				</Field>
