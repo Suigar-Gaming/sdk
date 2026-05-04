@@ -20,6 +20,20 @@ Public package entrypoints:
 - `@suigar/sdk/games` for game option and action types
 - `@suigar/sdk/utils` for parser helpers, numeric helpers, and reusable constants
 
+Utility behavior from `@suigar/sdk/utils`:
+
+- `toBigInt(value)` accepts `bigint`, finite `number`, and non-negative integer
+  `string` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` validates a finite integer in the `0..255` range without
+  coercing strings or fractional numbers
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
+  JavaScript `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a
+  JavaScript `number`
+- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+  byte arrays into the expected string, number, and boolean values while
+  preserving the original onchain keys
+
 ## Building Locally
 
 To get started, install [pnpm](https://pnpm.io/) and run commands from the repository root:

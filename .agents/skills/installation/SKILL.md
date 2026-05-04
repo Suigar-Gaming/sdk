@@ -48,6 +48,20 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `DEFAULT_RANGE_SCALE`
 - `DEFAULT_LIMBO_MULTIPLIER_SCALE`
 
+Utility behavior:
+
+- `toBigInt(value)` accepts `bigint`, finite `number`, and non-negative
+  integer `string` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` validates a finite integer in the inclusive `0..255` range and
+  does not coerce strings or truncate fractional numbers
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript
+  `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a
+  JavaScript `number`
+- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+  byte arrays into the expected string, number, and boolean values while
+  preserving the original onchain keys
+
 Internal config and metadata helpers stay under `packages/sdk/src/helpers/*` and are not part of the intended public import surface.
 
 ## Default setup
