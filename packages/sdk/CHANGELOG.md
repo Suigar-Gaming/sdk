@@ -1,5 +1,14 @@
 # @suigar/sdk
 
+## 2.0.0-beta.12
+
+### Patch Changes
+
+- 85ae057: Refine public validation failures to use `RangeError` and `TypeError` instead
+  of generic `Error` for unsupported networks, unsupported game or PvP action
+  inputs, unsupported configured coin types, bounded integer helpers, and
+  `parseCoinType()` parsing failures.
+
 ## 2.0.0-beta.11
 
 ### Patch Changes
