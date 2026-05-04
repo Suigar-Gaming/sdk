@@ -77,7 +77,7 @@ export function fromMoveFloat(float: MoveFloat): number {
 export function parseCoinType(type: string): string {
 	const coinType = parseStructTag(type).typeParams[0];
 	if (!coinType) {
-		throw new Error(`Unable to parse coin type from ${type}`);
+		throw new TypeError(`Unable to parse coin type from ${type}`);
 	}
 
 	return normalizeStructTag(coinType);

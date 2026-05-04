@@ -94,8 +94,8 @@ pnpm release
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
    The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
-   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values; `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range; `toU16()` accepts the same input shapes in the `0..65535` range.
-3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
+   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values, throwing `TypeError` for invalid input shapes and `RangeError` for negatives. `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values. `toU16()` accepts the same input shapes in the `0..65535` range with the same `TypeError` and `RangeError` split. `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
+3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders. Unsupported game ids, PvP actions, and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
 
@@ -146,6 +146,9 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
+
+Unsupported network resolution and unsupported configured coin types should be
+treated as `RangeError` cases when documenting or testing these flows.
 
 `client.suigar.getGameParameters(game, options?)` first reads the selected
 game's settings object from SweetHouse, then reads that game's

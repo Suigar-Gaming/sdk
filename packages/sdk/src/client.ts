@@ -106,7 +106,7 @@ export class SuigarClient {
 
 		const network = this.#client.network as SuiNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
-			throw new Error(`Unsupported network: ${network}`);
+			throw new RangeError(`Unsupported network: ${network}`);
 		}
 
 		this.#config = resolveSuigarConfig(network);
@@ -246,53 +246,6 @@ export class SuigarClient {
 		);
 	}
 
-	async #fetchGameParameters<TGame extends Game>(
-		game: TGame,
-		coinType: string,
-		signal?: AbortSignal,
-	): Promise<GameParameters<TGame>> {
-		const gameDefinition = GAME_SETTINGS[game];
-
-		const { object: settingsObject } =
-			await this.#client.core.getDynamicObjectField({
-				parentId: this.#config.packageIds.sweetHouse,
-				name: {
-					type: resolveGameSettingsKeyType(
-						gameDefinition.settingsKey.name,
-						resolveGamePackageId(this.#config, game),
-					),
-					bcs: gameDefinition.settingsKey
-						.serialize({ dummy_field: false })
-						.toBytes(),
-				},
-				signal,
-			});
-
-		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: settingsObject.objectId,
-			name: {
-				type: TypeName.name,
-				bcs: TypeName.serialize({
-					name: resolveCoinTypeNameForTypeNameKey(coinType),
-				}).toBytes(),
-			},
-			include: {
-				content: true,
-			},
-			signal,
-		});
-
-		if (!object?.content) {
-			throw new Error(
-				`Missing parameters object content for ${game} and coin type ${coinType}`,
-			);
-		}
-
-		return gameDefinition.parameters.parse(
-			object.content,
-		) as GameParameters<TGame>;
-	}
-
 	/**
 	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
 	 *
@@ -375,7 +328,7 @@ export class SuigarClient {
 						partner: this.#partner,
 					} as WithPartner<BuildWheelTransactionOptions>);
 				default:
-					throw new Error(`Unsupported game: ${gameId}`);
+					throw new RangeError(`Unsupported game: ${gameId}`);
 			}
 		},
 		/**
@@ -412,7 +365,7 @@ export class SuigarClient {
 						partner: this.#partner,
 					});
 				default:
-					throw new Error(`Unsupported PvP coinflip action: ${action}`);
+					throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
 			}
 		},
 	};
@@ -430,5 +383,52 @@ export class SuigarClient {
 				useGasCoin: options.allowGasCoinShortcut,
 			});
 		};
+	}
+
+	async #fetchGameParameters<TGame extends Game>(
+		game: TGame,
+		coinType: string,
+		signal?: AbortSignal,
+	): Promise<GameParameters<TGame>> {
+		const gameDefinition = GAME_SETTINGS[game];
+
+		const { object: settingsObject } =
+			await this.#client.core.getDynamicObjectField({
+				parentId: this.#config.packageIds.sweetHouse,
+				name: {
+					type: resolveGameSettingsKeyType(
+						gameDefinition.settingsKey.name,
+						resolveGamePackageId(this.#config, game),
+					),
+					bcs: gameDefinition.settingsKey
+						.serialize({ dummy_field: false })
+						.toBytes(),
+				},
+				signal,
+			});
+
+		const { object } = await this.#client.core.getDynamicObjectField({
+			parentId: settingsObject.objectId,
+			name: {
+				type: TypeName.name,
+				bcs: TypeName.serialize({
+					name: resolveCoinTypeNameForTypeNameKey(coinType),
+				}).toBytes(),
+			},
+			include: {
+				content: true,
+			},
+			signal,
+		});
+
+		if (!object?.content) {
+			throw new Error(
+				`Missing parameters object content for ${game} and coin type ${coinType}`,
+			);
+		}
+
+		return gameDefinition.parameters.parse(
+			object.content,
+		) as GameParameters<TGame>;
 	}
 }

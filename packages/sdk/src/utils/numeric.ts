@@ -96,7 +96,9 @@ function toBoundedInt(value: unknown, max: number, typeName: string): number {
 		num < 0 ||
 		num > max
 	) {
-		throw new Error(`Value must be a ${typeName} integer (0-${max}): ${value}`);
+		throw new RangeError(
+			`Value must be a ${typeName} integer (0-${max}): ${value}`,
+		);
 	}
 
 	return num;

@@ -56,14 +56,21 @@ Numeric helper behavior:
 
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
   `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+  while throwing `TypeError` for invalid input shapes and `RangeError` for
+  negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in
-  the inclusive `0..255` range and rejects booleans or fractional values
+  the inclusive `0..255` range, throwing `TypeError` for non-numeric input and
+  `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string`
-  in the inclusive `0..65535` range and rejects booleans or fractional values
+  in the inclusive `0..65535` range, throwing `TypeError` for non-numeric
+  input and `RangeError` for booleans, fractional values, or out-of-range
+  integers
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
   JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a
   JavaScript `number`
+- `parseCoinType(type)` extracts the normalized first generic coin type from a
+  Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
   preserving the original onchain keys
@@ -121,6 +128,9 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ### `suigar(options?)`
 
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
+
+The extension constructor throws `RangeError` when the connected client network
+is not one of the SDK's supported Sui networks.
 
 ### Partner Setup
 
@@ -321,6 +331,12 @@ Shared behavior:
 - the SDK resolves the price info object from the configured supported-coin mapping
 - the reward object is transferred back to `playerAddress`
 
+Error behavior:
+
+- `RangeError` when `gameId` is unsupported
+- `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
+- `RangeError` from bounded numeric helpers such as `toU8()` when `plinko` or `wheel` `configId` is out of range or not an integer
+
 Per-game options:
 
 - `coinflip`: `side: 'heads' | 'tails'`
@@ -420,6 +436,11 @@ Action-specific options:
 - `join`: `gameId`
 - `cancel`: `gameId`
 
+Error behavior:
+
+- `RangeError` when `action` is unsupported
+- `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
+
 ## `bcs`
 
 BCS helpers live under `client.suigar.bcs`.
@@ -438,6 +459,7 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>`
+  and throws `TypeError` when the type string does not include a first generic coin type
 - `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
