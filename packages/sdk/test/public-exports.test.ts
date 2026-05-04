@@ -64,6 +64,7 @@ describe('public source subpath modules', () => {
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
 		expect(toBigInt(1)).toBe(1n);
+		expect(toBigInt('1')).toBe(1n);
 		expect(toU8(255)).toBe(255);
 	});
 

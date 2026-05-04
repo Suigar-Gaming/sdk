@@ -1,67 +1,73 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-function isFiniteNumber(
-	value: unknown,
-	message: string,
-): asserts value is number {
-	if (typeof value !== 'number') {
-		throw new Error(`${message}: ${String(value)}`);
-	}
-
-	if (!Number.isFinite(value)) {
-		throw new Error(`Value must be a finite number: ${value}`);
+/**
+ * Ensures a value is a finite JavaScript number.
+ *
+ * This is only used for helpers that accept raw `number` input before applying
+ * additional integer or range validation.
+ */
+function assertFinite(value: unknown, label: string): asserts value is number {
+	if (typeof value !== 'number' || !Number.isFinite(value)) {
+		throw new Error(`${label}: ${String(value)}`);
 	}
 }
 
 /**
- * Normalizes a numeric input into a non-negative `bigint`.
+ * Normalizes a value into a non-negative `bigint`.
  *
- * This helper accepts the two number shapes the SDK commonly sees from app
- * code: plain JavaScript numbers and already-normalized `bigint` values.
- * Number inputs are truncated toward zero before conversion, so UI-friendly
- * values like `5.9` become `5n`.
+ * Accepted inputs:
+ * - `bigint`
+ * - finite `number`
+ * - base-10 integer `string`
  *
- * @param value Value to coerce into a `bigint`.
- * @returns The normalized non-negative `bigint`.
- * @throws When `value` is not a finite number or bigint, or when it is negative.
+ * Number inputs are truncated toward zero before conversion, so `5.9` becomes
+ * `5n`. String inputs are parsed through the native `BigInt(...)` constructor,
+ * which means only integer strings are accepted.
+ *
+ * @param value Value to normalize.
+ * @returns A non-negative `bigint`.
+ * @throws When `value` is not a bigint, finite number, or integer string.
+ * @throws When the normalized value is negative.
  */
 export function toBigInt(value: unknown): bigint {
-	if (typeof value === 'bigint') {
-		if (value < 0n) {
-			throw new Error(`Value must be non-negative: ${value}`);
+	let result: bigint;
+
+	try {
+		if (typeof value === 'bigint' || typeof value === 'string') {
+			result = BigInt(value);
+		} else {
+			assertFinite(value, 'Value must be a bigint, number, or integer string');
+			result = BigInt(Math.trunc(value));
 		}
-		return value;
+	} catch {
+		throw new Error(
+			`Value must be a bigint, number, or integer string: ${value}`,
+		);
 	}
 
-	isFiniteNumber(value, 'Value must be a bigint or number');
-
-	if (value < 0) {
-		throw new Error(`Value must be a finite non-negative number: ${value}`);
+	if (result < 0n) {
+		throw new Error(`Value must be non-negative: ${value}`);
 	}
 
-	return BigInt(Math.trunc(value));
+	return result;
 }
 
 /**
  * Validates that a value can be safely used as a Move `u8`.
  *
- * Use this for config ids and other small integer fields that must stay inside
- * the `0..255` range. Unlike `toBigInt`, this does not coerce fractional
- * values: the input must already be an integer.
+ * The input must already be a finite integer in the inclusive `0..255` range.
+ * This helper does not coerce strings or truncate fractional numbers.
  *
  * @param value Value to validate.
- * @returns The original number once it has been confirmed to be a valid `u8`.
- * @throws When `value` is not a finite integer between `0` and `255`.
+ * @returns The original numeric value once validated.
+ * @throws When `value` is not a finite number.
+ * @throws When `value` is not an integer between `0` and `255`.
  */
 export function toU8(value: unknown): number {
-	isFiniteNumber(value, 'Value must be a number');
+	assertFinite(value, 'Value must be a number');
 
-	if (!Number.isInteger(value)) {
-		throw new Error(`Value must be an integer: ${value}`);
-	}
-
-	if (value < 0 || value > 255) {
+	if (!Number.isInteger(value) || value < 0 || value > 255) {
 		throw new Error(`Value must be an integer between 0 and 255: ${value}`);
 	}
 

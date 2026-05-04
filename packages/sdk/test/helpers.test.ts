@@ -91,29 +91,42 @@ describe('parseGameDetails', () => {
 });
 
 describe('toBigInt', () => {
-	it('accepts bigint and number inputs', () => {
+	it('accepts bigint, number, and integer string inputs', () => {
 		expect(toBigInt(5n)).toBe(5n);
 		expect(toBigInt(5)).toBe(5n);
 		expect(toBigInt(5.9)).toBe(5n);
+		expect(toBigInt('5')).toBe(5n);
+		expect(toBigInt('0005')).toBe(5n);
 	});
 
 	it('rejects unsupported input types', () => {
-		expect(() => toBigInt('5')).toThrow('Value must be a bigint or number');
-		expect(() => toBigInt(null)).toThrow('Value must be a bigint or number');
+		expect(() => toBigInt(null)).toThrow(
+			'Value must be a bigint, number, or integer string',
+		);
+	});
+
+	it('rejects invalid string inputs', () => {
+		expect(() => toBigInt('5.1')).toThrow(
+			'Value must be a bigint, number, or integer string',
+		);
+		expect(() => toBigInt('1e3')).toThrow(
+			'Value must be a bigint, number, or integer string',
+		);
 	});
 
 	it('rejects non-finite numbers', () => {
-		expect(() => toBigInt(Number.NaN)).toThrow('Value must be a finite number');
+		expect(() => toBigInt(Number.NaN)).toThrow(
+			'Value must be a bigint, number, or integer string',
+		);
 		expect(() => toBigInt(Number.POSITIVE_INFINITY)).toThrow(
-			'Value must be a finite number',
+			'Value must be a bigint, number, or integer string',
 		);
 	});
 
 	it('rejects negative values', () => {
-		expect(() => toBigInt(-1)).toThrow(
-			'Value must be a finite non-negative number',
-		);
+		expect(() => toBigInt(-1)).toThrow('Value must be non-negative');
 		expect(() => toBigInt(-1n)).toThrow('Value must be non-negative');
+		expect(() => toBigInt('-1')).toThrow('Value must be non-negative');
 	});
 });
 
@@ -129,14 +142,16 @@ describe('toU8', () => {
 	});
 
 	it('rejects non-finite numbers', () => {
-		expect(() => toU8(Number.NaN)).toThrow('Value must be a finite number');
+		expect(() => toU8(Number.NaN)).toThrow('Value must be a number');
 		expect(() => toU8(Number.NEGATIVE_INFINITY)).toThrow(
-			'Value must be a finite number',
+			'Value must be a number',
 		);
 	});
 
 	it('rejects non-integer and out-of-range numbers', () => {
-		expect(() => toU8(1.5)).toThrow('Value must be an integer');
+		expect(() => toU8(1.5)).toThrow(
+			'Value must be an integer between 0 and 255',
+		);
 		expect(() => toU8(-1)).toThrow(
 			'Value must be an integer between 0 and 255',
 		);
