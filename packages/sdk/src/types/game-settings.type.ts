@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SuiClientTypes } from '@mysten/sui/client';
 import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,
@@ -62,8 +63,8 @@ type GameParametersMap = {
 
 export type GameParameters<TGame extends Game> = GameParametersMap[TGame];
 
-export type GetGameParametersOptions = {
-	coinType?: string;
-	ignoreCache?: boolean;
-	signal?: AbortSignal;
-};
+export type GetGameParametersOptions =
+	SuiClientTypes.CoreClientMethodOptions & {
+		coinType?: string;
+		ignoreCache?: boolean;
+	};

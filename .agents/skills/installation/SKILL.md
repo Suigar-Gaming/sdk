@@ -112,8 +112,9 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ## Onchain parameters
 
 Use `client.suigar.getGameParameters(game, options?)` when an app needs live
-onchain game bounds or RTP parameters. The SDK resolves the settings object from
-SweetHouse, then reads the per-coin `Parameters<T>` object.
+onchain game bounds or RTP parameters. The SDK first reads the selected game's
+settings object from SweetHouse, then reads that game's coin-specific
+`Parameters<T>` object and parses it.
 
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
@@ -121,9 +122,10 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 });
 ```
 
-The return type is inferred from the game id. The SDK caches settings id and
-parameters lookups for `cacheTtl`, which defaults to 30 minutes. Pass
-`ignoreCache: true` to force both lookups to refresh.
+The return type is inferred from the game id. The SDK caches the parsed
+parameters for `cacheTtl`, which defaults to 30 minutes. Pass
+`ignoreCache: true` to force the onchain read to refresh and replace the cached
+value.
 
 ## Event parsing
 

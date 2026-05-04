@@ -149,7 +149,8 @@ const client = new SuiGrpcClient({
 ```
 
 Configure SDK-managed onchain read caching with `cacheTtl`, in milliseconds.
-The default is 30 minutes.
+The default is 30 minutes. This cache is used by onchain reads such as
+`getGameParameters`.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(
@@ -158,8 +159,11 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 ```
 
 Read typed onchain game parameters with `getGameParameters(game, options?)`.
-The SDK resolves the game settings object from SweetHouse and caches both the
-settings id lookup and parameters lookup.
+Use this when an app needs current game bounds such as min/max stake or
+game-specific configuration limits. The SDK first reads the selected game's
+settings object from SweetHouse, then reads that game's coin-specific
+`Parameters<T>` object, parses it with the generated game type, and caches the
+parsed result.
 
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
@@ -169,7 +173,8 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 console.log(parameters.min_stake);
 ```
 
-Pass `ignoreCache: true` to refresh both lookups and update the cache.
+Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+value.
 
 ## Standard Game APIs
 

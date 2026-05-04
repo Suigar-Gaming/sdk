@@ -144,9 +144,13 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving network-scoped package ids
 - normalizing the configured supported coin types for the active network
 - resolving price info object ids from the supported-coin mapping
-- resolving game settings object ids from the configured SweetHouse object for `getGameParameters`
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
+
+`client.suigar.getGameParameters(game, options?)` first reads the selected
+game's settings object from SweetHouse, then reads that game's
+coin-specific `Parameters<T>` object, parses it with the generated type, and
+caches the parsed result for `cacheTtl`.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 

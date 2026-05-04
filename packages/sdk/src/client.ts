@@ -153,9 +153,9 @@ export class SuigarClient {
 	/**
 	 * Reads on-chain game parameters for the requested game.
 	 *
-	 * The SDK resolves the game settings object through the configured SweetHouse
-	 * object and then reads the per-coin `Parameters<T>` dynamic object. Results
-	 * are cached according to the extension `cacheTtl` option. Pass
+	 * The SDK first reads the selected game's settings object from SweetHouse,
+	 * then reads that game's coin-specific `Parameters<T>` object. Results are
+	 * cached according to the extension `cacheTtl` option. Pass
 	 * `ignoreCache: true` to refresh the onchain read and replace the cached
 	 * value.
 	 *

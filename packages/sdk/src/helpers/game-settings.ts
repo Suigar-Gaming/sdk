@@ -1,7 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
+import {
+	normalizeStructTag,
+	normalizeSuiAddress,
+	parseStructTag,
+} from '@mysten/sui/utils';
 
 function replaceStructTagAddress(structName: string, address: string) {
 	return normalizeStructTag({
@@ -18,8 +22,10 @@ export function resolveGameSettingsKeyType(
 }
 
 export function resolveCoinTypeNameForTypeNameKey(structName: string) {
+	const { address } = parseStructTag(structName);
+
 	return replaceStructTagAddress(
 		structName,
-		normalizeStructTag(structName).replace(/^0x/, ''),
+		normalizeSuiAddress(address).replace(/^0x/, ''),
 	);
 }

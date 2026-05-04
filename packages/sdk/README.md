@@ -154,7 +154,7 @@ address into the onchain metadata vec-map. Transaction builder options may also
 include `metadata`, but reserved keys such as `partner` and `referrer` are
 ignored with a warning when provided manually.
 
-`cacheTtl` controls the SDK cache for onchain config reads such as game
+`cacheTtl` controls the SDK cache for onchain reads such as parsed game
 parameters. It is expressed in milliseconds and defaults to 30 minutes.
 
 ## Runtime Surface
@@ -189,12 +189,14 @@ console.log(config.packageIds);
 
 ### `getGameParameters(game, options?)`
 
-Returns the onchain `Parameters<T>` object for any supported game. The return
-type is inferred from `game`.
+Returns the onchain `Parameters<T>` object for any supported game and coin type.
+The return type is inferred from `game`.
 
-The SDK resolves the game settings object from the configured SweetHouse object,
-then reads the per-coin parameters object from that settings object. Both lookups
-are cached using the extension `cacheTtl`.
+The SDK first reads the selected game's settings object from the configured
+SweetHouse object, then reads that game's coin-specific `Parameters<T>` object.
+This is useful for displaying or validating current limits such as min/max
+stake, house edge, or game-specific config bounds. The parsed result is cached
+using the extension `cacheTtl`.
 
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
@@ -204,8 +206,8 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 console.log(parameters.min_stake);
 ```
 
-Pass `ignoreCache: true` to refresh the settings id and parameters lookups and
-replace the cached values.
+Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+value.
 
 ### `serializeTransactionToBase64(transaction, options?)`
 
