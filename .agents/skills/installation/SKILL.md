@@ -53,14 +53,21 @@ Utility behavior:
 
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
   `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+  while throwing `TypeError` for invalid input shapes and `RangeError` for
+  negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in
-  the inclusive `0..255` range and rejects booleans or fractional values
+  the inclusive `0..255` range, throwing `TypeError` for non-numeric input and
+  `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string`
-  in the inclusive `0..65535` range and rejects booleans or fractional values
+  in the inclusive `0..65535` range, throwing `TypeError` for non-numeric
+  input and `RangeError` for booleans, fractional values, or out-of-range
+  integers
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript
   `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a
   JavaScript `number`
+- `parseCoinType(type)` extracts the normalized first generic coin type from a
+  Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
   preserving the original onchain keys
