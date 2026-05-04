@@ -42,11 +42,28 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `fromMoveFloat`
 - `parseGameDetails`
 - `toBigInt`
+- `toU16`
 - `toU8`
 - `DEFAULT_GAS_BUDGET_MIST`
 - `RANGE_POINT_LIMIT`
 - `DEFAULT_RANGE_SCALE`
 - `DEFAULT_LIMBO_MULTIPLIER_SCALE`
+
+Utility behavior:
+
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
+  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` accepts a finite integer `number` or plain integer `string` in
+  the inclusive `0..255` range and rejects booleans or fractional values
+- `toU16(value)` accepts a finite integer `number` or plain integer `string`
+  in the inclusive `0..65535` range and rejects booleans or fractional values
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript
+  `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a
+  JavaScript `number`
+- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+  byte arrays into the expected string, number, and boolean values while
+  preserving the original onchain keys
 
 Internal config and metadata helpers stay under `packages/sdk/src/helpers/*` and are not part of the intended public import surface.
 
@@ -108,6 +125,28 @@ const tx = client.suigar.tx.createBetTransaction('coinflip', {
 
 const base64 = await client.suigar.serializeTransactionToBase64(tx);
 ```
+
+## Onchain parameters
+
+Use `client.suigar.getGameParameters(game, options?)` when an app needs live
+onchain game bounds or RTP parameters. The SDK first reads the selected game's
+settings object from SweetHouse, then reads that game's coin-specific
+`Parameters<T>` object and parses it.
+
+If a returned parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, run
+it through `fromMoveFloat()` before using it as a normal JavaScript number.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+```
+
+The return type is inferred from the game id. The SDK caches the parsed
+parameters for `cacheTtl`, which defaults to 30 minutes. Pass
+`ignoreCache: true` to force the onchain read to refresh and replace the cached
+value.
 
 ## Event parsing
 

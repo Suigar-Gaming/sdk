@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import packageJson from '../package.json';
+import packageJson from '../../package.json';
 import type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
@@ -14,8 +14,8 @@ import type {
 	BuildWheelTransactionOptions,
 	CoinSide,
 	PvPCoinflipAction,
-} from '../src/games.js';
-import type { CoinSide as InternalCoinSide } from '../src/types/game.type.js';
+} from '../../src/games.js';
+import type { CoinSide as InternalCoinSide } from '../../src/types/game.type.js';
 import type {
 	BuildCancelPvPCoinflipTransactionOptions as InternalBuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions as InternalBuildCoinflipTransactionOptions,
@@ -26,7 +26,7 @@ import type {
 	BuildRangeTransactionOptions as InternalBuildRangeTransactionOptions,
 	BuildWheelTransactionOptions as InternalBuildWheelTransactionOptions,
 	PvPCoinflipAction as InternalPvPCoinflipAction,
-} from '../src/types/transaction-options.type.js';
+} from '../../src/types/transaction-options.type.js';
 import {
 	DEFAULT_GAS_BUDGET_MIST,
 	DEFAULT_LIMBO_MULTIPLIER_SCALE,
@@ -37,18 +37,19 @@ import {
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
-} from '../src/utils/index.js';
+	toU16,
+} from '../../src/utils/index.js';
 
 describe('public source subpath modules', () => {
 	it('loads the games subpath module', async () => {
-		const module = await import('../src/games.js');
+		const module = await import('../../src/games.js');
 
 		expect(module).toBeDefined();
 		expect(Object.keys(module)).toEqual([]);
 	});
 
 	it('loads the utils subpath module', async () => {
-		const module = await import('../src/utils/index.js');
+		const module = await import('../../src/utils/index.js');
 
 		expect(module).toBeDefined();
 		expect(DEFAULT_GAS_BUDGET_MIST).toBeTypeOf('bigint');
@@ -64,7 +65,12 @@ describe('public source subpath modules', () => {
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
 		expect(toBigInt(1)).toBe(1n);
+		expect(toBigInt('1')).toBe(1n);
+		expect(toBigInt(true)).toBe(1n);
 		expect(toU8(255)).toBe(255);
+		expect(toU8('1')).toBe(1);
+		expect(toU16(65_535)).toBe(65_535);
+		expect(toU16('1')).toBe(1);
 	});
 
 	it('exposes only the intended package subpaths', () => {

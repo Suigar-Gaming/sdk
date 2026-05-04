@@ -34,7 +34,7 @@ pnpm --dir packages/sdk test
 pnpm --dir packages/sdk typecheck
 
 # Run a specific vitest file
-pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
 
 # Run a specific test name
 pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
@@ -76,7 +76,7 @@ pnpm release
   - `utils/` - public parser, constants, and numeric helpers exposed through `@suigar/sdk/utils`
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
-- `packages/sdk/test/` - Vitest coverage for config resolution and transaction builders
+- `packages/sdk/test/unit/` - Vitest coverage for config resolution, cache helpers, and transaction builders
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
 - `apps/playground/` - workspace-local Next.js integration playground
@@ -94,7 +94,7 @@ pnpm release
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
    The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
-   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable.
+   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values; `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range; `toU16()` accepts the same input shapes in the `0..65535` range.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
@@ -147,6 +147,14 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
 
+`client.suigar.getGameParameters(game, options?)` first reads the selected
+game's settings object from SweetHouse, then reads that game's
+coin-specific `Parameters<T>` object, parses it with the generated type, and
+caches the parsed result for `cacheTtl`. When returned parameter fields are
+generated Move float structs, such as `min_target_multiplier`,
+`max_target_multiplier`, `min_rtp`, or `max_rtp`, convert them with
+`fromMoveFloat()` before using them as normal JavaScript numbers.
+
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
 #### Metadata and Amount Handling
@@ -161,8 +169,8 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 ### Testing Conventions
 
-- `packages/sdk/test/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
-- `packages/sdk/test/config.test.ts` covers config resolution and defaults.
+- `packages/sdk/test/unit/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
+- `packages/sdk/test/unit/config.test.ts` covers config resolution and defaults.
 - When changing transaction behavior, update tests to cover package id resolution, player-address normalization, and action-specific argument mapping.
 
 ### Changeset Conventions
@@ -186,7 +194,7 @@ Documentation is part of the deliverable:
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
 - At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
 - Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
-- When a repo-local skill is mirrored under `.claude/skills`, keep the mirrored copy aligned in the same task.
+- Do not edit `.claude/skills` separately. In this repository, `.claude/skills` is a symlink to `.agents/skills`, so updating `.agents/skills` already updates the Claude-visible path.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
@@ -202,7 +210,7 @@ Use the repo-local skills in `.agents/skills/` when the task is about building a
 
 Claude Code compatibility:
 
-- `.claude/skills` mirrors `.agents/skills`
+- `.claude/skills` is a symlink to `.agents/skills`
 - `CLAUDE.md` exists at the repository root for Claude-oriented repository guidance
 
 ## Pull Requests

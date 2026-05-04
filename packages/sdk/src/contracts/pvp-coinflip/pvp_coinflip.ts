@@ -14,6 +14,12 @@ import * as vec_map from './deps/0x000000000000000000000000000000000000000000000
 
 const $moduleName =
 	'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip';
+export const PvpCoinflipSettingsKey = new MoveStruct({
+	name: `${$moduleName}::PvpCoinflipSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const Game = new MoveStruct({
 	name: `${$moduleName}::Game<phantom T0>`,
 	fields: {
@@ -68,6 +74,14 @@ export const GameCancelledEvent = new MoveStruct({
 		is_private: bcs.bool(),
 		stake_per_player: bcs.u64(),
 		coin_type: type_name.TypeName,
+	},
+});
+export const Parameters = new MoveStruct({
+	name: `${$moduleName}::Parameters<phantom T0>`,
+	fields: {
+		id: bcs.Address,
+		house_edge_bps: bcs.u64(),
+		min_stake: bcs.u64(),
 	},
 });
 export interface CreateGameOptions {

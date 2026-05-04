@@ -1,5 +1,6 @@
 'use client';
 
+import type * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import {
@@ -18,9 +19,13 @@ import type { RangeFormValues } from '@/lib/suigar-types';
 export function RangeForm({
 	value,
 	onChange,
+	stakeDescription,
+	rangeBoundsDescription,
 }: {
 	value: RangeFormValues;
 	onChange: (patch: Partial<RangeFormValues>) => void;
+	stakeDescription?: React.ReactNode;
+	rangeBoundsDescription?: React.ReactNode;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -64,6 +69,7 @@ export function RangeForm({
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
 						larger scales reduce the allowed frontend range.
 					</FieldDescription>
+					{rangeBoundsDescription}
 				</Field>
 			</FieldGroup>
 			<FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -99,7 +105,11 @@ export function RangeForm({
 					</Field>
 				</div>
 			</FieldGroup>
-			<SharedGameFields value={value} onChange={onChange} />
+			<SharedGameFields
+				value={value}
+				onChange={onChange}
+				description={stakeDescription}
+			/>
 		</div>
 	);
 }

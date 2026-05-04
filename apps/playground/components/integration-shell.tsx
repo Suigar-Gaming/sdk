@@ -10,17 +10,21 @@ import {
 	BookOpenText,
 	CirclePlus,
 	Gamepad2,
+	LoaderCircle,
 	ShieldX,
+	SlidersHorizontal,
 	Swords,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { CodeSample } from '@/components/code-sample';
 import { CoinIcon } from '@/components/coins';
 import { EventsTable } from '@/components/events-table';
 import { ExecuteTransactionCard } from '@/components/execute-transaction';
+import { GameSettingsDialog } from '@/components/game-settings-dialog';
 import { CoinflipForm } from '@/components/games/coinflip-form';
 import { LimboForm } from '@/components/games/limbo-form';
 import { PlinkoForm } from '@/components/games/plinko-form';
@@ -35,12 +39,14 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
+	CardAction,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
 import {
+	FieldCode,
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
@@ -54,14 +60,21 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { parseSuigarEvents } from '@/lib/event-parsing';
+import {
+	findGameConfigOption,
+	resolveStakeRangeForGame,
+	summarizeStandardGameParameters,
+} from '@/lib/onchain-parameters';
 import { withBasePath } from '@/lib/paths';
 import {
 	COIN_DECIMALS,
 	DEFAULT_PVP_FORMS,
 	DEFAULT_STANDARD_FORMS,
+	getRangePointMax,
 	isPvPAction,
 	isPvPGame,
 	isStandardGame,
+	parseOptionalNumber,
 } from '@/lib/suigar-app';
 import type {
 	PvPAction,
@@ -70,6 +83,7 @@ import type {
 	PvPGameId,
 	StandardForms,
 	StandardGameId,
+	StandardGameParametersSummary,
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 import {
@@ -210,6 +224,21 @@ function parseError(error: unknown) {
 	return 'Unknown error';
 }
 
+function clampNumber(value: number, min: number, max: number) {
+	return Math.min(max, Math.max(min, value));
+}
+
+function formatInputNumber(value: number) {
+	if (!Number.isFinite(value)) {
+		return '0';
+	}
+
+	const rounded = Math.round(value * 1_000_000) / 1_000_000;
+	return Number.isInteger(rounded)
+		? String(rounded)
+		: rounded.toString().replace(/0+$/, '').replace(/\.$/, '');
+}
+
 function getStandardGameFromParams(params: URLSearchParams) {
 	const queryGame = params.get('game');
 	return isStandardGame(queryGame) ? queryGame : 'coinflip';
@@ -244,20 +273,38 @@ function buildPvPPreviewFallback(
 	].join('\n');
 }
 
+function getStandardGameLabel(game: StandardGameId) {
+	return (
+		STANDARD_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game
+	);
+}
+
+function stringifyGameParameters(value: unknown) {
+	return JSON.stringify(
+		value,
+		(_, currentValue) =>
+			typeof currentValue === 'bigint' ? currentValue.toString() : currentValue,
+		2,
+	);
+}
+
 function SectionShell({
 	title,
 	description,
 	icon,
+	action,
 	children,
 }: {
 	title: string;
 	description: string;
 	icon: React.ReactNode;
+	action?: React.ReactNode;
 	children: React.ReactNode;
 }) {
 	return (
 		<Card className="h-full border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<CardHeader>
+				{action ? <CardAction>{action}</CardAction> : null}
 				<CardTitle className="flex items-center gap-2">
 					{icon}
 					{title}
@@ -296,6 +343,16 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [isPvPLobbyLoading, setIsPvPLobbyLoading] = React.useState(false);
 	const [pvpLobbyRefreshKey, setPvPLobbyRefreshKey] = React.useState(0);
 	const [showPrivateJoinLobbies, setShowPrivateJoinLobbies] =
+		React.useState(false);
+	const [standardGameParameters, setStandardGameParameters] =
+		React.useState<StandardGameParametersSummary | null>(null);
+	const [standardGameParametersPayload, setStandardGameParametersPayload] =
+		React.useState<unknown>(null);
+	const [standardGameParametersError, setStandardGameParametersError] =
+		React.useState<string | null>(null);
+	const [isStandardGameParametersLoading, setIsStandardGameParametersLoading] =
+		React.useState(false);
+	const [isGameSettingsDialogOpen, setIsGameSettingsDialogOpen] =
 		React.useState(false);
 
 	const [standardGame, setStandardGame] = React.useState<StandardGameId>(() =>
@@ -410,6 +467,55 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
 
 	React.useEffect(() => {
+		let cancelled = false;
+
+		const fetchStandardGameParameters = async () => {
+			setIsStandardGameParametersLoading(true);
+			setStandardGameParameters(null);
+			setStandardGameParametersPayload(null);
+			setStandardGameParametersError(null);
+
+			try {
+				const parameters = await currentClient.suigar.getGameParameters(
+					standardGame,
+					{ coinType },
+				);
+
+				if (cancelled) {
+					return;
+				}
+
+				setStandardGameParametersPayload(parameters);
+				setStandardGameParameters(
+					summarizeStandardGameParameters(
+						standardGame,
+						parameters,
+						COIN_DECIMALS[effectiveSelectedCoin],
+					),
+				);
+			} catch (parametersError) {
+				if (cancelled) {
+					return;
+				}
+
+				setStandardGameParameters(null);
+				setStandardGameParametersPayload(null);
+				setStandardGameParametersError(parseError(parametersError));
+			} finally {
+				if (!cancelled) {
+					setIsStandardGameParametersLoading(false);
+				}
+			}
+		};
+
+		void fetchStandardGameParameters();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [coinType, currentClient, effectiveSelectedCoin, standardGame]);
+
+	React.useEffect(() => {
 		const previousMode = previousModeRef.current;
 		const previousStandardGame = previousStandardGameRef.current;
 		const previousPvPGame = previousPvPGameRef.current;
@@ -481,6 +587,281 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 	const normalizedCurrentAccount =
 		currentAccount?.address.toLowerCase() ?? null;
+	const activeConfigId =
+		standardGame === 'plinko' || standardGame === 'wheel'
+			? standardForms[standardGame].configId
+			: undefined;
+	const activeConfigOption = React.useMemo(
+		() =>
+			activeConfigId
+				? findGameConfigOption(standardGameParameters, activeConfigId)
+				: null,
+		[activeConfigId, standardGameParameters],
+	);
+	const activeStakeRange = React.useMemo(
+		() =>
+			resolveStakeRangeForGame(
+				standardGame,
+				standardGameParameters,
+				activeConfigId,
+			),
+		[activeConfigId, standardGame, standardGameParameters],
+	);
+	const stakeDescription = React.useMemo(() => {
+		if (isStandardGameParametersLoading) {
+			return (
+				<FieldDescription className="inline-flex items-center gap-1.5">
+					<LoaderCircle className="size-3.5 animate-spin" />
+					Loading on-chain stake limits for this coin.
+				</FieldDescription>
+			);
+		}
+
+		if (standardGameParametersError) {
+			return (
+				<FieldDescription>
+					Unable to load on-chain stake limits: {standardGameParametersError}
+				</FieldDescription>
+			);
+		}
+
+		if (!activeStakeRange) {
+			return null;
+		}
+
+		return (
+			<FieldDescription>
+				On-chain stake range: <FieldCode>{activeStakeRange.min}</FieldCode> to{' '}
+				<FieldCode>{activeStakeRange.max}</FieldCode>{' '}
+				{effectiveSelectedCoin.toUpperCase()}
+				{activeConfigOption && !activeConfigOption.isPlayable
+					? '. The selected config is disabled on-chain.'
+					: '.'}
+			</FieldDescription>
+		);
+	}, [
+		activeConfigOption,
+		activeStakeRange,
+		effectiveSelectedCoin,
+		isStandardGameParametersLoading,
+		standardGameParametersError,
+	]);
+	const standardGameLabel = React.useMemo(
+		() => getStandardGameLabel(standardGame),
+		[standardGame],
+	);
+	const serializedGameSettings = React.useMemo(
+		() =>
+			standardGameParametersPayload
+				? stringifyGameParameters(standardGameParametersPayload)
+				: null,
+		[standardGameParametersPayload],
+	);
+	const settingsCallPreview = React.useMemo(
+		() =>
+			`client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`,
+		[coinType, standardGame],
+	);
+	const limboTargetMultiplierDescription = React.useMemo(() => {
+		if (
+			standardGame !== 'limbo' ||
+			!standardGameParameters?.targetMultiplierRange
+		) {
+			return null;
+		}
+
+		return (
+			<FieldDescription>
+				On-chain target multiplier range:{' '}
+				<FieldCode>
+					{formatInputNumber(standardGameParameters.targetMultiplierRange.min)}
+				</FieldCode>{' '}
+				to{' '}
+				<FieldCode>
+					{formatInputNumber(standardGameParameters.targetMultiplierRange.max)}
+				</FieldCode>
+				.
+			</FieldDescription>
+		);
+	}, [standardGame, standardGameParameters]);
+	const rangeBoundsDescription = React.useMemo(() => {
+		if (standardGame !== 'range' || !standardGameParameters?.rangeBounds) {
+			return null;
+		}
+
+		const configuredScale = parseOptionalNumber(standardForms.range.scale);
+		const effectiveScale =
+			configuredScale && Number.isFinite(configuredScale) && configuredScale > 0
+				? configuredScale
+				: DEFAULT_RANGE_SCALE;
+
+		return (
+			<FieldDescription>
+				On-chain zone size:{' '}
+				<FieldCode>
+					{formatInputNumber(
+						standardGameParameters.rangeBounds.minZoneSize / effectiveScale,
+					)}
+				</FieldCode>{' '}
+				to{' '}
+				<FieldCode>
+					{formatInputNumber(
+						standardGameParameters.rangeBounds.maxZoneSize / effectiveScale,
+					)}
+				</FieldCode>{' '}
+				with RTP from{' '}
+				<FieldCode>
+					{formatInputNumber(standardGameParameters.rangeBounds.minRtp)}
+				</FieldCode>{' '}
+				to{' '}
+				<FieldCode>
+					{formatInputNumber(standardGameParameters.rangeBounds.maxRtp)}
+				</FieldCode>
+				.
+			</FieldDescription>
+		);
+	}, [standardGame, standardGameParameters, standardForms.range.scale]);
+
+	React.useEffect(() => {
+		if (standardGame !== 'plinko' && standardGame !== 'wheel') {
+			return;
+		}
+
+		const configOptions = standardGameParameters?.configOptions;
+		if (!configOptions?.length) {
+			return;
+		}
+
+		const currentConfigId = standardForms[standardGame].configId;
+		const nextConfig =
+			configOptions.find(
+				(option) => option.id === currentConfigId && option.isPlayable,
+			) ??
+			configOptions.find((option) => option.isPlayable) ??
+			configOptions[0];
+
+		if (!nextConfig || nextConfig.id === currentConfigId) {
+			return;
+		}
+
+		setStandardForms((current) => ({
+			...current,
+			[standardGame]: {
+				...current[standardGame],
+				configId: nextConfig.id,
+			},
+		}));
+	}, [setStandardForms, standardForms, standardGame, standardGameParameters]);
+
+	React.useEffect(() => {
+		const currentForm = standardForms[standardGame];
+		const patch: Record<string, string | boolean> = {};
+
+		if (activeStakeRange) {
+			const currentStake = parseOptionalNumber(currentForm.stake);
+			const minStake = parseOptionalNumber(activeStakeRange.min);
+			const maxStake = parseOptionalNumber(activeStakeRange.max);
+
+			if (
+				currentStake !== undefined &&
+				minStake !== undefined &&
+				maxStake !== undefined
+			) {
+				if (currentStake < minStake) {
+					patch.stake = activeStakeRange.min;
+				} else if (currentStake > maxStake) {
+					patch.stake = activeStakeRange.max;
+				}
+			}
+		}
+
+		if (
+			standardGame === 'limbo' &&
+			standardGameParameters?.targetMultiplierRange
+		) {
+			const targetMultiplier = parseOptionalNumber(
+				standardForms.limbo.targetMultiplier,
+			);
+
+			if (targetMultiplier !== undefined) {
+				const clampedTargetMultiplier = clampNumber(
+					targetMultiplier,
+					standardGameParameters.targetMultiplierRange.min,
+					standardGameParameters.targetMultiplierRange.max,
+				);
+
+				if (clampedTargetMultiplier !== targetMultiplier) {
+					patch.targetMultiplier = formatInputNumber(clampedTargetMultiplier);
+				}
+			}
+		}
+
+		if (standardGame === 'range' && standardGameParameters?.rangeBounds) {
+			const configuredScale = parseOptionalNumber(standardForms.range.scale);
+			const effectiveScale =
+				configuredScale &&
+				Number.isFinite(configuredScale) &&
+				configuredScale > 0
+					? configuredScale
+					: DEFAULT_RANGE_SCALE;
+			const maxPoint = getRangePointMax(configuredScale);
+			const minZoneSize =
+				standardGameParameters.rangeBounds.minZoneSize / effectiveScale;
+			const maxZoneSize =
+				standardGameParameters.rangeBounds.maxZoneSize / effectiveScale;
+			const leftPoint = parseOptionalNumber(standardForms.range.leftPoint);
+			const rightPoint = parseOptionalNumber(standardForms.range.rightPoint);
+
+			if (leftPoint !== undefined && rightPoint !== undefined) {
+				let nextLeftPoint = clampNumber(leftPoint, 0, maxPoint);
+				let nextRightPoint = clampNumber(rightPoint, 0, maxPoint);
+
+				if (nextRightPoint < nextLeftPoint) {
+					[nextLeftPoint, nextRightPoint] = [nextRightPoint, nextLeftPoint];
+				}
+
+				let zoneSize = nextRightPoint - nextLeftPoint;
+				if (zoneSize < minZoneSize) {
+					nextRightPoint = Math.min(maxPoint, nextLeftPoint + minZoneSize);
+					if (nextRightPoint - nextLeftPoint < minZoneSize) {
+						nextLeftPoint = Math.max(0, nextRightPoint - minZoneSize);
+					}
+				}
+
+				zoneSize = nextRightPoint - nextLeftPoint;
+				if (zoneSize > maxZoneSize) {
+					nextRightPoint = Math.min(maxPoint, nextLeftPoint + maxZoneSize);
+				}
+
+				if (nextLeftPoint !== leftPoint) {
+					patch.leftPoint = formatInputNumber(nextLeftPoint);
+				}
+
+				if (nextRightPoint !== rightPoint) {
+					patch.rightPoint = formatInputNumber(nextRightPoint);
+				}
+			}
+		}
+
+		if (Object.keys(patch).length === 0) {
+			return;
+		}
+
+		setStandardForms((current) => ({
+			...current,
+			[standardGame]: {
+				...current[standardGame],
+				...patch,
+			},
+		}));
+	}, [
+		activeStakeRange,
+		setStandardForms,
+		standardForms,
+		standardGame,
+		standardGameParameters,
+	]);
+
 	const joinLobbyGames = React.useMemo(
 		() =>
 			pvpLobbyGames.filter((game) => {
@@ -891,6 +1272,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
 									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
 							}
+							action={
+								mode === 'standard' ? (
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => setIsGameSettingsDialogOpen(true)}
+										className="rounded-full border-border/70 bg-background/55"
+									>
+										<SlidersHorizontal className="size-4" />
+										View settings
+									</Button>
+								) : undefined
+							}
 						>
 							<div className="space-y-6">
 								{mode === 'standard' ? (
@@ -901,12 +1296,17 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												onChange={(patch) =>
 													updateStandardForm('coinflip', patch)
 												}
+												stakeDescription={stakeDescription}
 											/>
 										) : null}
 										{standardGame === 'limbo' ? (
 											<LimboForm
 												value={standardForms.limbo}
 												onChange={(patch) => updateStandardForm('limbo', patch)}
+												stakeDescription={stakeDescription}
+												targetMultiplierDescription={
+													limboTargetMultiplierDescription
+												}
 											/>
 										) : null}
 										{standardGame === 'plinko' ? (
@@ -915,18 +1315,28 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												onChange={(patch) =>
 													updateStandardForm('plinko', patch)
 												}
+												configOptions={standardGameParameters?.configOptions}
+												isConfigLoading={isStandardGameParametersLoading}
+												configError={standardGameParametersError}
+												stakeDescription={stakeDescription}
 											/>
 										) : null}
 										{standardGame === 'range' ? (
 											<RangeForm
 												value={standardForms.range}
 												onChange={(patch) => updateStandardForm('range', patch)}
+												stakeDescription={stakeDescription}
+												rangeBoundsDescription={rangeBoundsDescription}
 											/>
 										) : null}
 										{standardGame === 'wheel' ? (
 											<WheelForm
 												value={standardForms.wheel}
 												onChange={(patch) => updateStandardForm('wheel', patch)}
+												configOptions={standardGameParameters?.configOptions}
+												isConfigLoading={isStandardGameParametersLoading}
+												configError={standardGameParametersError}
+												stakeDescription={stakeDescription}
 											/>
 										) : null}
 									</>
@@ -1024,14 +1434,6 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										) : null}
 									</>
 								)}
-
-								<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
-									<p className="text-sm text-muted-foreground">
-										The event table below is shared across game switches, so
-										each new bet or PvP action appends to the same running
-										history.
-									</p>
-								</div>
 							</div>
 						</SectionShell>
 
@@ -1050,6 +1452,21 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					<EventsTable />
 				</main>
 			</div>
+
+			<GameSettingsDialog
+				activeConfigOption={activeConfigOption}
+				activeStakeRange={activeStakeRange}
+				coinLabel={effectiveSelectedCoin.toUpperCase()}
+				configOptions={standardGameParameters?.configOptions}
+				error={standardGameParametersError}
+				game={standardGame}
+				gameLabel={standardGameLabel}
+				isLoading={isStandardGameParametersLoading}
+				isOpen={isGameSettingsDialogOpen}
+				onClose={() => setIsGameSettingsDialogOpen(false)}
+				serializedGameSettings={serializedGameSettings}
+				settingsCallPreview={settingsCallPreview}
+			/>
 
 			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
 				<Button

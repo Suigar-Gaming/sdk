@@ -8,12 +8,15 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
-} from '../src/configs';
+} from '../../src/configs';
+import { PlinkoSettingsKey } from '../../src/contracts/plinko/plinko.js';
 import {
+	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
+	resolveGameSettingsKeyType,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
-} from '../src/helpers/index.js';
+} from '../../src/helpers/index.js';
 
 describe('resolveSuigarConfig', () => {
 	it('resolves internal package ids and default coin types', () => {
@@ -69,6 +72,37 @@ describe('resolveSuigarConfig', () => {
 		config.packageIds.range = '0x123';
 
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
+	});
+
+	it('builds the SweetHouse settings key type with the configured game package id', () => {
+		expect(
+			resolveGameSettingsKeyType(
+				PlinkoSettingsKey.name,
+				PACKAGE_IDS.mainnet.plinko,
+			),
+		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
+	});
+
+	it('keeps settings key module and struct names when replacing the package id', () => {
+		expect(
+			resolveGameSettingsKeyType(
+				'0x123::custom_game::CustomSettingsKey',
+				'0x456',
+			),
+		).toBe('0x456::custom_game::CustomSettingsKey');
+	});
+
+	it('formats coin types for Move TypeName dynamic field key payloads', () => {
+		expect(resolveCoinTypeNameForTypeNameKey('0x2::sui::SUI')).toBe(
+			'0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+		);
+		expect(
+			resolveCoinTypeNameForTypeNameKey(
+				'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+			),
+		).toBe(
+			'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+		);
 	});
 
 	it('throws when no price info object id is configured for the requested coin type', () => {

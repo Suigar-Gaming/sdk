@@ -3,7 +3,19 @@
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
+	/**
+	 * Partner wallet address injected into bet metadata for attribution.
+	 *
+	 * Configure this once when registering the `suigar()` client extension
+	 * instead of passing partner data through per-transaction metadata.
+	 */
 	partner?: string;
+	/**
+	 * Cache TTL in milliseconds for SDK-managed on-chain config lookups.
+	 *
+	 * Defaults to 30 minutes.
+	 */
+	cacheTtl?: number;
 }
 
 export type SuigarCoin = 'sui' | 'usdc';

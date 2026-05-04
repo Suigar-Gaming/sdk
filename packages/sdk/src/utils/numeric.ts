@@ -1,69 +1,145 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-function isFiniteNumber(
+/**
+ * Ensures a value is a finite JavaScript number.
+ *
+ * This is only used for helpers that accept raw `number` input before applying
+ * additional integer or range validation.
+ */
+function assertFiniteNumber(
 	value: unknown,
-	message: string,
+	errorMessage: string,
 ): asserts value is number {
-	if (typeof value !== 'number') {
-		throw new Error(`${message}: ${String(value)}`);
-	}
-
-	if (!Number.isFinite(value)) {
-		throw new Error(`Value must be a finite number: ${value}`);
+	if (typeof value !== 'number' || !Number.isFinite(value)) {
+		throw new TypeError(`${errorMessage}: ${String(value)}`);
 	}
 }
 
 /**
- * Normalizes a numeric input into a non-negative `bigint`.
+ * Normalizes a value into a non-negative `bigint`.
  *
- * This helper accepts the two number shapes the SDK commonly sees from app
- * code: plain JavaScript numbers and already-normalized `bigint` values.
- * Number inputs are truncated toward zero before conversion, so UI-friendly
- * values like `5.9` become `5n`.
+ * Accepted inputs:
+ * - `bigint`
+ * - finite `number`
+ * - base-10 integer `string`
+ * - `boolean`
  *
- * @param value Value to coerce into a `bigint`.
- * @returns The normalized non-negative `bigint`.
- * @throws When `value` is not a finite number or bigint, or when it is negative.
+ * Number inputs are truncated toward zero before conversion, so `5.9` becomes
+ * `5n`. String and boolean inputs are parsed through the native
+ * `BigInt(...)` constructor, so `true` becomes `1n`, `false` becomes `0n`,
+ * and only integer strings are accepted.
+ *
+ * @param value Value to normalize.
+ * @returns A non-negative `bigint`.
+ * @throws When `value` is not a bigint, finite number, integer string, or
+ * boolean.
+ * @throws When the normalized value is negative.
  */
 export function toBigInt(value: unknown): bigint {
-	if (typeof value === 'bigint') {
-		if (value < 0n) {
-			throw new Error(`Value must be non-negative: ${value}`);
+	let result: bigint;
+
+	try {
+		if (
+			typeof value === 'bigint' ||
+			typeof value === 'string' ||
+			typeof value === 'boolean'
+		) {
+			result = BigInt(value);
+		} else {
+			assertFiniteNumber(
+				value,
+				'Value must be a bigint, number, integer string, or boolean',
+			);
+			result = BigInt(Math.trunc(value));
 		}
-		return value;
+	} catch {
+		throw new TypeError(
+			`Value must be a bigint, number, integer string, or boolean: ${value}`,
+		);
 	}
 
-	isFiniteNumber(value, 'Value must be a bigint or number');
-
-	if (value < 0) {
-		throw new Error(`Value must be a finite non-negative number: ${value}`);
+	if (result < 0n) {
+		throw new RangeError(`Value must be non-negative: ${value}`);
 	}
 
-	return BigInt(Math.trunc(value));
+	return result;
 }
 
 /**
- * Validates that a value can be safely used as a Move `u8`.
+ * Validates and normalizes a bounded unsigned integer.
  *
- * Use this for config ids and other small integer fields that must stay inside
- * the `0..255` range. Unlike `toBigInt`, this does not coerce fractional
- * values: the input must already be an integer.
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * This internal helper powers the public `toU8()` and `toU16()` helpers. It
+ * accepts stringified integers such as `'1'` for parsed values, but rejects
+ * booleans, empty strings, fractional values, and out-of-range numbers.
  *
  * @param value Value to validate.
- * @returns The original number once it has been confirmed to be a valid `u8`.
- * @throws When `value` is not a finite integer between `0` and `255`.
+ * @param max Inclusive upper bound.
+ * @param typeName Move integer label used in error messages.
+ * @returns The validated integer as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `max`.
+ */
+function toBoundedInt(value: unknown, max: number, typeName: string): number {
+	const num =
+		typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
+
+	assertFiniteNumber(num, 'Value must be a finite number or integer string');
+	if (
+		typeof value === 'boolean' ||
+		value == null ||
+		!Number.isInteger(num) ||
+		num < 0 ||
+		num > max
+	) {
+		throw new Error(`Value must be a ${typeName} integer (0-${max}): ${value}`);
+	}
+
+	return num;
+}
+
+/**
+ * Validates that a value can be safely used as a Move `u8` in the `0..255`
+ * range.
+ *
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * String inputs are accepted for parsed values such as `'1'`, but only when
+ * they are plain non-negative integer strings. This helper does not accept
+ * booleans and does not truncate fractional values.
+ *
+ * @param value Value to validate.
+ * @returns The validated `u8` value as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `255`.
  */
 export function toU8(value: unknown): number {
-	isFiniteNumber(value, 'Value must be a number');
+	return toBoundedInt(value, 255, 'u8');
+}
 
-	if (!Number.isInteger(value)) {
-		throw new Error(`Value must be an integer: ${value}`);
-	}
-
-	if (value < 0 || value > 255) {
-		throw new Error(`Value must be an integer between 0 and 255: ${value}`);
-	}
-
-	return value;
+/**
+ * Validates that a value can be safely used as a Move `u16` in the
+ * `0..65535` range.
+ *
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * String inputs are accepted for parsed values such as `'1'`, but only when
+ * they are plain non-negative integer strings. This helper does not accept
+ * booleans and does not truncate fractional values.
+ *
+ * @param value Value to validate.
+ * @returns The validated `u16` value as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `65535`.
+ */
+export function toU16(value: unknown): number {
+	return toBoundedInt(value, 65535, 'u16');
 }

@@ -48,8 +48,25 @@ import {
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
+	toU16,
 } from '@suigar/sdk/utils';
 ```
+
+Numeric helper behavior:
+
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
+  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` accepts a finite integer `number` or plain integer `string` in
+  the inclusive `0..255` range and rejects booleans or fractional values
+- `toU16(value)` accepts a finite integer `number` or plain integer `string`
+  in the inclusive `0..65535` range and rejects booleans or fractional values
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
+  JavaScript `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a
+  JavaScript `number`
+- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+  byte arrays into the expected string, number, and boolean values while
+  preserving the original onchain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -147,17 +164,22 @@ Supported override areas:
 
 - `name`
 - `partner`
+- `cacheTtl`
 
 If `partner` is configured, the SDK automatically writes that partner wallet
 address into the onchain metadata vec-map. Transaction builder options may also
 include `metadata`, but reserved keys such as `partner` and `referrer` are
 ignored with a warning when provided manually.
 
+`cacheTtl` controls the SDK cache for onchain reads such as parsed game
+parameters. It is expressed in milliseconds and defaults to 30 minutes.
+
 ## Runtime Surface
 
 The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
+- `getGameParameters(game, options?)`
 - `serializeTransactionToBase64(transaction, options?)`
 - `getPvPCoinflipGames(options?)`
 - `bcs`
@@ -181,6 +203,32 @@ It includes:
 const config = client.suigar.getConfig();
 console.log(config.packageIds);
 ```
+
+### `getGameParameters(game, options?)`
+
+Returns the onchain `Parameters<T>` object for any supported game and coin type.
+The return type is inferred from `game`.
+
+The SDK first reads the selected game's settings object from the configured
+SweetHouse object, then reads that game's coin-specific `Parameters<T>` object.
+This is useful for displaying or validating current limits such as min/max
+stake, house edge, or game-specific config bounds. The parsed result is cached
+using the extension `cacheTtl`.
+
+When a parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use
+`fromMoveFloat()` before treating it as a normal JavaScript number.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+
+console.log(parameters.min_stake);
+```
+
+Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+value.
 
 ### `serializeTransactionToBase64(transaction, options?)`
 

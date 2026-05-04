@@ -10,6 +10,8 @@ import {
 } from '../configs/index.js';
 import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
 
+export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
+
 export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const registryIds = REGISTRY_IDS[network];

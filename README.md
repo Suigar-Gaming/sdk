@@ -20,6 +20,22 @@ Public package entrypoints:
 - `@suigar/sdk/games` for game option and action types
 - `@suigar/sdk/utils` for parser helpers, numeric helpers, and reusable constants
 
+Utility behavior from `@suigar/sdk/utils`:
+
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
+  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
+- `toU8(value)` accepts a finite integer `number` or plain integer `string`
+  in the `0..255` range and rejects booleans or fractional values
+- `toU16(value)` accepts a finite integer `number` or plain integer `string`
+  in the `0..65535` range and rejects booleans or fractional values
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
+  JavaScript `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a
+  JavaScript `number`
+- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+  byte arrays into the expected string, number, and boolean values while
+  preserving the original onchain keys
+
 ## Building Locally
 
 To get started, install [pnpm](https://pnpm.io/) and run commands from the repository root:
@@ -57,7 +73,7 @@ pnpm --dir packages/sdk typecheck
 Run a specific Vitest file:
 
 ```bash
-pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
 ```
 
 Run a specific test name:
@@ -84,8 +100,6 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 Common gRPC fullnode URLs:
 
-- Localnet: `http://127.0.0.1:9000`
-- Devnet: `https://fullnode.devnet.sui.io:443`
 - Testnet: `https://fullnode.testnet.sui.io:443`
 - Mainnet: `https://fullnode.mainnet.sui.io:443`
 
@@ -103,17 +117,15 @@ const coins = await client.core.getCoins({
 });
 ```
 
-For local development, run a local Sui network with a validator, fullnode, and faucet. See the [Sui local network guide](https://docs.sui.io/build/sui-local-network).
-
 ## Getting Coins From The Faucet
 
-You can request SUI from the faucet when running against devnet or localnet. For testnet, visit [faucet.sui.io](https://faucet.sui.io/).
+You can request SUI from the testnet faucet at [faucet.sui.io](https://faucet.sui.io/).
 
 ```ts
 import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
 
 await requestSuiFromFaucetV2({
-	host: getFaucetHost('devnet'),
+	host: getFaucetHost('testnet'),
 	recipient:
 		'0xcc2bd176a478baea9a0de7a24cd927661cc6e860d5bacecb9a138ef20dbab231',
 });
@@ -151,6 +163,38 @@ const client = new SuiGrpcClient({
 	baseUrl: 'https://fullnode.testnet.sui.io:443',
 }).$extend(suigar({ partner: '0xpartner_wallet_address' }));
 ```
+
+Configure SDK-managed onchain read caching with `cacheTtl`, in milliseconds.
+The default is 30 minutes. This cache is used by onchain reads such as
+`getGameParameters`.
+
+```ts
+const client = new SuiGrpcClient({ network, baseUrl }).$extend(
+	suigar({ cacheTtl: 30 * 60 * 1000 }),
+);
+```
+
+Read typed onchain game parameters with `getGameParameters(game, options?)`.
+Use this when an app needs current game bounds such as min/max stake or
+game-specific configuration limits. The SDK first reads the selected game's
+settings object from SweetHouse, then reads that game's coin-specific
+`Parameters<T>` object, parses it with the generated game type, and caches the
+parsed result.
+
+When a returned parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use
+`fromMoveFloat()` before treating it as a normal JavaScript number.
+
+```ts
+const parameters = await client.suigar.getGameParameters('coinflip', {
+	coinType: '0x2::sui::SUI',
+});
+
+console.log(parameters.min_stake);
+```
+
+Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+value.
 
 ## Standard Game APIs
 

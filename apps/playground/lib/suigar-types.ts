@@ -12,6 +12,43 @@ export type SharedFields = {
 	stake: string;
 };
 
+export type StakeRangeSummary = {
+	min: string;
+	max: string;
+};
+
+export type NumberRangeSummary = {
+	min: number;
+	max: number;
+};
+
+export type RangeBoundsSummary = {
+	minZoneSize: number;
+	maxZoneSize: number;
+	minRtp: number;
+	maxRtp: number;
+};
+
+export type GameConfigOption = {
+	id: string;
+	label: string;
+	description: string;
+	details?: Array<{
+		label: string;
+		value: string;
+	}>;
+	multiplierValues?: string[];
+	isPlayable: boolean;
+	stakeRange: StakeRangeSummary;
+};
+
+export type StandardGameParametersSummary = {
+	stakeRange: StakeRangeSummary;
+	configOptions?: GameConfigOption[];
+	targetMultiplierRange?: NumberRangeSummary;
+	rangeBounds?: RangeBoundsSummary;
+};
+
 export type CoinflipFormValues = SharedFields & {
 	side: CoinSide;
 };

@@ -43,13 +43,13 @@
 		"node": ">=24"
 	},
 	"scripts": {
-		"build": "pnpm run clean && pnpm run codegen && tsup",
+		"build": "pnpm clean && pnpm codegen && tsup",
 		"build:ci": "rm -rf dist && tsup",
 		"clean": "rm -rf dist src/contracts .vitest-cache",
-		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm run lint",
+		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm lint",
 		"eslint:fix": "eslint . --fix",
-		"format": "pnpm run prettier:fix",
-		"lint": "pnpm run eslint:fix && pnpm run prettier:fix",
+		"format": "pnpm prettier:fix",
+		"lint": "pnpm eslint:fix && pnpm prettier:fix",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit"
