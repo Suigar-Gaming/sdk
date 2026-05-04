@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.13
+
+### Patch Changes
+
+- 667d7c4: Normalize authored repository wording to use `on-chain` consistently.
+
 ## 2.0.0-beta.12
 
 ### Patch Changes
