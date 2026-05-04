@@ -23,7 +23,7 @@
 
 ### Patch Changes
 
-- 4b59c7b: Remove the `client.suigar.resolvePvPConflipGame()` client method. Use the exported generated helper `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` for one specific live PvP coinflip game object instead.
+- 4b59c7b: Remove the `client.suigar.resolvePvPCoinflipGame()` client method. Use the exported generated helper `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` for one specific live PvP coinflip game object instead.
 
   Add `parseCoinType` to `@suigar/sdk/utils` for extracting normalized coin types from generic Move object type strings.
 
@@ -49,7 +49,7 @@
 - a2aa324: Update PvP coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
   - Make `getPvPCoinflipGames()` parse bulk `client.core.getObjects()` results instead of resolving each game individually.
   - Skip per-object fetch or parse failures by default and continue supporting strict rejection with `throwOnError: true`.
-  - Forward supported lookup options such as `signal` through `getPvPCoinflipGames()` and `resolvePvPConflipGame(gameId, options?)`.
+  - Forward supported lookup options such as `signal` through `getPvPCoinflipGames()` and `resolvePvPCoinflipGame(gameId, options?)`.
   - Update tests, README guidance, and repo-local PvP skill documentation to match the current client behavior.
 
 ## 2.0.0-beta.7
@@ -94,7 +94,7 @@
 
   Document the PvP coinflip runtime helpers more clearly by describing
   registry-backed unresolved game discovery through `getPvPCoinflipGames()` and
-  the normalized live-game lookup behavior of `resolvePvPConflipGame()`.
+  the normalized live-game lookup behavior of `resolvePvPCoinflipGame()`.
 
 - 4861f55: Add public utility exports for shared scaling constants in `@suigar/sdk/utils`, including `RANGE_POINT_LIMIT` and `DEFAULT_RANGE_SCALE`. Update the SDK example app and documentation to use the exported constants and document limbo/range scaling behavior more clearly.
 
