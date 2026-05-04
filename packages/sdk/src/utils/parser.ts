@@ -48,7 +48,7 @@ export function fromMoveI64(i64: MoveFloat['exp']): number {
  *
  * Suigar float values are represented as a sign flag, an unsigned mantissa,
  * and a Move `i64` exponent. This helper rebuilds the numeric value using the
- * same normalization expected by the onchain format and applies the sign at
+ * same normalization expected by the on-chain format and applies the sign at
  * the end. Missing mantissas are treated as `0`, and a zero mantissa returns `0`.
  *
  * @param float Generated Move float value with `mant`, `exp`, and `is_negative`.
@@ -126,7 +126,7 @@ function parseGameDetail(
  * Suigar stores game detail entries as `VecMap<string, vector<u8>>`, so raw BCS
  * decoding leaves each value as bytes. This helper looks up the known schema for
  * each key, parses the bytes into the expected runtime type, and preserves the
- * original onchain keys in the returned object. Unknown keys fall back to
+ * original on-chain keys in the returned object. Unknown keys fall back to
  * string decoding so newer detail fields remain readable by default.
  *
  * @param gameDetails Raw `game_details` map from a decoded bet result event.

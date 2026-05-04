@@ -40,7 +40,7 @@ Utility behavior from `@suigar/sdk/utils`:
   Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
-  preserving the original onchain keys
+  preserving the original on-chain keys
 
 ## Building Locally
 
@@ -173,8 +173,8 @@ const client = new SuiGrpcClient({
 }).$extend(suigar({ partner: '0xpartner_wallet_address' }));
 ```
 
-Configure SDK-managed onchain read caching with `cacheTtl`, in milliseconds.
-The default is 30 minutes. This cache is used by onchain reads such as
+Configure SDK-managed on-chain read caching with `cacheTtl`, in milliseconds.
+The default is 30 minutes. This cache is used by on-chain reads such as
 `getGameParameters`.
 
 ```ts
@@ -183,7 +183,7 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 );
 ```
 
-Read typed onchain game parameters with `getGameParameters(game, options?)`.
+Read typed on-chain game parameters with `getGameParameters(game, options?)`.
 Use this when an app needs current game bounds such as min/max stake or
 game-specific configuration limits. The SDK first reads the selected game's
 settings object from SweetHouse, then reads that game's coin-specific
@@ -202,7 +202,7 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 console.log(parameters.min_stake);
 ```
 
-Pass `ignoreCache: true` to refresh the onchain read and replace the cached
+Pass `ignoreCache: true` to refresh the on-chain read and replace the cached
 value.
 
 ## Standard Game APIs
@@ -217,7 +217,7 @@ Use `createBetTransaction(gameId, options)` for standard games:
 
 Shared options include `playerAddress`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `allowGasCoinShortcut`.
 
-`stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into onchain byte arrays.
+`stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into on-chain byte arrays.
 
 ```ts
 const limboTx = client.suigar.tx.createBetTransaction('limbo', {

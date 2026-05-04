@@ -134,7 +134,7 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 
 Guardrails:
 
-- Keep cancellation tied to the onchain `gameId`.
+- Keep cancellation tied to the on-chain `gameId`.
 - Do not reuse create or join payload shapes for cancel flows.
 
 ## Critical guardrails
@@ -158,7 +158,7 @@ Use:
 
 Use `getPvPCoinflipGames()` when you need the current unresolved lobby from the
 registry. Use the generated `PvPCoinflipGame` helper when you need the current
-onchain PvP coinflip game object for a specific `gameId` and not just
+on-chain PvP coinflip game object for a specific `gameId` and not just
 transaction events:
 
 ```ts
@@ -213,7 +213,7 @@ Guardrails:
 - `getPvPCoinflipGames()` skips per-object fetch or parse failures by default; use `throwOnError: true` when the product should fail the whole lookup instead.
 - Use `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` when you need one specific live pending game object; it forwards supported object lookup options such as `signal`.
 - Use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` only when you already fetched the object content yourself.
-- After join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain onchain.
+- After join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain on-chain.
 - Use `event.bcs` as the event payload input when available.
 - Do not route PvP coinflip transaction creation through standard bet builders.
 - Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.
@@ -226,4 +226,4 @@ Guardrails:
 4. If the product needs the unresolved lobby, read it with `client.suigar.getPvPCoinflipGames()`. If it needs a specific live match state, fetch it with `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId: gameId })`.
 5. Parse emitted PvP events with the generated BCS helpers.
 6. Parse `BetResultEvent.game_details` with `parseGameDetails` when displaying bet result details.
-7. Keep frontend or backend state aligned with onchain ids and privacy flags.
+7. Keep frontend or backend state aligned with on-chain ids and privacy flags.
