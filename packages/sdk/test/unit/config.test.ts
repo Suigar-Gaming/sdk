@@ -8,15 +8,15 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
-} from '../src/configs';
-import { PlinkoSettingsKey } from '../src/contracts/plinko/plinko.js';
+} from '../../src/configs';
+import { PlinkoSettingsKey } from '../../src/contracts/plinko/plinko.js';
 import {
 	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
 	resolveGameSettingsKeyType,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
-} from '../src/helpers/index.js';
+} from '../../src/helpers/index.js';
 
 describe('resolveSuigarConfig', () => {
 	it('resolves internal package ids and default coin types', () => {

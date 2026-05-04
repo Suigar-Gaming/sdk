@@ -11,18 +11,18 @@ import {
 	SUI_ADDRESS_LENGTH,
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { suigar, type SuigarClient } from '../src/client.js';
-import { COIN_TYPES, PACKAGE_IDS } from '../src/configs/index.js';
+import { suigar, type SuigarClient } from '../../src/client.js';
+import { COIN_TYPES, PACKAGE_IDS } from '../../src/configs/index.js';
 import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
-} from '../src/contracts/coinflip/coinflip.js';
-import { TypeName } from '../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
-import { Game as GeneratedPvPCoinflipGame } from '../src/contracts/pvp-coinflip/pvp_coinflip.js';
+} from '../../src/contracts/coinflip/coinflip.js';
+import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import { Game as GeneratedPvPCoinflipGame } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
-} from '../src/transactions/index.js';
+} from '../../src/transactions/index.js';
 import { encodeUtf8 } from './utils.js';
 
 const TEST_CONFIG = {
@@ -625,7 +625,7 @@ describe('transaction builders', () => {
 describe('shared transaction helpers', () => {
 	it('creates a base transaction with normalized player address and configured gas budget', async () => {
 		const { createBaseGameTransaction } =
-			await import('../src/transactions/shared.js');
+			await import('../../src/transactions/shared.js');
 
 		const tx = createBaseGameTransaction({
 			config: TEST_CONFIG,
@@ -644,7 +644,7 @@ describe('shared transaction helpers', () => {
 
 	it('resolves standard game bet context before invoking the reward builder', async () => {
 		const { buildSharedStandardGameBetCall } =
-			await import('../src/transactions/shared.js');
+			await import('../../src/transactions/shared.js');
 
 		let context: Parameters<
 			typeof buildSharedStandardGameBetCall
@@ -694,7 +694,7 @@ describe('shared transaction helpers', () => {
 
 	it('warns and skips reserved metadata keys', async () => {
 		const { buildSharedStandardGameBetCall } =
-			await import('../src/transactions/shared.js');
+			await import('../../src/transactions/shared.js');
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
 		buildSharedStandardGameBetCall({
@@ -733,7 +733,7 @@ describe('shared transaction helpers', () => {
 
 	it('encodes wallet addresses in non-reserved metadata values', async () => {
 		const { buildSharedStandardGameBetCall } =
-			await import('../src/transactions/shared.js');
+			await import('../../src/transactions/shared.js');
 		const accountManager = normalizeSuiAddress('0x456');
 
 		buildSharedStandardGameBetCall({
@@ -772,9 +772,9 @@ describe('coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildCoinflipTransaction: typeof buildCoinflipTransaction;
 			}>(
-				'../src/contracts/coinflip/coinflip.js',
+				'../../src/contracts/coinflip/coinflip.js',
 				{ play },
-				'../src/transactions/coinflip.js',
+				'../../src/transactions/coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 
@@ -820,9 +820,9 @@ describe('limbo transaction wrapper', () => {
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
 		}>(
-			'../src/contracts/limbo/limbo.js',
+			'../../src/contracts/limbo/limbo.js',
 			{ play },
-			'../src/transactions/limbo.js',
+			'../../src/transactions/limbo.js',
 		);
 
 		buildLimboTransaction({
@@ -847,9 +847,9 @@ describe('limbo transaction wrapper', () => {
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
 		}>(
-			'../src/contracts/limbo/limbo.js',
+			'../../src/contracts/limbo/limbo.js',
 			{ play },
-			'../src/transactions/limbo.js',
+			'../../src/transactions/limbo.js',
 		);
 
 		buildLimboTransaction({
@@ -877,9 +877,9 @@ describe('plinko transaction wrapper', () => {
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
 		}>(
-			'../src/contracts/plinko/plinko.js',
+			'../../src/contracts/plinko/plinko.js',
 			{ play },
-			'../src/transactions/plinko.js',
+			'../../src/transactions/plinko.js',
 		);
 
 		buildPlinkoTransaction({
@@ -898,7 +898,7 @@ describe('plinko transaction wrapper', () => {
 
 	it('rejects config ids outside the u8 range', async () => {
 		const { buildPlinkoTransaction } =
-			await import('../src/transactions/plinko.js');
+			await import('../../src/transactions/plinko.js');
 
 		expect(() =>
 			buildPlinkoTransaction({
@@ -920,9 +920,9 @@ describe('range transaction wrapper', () => {
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
 		}>(
-			'../src/contracts/range/range.js',
+			'../../src/contracts/range/range.js',
 			{ play },
-			'../src/transactions/range.js',
+			'../../src/transactions/range.js',
 		);
 
 		buildRangeTransaction({
@@ -952,9 +952,9 @@ describe('wheel transaction wrapper', () => {
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
 		}>(
-			'../src/contracts/wheel/wheel.js',
+			'../../src/contracts/wheel/wheel.js',
 			{ play },
-			'../src/transactions/wheel.js',
+			'../../src/transactions/wheel.js',
 		);
 
 		buildWheelTransaction({
@@ -973,7 +973,7 @@ describe('wheel transaction wrapper', () => {
 
 	it('rejects invalid wheel config ids', async () => {
 		const { buildWheelTransaction } =
-			await import('../src/transactions/wheel.js');
+			await import('../../src/transactions/wheel.js');
 
 		expect(() =>
 			buildWheelTransaction({
@@ -996,9 +996,9 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{ createGame, joinGame: vi.fn(), cancelGame: vi.fn() },
-				'../src/transactions/pvp-coinflip.js',
+				'../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 
@@ -1040,9 +1040,9 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{ createGame: vi.fn(), joinGame, cancelGame: vi.fn() },
-				'../src/transactions/pvp-coinflip.js',
+				'../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 
@@ -1079,9 +1079,9 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{ createGame: vi.fn(), joinGame: vi.fn(), cancelGame },
-				'../src/transactions/pvp-coinflip.js',
+				'../../src/transactions/pvp-coinflip.js',
 			);
 
 		buildPvPCoinflipTransactionWithMock('cancel', {
@@ -1113,29 +1113,29 @@ describe('SuigarClient', () => {
 
 		vi.resetModules();
 		vi.doMock(
-			'../src/contracts/coinflip/coinflip.js',
+			'../../src/contracts/coinflip/coinflip.js',
 			async (importOriginal) => {
 				const actual =
 					await importOriginal<
-						typeof import('../src/contracts/coinflip/coinflip.js')
+						typeof import('../../src/contracts/coinflip/coinflip.js')
 					>();
 				return { ...actual, play };
 			},
 		);
 		for (const contractPath of [
-			'../src/contracts/limbo/limbo.js',
-			'../src/contracts/plinko/plinko.js',
-			'../src/contracts/range/range.js',
-			'../src/contracts/wheel/wheel.js',
+			'../../src/contracts/limbo/limbo.js',
+			'../../src/contracts/plinko/plinko.js',
+			'../../src/contracts/range/range.js',
+			'../../src/contracts/wheel/wheel.js',
 		]) {
 			vi.doMock(contractPath, async (importOriginal) => await importOriginal());
 		}
-		await import('../src/transactions/coinflip.js');
+		await import('../../src/transactions/coinflip.js');
 		vi.doMock(
-			'../src/contracts/pvp-coinflip/pvp_coinflip.js',
+			'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 			async (importOriginal) => await importOriginal(),
 		);
-		const { suigar: mockedSuigar } = await import('../src/client.js');
+		const { suigar: mockedSuigar } = await import('../../src/client.js');
 		const partner = normalizeSuiAddress('0x456');
 		const client = new TestClient().$extend(
 			mockedSuigar({ partner }),

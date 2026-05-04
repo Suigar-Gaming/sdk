@@ -34,7 +34,7 @@ pnpm --dir packages/sdk test
 pnpm --dir packages/sdk typecheck
 
 # Run a specific vitest file
-pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
 
 # Run a specific test name
 pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with the configured package id"
@@ -76,7 +76,7 @@ pnpm release
   - `utils/` - public parser, constants, and numeric helpers exposed through `@suigar/sdk/utils`
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
-- `packages/sdk/test/` - Vitest coverage for config resolution and transaction builders
+- `packages/sdk/test/unit/` - Vitest coverage for config resolution, cache helpers, and transaction builders
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
 - `apps/playground/` - workspace-local Next.js integration playground
@@ -169,8 +169,8 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 ### Testing Conventions
 
-- `packages/sdk/test/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
-- `packages/sdk/test/config.test.ts` covers config resolution and defaults.
+- `packages/sdk/test/unit/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
+- `packages/sdk/test/unit/config.test.ts` covers config resolution and defaults.
 - When changing transaction behavior, update tests to cover package id resolution, player-address normalization, and action-specific argument mapping.
 
 ### Changeset Conventions

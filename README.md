@@ -73,7 +73,7 @@ pnpm --dir packages/sdk typecheck
 Run a specific Vitest file:
 
 ```bash
-pnpm --dir packages/sdk exec vitest run test/transactions.test.ts
+pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
 ```
 
 Run a specific test name:

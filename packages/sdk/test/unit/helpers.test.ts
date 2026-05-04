@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { BetResultGameDetails } from '../src/types/index.js';
+import { BetResultGameDetails } from '../../src/types/index.js';
 import {
 	parseCoinType,
 	parseGameDetails,
 	toBigInt,
 	toU8,
 	toU16,
-} from '../src/utils/index.js';
+} from '../../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from './utils.js';
 
 function gameDetails(
