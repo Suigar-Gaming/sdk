@@ -25,7 +25,7 @@ The example reflects the current package export split:
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - Standard game forms backed by `client.suigar.getGameParameters()` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Wheel config selection
-- A game-settings dialog in the standard controls card that shows the current typed `getGameParameters()` result, available configs, selected config, lookup request, and raw payload
+- A game-settings dialog in the standard controls card that shows the current typed `getGameParameters()` result, available configs, selected config, lookup request, raw payload, and expandable per-config details such as parsed multiplier values
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview

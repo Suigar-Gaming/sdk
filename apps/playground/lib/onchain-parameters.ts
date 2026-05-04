@@ -62,7 +62,10 @@ function toConfigOptions<TEntry extends ConfigEntry>(
 	decimals: number,
 	buildConfig: (
 		entry: TEntry,
-	) => Pick<GameConfigOption, 'label' | 'description' | 'details'>,
+	) => Pick<
+		GameConfigOption,
+		'label' | 'description' | 'details' | 'multiplierValues'
+	>,
 ): GameConfigOption[] {
 	return entries.map((entry) => {
 		const stakeRange = toStakeRange(
@@ -146,7 +149,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_rows: number;
-								multipliers: unknown[];
+								multipliers: MoveFloatLike[];
 							};
 						}
 					>;
@@ -167,6 +170,9 @@ export function summarizeStandardGameParameters(
 						{ label: 'Rows', value: String(entry.value.num_rows) },
 						{ label: 'Slots', value: String(entry.value.multipliers.length) },
 					],
+					multiplierValues: entry.value.multipliers.map((value) =>
+						String(fromMoveFloat(value)),
+					),
 				}),
 			);
 
@@ -179,7 +185,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_cases: number;
-								multipliers: unknown[];
+								multipliers: MoveFloatLike[];
 							};
 						}
 					>;
@@ -203,6 +209,9 @@ export function summarizeStandardGameParameters(
 							value: String(entry.value.multipliers.length),
 						},
 					],
+					multiplierValues: entry.value.multipliers.map((value) =>
+						String(fromMoveFloat(value)),
+					),
 				}),
 			);
 
