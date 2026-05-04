@@ -92,12 +92,12 @@ function formatParsedMap(value: Record<string, unknown>) {
 
 function formatOraclePrice(value: unknown) {
 	if (typeof value !== 'object' || value === null) {
-		return 'n/a';
+		return 'N/A';
 	}
 
 	const parsed = fromMoveFloat(value as Parameters<typeof fromMoveFloat>[0]);
 	if (!Number.isFinite(parsed)) {
-		return 'n/a';
+		return 'N/A';
 	}
 
 	return parsed.toLocaleString(undefined, {

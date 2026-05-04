@@ -1,5 +1,6 @@
 'use client';
 
+import type * as React from 'react';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
@@ -14,9 +15,11 @@ import type { CoinflipFormValues } from '@/lib/suigar-types';
 export function CoinflipForm({
 	value,
 	onChange,
+	stakeDescription,
 }: {
 	value: CoinflipFormValues;
 	onChange: (patch: Partial<CoinflipFormValues>) => void;
+	stakeDescription?: React.ReactNode;
 }) {
 	return (
 		<div className="space-y-6">
@@ -37,7 +40,11 @@ export function CoinflipForm({
 					</SelectContent>
 				</Select>
 			</Field>
-			<SharedGameFields value={value} onChange={onChange} />
+			<SharedGameFields
+				value={value}
+				onChange={onChange}
+				description={stakeDescription}
+			/>
 		</div>
 	);
 }

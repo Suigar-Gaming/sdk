@@ -117,7 +117,7 @@ export function toAtomicAmount(value: string, decimals: number) {
 
 export function compactAddress(value?: string) {
 	if (!value) {
-		return 'n/a';
+		return 'N/A';
 	}
 
 	if (value.length <= 18) {

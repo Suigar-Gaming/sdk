@@ -1,5 +1,6 @@
 'use client';
 
+import type * as React from 'react';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '@suigar/sdk/utils';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import {
@@ -16,9 +17,13 @@ import type { LimboFormValues } from '@/lib/suigar-types';
 export function LimboForm({
 	value,
 	onChange,
+	stakeDescription,
+	targetMultiplierDescription,
 }: {
 	value: LimboFormValues;
 	onChange: (patch: Partial<LimboFormValues>) => void;
+	stakeDescription?: React.ReactNode;
+	targetMultiplierDescription?: React.ReactNode;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -48,6 +53,7 @@ export function LimboForm({
 						<FieldCode>{String(Math.round(2.5 * effectiveScale))}</FieldCode>{' '}
 						onchain.
 					</FieldDescription>
+					{targetMultiplierDescription}
 				</Field>
 				<Field>
 					<FieldLabel htmlFor="limboScale">Scale (optional)</FieldLabel>
@@ -66,7 +72,11 @@ export function LimboForm({
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
-			<SharedGameFields value={value} onChange={onChange} />
+			<SharedGameFields
+				value={value}
+				onChange={onChange}
+				description={stakeDescription}
+			/>
 		</div>
 	);
 }
