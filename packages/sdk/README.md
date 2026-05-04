@@ -48,6 +48,7 @@ import {
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
+	toU16,
 } from '@suigar/sdk/utils';
 ```
 
@@ -57,6 +58,8 @@ Numeric helper behavior:
   `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in
   the inclusive `0..255` range and rejects booleans or fractional values
+- `toU16(value)` accepts a finite integer `number` or plain integer `string`
+  in the inclusive `0..65535` range and rejects booleans or fractional values
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
   JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a

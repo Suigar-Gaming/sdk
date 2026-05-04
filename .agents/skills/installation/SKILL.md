@@ -42,6 +42,7 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 - `fromMoveFloat`
 - `parseGameDetails`
 - `toBigInt`
+- `toU16`
 - `toU8`
 - `DEFAULT_GAS_BUDGET_MIST`
 - `RANGE_POINT_LIMIT`
@@ -54,6 +55,8 @@ Utility behavior:
   `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in
   the inclusive `0..255` range and rejects booleans or fractional values
+- `toU16(value)` accepts a finite integer `number` or plain integer `string`
+  in the inclusive `0..65535` range and rejects booleans or fractional values
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript
   `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a

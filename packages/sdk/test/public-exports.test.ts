@@ -37,6 +37,7 @@ import {
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
+	toU16,
 } from '../src/utils/index.js';
 
 describe('public source subpath modules', () => {
@@ -67,6 +68,9 @@ describe('public source subpath modules', () => {
 		expect(toBigInt('1')).toBe(1n);
 		expect(toBigInt(true)).toBe(1n);
 		expect(toU8(255)).toBe(255);
+		expect(toU8('1')).toBe(1);
+		expect(toU16(65_535)).toBe(65_535);
+		expect(toU16('1')).toBe(1);
 	});
 
 	it('exposes only the intended package subpaths', () => {

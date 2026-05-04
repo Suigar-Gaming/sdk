@@ -12,7 +12,7 @@ function assertFiniteNumber(
 	errorMessage: string,
 ): asserts value is number {
 	if (typeof value !== 'number' || !Number.isFinite(value)) {
-		throw new Error(`${errorMessage}: ${String(value)}`);
+		throw new TypeError(`${errorMessage}: ${String(value)}`);
 	}
 }
 
@@ -54,35 +54,92 @@ export function toBigInt(value: unknown): bigint {
 			result = BigInt(Math.trunc(value));
 		}
 	} catch {
-		throw new Error(
+		throw new TypeError(
 			`Value must be a bigint, number, integer string, or boolean: ${value}`,
 		);
 	}
 
 	if (result < 0n) {
-		throw new Error(`Value must be non-negative: ${value}`);
+		throw new RangeError(`Value must be non-negative: ${value}`);
 	}
 
 	return result;
 }
 
 /**
- * Validates that a value can be safely used as a Move `u8`.
+ * Validates and normalizes a bounded unsigned integer.
  *
- * The input must already be a finite integer in the inclusive `0..255` range.
- * This helper does not coerce strings or truncate fractional numbers.
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * This internal helper powers the public `toU8()` and `toU16()` helpers. It
+ * accepts stringified integers such as `'1'` for parsed values, but rejects
+ * booleans, empty strings, fractional values, and out-of-range numbers.
  *
  * @param value Value to validate.
- * @returns The original numeric value once validated.
- * @throws When `value` is not a finite number.
+ * @param max Inclusive upper bound.
+ * @param typeName Move integer label used in error messages.
+ * @returns The validated integer as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `max`.
+ */
+function toBoundedInt(value: unknown, max: number, typeName: string): number {
+	const num =
+		typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
+
+	assertFiniteNumber(num, 'Value must be a finite number or integer string');
+	if (
+		typeof value === 'boolean' ||
+		value == null ||
+		!Number.isInteger(num) ||
+		num < 0 ||
+		num > max
+	) {
+		throw new Error(`Value must be a ${typeName} integer (0-${max}): ${value}`);
+	}
+
+	return num;
+}
+
+/**
+ * Validates that a value can be safely used as a Move `u8` in the `0..255`
+ * range.
+ *
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * String inputs are accepted for parsed values such as `'1'`, but only when
+ * they are plain non-negative integer strings. This helper does not accept
+ * booleans and does not truncate fractional values.
+ *
+ * @param value Value to validate.
+ * @returns The validated `u8` value as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
  * @throws When `value` is not an integer between `0` and `255`.
  */
 export function toU8(value: unknown): number {
-	assertFiniteNumber(value, 'Value must be a finite number');
+	return toBoundedInt(value, 255, 'u8');
+}
 
-	if (!Number.isInteger(value) || value < 0 || value > 255) {
-		throw new Error(`Value must be an integer between 0 and 255: ${value}`);
-	}
-
-	return value;
+/**
+ * Validates that a value can be safely used as a Move `u16` in the
+ * `0..65535` range.
+ *
+ * Accepted inputs:
+ * - finite `number`
+ * - base-10 integer `string`
+ *
+ * String inputs are accepted for parsed values such as `'1'`, but only when
+ * they are plain non-negative integer strings. This helper does not accept
+ * booleans and does not truncate fractional values.
+ *
+ * @param value Value to validate.
+ * @returns The validated `u16` value as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `65535`.
+ */
+export function toU16(value: unknown): number {
+	return toBoundedInt(value, 65535, 'u16');
 }

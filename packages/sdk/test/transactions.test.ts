@@ -908,7 +908,7 @@ describe('plinko transaction wrapper', () => {
 				configId: 256,
 				config: TEST_CONFIG,
 			}),
-		).toThrow('Value must be an integer between 0 and 255');
+		).toThrow('Value must be a u8 integer');
 	});
 });
 
@@ -983,7 +983,7 @@ describe('wheel transaction wrapper', () => {
 				configId: -1,
 				config: TEST_CONFIG,
 			}),
-		).toThrow('Value must be an integer between 0 and 255');
+		).toThrow('Value must be a u8 integer');
 	});
 });
 
