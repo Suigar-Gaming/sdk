@@ -150,7 +150,10 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 `client.suigar.getGameParameters(game, options?)` first reads the selected
 game's settings object from SweetHouse, then reads that game's
 coin-specific `Parameters<T>` object, parses it with the generated type, and
-caches the parsed result for `cacheTtl`.
+caches the parsed result for `cacheTtl`. When returned parameter fields are
+generated Move float structs, such as `min_target_multiplier`,
+`max_target_multiplier`, `min_rtp`, or `max_rtp`, convert them with
+`fromMoveFloat()` before using them as normal JavaScript numbers.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
@@ -191,7 +194,7 @@ Documentation is part of the deliverable:
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
 - At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
 - Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
-- When a repo-local skill is mirrored under `.claude/skills`, keep the mirrored copy aligned in the same task.
+- Do not edit `.claude/skills` separately. In this repository, `.claude/skills` is a symlink to `.agents/skills`, so updating `.agents/skills` already updates the Claude-visible path.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
@@ -207,7 +210,7 @@ Use the repo-local skills in `.agents/skills/` when the task is about building a
 
 Claude Code compatibility:
 
-- `.claude/skills` mirrors `.agents/skills`
+- `.claude/skills` is a symlink to `.agents/skills`
 - `CLAUDE.md` exists at the repository root for Claude-oriented repository guidance
 
 ## Pull Requests

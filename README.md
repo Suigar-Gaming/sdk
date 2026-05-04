@@ -179,6 +179,10 @@ settings object from SweetHouse, then reads that game's coin-specific
 `Parameters<T>` object, parses it with the generated game type, and caches the
 parsed result.
 
+When a returned parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use
+`fromMoveFloat()` before treating it as a normal JavaScript number.
+
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
 	coinType: '0x2::sui::SUI',

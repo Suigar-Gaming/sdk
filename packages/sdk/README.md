@@ -212,6 +212,10 @@ This is useful for displaying or validating current limits such as min/max
 stake, house edge, or game-specific config bounds. The parsed result is cached
 using the extension `cacheTtl`.
 
+When a parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use
+`fromMoveFloat()` before treating it as a normal JavaScript number.
+
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
 	coinType: '0x2::sui::SUI',

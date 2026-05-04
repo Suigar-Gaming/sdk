@@ -130,6 +130,10 @@ onchain game bounds or RTP parameters. The SDK first reads the selected game's
 settings object from SweetHouse, then reads that game's coin-specific
 `Parameters<T>` object and parses it.
 
+If a returned parameter field is a generated Move float struct, such as
+`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, run
+it through `fromMoveFloat()` before using it as a normal JavaScript number.
+
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
 	coinType: '0x2::sui::SUI',

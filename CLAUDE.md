@@ -14,5 +14,5 @@ Read `AGENTS.md` first for:
 
 Claude Code skill compatibility:
 
-- `.claude/skills` mirrors `.agents/skills`
-- use the skills under `.claude/skills/`
+- `.claude/skills` is a symlink to `.agents/skills`
+- update `.agents/skills/`; separate edits under `.claude/skills/` are unnecessary
