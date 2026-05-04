@@ -108,6 +108,6 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		default:
-			throw new Error(`Unsupported PvP coinflip action: ${action}`);
+			throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
 	}
 }

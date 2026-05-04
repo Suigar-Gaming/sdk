@@ -84,7 +84,7 @@ function resolveSupportedCoin(
 		[];
 
 	if (!supportedCoin) {
-		throw new Error(
+		throw new RangeError(
 			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(
 				config.coinTypes,
 			).join(', ')}`,

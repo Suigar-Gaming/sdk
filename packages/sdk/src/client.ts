@@ -106,7 +106,7 @@ export class SuigarClient {
 
 		const network = this.#client.network as SuiNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
-			throw new Error(`Unsupported network: ${network}`);
+			throw new RangeError(`Unsupported network: ${network}`);
 		}
 
 		this.#config = resolveSuigarConfig(network);
@@ -375,7 +375,7 @@ export class SuigarClient {
 						partner: this.#partner,
 					} as WithPartner<BuildWheelTransactionOptions>);
 				default:
-					throw new Error(`Unsupported game: ${gameId}`);
+					throw new RangeError(`Unsupported game: ${gameId}`);
 			}
 		},
 		/**
@@ -412,7 +412,7 @@ export class SuigarClient {
 						partner: this.#partner,
 					});
 				default:
-					throw new Error(`Unsupported PvP coinflip action: ${action}`);
+					throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
 			}
 		},
 	};
