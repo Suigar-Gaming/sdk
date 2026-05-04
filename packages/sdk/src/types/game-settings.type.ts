@@ -27,15 +27,6 @@ import {
 } from '../contracts/wheel/wheel';
 import type { Game } from './game.type.js';
 
-type SettingsKeyStruct = {
-	name: string;
-	serialize(value: { dummy_field: boolean }): { toBytes(): Uint8Array };
-};
-
-type ParametersStruct = {
-	parse(bytes: Uint8Array): unknown;
-};
-
 export const GAME_SETTINGS = {
 	coinflip: {
 		settingsKey: CoinFlipSettingsKey,
@@ -61,21 +52,12 @@ export const GAME_SETTINGS = {
 		settingsKey: WheelSettingsKey,
 		parameters: WheelParameters,
 	},
-} as const satisfies Record<
-	Game,
-	{
-		settingsKey: SettingsKeyStruct;
-		parameters: ParametersStruct;
-	}
->;
+} as const;
 
 export type GameParametersMap = {
-	coinflip: ReturnType<typeof CoinflipParameters.parse>;
-	limbo: ReturnType<typeof LimboParameters.parse>;
-	plinko: ReturnType<typeof PlinkoParameters.parse>;
-	'pvp-coinflip': ReturnType<typeof PvPCoinflipParameters.parse>;
-	range: ReturnType<typeof RangeParameters.parse>;
-	wheel: ReturnType<typeof WheelParameters.parse>;
+	[TGame in Game]: ReturnType<
+		(typeof GAME_SETTINGS)[TGame]['parameters']['parse']
+	>;
 };
 
 export type GameParameters<TGame extends Game> = GameParametersMap[TGame];

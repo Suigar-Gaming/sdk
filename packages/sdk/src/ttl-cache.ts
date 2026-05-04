@@ -8,6 +8,10 @@ type CacheEntry<Value> = {
 	value: Value;
 };
 
+type TtlClientCacheReadOptions = {
+	ignoreCache?: boolean;
+};
+
 export class TtlClientCache extends ClientCache {
 	#ttlMs: number;
 
@@ -22,7 +26,12 @@ export class TtlClientCache extends ClientCache {
 	override read<T>(
 		key: [string, ...string[]],
 		load: () => T | Promise<T>,
+		options?: TtlClientCacheReadOptions,
 	): T | Promise<T> {
+		if (options?.ignoreCache) {
+			super.clear(key);
+		}
+
 		if (this.#ttlMs <= 0) {
 			return load();
 		}
@@ -43,8 +52,30 @@ export class TtlClientCache extends ClientCache {
 		).value as T | Promise<T>;
 	}
 
-	override clear(prefix?: string[]) {
-		super.clear(prefix);
+	override readSync<T>(
+		key: [string, ...string[]],
+		load: () => T,
+		options?: TtlClientCacheReadOptions,
+	): T {
+		if (options?.ignoreCache) {
+			super.clear(key);
+		}
+
+		if (this.#ttlMs <= 0) {
+			return load();
+		}
+
+		const cached = super.readSync<CacheEntry<T>>(key, () =>
+			this.#loadSyncEntry(load),
+		);
+
+		if (cached.expiresAt > Date.now()) {
+			return cached.value;
+		}
+
+		super.clear(key);
+		return super.readSync<CacheEntry<T>>(key, () => this.#loadSyncEntry(load))
+			.value;
 	}
 
 	#loadEntry<T>(
@@ -74,6 +105,13 @@ export class TtlClientCache extends ClientCache {
 		}
 
 		return entry;
+	}
+
+	#loadSyncEntry<T>(load: () => T): CacheEntry<T> {
+		return {
+			value: load(),
+			expiresAt: Date.now() + this.#ttlMs,
+		};
 	}
 }
 
