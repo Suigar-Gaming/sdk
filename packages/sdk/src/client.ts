@@ -246,53 +246,6 @@ export class SuigarClient {
 		);
 	}
 
-	async #fetchGameParameters<TGame extends Game>(
-		game: TGame,
-		coinType: string,
-		signal?: AbortSignal,
-	): Promise<GameParameters<TGame>> {
-		const gameDefinition = GAME_SETTINGS[game];
-
-		const { object: settingsObject } =
-			await this.#client.core.getDynamicObjectField({
-				parentId: this.#config.packageIds.sweetHouse,
-				name: {
-					type: resolveGameSettingsKeyType(
-						gameDefinition.settingsKey.name,
-						resolveGamePackageId(this.#config, game),
-					),
-					bcs: gameDefinition.settingsKey
-						.serialize({ dummy_field: false })
-						.toBytes(),
-				},
-				signal,
-			});
-
-		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: settingsObject.objectId,
-			name: {
-				type: TypeName.name,
-				bcs: TypeName.serialize({
-					name: resolveCoinTypeNameForTypeNameKey(coinType),
-				}).toBytes(),
-			},
-			include: {
-				content: true,
-			},
-			signal,
-		});
-
-		if (!object?.content) {
-			throw new Error(
-				`Missing parameters object content for ${game} and coin type ${coinType}`,
-			);
-		}
-
-		return gameDefinition.parameters.parse(
-			object.content,
-		) as GameParameters<TGame>;
-	}
-
 	/**
 	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
 	 *
@@ -430,5 +383,52 @@ export class SuigarClient {
 				useGasCoin: options.allowGasCoinShortcut,
 			});
 		};
+	}
+
+	async #fetchGameParameters<TGame extends Game>(
+		game: TGame,
+		coinType: string,
+		signal?: AbortSignal,
+	): Promise<GameParameters<TGame>> {
+		const gameDefinition = GAME_SETTINGS[game];
+
+		const { object: settingsObject } =
+			await this.#client.core.getDynamicObjectField({
+				parentId: this.#config.packageIds.sweetHouse,
+				name: {
+					type: resolveGameSettingsKeyType(
+						gameDefinition.settingsKey.name,
+						resolveGamePackageId(this.#config, game),
+					),
+					bcs: gameDefinition.settingsKey
+						.serialize({ dummy_field: false })
+						.toBytes(),
+				},
+				signal,
+			});
+
+		const { object } = await this.#client.core.getDynamicObjectField({
+			parentId: settingsObject.objectId,
+			name: {
+				type: TypeName.name,
+				bcs: TypeName.serialize({
+					name: resolveCoinTypeNameForTypeNameKey(coinType),
+				}).toBytes(),
+			},
+			include: {
+				content: true,
+			},
+			signal,
+		});
+
+		if (!object?.content) {
+			throw new Error(
+				`Missing parameters object content for ${game} and coin type ${coinType}`,
+			);
+		}
+
+		return gameDefinition.parameters.parse(
+			object.content,
+		) as GameParameters<TGame>;
 	}
 }
