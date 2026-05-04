@@ -4,20 +4,14 @@
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
-import { Parameters as CoinflipParameters } from './contracts/coinflip/coinflip';
 import { BetResultEvent } from './contracts/core/core';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name';
-import { Parameters as LimboParameters } from './contracts/limbo/limbo';
-import { Parameters as PlinkoParameters } from './contracts/plinko/plinko';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
 	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
-	Parameters as PvPCoinflipParameters,
 } from './contracts/pvp-coinflip/pvp_coinflip';
-import { Parameters as RangeParameters } from './contracts/range/range';
-import { Parameters as WheelParameters } from './contracts/wheel/wheel';
 import {
 	DEFAULT_CACHE_TTL_MS,
 	resolveCoinTypeNameForTypeNameKey,
@@ -311,12 +305,6 @@ export class SuigarClient {
 	 */
 	bcs = {
 		// Objects
-		CoinflipParameters,
-		LimboParameters,
-		PlinkoParameters,
-		PvPCoinflipParameters,
-		RangeParameters,
-		WheelParameters,
 		/**
 		 * Object representing the state of a PvP coinflip game, as stored on-chain.
 		 */
