@@ -54,7 +54,7 @@ export const GAME_SETTINGS = {
 	},
 } as const;
 
-export type GameParametersMap = {
+type GameParametersMap = {
 	[TGame in Game]: ReturnType<
 		(typeof GAME_SETTINGS)[TGame]['parameters']['parse']
 	>;

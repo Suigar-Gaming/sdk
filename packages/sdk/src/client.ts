@@ -62,12 +62,6 @@ import {
 } from './types/game-settings.type.js';
 import { parseCoinType } from './utils/index.js';
 
-export type {
-	GameParameters,
-	GameParametersMap,
-	GetGameParametersOptions,
-} from './types/game-settings.type.js';
-
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
 	partner,
@@ -264,14 +258,14 @@ export class SuigarClient {
 		signal?: AbortSignal,
 	): Promise<GameParameters<TGame>> {
 		const gameDefinition = GAME_SETTINGS[game];
-		const packageId = resolveGamePackageId(this.#config, game);
+
 		const { object: settingsObject } =
 			await this.#client.core.getDynamicObjectField({
 				parentId: this.#config.packageIds.sweetHouse,
 				name: {
 					type: resolvePackageMoveStructName(
 						gameDefinition.settingsKey.name,
-						packageId,
+						resolveGamePackageId(this.#config, game),
 					),
 					bcs: gameDefinition.settingsKey
 						.serialize({ dummy_field: false })
@@ -279,6 +273,7 @@ export class SuigarClient {
 				},
 				signal,
 			});
+
 		const { object } = await this.#client.core.getDynamicObjectField({
 			parentId: settingsObject.objectId,
 			name: {
@@ -294,7 +289,9 @@ export class SuigarClient {
 		});
 
 		if (!object?.content) {
-			throw new Error(`Missing parameters object content for ${game}`);
+			throw new Error(
+				`Missing parameters object content for ${game} and coin type ${coinType}`,
+			);
 		}
 
 		return gameDefinition.parameters.parse(
