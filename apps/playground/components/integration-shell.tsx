@@ -64,7 +64,7 @@ import {
 	findGameConfigOption,
 	resolveStakeRangeForGame,
 	summarizeStandardGameParameters,
-} from '@/lib/onchain-parameters';
+} from '@/lib/on-chain-parameters';
 import { withBasePath } from '@/lib/paths';
 import {
 	COIN_DECIMALS,
