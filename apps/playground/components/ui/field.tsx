@@ -142,6 +142,19 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
 	);
 }
 
+function FieldCode({ className, ...props }: React.ComponentProps<'code'>) {
+	return (
+		<code
+			data-slot="field-code"
+			className={cn(
+				'inline-flex items-center rounded-md border border-border/70 bg-background/70 px-1.5 py-0.5 font-mono text-[0.85em] leading-none text-foreground',
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
 function FieldSeparator({
 	children,
 	className,
@@ -225,6 +238,7 @@ function FieldError({
 
 export {
 	Field,
+	FieldCode,
 	FieldLabel,
 	FieldDescription,
 	FieldError,
