@@ -112,7 +112,7 @@ export function EventsTable() {
 	}
 
 	return (
-		<Card className="border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+		<Card className="shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<CardHeader>
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">

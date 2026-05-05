@@ -14,7 +14,7 @@ const homeHref = withBasePath('/');
 export default function NotFound() {
 	return (
 		<main className="flex min-h-screen items-center justify-center px-6 py-16">
-			<Card className="w-full max-w-lg border-border/70 bg-card/85 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)]">
+			<Card className="w-full max-w-lg bg-card/85 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)]">
 				<CardHeader className="gap-2 pb-4">
 					<div className="space-y-2 text-center">
 						<CardTitle className="font-serif text-4xl tracking-normal text-foreground sm:text-5xl">

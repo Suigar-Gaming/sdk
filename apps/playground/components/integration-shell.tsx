@@ -302,7 +302,7 @@ function SectionShell({
 	children: React.ReactNode;
 }) {
 	return (
-		<Card className="h-full border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+		<Card className="h-full shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<CardHeader>
 				{action ? <CardAction>{action}</CardAction> : null}
 				<CardTitle className="flex items-center gap-2">
