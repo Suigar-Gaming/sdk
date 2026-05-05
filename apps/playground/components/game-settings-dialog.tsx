@@ -1,6 +1,8 @@
 'use client';
 
+import { Cog } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
+import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
 import {
 	Accordion,
@@ -19,12 +21,18 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { FieldCode } from '@/components/ui/field';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import type {
 	GameConfigOption,
 	StakeRangeSummary,
 	StandardGameId,
+	SupportedCoinKey,
 } from '@/lib/suigar-types';
 
 function SettingsSummaryCard({
@@ -39,13 +47,17 @@ function SettingsSummaryCard({
 	return (
 		<Card className="rounded-2xl bg-background/40 shadow-none">
 			<CardContent className="p-4">
-				<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+				<p className="text-xs font-medium uppercase text-muted-foreground">
 					{title}
 				</p>
-				<p className="mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-foreground">
+				<div className="mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-foreground">
 					{value}
-				</p>
-				<p className="mt-1 text-sm text-muted-foreground">{description}</p>
+				</div>
+				{description ? (
+					<div className="mt-1 text-sm text-muted-foreground">
+						{description}
+					</div>
+				) : null}
 			</CardContent>
 		</Card>
 	);
@@ -68,6 +80,7 @@ function SettingsStateCard({
 export function GameSettingsDialog({
 	activeConfigOption,
 	activeStakeRange,
+	coinKey,
 	coinLabel,
 	configOptions,
 	error,
@@ -81,6 +94,7 @@ export function GameSettingsDialog({
 }: {
 	activeConfigOption: GameConfigOption | null;
 	activeStakeRange: StakeRangeSummary | null;
+	coinKey: SupportedCoinKey;
 	coinLabel: string;
 	configOptions?: GameConfigOption[];
 	error: string | null;
@@ -92,36 +106,41 @@ export function GameSettingsDialog({
 	serializedGameSettings: string | null;
 	settingsCallPreview: string;
 }) {
+	const playableConfigCount =
+		configOptions?.filter((option) => option.isPlayable).length ?? 0;
+	const activeConfigDetails = activeConfigOption?.details?.slice(0, 3) ?? [];
+	const activeMultiplierValues = activeConfigOption?.multiplierValues ?? [];
+
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent
 				size="xl"
 				showCloseButton={false}
-				className="flex h-[96vh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-y-auto border border-border/80 bg-card/92 p-0 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)]"
+				className="flex h-[96vh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden border border-border/80 bg-card/92 p-0 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)]"
 			>
-				<DialogHeader className="sticky top-0 z-10 gap-4 border-b border-border/70 bg-card/95 px-4 py-4 md:px-6 md:py-5">
+				<DialogHeader className="z-10 gap-4 border-b border-border/70 bg-card/95 px-4 py-4 md:px-6 md:py-5">
 					<div className="flex flex-wrap items-start justify-between gap-3">
 						<div className="flex flex-wrap items-center gap-2.5">
-							<Badge variant="secondary" className="px-3 py-1 text-[0.68rem]">
+							<Badge variant="default" className="px-3 py-1">
 								{gameLabel}
 							</Badge>
-							<Badge variant="outline" className="px-3 py-1 text-[0.68rem]">
-								{coinLabel}
+							<Badge variant="outline" className="px-3 py-1">
+								<span className="inline-flex items-center gap-1">
+									<CoinIcon coinKey={coinKey} className="size-3.5" />
+									{coinLabel}
+								</span>
 							</Badge>
 							{isLoading ? (
 								<Badge
 									variant="outline"
-									className="gap-1 px-3 py-1 text-[0.68rem] normal-case"
+									className="gap-1 px-3 py-1 normal-case"
 								>
 									<Spinner className="size-3.5" data-icon="inline-start" />
 									Loading
 								</Badge>
 							) : null}
 							{error ? (
-								<Badge
-									variant="destructive"
-									className="px-3 py-1 text-[0.68rem]"
-								>
+								<Badge variant="destructive" className="px-3 py-1">
 									Error
 								</Badge>
 							) : null}
@@ -139,47 +158,146 @@ export function GameSettingsDialog({
 					</div>
 					<div className="space-y-1">
 						<DialogTitle className="w-full text-xl md:text-2xl">
-							Live game settings
+							{gameLabel} live settings
 						</DialogTitle>
 						<DialogDescription>
-							On-chain parameters for the current standard game selection.
+							On-chain parameters for {gameLabel} game
 						</DialogDescription>
 					</div>
 				</DialogHeader>
 
-				<div className="min-h-0 flex-1 px-4 py-4 md:px-6 md:py-6">
+				<div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
 					<div className="flex flex-col gap-6 pr-1">
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 							<SettingsSummaryCard
 								title="Stake range"
 								value={
 									activeStakeRange ? (
-										<>
-											<FieldCode>{activeStakeRange.min}</FieldCode>
-											<span>to</span>
-											<FieldCode>{activeStakeRange.max}</FieldCode>
-										</>
+										<div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+											<FieldCode className="shrink-0">
+												{activeStakeRange.min}
+											</FieldCode>
+											<span className="shrink-0">to</span>
+											<FieldCode className="shrink-0">
+												{activeStakeRange.max}
+											</FieldCode>
+											<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+												<CoinIcon coinKey={coinKey} className="size-4" />
+												{coinLabel}
+											</span>
+										</div>
 									) : (
 										'--'
 									)
 								}
-								description={coinLabel}
+								description={null}
 							/>
 							<SettingsSummaryCard
 								title="Configs"
-								value={configOptions?.length ?? 0}
+								value={
+									configOptions?.length ? (
+										<>
+											<FieldCode>{configOptions.length}</FieldCode>
+											<Badge variant="success">
+												{playableConfigCount} playable
+											</Badge>
+										</>
+									) : (
+										<FieldCode>0</FieldCode>
+									)
+								}
 								description={
 									game === 'plinko' || game === 'wheel'
-										? 'On-chain config options available for this game.'
+										? null
 										: 'This game uses top-level parameters only.'
 								}
 							/>
 							<SettingsSummaryCard
-								title="Selected config"
-								value={activeConfigOption?.label ?? 'N/A'}
+								title="Current config"
+								value={
+									activeConfigOption ? (
+										<div className="flex flex-wrap items-center gap-2 text-base">
+											<span>{activeConfigOption.label}</span>
+											<Popover>
+												<PopoverTrigger asChild>
+													<Button type="button" variant="outline" size="xs">
+														<Cog />
+														Config details
+													</Button>
+												</PopoverTrigger>
+												<PopoverContent
+													align="start"
+													className="w-[min(22rem,calc(100vw-3rem))] gap-3 rounded-2xl border border-border/70 bg-popover/98 p-4"
+												>
+													<div className="space-y-3 text-sm">
+														<div className="min-w-0 overflow-x-auto">
+															<div className="flex w-max min-w-full flex-nowrap items-center gap-2 text-muted-foreground">
+																<span className="shrink-0 font-medium text-foreground">
+																	Stake range
+																</span>
+																<FieldCode className="shrink-0">
+																	{activeConfigOption.stakeRange.min}
+																</FieldCode>
+																<span className="shrink-0">to</span>
+																<FieldCode className="shrink-0">
+																	{activeConfigOption.stakeRange.max}
+																</FieldCode>
+																<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em]">
+																	<CoinIcon
+																		coinKey={coinKey}
+																		className="size-4"
+																	/>
+																	{coinLabel}
+																</span>
+															</div>
+														</div>
+														{activeConfigDetails.length ? (
+															<div className="space-y-1">
+																{activeConfigDetails.map((detail) => (
+																	<p
+																		key={`active-config-${detail.label}`}
+																		className="flex items-center justify-between gap-3 text-muted-foreground"
+																	>
+																		<span>{detail.label}</span>
+																		<FieldCode>{detail.value}</FieldCode>
+																	</p>
+																))}
+															</div>
+														) : null}
+														{activeMultiplierValues.length ? (
+															<>
+																<div className="font-medium text-foreground mb-2">
+																	Multipliers:{' '}
+																	<FieldCode>
+																		{activeMultiplierValues.length}
+																	</FieldCode>
+																</div>
+																<div className="flex flex-wrap gap-1.5">
+																	{activeMultiplierValues.map(
+																		(value, index) => (
+																			<FieldCode
+																				key={`active-config-multiplier-${index}`}
+																				className="shrink-0 justify-center"
+																			>
+																				{value}
+																			</FieldCode>
+																		),
+																	)}
+																</div>
+															</>
+														) : null}
+													</div>
+												</PopoverContent>
+											</Popover>
+										</div>
+									) : (
+										<span className="text-base">N/A</span>
+									)
+								}
 								description={
-									activeConfigOption?.description ??
-									'No per-config selection for the current game.'
+									activeConfigOption
+										? null
+										: 'No per-config selection for the current game.'
 								}
 							/>
 						</div>
@@ -220,7 +338,11 @@ export function GameSettingsDialog({
 										<p className="text-sm text-muted-foreground">
 											Playable configs stay enabled in the form selector.
 										</p>
-										<GameSettingsConfigList configOptions={configOptions} />
+										<GameSettingsConfigList
+											activeConfigId={activeConfigOption?.id}
+											coinKey={coinKey}
+											configOptions={configOptions}
+										/>
 									</AccordionContent>
 								</AccordionItem>
 							) : null}

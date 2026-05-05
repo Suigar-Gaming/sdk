@@ -3,6 +3,7 @@
 import { Copy, RefreshCw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
+import { CoinIcon } from '@/components/coins';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,6 +50,17 @@ function parseCoinTypeLabel(
 
 	const segments = coinType.split('::');
 	return segments[segments.length - 1] ?? coinType;
+}
+
+function parseCoinKey(
+	coinType: string,
+	coinTypes: Record<SupportedCoinKey, string>,
+) {
+	return (
+		(Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>).find(
+			([, configuredCoinType]) => configuredCoinType === coinType,
+		)?.[0] ?? null
+	);
 }
 
 export function PvPLobbyPicker({
@@ -102,7 +114,7 @@ export function PvPLobbyPicker({
 						disabled={isLoading}
 					>
 						{isLoading ? (
-							<Spinner data-icon="inline-start" />
+							<Spinner data-icon="size-4 inline-start" />
 						) : (
 							<RefreshCw className="size-4" />
 						)}
@@ -131,6 +143,7 @@ export function PvPLobbyPicker({
 								BigInt(game.stake_per_player),
 								getCoinDecimals(game.coinType),
 							);
+							const coinKey = parseCoinKey(game.coinType, coinTypes);
 							const coinLabel = parseCoinTypeLabel(game.coinType, coinTypes);
 
 							return (
@@ -156,15 +169,21 @@ export function PvPLobbyPicker({
 									<div className="flex flex-col gap-2">
 										<div className="flex items-start justify-between gap-3">
 											<div className="space-y-1">
-												<p className="text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
+												<p className="text-sm uppercase text-muted-foreground">
 													Amount
 												</p>
-												<p className="text-sm font-semibold tabular-nums text-foreground">
-													{amount}{' '}
-													<span className="text-[0.68rem] font-medium text-muted-foreground">
+												<div className="flex min-w-0 items-center gap-1 whitespace-nowrap text-sm font-semibold tabular-nums text-foreground">
+													<span className="min-w-0 truncate">{amount}</span>
+													<span className="inline-flex shrink-0 items-center gap-1 text-[0.68rem] font-medium text-muted-foreground">
+														{coinKey ? (
+															<CoinIcon
+																coinKey={coinKey}
+																className="size-3.5 shrink-0"
+															/>
+														) : null}
 														{coinLabel}
 													</span>
-												</p>
+												</div>
 											</div>
 											<Badge
 												variant={game.is_private ? 'destructive' : 'success'}
@@ -176,7 +195,7 @@ export function PvPLobbyPicker({
 
 										<div className="flex items-center justify-between gap-3">
 											<div className="space-y-1">
-												<p className="text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
+												<p className="text-xs uppercase text-muted-foreground">
 													Creator side
 												</p>
 												<p className="text-xs font-medium capitalize text-foreground">

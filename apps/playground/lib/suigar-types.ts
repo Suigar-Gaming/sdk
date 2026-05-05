@@ -32,7 +32,7 @@ export type RangeBoundsSummary = {
 export type GameConfigOption = {
 	id: string;
 	label: string;
-	description: string;
+	description?: string;
 	details?: Array<{
 		label: string;
 		value: string;
