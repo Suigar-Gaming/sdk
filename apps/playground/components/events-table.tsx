@@ -113,7 +113,7 @@ export function EventsTable() {
 
 	return (
 		<Card className="shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-			<CardHeader>
+			<CardHeader className="relative">
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
 						<ListTree className="size-5 text-secondary dark:text-primary" />
@@ -124,8 +124,8 @@ export function EventsTable() {
 						whenever you want a fresh log.
 					</CardDescription>
 				</div>
-				<CardAction>
-					<Button variant="outline" size="sm" onClick={clearRows}>
+				<CardAction className="absolute top-6 right-6">
+					<Button variant="destructive" size="sm" onClick={clearRows}>
 						<Trash2 className="size-4" />
 						Clear
 					</Button>

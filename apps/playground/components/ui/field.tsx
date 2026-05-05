@@ -127,16 +127,32 @@ function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
 	);
 }
 
-function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
+const fieldDescriptionVariants = cva(
+	'text-left font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5 last:mt-0 nth-last-2:-mt-1 [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary',
+	{
+		variants: {
+			size: {
+				sm: 'text-xs leading-5',
+				md: 'text-sm leading-normal',
+				xl: 'text-base leading-7',
+			},
+		},
+		defaultVariants: {
+			size: 'md',
+		},
+	},
+);
+
+function FieldDescription({
+	className,
+	size = 'md',
+	...props
+}: React.ComponentProps<'p'> & VariantProps<typeof fieldDescriptionVariants>) {
 	return (
 		<p
 			data-slot="field-description"
-			className={cn(
-				'text-left text-sm leading-normal font-normal text-muted-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5',
-				'last:mt-0 nth-last-2:-mt-1',
-				'[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary',
-				className,
-			)}
+			data-size={size ?? undefined}
+			className={cn(fieldDescriptionVariants({ size }), className)}
 			{...props}
 		/>
 	);

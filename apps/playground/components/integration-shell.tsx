@@ -303,13 +303,19 @@ function SectionShell({
 }) {
 	return (
 		<Card className="h-full shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-			<CardHeader>
-				{action ? <CardAction>{action}</CardAction> : null}
-				<CardTitle className="flex items-center gap-2">
-					{icon}
-					{title}
-				</CardTitle>
-				<CardDescription>{description}</CardDescription>
+			<CardHeader className="gap-4">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+					<div className="space-y-2">
+						<CardTitle className="flex items-center gap-2">
+							{icon}
+							{title}
+						</CardTitle>
+						<CardDescription>{description}</CardDescription>
+					</div>
+					{action ? (
+						<CardAction className="sm:ml-auto">{action}</CardAction>
+					) : null}
+				</div>
 			</CardHeader>
 			<CardContent>{children}</CardContent>
 		</Card>
@@ -1090,7 +1096,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											setSelectedCoin(value as SupportedCoinKey)
 										}
 									>
-										<SelectTrigger className="w-auto min-w-0 rounded-full border-border/70 bg-background/55">
+										<SelectTrigger className="h-10 w-auto min-w-[8.75rem] rounded-full border-border/70 bg-background/55 px-3">
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -1149,7 +1155,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											asChild
 											variant={mode === 'standard' ? 'default' : 'outline'}
 											size="sm"
-											className="rounded-full px-4"
+											className="h-10 rounded-full px-4"
 										>
 											<Link href="/standard?game=coinflip" scroll={false}>
 												Standard
@@ -1159,7 +1165,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											asChild
 											variant={mode === 'pvp' ? 'default' : 'outline'}
 											size="sm"
-											className="rounded-full px-4"
+											className="h-10 rounded-full px-4"
 										>
 											<Link
 												href="/pvp?game=pvp-coinflip&action=create"
@@ -1180,7 +1186,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														updateQuery('game', value);
 													}}
 												>
-													<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+													<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
@@ -1202,7 +1208,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 															updateQuery('game', value);
 														}}
 													>
-														<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+														<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
 															<SelectValue />
 														</SelectTrigger>
 														<SelectContent>
@@ -1231,7 +1237,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 																updateQuery('action', action.value);
 															}}
 															className={cn(
-																'justify-start rounded-full',
+																'h-10 justify-start rounded-full px-4',
 																pvpAction === action.value && 'shadow-none',
 															)}
 														>
@@ -1278,10 +1284,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								mode === 'standard' ? (
 									<Button
 										type="button"
-										variant="outline"
+										variant="secondary"
 										size="sm"
 										onClick={() => setIsGameSettingsDialogOpen(true)}
-										className="rounded-full border-border/70 bg-background/55"
+										className="h-10 rounded-full px-4"
 									>
 										<SlidersHorizontal className="size-4" />
 										View settings
@@ -1353,18 +1359,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										{pvpAction === 'join' ? (
 											<>
 												<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
-													<FieldGroup className="items-center justify-between gap-3">
-														<div className="space-y-1">
+													<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+														<div className="min-w-0 space-y-1">
 															<FieldLabel htmlFor="join-private-lobbies">
 																Show private lobbies
 															</FieldLabel>
-															<FieldDescription>
+															<FieldDescription size="sm">
 																Public unresolved lobbies stay visible even when
 																the wallet is disconnected.
 															</FieldDescription>
 														</div>
 														<Switch
 															id="join-private-lobbies"
+															size="default"
+															className="mt-0.5 justify-self-end self-start"
 															checked={showPrivateJoinLobbies}
 															onCheckedChange={setShowPrivateJoinLobbies}
 														/>

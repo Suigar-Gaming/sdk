@@ -97,7 +97,7 @@ export function PvPLobbyPicker({
 						type="button"
 						variant="outline"
 						size="sm"
-						className="rounded-full"
+						className="h-10 rounded-full px-4"
 						onClick={onRefresh}
 						disabled={isLoading}
 					>
@@ -186,7 +186,7 @@ export function PvPLobbyPicker({
 												type="button"
 												variant="ghost"
 												size="sm"
-												className="h-7 rounded-full px-2 text-[0.68rem] text-muted-foreground"
+												className="h-8 rounded-full px-2.5 text-[0.72rem] text-muted-foreground"
 												onClick={(event) => handleCopyGameId(event, game.id)}
 											>
 												<Copy className="size-3.5" />

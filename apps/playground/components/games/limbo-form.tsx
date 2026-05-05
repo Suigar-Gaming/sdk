@@ -40,6 +40,7 @@ export function LimboForm({
 						id="targetMultiplier"
 						type="number"
 						step="any"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.targetMultiplier}
 						onChange={(event) =>
 							onChange({ targetMultiplier: event.target.value })
@@ -62,6 +63,7 @@ export function LimboForm({
 						type="number"
 						step="1"
 						min="1"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.scale}
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"

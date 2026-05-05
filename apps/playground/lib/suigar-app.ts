@@ -42,7 +42,7 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	},
 	plinko: {
 		...DEFAULT_SHARED_FIELDS,
-		configId: '3',
+		configId: '',
 	},
 	range: {
 		...DEFAULT_SHARED_FIELDS,
@@ -53,7 +53,7 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	},
 	wheel: {
 		...DEFAULT_SHARED_FIELDS,
-		configId: '1',
+		configId: '',
 	},
 };
 

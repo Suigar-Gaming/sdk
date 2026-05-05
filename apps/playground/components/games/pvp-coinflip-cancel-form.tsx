@@ -19,7 +19,7 @@ export function PvPCoinflipCancelForm({
 					value={value.gameId}
 					readOnly
 					aria-readonly="true"
-					className="cursor-default bg-muted/35 font-mono text-xs md:text-sm"
+					className="h-11 cursor-default rounded-2xl bg-muted/35 px-4 font-mono text-xs md:text-sm"
 				/>
 			</Field>
 		</div>

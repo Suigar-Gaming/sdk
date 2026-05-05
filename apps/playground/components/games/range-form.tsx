@@ -45,6 +45,7 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.leftPoint}
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
@@ -62,6 +63,7 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.rightPoint}
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
@@ -80,6 +82,7 @@ export function RangeForm({
 						type="number"
 						step="1"
 						min="1"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.scale}
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
@@ -91,10 +94,11 @@ export function RangeForm({
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
-					<Field className="w-full rounded-xl border border-border/70 bg-background/40 px-4 py-3 md:max-w-sm">
+					<Field className="w-full rounded-2xl border border-border/70 bg-background/45 px-4 py-4 md:max-w-sm">
 						<div className="flex items-center justify-between gap-3">
 							<FieldTitle>Out of range</FieldTitle>
 							<Switch
+								size="default"
 								checked={value.outOfRange}
 								onCheckedChange={(checked) => onChange({ outOfRange: checked })}
 							/>

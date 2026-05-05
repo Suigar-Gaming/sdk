@@ -43,7 +43,10 @@ export function PlinkoForm({
 						value={value.configId}
 						onValueChange={(configId) => onChange({ configId })}
 					>
-						<SelectTrigger id="plinkoConfigId">
+						<SelectTrigger
+							id="plinkoConfigId"
+							className="h-11 rounded-2xl bg-background/55 px-4"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent className="max-h-[min(22rem,calc(100vh-6rem))]">
@@ -59,6 +62,7 @@ export function PlinkoForm({
 						id="plinkoConfigId"
 						type="number"
 						step="1"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.configId}
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>
