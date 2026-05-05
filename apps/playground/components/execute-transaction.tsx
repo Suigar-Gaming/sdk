@@ -49,7 +49,7 @@ export function ExecuteTransactionCard({
 						disabled={isExecuting || !currentAccount}
 					>
 						{isExecuting ? (
-							<Spinner data-icon="inline-start" />
+							<Spinner data-icon="size-4 inline-start" />
 						) : (
 							<Swords className="size-4" />
 						)}
