@@ -1156,7 +1156,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									<div className="flex flex-wrap items-center gap-2 lg:justify-end">
 										<Button
 											asChild
-											variant={mode === 'standard' ? 'default' : 'outline'}
+											variant={
+												mode === 'standard' ? 'control-active' : 'control'
+											}
 											size="sm"
 											className="h-10 rounded-full px-4"
 										>
@@ -1166,7 +1168,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										</Button>
 										<Button
 											asChild
-											variant={mode === 'pvp' ? 'default' : 'outline'}
+											variant={mode === 'pvp' ? 'control-active' : 'control'}
 											size="sm"
 											className="h-10 rounded-full px-4"
 										>
@@ -1231,8 +1233,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 															size="sm"
 															variant={
 																pvpAction === action.value
-																	? 'default'
-																	: 'outline'
+																	? 'control-active'
+																	: 'control'
 															}
 															onClick={() => {
 																setPvPAction(action.value);
