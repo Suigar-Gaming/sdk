@@ -62,10 +62,7 @@ function toConfigOptions<TEntry extends ConfigEntry>(
 	decimals: number,
 	buildConfig: (
 		entry: TEntry,
-	) => Pick<
-		GameConfigOption,
-		'label' | 'description' | 'details' | 'multiplierValues'
-	>,
+	) => Pick<GameConfigOption, 'label' | 'details' | 'multiplierValues'>,
 ): GameConfigOption[] {
 	return entries.map((entry) => {
 		const stakeRange = toStakeRange(
@@ -165,7 +162,6 @@ export function summarizeStandardGameParameters(
 				decimals,
 				(entry) => ({
 					label: `Config ${entry.key}`,
-					description: 'Plinko board parameters and allowed stake range.',
 					details: [
 						{ label: 'Rows', value: String(entry.value.num_rows) },
 						{ label: 'Slots', value: String(entry.value.multipliers.length) },
@@ -201,7 +197,6 @@ export function summarizeStandardGameParameters(
 				decimals,
 				(entry) => ({
 					label: `Config ${entry.key}`,
-					description: 'Wheel case layout and allowed stake range.',
 					details: [
 						{ label: 'Cases', value: String(entry.value.num_cases) },
 						{
