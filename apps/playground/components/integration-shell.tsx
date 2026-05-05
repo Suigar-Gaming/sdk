@@ -10,7 +10,6 @@ import {
 	BookOpenText,
 	CirclePlus,
 	Gamepad2,
-	LoaderCircle,
 	ShieldX,
 	SlidersHorizontal,
 	Swords,
@@ -58,6 +57,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
@@ -302,14 +302,20 @@ function SectionShell({
 	children: React.ReactNode;
 }) {
 	return (
-		<Card className="h-full border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-			<CardHeader>
-				{action ? <CardAction>{action}</CardAction> : null}
-				<CardTitle className="flex items-center gap-2">
-					{icon}
-					{title}
-				</CardTitle>
-				<CardDescription>{description}</CardDescription>
+		<Card className="h-full shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+			<CardHeader className="gap-4">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+					<div className="space-y-2">
+						<CardTitle className="flex items-center gap-2">
+							{icon}
+							{title}
+						</CardTitle>
+						<CardDescription>{description}</CardDescription>
+					</div>
+					{action ? (
+						<CardAction className="sm:ml-auto">{action}</CardAction>
+					) : null}
+				</div>
 			</CardHeader>
 			<CardContent>{children}</CardContent>
 		</Card>
@@ -610,8 +616,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const stakeDescription = React.useMemo(() => {
 		if (isStandardGameParametersLoading) {
 			return (
-				<FieldDescription className="inline-flex items-center gap-1.5">
-					<LoaderCircle className="size-3.5 animate-spin" />
+				<FieldDescription
+					size="sm"
+					className="inline-flex items-center gap-1.5"
+				>
+					<Spinner className="size-3.5" />
 					Loading on-chain stake limits for this coin.
 				</FieldDescription>
 			);
@@ -619,7 +628,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 		if (standardGameParametersError) {
 			return (
-				<FieldDescription>
+				<FieldDescription size="sm">
 					Unable to load on-chain stake limits: {standardGameParametersError}
 				</FieldDescription>
 			);
@@ -630,7 +639,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		}
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain stake range: <FieldCode>{activeStakeRange.min}</FieldCode> to{' '}
 				<FieldCode>{activeStakeRange.max}</FieldCode>{' '}
 				{effectiveSelectedCoin.toUpperCase()}
@@ -671,7 +680,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		}
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain target multiplier range:{' '}
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.targetMultiplierRange.min)}
@@ -696,7 +705,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				: DEFAULT_RANGE_SCALE;
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain zone size:{' '}
 				<FieldCode>
 					{formatInputNumber(
@@ -1066,7 +1075,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									alt="Suigar"
 									width={36}
 									height={36}
-									className="h-8 w-8 md:hidden"
+									className="size-8 md:hidden"
 									priority
 								/>
 								<Image
@@ -1074,7 +1083,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									alt="Suigar"
 									width={132}
 									height={36}
-									className="hidden h-8 w-auto md:block md:h-10"
+									className="hidden w-auto md:block md:h-10"
 									priority
 								/>
 							</Link>
@@ -1090,7 +1099,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											setSelectedCoin(value as SupportedCoinKey)
 										}
 									>
-										<SelectTrigger className="w-auto min-w-0 rounded-full border-border/70 bg-background/55">
+										<SelectTrigger className="h-10 w-auto min-w-[8.75rem] rounded-full border-border/70 bg-background/55 px-3">
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -1134,7 +1143,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 								<div className="space-y-2">
 									<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
-										Game integration playground
+										Suigar SDK playground
 									</h1>
 									<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
 										Build standard and PvP transactions, inspect the exact
@@ -1147,9 +1156,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									<div className="flex flex-wrap items-center gap-2 lg:justify-end">
 										<Button
 											asChild
-											variant={mode === 'standard' ? 'default' : 'outline'}
+											variant={
+												mode === 'standard' ? 'control-active' : 'control'
+											}
 											size="sm"
-											className="rounded-full px-4"
+											className="h-10 rounded-full px-4"
 										>
 											<Link href="/standard?game=coinflip" scroll={false}>
 												Standard
@@ -1157,9 +1168,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										</Button>
 										<Button
 											asChild
-											variant={mode === 'pvp' ? 'default' : 'outline'}
+											variant={mode === 'pvp' ? 'control-active' : 'control'}
 											size="sm"
-											className="rounded-full px-4"
+											className="h-10 rounded-full px-4"
 										>
 											<Link
 												href="/pvp?game=pvp-coinflip&action=create"
@@ -1180,7 +1191,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														updateQuery('game', value);
 													}}
 												>
-													<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+													<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
@@ -1202,7 +1213,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 															updateQuery('game', value);
 														}}
 													>
-														<SelectTrigger className="h-10 rounded-full border-border/70 bg-background/55 px-4">
+														<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
 															<SelectValue />
 														</SelectTrigger>
 														<SelectContent>
@@ -1222,8 +1233,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 															size="sm"
 															variant={
 																pvpAction === action.value
-																	? 'default'
-																	: 'outline'
+																	? 'control-active'
+																	: 'control'
 															}
 															onClick={() => {
 																setPvPAction(action.value);
@@ -1231,7 +1242,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 																updateQuery('action', action.value);
 															}}
 															className={cn(
-																'justify-start rounded-full',
+																'h-10 justify-start rounded-full px-4',
 																pvpAction === action.value && 'shadow-none',
 															)}
 														>
@@ -1258,7 +1269,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 						<SectionShell
 							title={
-								mode === 'standard' ? 'Game controls' : 'PvP Coinflip controls'
+								mode === 'standard'
+									? `${getStandardGameLabel(standardGame)} controls`
+									: 'PvP Coinflip controls'
 							}
 							icon={
 								mode === 'standard' ? (
@@ -1276,10 +1289,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								mode === 'standard' ? (
 									<Button
 										type="button"
-										variant="outline"
+										variant="ghost"
 										size="sm"
 										onClick={() => setIsGameSettingsDialogOpen(true)}
-										className="rounded-full border-border/70 bg-background/55"
+										className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
 									>
 										<SlidersHorizontal className="size-4" />
 										View settings
@@ -1351,18 +1364,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										{pvpAction === 'join' ? (
 											<>
 												<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
-													<FieldGroup className="items-center justify-between gap-3">
-														<div className="space-y-1">
+													<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+														<div className="min-w-0 space-y-1">
 															<FieldLabel htmlFor="join-private-lobbies">
 																Show private lobbies
 															</FieldLabel>
-															<FieldDescription>
+															<FieldDescription size="sm">
 																Public unresolved lobbies stay visible even when
 																the wallet is disconnected.
 															</FieldDescription>
 														</div>
 														<Switch
 															id="join-private-lobbies"
+															size="default"
+															className="mt-0.5 justify-self-end self-start"
 															checked={showPrivateJoinLobbies}
 															onCheckedChange={setShowPrivateJoinLobbies}
 														/>

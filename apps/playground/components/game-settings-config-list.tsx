@@ -50,7 +50,7 @@ export function GameSettingsConfigList({
 							<div className="flex items-center gap-2">
 								<Badge
 									variant={option.isPlayable ? 'success' : 'destructive'}
-									className="px-3 py-1 text-[0.68rem]"
+									className="px-3 py-1 text-[0.68rem] uppercase"
 								>
 									{option.isPlayable ? 'Playable' : 'Disabled'}
 								</Badge>
@@ -58,7 +58,7 @@ export function GameSettingsConfigList({
 									type="button"
 									variant="outline"
 									size="icon-sm"
-									className="h-7 w-7 rounded-full text-muted-foreground"
+									className="h-8 w-8 rounded-full text-muted-foreground"
 									onClick={() => toggleExpanded(option.id)}
 									aria-expanded={isExpanded}
 									aria-label={

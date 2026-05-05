@@ -2,7 +2,7 @@
 '@suigar/sdk': patch
 ---
 
-Add BCS parser helpers and a Next.js game integration example app.
+Add BCS parser helpers and a Next.js playground app.
 
 - expose parser helpers through `@suigar/sdk/utils`
 - add `parseGameDetails` for decoding `BetResultEvent.game_details`

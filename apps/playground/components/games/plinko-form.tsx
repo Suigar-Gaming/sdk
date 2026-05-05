@@ -1,6 +1,5 @@
 'use client';
 
-import { LoaderCircle } from 'lucide-react';
 import type * as React from 'react';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
@@ -12,6 +11,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import type { GameConfigOption, PlinkoFormValues } from '@/lib/suigar-types';
 
 export function PlinkoForm({
@@ -43,7 +43,10 @@ export function PlinkoForm({
 						value={value.configId}
 						onValueChange={(configId) => onChange({ configId })}
 					>
-						<SelectTrigger id="plinkoConfigId">
+						<SelectTrigger
+							id="plinkoConfigId"
+							className="h-11 rounded-2xl bg-background/55 px-4"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent className="max-h-[min(22rem,calc(100vh-6rem))]">
@@ -59,16 +62,17 @@ export function PlinkoForm({
 						id="plinkoConfigId"
 						type="number"
 						step="1"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.configId}
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>
 				)}
-				<FieldDescription>
+				<FieldDescription size="sm">
 					{selectedConfig ? (
 						selectedConfig.description
 					) : isConfigLoading ? (
 						<span className="inline-flex items-center gap-1.5">
-							<LoaderCircle className="size-3.5 animate-spin" />
+							<Spinner className="size-3.5" />
 							Loading Plinko configs from on-chain parameters.
 						</span>
 					) : configError ? (

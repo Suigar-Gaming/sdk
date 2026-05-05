@@ -36,6 +36,7 @@ export function RangeForm({
 
 	return (
 		<div className="space-y-6">
+			{rangeBoundsDescription}
 			<FieldGroup className="grid gap-4 md:grid-cols-2">
 				<Field>
 					<FieldLabel htmlFor="leftPoint">Left point</FieldLabel>
@@ -45,10 +46,11 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.leftPoint}
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Allowed range: <FieldCode>0</FieldCode> to{' '}
 						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
 						<FieldCode>{String(effectiveScale)}</FieldCode>.
@@ -62,14 +64,14 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.rightPoint}
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
 						larger scales reduce the allowed frontend range.
 					</FieldDescription>
-					{rangeBoundsDescription}
 				</Field>
 			</FieldGroup>
 			<FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -80,26 +82,28 @@ export function RangeForm({
 						type="number"
 						step="1"
 						min="1"
+						className="h-11 rounded-2xl bg-background/55 px-4"
 						value={value.scale}
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
 						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
 						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>.
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
-					<Field className="w-full rounded-xl border border-border/70 bg-background/40 px-4 py-3 md:max-w-sm">
+					<Field className="w-full rounded-2xl border border-border/70 bg-background/45 px-4 py-4 md:max-w-sm">
 						<div className="flex items-center justify-between gap-3">
 							<FieldTitle>Out of range</FieldTitle>
 							<Switch
+								size="default"
 								checked={value.outOfRange}
 								onCheckedChange={(checked) => onChange({ outOfRange: checked })}
 							/>
 						</div>
-						<FieldDescription>
+						<FieldDescription size="sm">
 							Flip the win condition outside the interval.
 						</FieldDescription>
 					</Field>

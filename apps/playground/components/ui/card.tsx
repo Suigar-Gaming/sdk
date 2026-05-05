@@ -18,10 +18,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="card-header"
-			className={cn(
-				'grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 p-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] *:data-[slot=card-action]:col-start-2 *:data-[slot=card-action]:row-span-2 *:data-[slot=card-action]:self-start *:data-[slot=card-action]:justify-self-end',
-				className,
-			)}
+			className={cn('flex flex-col items-start gap-2 p-6', className)}
 			{...props}
 		/>
 	);

@@ -12,6 +12,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { compactAddress } from '@/lib/suigar-app';
 import type {
 	PvPCoinflipLobbyGame,
@@ -85,7 +86,7 @@ export function PvPLobbyPicker({
 	}
 
 	return (
-		<Card className="border-border/70 bg-background/45">
+		<Card className="bg-background/45">
 			<CardHeader className="gap-3">
 				<div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
 					<div className="space-y-1">
@@ -96,11 +97,15 @@ export function PvPLobbyPicker({
 						type="button"
 						variant="outline"
 						size="sm"
-						className="rounded-full"
+						className="h-10 rounded-full px-4"
 						onClick={onRefresh}
 						disabled={isLoading}
 					>
-						<RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
+						{isLoading ? (
+							<Spinner data-icon="inline-start" />
+						) : (
+							<RefreshCw className="size-4" />
+						)}
 						Refresh
 					</Button>
 				</div>
@@ -163,6 +168,7 @@ export function PvPLobbyPicker({
 											</div>
 											<Badge
 												variant={game.is_private ? 'destructive' : 'success'}
+												className="uppercase"
 											>
 												{game.is_private ? 'Private' : 'Public'}
 											</Badge>
@@ -181,7 +187,7 @@ export function PvPLobbyPicker({
 												type="button"
 												variant="ghost"
 												size="sm"
-												className="h-7 rounded-full px-2 text-[0.68rem] text-muted-foreground"
+												className="h-8 rounded-full px-2.5 text-[0.72rem] text-muted-foreground"
 												onClick={(event) => handleCopyGameId(event, game.id)}
 											>
 												<Copy className="size-3.5" />
