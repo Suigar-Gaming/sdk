@@ -97,13 +97,13 @@ export function GameSettingsConfigList({
 								</span>
 							</div>
 
-							<AccordionContent className="mt-3 border-t border-border/60 pt-3">
+							<AccordionContent className="mt-3 border-t border-border/60 pt-3 pb-0">
 								{option.multiplierValues?.length ? (
-									<div className="space-y-2">
-										<p className="text-sm font-medium text-muted-foreground">
+									<>
+										<div className="text-sm font-medium text-muted-foreground mb-2">
 											Multipliers:{' '}
 											<FieldCode>{option.multiplierValues.length}</FieldCode>
-										</p>
+										</div>
 										<div className="flex flex-wrap gap-1.5">
 											{option.multiplierValues.map((value, index) => (
 												<FieldCode
@@ -114,7 +114,7 @@ export function GameSettingsConfigList({
 												</FieldCode>
 											))}
 										</div>
-									</div>
+									</>
 								) : (
 									<p className="text-xs text-muted-foreground">
 										No additional per-config details are available for this

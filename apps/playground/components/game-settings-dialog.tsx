@@ -265,13 +265,13 @@ export function GameSettingsDialog({
 															</div>
 														) : null}
 														{activeMultiplierValues.length ? (
-															<div className="space-y-2">
-																<p className="font-medium text-foreground">
+															<>
+																<div className="font-medium text-foreground mb-2">
 																	Multipliers:{' '}
 																	<FieldCode>
 																		{activeMultiplierValues.length}
 																	</FieldCode>
-																</p>
+																</div>
 																<div className="flex flex-wrap gap-1.5">
 																	{activeMultiplierValues.map(
 																		(value, index) => (
@@ -284,7 +284,7 @@ export function GameSettingsDialog({
 																		),
 																	)}
 																</div>
-															</div>
+															</>
 														) : null}
 													</div>
 												</PopoverContent>
