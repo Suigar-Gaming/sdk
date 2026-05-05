@@ -28,6 +28,44 @@ import type {
 	StandardGameId,
 } from '@/lib/suigar-types';
 
+function SettingsSummaryCard({
+	title,
+	value,
+	description,
+}: {
+	title: string;
+	value: React.ReactNode;
+	description: React.ReactNode;
+}) {
+	return (
+		<Card className="rounded-2xl bg-background/40 shadow-none">
+			<CardContent className="p-4">
+				<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+					{title}
+				</p>
+				<p className="mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-foreground">
+					{value}
+				</p>
+				<p className="mt-1 text-sm text-muted-foreground">{description}</p>
+			</CardContent>
+		</Card>
+	);
+}
+
+function SettingsStateCard({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<Card className={className}>
+			<CardContent className="p-5 text-sm">{children}</CardContent>
+		</Card>
+	);
+}
+
 export function GameSettingsDialog({
 	activeConfigOption,
 	activeStakeRange,
@@ -142,12 +180,10 @@ export function GameSettingsDialog({
 					<CardContent className="min-h-0 flex-1 overflow-hidden p-4 md:p-6">
 						<div className="flex h-full flex-col gap-6 overflow-y-auto pr-1">
 							<div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-								<div className="rounded-2xl border border-border/70 bg-background/40 p-4">
-									<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-										Stake range
-									</p>
-									<p className="mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold text-foreground">
-										{activeStakeRange ? (
+								<SettingsSummaryCard
+									title="Stake range"
+									value={
+										activeStakeRange ? (
 											<>
 												<FieldCode>{activeStakeRange.min}</FieldCode>
 												<span>to</span>
@@ -155,37 +191,27 @@ export function GameSettingsDialog({
 											</>
 										) : (
 											'--'
-										)}
-									</p>
-									<p className="mt-1 text-sm text-muted-foreground">
-										{coinLabel}
-									</p>
-								</div>
-								<div className="rounded-2xl border border-border/70 bg-background/40 p-4">
-									<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-										Configs
-									</p>
-									<p className="mt-2 text-lg font-semibold text-foreground">
-										{configOptions?.length ?? 0}
-									</p>
-									<p className="mt-1 text-sm text-muted-foreground">
-										{game === 'plinko' || game === 'wheel'
+										)
+									}
+									description={coinLabel}
+								/>
+								<SettingsSummaryCard
+									title="Configs"
+									value={configOptions?.length ?? 0}
+									description={
+										game === 'plinko' || game === 'wheel'
 											? 'On-chain config options available for this game.'
-											: 'This game uses top-level parameters only.'}
-									</p>
-								</div>
-								<div className="rounded-2xl border border-border/70 bg-background/40 p-4">
-									<p className="text-[0.72rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-										Selected config
-									</p>
-									<p className="mt-2 text-lg font-semibold text-foreground">
-										{activeConfigOption?.label ?? 'N/A'}
-									</p>
-									<p className="mt-1 text-sm text-muted-foreground">
-										{activeConfigOption?.description ??
-											'No per-config selection for the current game.'}
-									</p>
-								</div>
+											: 'This game uses top-level parameters only.'
+									}
+								/>
+								<SettingsSummaryCard
+									title="Selected config"
+									value={activeConfigOption?.label ?? 'N/A'}
+									description={
+										activeConfigOption?.description ??
+										'No per-config selection for the current game.'
+									}
+								/>
 							</div>
 
 							<Separator />
@@ -219,14 +245,16 @@ export function GameSettingsDialog({
 									<AccordionTrigger>Raw payload</AccordionTrigger>
 									<AccordionContent>
 										{isLoading ? (
-											<div className="inline-flex items-center gap-2 rounded-2xl border border-border/70 bg-background/40 p-5 text-sm text-muted-foreground">
-												<Spinner />
-												Loading game settings from on-chain parameters.
-											</div>
+											<SettingsStateCard className="inline-flex bg-background/40 text-muted-foreground shadow-none">
+												<div className="flex items-center gap-2">
+													<Spinner />
+													Loading game settings from on-chain parameters.
+												</div>
+											</SettingsStateCard>
 										) : error ? (
-											<div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-5 text-sm text-destructive">
+											<SettingsStateCard className="border-destructive/40 bg-destructive/10 text-destructive shadow-none">
 												{error}
-											</div>
+											</SettingsStateCard>
 										) : serializedGameSettings ? (
 											<CodeBlock
 												code={serializedGameSettings}
@@ -235,10 +263,10 @@ export function GameSettingsDialog({
 												copyDescription="The raw payload was copied."
 											/>
 										) : (
-											<div className="rounded-2xl border border-border/70 bg-background/40 p-5 text-sm text-muted-foreground">
+											<SettingsStateCard className="bg-background/40 text-muted-foreground shadow-none">
 												No game settings are available yet for the current
 												selection.
-											</div>
+											</SettingsStateCard>
 										)}
 									</AccordionContent>
 								</AccordionItem>
