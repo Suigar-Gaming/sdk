@@ -36,6 +36,7 @@ export function RangeForm({
 
 	return (
 		<div className="space-y-6">
+			{rangeBoundsDescription}
 			<FieldGroup className="grid gap-4 md:grid-cols-2">
 				<Field>
 					<FieldLabel htmlFor="leftPoint">Left point</FieldLabel>
@@ -71,7 +72,6 @@ export function RangeForm({
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
 						larger scales reduce the allowed frontend range.
 					</FieldDescription>
-					{rangeBoundsDescription}
 				</Field>
 			</FieldGroup>
 			<FieldGroup className="grid gap-4 md:grid-cols-2">
