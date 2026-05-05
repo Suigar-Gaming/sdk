@@ -2,4 +2,4 @@
 '@suigar/sdk': patch
 ---
 
-Normalize authored repository wording to use `on-chain` consistently.
+Normalize repository wording to use `on-chain` consistently.

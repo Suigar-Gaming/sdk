@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 667d7c4: Normalize authored repository wording to use `on-chain` consistently.
+- 667d7c4: Normalize repository wording to use `on-chain` consistently.
 
 ## 2.0.0-beta.12
 
@@ -96,7 +96,7 @@
   - update PvP coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id
 
 - b89d0b4: Add a public `@suigar/sdk/games` export subpath for shared game option types, and export `SuigarClient` from the package root.
-- bf1f71b: Add `registryIds` to `SuigarConfig` and resolve it from the network config registry map.
+- bf1f71b: Add `registryIds` to `SuigarConfig` and resolve them from the network config registry map.
 
   Document the PvP coinflip runtime helpers more clearly by describing
   registry-backed unresolved game discovery through `getPvPCoinflipGames()` and
