@@ -7,14 +7,14 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'packages/**'
       - 'apps/playground/**'
+      - 'turbo.json'
   pull_request:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'packages/**'
       - 'apps/playground/**'
+      - 'turbo.json'
   workflow_dispatch:
 
 permissions:
