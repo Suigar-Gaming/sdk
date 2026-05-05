@@ -50,7 +50,7 @@ export function GameSettingsConfigList({
 							<div className="flex items-center gap-2">
 								<Badge
 									variant={option.isPlayable ? 'success' : 'destructive'}
-									className="px-3 py-1 text-[0.68rem]"
+									className="px-3 py-1 text-[0.68rem] uppercase"
 								>
 									{option.isPlayable ? 'Playable' : 'Disabled'}
 								</Badge>

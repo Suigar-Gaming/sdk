@@ -168,6 +168,7 @@ export function PvPLobbyPicker({
 											</div>
 											<Badge
 												variant={game.is_private ? 'destructive' : 'success'}
+												className="uppercase"
 											>
 												{game.is_private ? 'Private' : 'Public'}
 											</Badge>

@@ -53,7 +53,7 @@ export function PvPCoinflipCreateForm({
 							onCheckedChange={(checked) => onChange({ isPrivate: checked })}
 						/>
 					</div>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Marks the game as private on-chain.
 					</FieldDescription>
 				</Field>

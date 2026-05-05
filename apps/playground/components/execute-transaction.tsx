@@ -44,7 +44,7 @@ export function ExecuteTransactionCard({
 				<div className="flex flex-col items-center gap-4">
 					<Button
 						size="lg"
-						className="h-10 w-full max-w-sm rounded-2xl px-5 font-semibold"
+						className="h-10 rounded-2xl px-5"
 						onClick={onExecute}
 						disabled={isExecuting || !currentAccount}
 					>

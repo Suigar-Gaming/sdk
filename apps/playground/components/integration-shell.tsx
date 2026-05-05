@@ -616,7 +616,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const stakeDescription = React.useMemo(() => {
 		if (isStandardGameParametersLoading) {
 			return (
-				<FieldDescription className="inline-flex items-center gap-1.5">
+				<FieldDescription
+					size="sm"
+					className="inline-flex items-center gap-1.5"
+				>
 					<Spinner className="size-3.5" />
 					Loading on-chain stake limits for this coin.
 				</FieldDescription>
@@ -625,7 +628,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 		if (standardGameParametersError) {
 			return (
-				<FieldDescription>
+				<FieldDescription size="sm">
 					Unable to load on-chain stake limits: {standardGameParametersError}
 				</FieldDescription>
 			);
@@ -636,7 +639,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		}
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain stake range: <FieldCode>{activeStakeRange.min}</FieldCode> to{' '}
 				<FieldCode>{activeStakeRange.max}</FieldCode>{' '}
 				{effectiveSelectedCoin.toUpperCase()}
@@ -677,7 +680,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		}
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain target multiplier range:{' '}
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.targetMultiplierRange.min)}
@@ -702,7 +705,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				: DEFAULT_RANGE_SCALE;
 
 		return (
-			<FieldDescription>
+			<FieldDescription size="sm">
 				On-chain zone size:{' '}
 				<FieldCode>
 					{formatInputNumber(
@@ -1284,10 +1287,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								mode === 'standard' ? (
 									<Button
 										type="button"
-										variant="secondary"
+										variant="ghost"
 										size="sm"
 										onClick={() => setIsGameSettingsDialogOpen(true)}
-										className="h-10 rounded-full px-4"
+										className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
 									>
 										<SlidersHorizontal className="size-4" />
 										View settings

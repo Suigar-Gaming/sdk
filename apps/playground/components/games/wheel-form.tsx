@@ -67,7 +67,7 @@ export function WheelForm({
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>
 				)}
-				<FieldDescription>
+				<FieldDescription size="sm">
 					{selectedConfig ? (
 						selectedConfig.description
 					) : isConfigLoading ? (

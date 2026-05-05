@@ -49,7 +49,7 @@ export function RangeForm({
 						value={value.leftPoint}
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Allowed range: <FieldCode>0</FieldCode> to{' '}
 						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
 						<FieldCode>{String(effectiveScale)}</FieldCode>.
@@ -67,7 +67,7 @@ export function RangeForm({
 						value={value.rightPoint}
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
 						larger scales reduce the allowed frontend range.
 					</FieldDescription>
@@ -87,7 +87,7 @@ export function RangeForm({
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
 						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
 						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>.
@@ -103,7 +103,7 @@ export function RangeForm({
 								onCheckedChange={(checked) => onChange({ outOfRange: checked })}
 							/>
 						</div>
-						<FieldDescription>
+						<FieldDescription size="sm">
 							Flip the win condition outside the interval.
 						</FieldDescription>
 					</Field>

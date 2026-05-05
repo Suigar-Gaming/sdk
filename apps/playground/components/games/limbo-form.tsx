@@ -46,7 +46,7 @@ export function LimboForm({
 							onChange({ targetMultiplier: event.target.value })
 						}
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						The SDK sends{' '}
 						<FieldCode>Math.round(targetMultiplier * scale)</FieldCode>. With
 						scale <FieldCode>{String(effectiveScale)}</FieldCode>, a target
@@ -68,7 +68,7 @@ export function LimboForm({
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
 					/>
-					<FieldDescription>
+					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
 						<FieldCode>{String(DEFAULT_LIMBO_MULTIPLIER_SCALE)}</FieldCode>.
 					</FieldDescription>
