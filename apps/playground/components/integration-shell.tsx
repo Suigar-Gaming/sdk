@@ -303,19 +303,15 @@ function SectionShell({
 }) {
 	return (
 		<Card className="h-full shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-			<CardHeader className="gap-4">
-				<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-					<div className="space-y-2">
-						<CardTitle className="flex items-center gap-2">
-							{icon}
-							{title}
-						</CardTitle>
-						<CardDescription>{description}</CardDescription>
-					</div>
-					{action ? (
-						<CardAction className="sm:ml-auto">{action}</CardAction>
-					) : null}
+			<CardHeader className="flex-row items-start justify-between gap-4">
+				<div className="min-w-0 flex-1 space-y-2">
+					<CardTitle className="flex items-center gap-2">
+						{icon}
+						{title}
+					</CardTitle>
+					<CardDescription>{description}</CardDescription>
 				</div>
+				{action ? <CardAction className="shrink-0">{action}</CardAction> : null}
 			</CardHeader>
 			<CardContent>{children}</CardContent>
 		</Card>
@@ -640,9 +636,16 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 		return (
 			<FieldDescription size="sm">
-				On-chain stake range: <FieldCode>{activeStakeRange.min}</FieldCode> to{' '}
-				<FieldCode>{activeStakeRange.max}</FieldCode>{' '}
-				{effectiveSelectedCoin.toUpperCase()}
+				<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
+					<span className="shrink-0">On-chain stake range:</span>
+					<FieldCode className="shrink-0">{activeStakeRange.min}</FieldCode>
+					<span className="shrink-0">to</span>
+					<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
+					<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-[0.12em]">
+						<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
+						{effectiveSelectedCoin.toUpperCase()}
+					</span>
+				</span>
 				{activeConfigOption && !activeConfigOption.isPlayable
 					? '. The selected config is disabled on-chain.'
 					: '.'}
@@ -1471,6 +1474,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			<GameSettingsDialog
 				activeConfigOption={activeConfigOption}
 				activeStakeRange={activeStakeRange}
+				coinKey={effectiveSelectedCoin}
 				coinLabel={effectiveSelectedCoin.toUpperCase()}
 				configOptions={standardGameParameters?.configOptions}
 				error={standardGameParametersError}
