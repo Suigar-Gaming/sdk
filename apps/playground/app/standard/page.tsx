@@ -11,7 +11,7 @@ const StandardPageContent = dynamic(
 	{
 		ssr: false,
 		loading: () => (
-			<PageLoadingProgress label="Loading standard game integration..." />
+			<PageLoadingProgress label="Loading standard game playground..." />
 		),
 	},
 );

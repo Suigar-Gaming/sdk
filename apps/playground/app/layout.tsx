@@ -22,13 +22,17 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'Suigar SDK Game Integration',
+	applicationName: 'Suigar SDK Playground',
+	title: 'Suigar SDK Playground',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
-	icons: {
-		icon: withBasePath('/icon.png'),
-		apple: withBasePath('/icon.png'),
+	icons: withBasePath('/icon.png'),
+	appleWebApp: true,
+	authors: {
+		name: 'Suigar Team',
+		url: 'https://github.com/Suigar-Gaming',
 	},
+	creator: 'Suigar Team',
 };
 
 export default function RootLayout({

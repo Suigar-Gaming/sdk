@@ -1,12 +1,7 @@
 'use client';
 
 import { useCurrentAccount } from '@mysten/dapp-kit-react';
-import {
-	CheckCircle2,
-	LoaderCircle,
-	SendHorizontal,
-	Swords,
-} from 'lucide-react';
+import { CheckCircle2, SendHorizontal, Swords } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +11,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 
 type Props = {
 	onExecute: () => void;
@@ -52,7 +48,7 @@ export function ExecuteTransactionCard({
 						disabled={isExecuting || !currentAccount}
 					>
 						{isExecuting ? (
-							<LoaderCircle className="size-4 animate-spin" />
+							<Spinner data-icon="inline-start" />
 						) : (
 							<Swords className="size-4" />
 						)}

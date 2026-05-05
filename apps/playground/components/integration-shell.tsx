@@ -10,7 +10,6 @@ import {
 	BookOpenText,
 	CirclePlus,
 	Gamepad2,
-	LoaderCircle,
 	ShieldX,
 	SlidersHorizontal,
 	Swords,
@@ -58,6 +57,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
@@ -611,7 +611,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		if (isStandardGameParametersLoading) {
 			return (
 				<FieldDescription className="inline-flex items-center gap-1.5">
-					<LoaderCircle className="size-3.5 animate-spin" />
+					<Spinner className="size-3.5" />
 					Loading on-chain stake limits for this coin.
 				</FieldDescription>
 			);
@@ -1066,7 +1066,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									alt="Suigar"
 									width={36}
 									height={36}
-									className="h-8 w-8 md:hidden"
+									className="size-8 md:hidden"
 									priority
 								/>
 								<Image
@@ -1074,7 +1074,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									alt="Suigar"
 									width={132}
 									height={36}
-									className="hidden h-8 w-auto md:block md:h-10"
+									className="hidden w-auto md:block md:h-10"
 									priority
 								/>
 							</Link>
@@ -1134,7 +1134,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 								<div className="space-y-2">
 									<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
-										Game integration playground
+										Suigar SDK playground
 									</h1>
 									<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
 										Build standard and PvP transactions, inspect the exact
@@ -1258,7 +1258,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
 						<SectionShell
 							title={
-								mode === 'standard' ? 'Game controls' : 'PvP Coinflip controls'
+								mode === 'standard'
+									? `${getStandardGameLabel(standardGame)} controls`
+									: 'PvP Coinflip controls'
 							}
 							icon={
 								mode === 'standard' ? (

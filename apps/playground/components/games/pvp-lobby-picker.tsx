@@ -12,6 +12,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { compactAddress } from '@/lib/suigar-app';
 import type {
 	PvPCoinflipLobbyGame,
@@ -100,7 +101,11 @@ export function PvPLobbyPicker({
 						onClick={onRefresh}
 						disabled={isLoading}
 					>
-						<RefreshCw className={cn('size-4', isLoading && 'animate-spin')} />
+						{isLoading ? (
+							<Spinner data-icon="inline-start" />
+						) : (
+							<RefreshCw className="size-4" />
+						)}
 						Refresh
 					</Button>
 				</div>

@@ -11,7 +11,7 @@ const PvPPageContent = dynamic(
 	{
 		ssr: false,
 		loading: () => (
-			<PageLoadingProgress label="Loading PvP game integration..." />
+			<PageLoadingProgress label="Loading PvP game playground..." />
 		),
 	},
 );

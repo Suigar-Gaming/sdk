@@ -1,6 +1,6 @@
 'use client';
 
-import { LoaderCircle, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import * as React from 'react';
 import { CodeBlock } from '@/components/code-block';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/card';
 import { FieldCode } from '@/components/ui/field';
 import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
 import type {
 	GameConfigOption,
 	StakeRangeSummary,
@@ -101,7 +102,7 @@ export function GameSettingsDialog({
 										variant="outline"
 										className="gap-1 px-3 py-1 text-[0.68rem] normal-case"
 									>
-										<LoaderCircle className="size-3.5 animate-spin" />
+										<Spinner className="size-3.5" data-icon="inline-start" />
 										Loading
 									</Badge>
 								) : null}
@@ -219,7 +220,7 @@ export function GameSettingsDialog({
 									<AccordionContent>
 										{isLoading ? (
 											<div className="inline-flex items-center gap-2 rounded-2xl border border-border/70 bg-background/40 p-5 text-sm text-muted-foreground">
-												<LoaderCircle className="size-4 animate-spin" />
+												<Spinner />
 												Loading game settings from on-chain parameters.
 											</div>
 										) : error ? (
