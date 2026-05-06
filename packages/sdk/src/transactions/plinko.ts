@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/plinko/plinko.js';
 import type { BuildPlinkoTransactionOptions, WithPartner } from '../types';
 import { toU8 } from '../utils/index.js';
@@ -8,7 +9,7 @@ import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildPlinkoTransaction(
 	options: WithPartner<BuildPlinkoTransactionOptions>,
-) {
+): Transaction {
 	const configId = toU8(options.configId);
 
 	return buildSharedStandardGameBetTransaction({

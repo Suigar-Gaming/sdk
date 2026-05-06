@@ -1,6 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SuiNetwork } from './network.type';
+
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
 	/**
@@ -21,7 +23,8 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 export type SuigarCoin = 'sui' | 'usdc';
 
 export type SuigarCoinTypes = Record<SuigarCoin, string>;
-export type SuigarPackageKey =
+
+export type SuigarPackage =
 	| 'sweetHouse'
 	| 'core'
 	| 'coinflip'
@@ -30,14 +33,18 @@ export type SuigarPackageKey =
 	| 'pvpCoinflip'
 	| 'range'
 	| 'wheel';
-export type SuigarPackage = Record<SuigarPackageKey, string>;
-export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
-export type SuigarRegistryKey = 'pvpCoinflip';
-export type SuigarRegistryId = Record<SuigarRegistryKey, string>;
+export type SuigarPackageIds = Record<SuigarPackage, string>;
+
+export type SuigarRegistry = 'pvpCoinflip';
+export type SuigarRegistryIds = Record<SuigarRegistry, string>;
+
+export type SuigarPriceInfoObjectIds = Record<SuigarCoin, string>;
+
+export type SuiNetworkRegistry<TRegistry> = Record<SuiNetwork, TRegistry>;
 
 export type SuigarConfig = {
-	packageIds: SuigarPackage;
-	registryIds: SuigarRegistryId;
+	packageIds: SuigarPackageIds;
+	registryIds: SuigarRegistryIds;
 	coinTypes: SuigarCoinTypes;
-	priceInfoObjectIds: SuigarPriceInfoObjectId;
+	priceInfoObjectIds: SuigarPriceInfoObjectIds;
 };

@@ -352,6 +352,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [pvpLobbyError, setPvPLobbyError] = React.useState<string | null>(null);
 	const [isPvPLobbyLoading, setIsPvPLobbyLoading] = React.useState(false);
 	const [pvpLobbyRefreshKey, setPvPLobbyRefreshKey] = React.useState(0);
+	const [
+		standardGameParametersRefreshKey,
+		setStandardGameParametersRefreshKey,
+	] = React.useState(0);
+	const [pvpGameParametersRefreshKey, setPvPGameParametersRefreshKey] =
+		React.useState(0);
 	const [showPrivateJoinLobbies, setShowPrivateJoinLobbies] =
 		React.useState(false);
 	const [standardGameParameters, setStandardGameParameters] =
@@ -408,6 +414,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const previousStandardGameRef = React.useRef<StandardGameId>(standardGame);
 	const previousPvPGameRef = React.useRef<PvPGameId>(pvpGame);
 	const previousPvPActionRef = React.useRef<PvPAction>(pvpAction);
+	const forceRefreshStandardGameParametersRef = React.useRef(false);
+	const forceRefreshPvPGameParametersRef = React.useRef(false);
 
 	React.useEffect(() => {
 		if (typeof window === 'undefined') {
@@ -487,6 +495,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 	React.useEffect(() => {
 		let cancelled = false;
+		const shouldIgnoreCache = forceRefreshStandardGameParametersRef.current;
+		forceRefreshStandardGameParametersRef.current = false;
 
 		const fetchStandardGameParameters = async () => {
 			setIsStandardGameParametersLoading(true);
@@ -497,7 +507,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
 					standardGame,
-					{ coinType },
+					{ coinType, ignoreCache: shouldIgnoreCache },
 				);
 
 				if (cancelled) {
@@ -532,7 +542,13 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [coinType, currentClient, effectiveSelectedCoin, standardGame]);
+	}, [
+		coinType,
+		currentClient,
+		effectiveSelectedCoin,
+		standardGame,
+		standardGameParametersRefreshKey,
+	]);
 
 	React.useEffect(() => {
 		if (mode !== 'pvp') {
@@ -540,6 +556,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		}
 
 		let cancelled = false;
+		const shouldIgnoreCache = forceRefreshPvPGameParametersRef.current;
+		forceRefreshPvPGameParametersRef.current = false;
 
 		const fetchPvPGameParameters = async () => {
 			setIsPvPGameParametersLoading(true);
@@ -552,6 +570,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					pvpGame,
 					{
 						coinType,
+						ignoreCache: shouldIgnoreCache,
 					},
 				);
 
@@ -587,7 +606,14 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [coinType, currentClient, effectiveSelectedCoin, mode, pvpGame]);
+	}, [
+		coinType,
+		currentClient,
+		effectiveSelectedCoin,
+		mode,
+		pvpGame,
+		pvpGameParametersRefreshKey,
+	]);
 
 	React.useEffect(() => {
 		const previousMode = previousModeRef.current;
@@ -817,6 +843,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		mode === 'standard' ? standardGameParameters?.configOptions : undefined;
 	const settingsGameLabel =
 		mode === 'standard' ? standardGameLabel : pvpGameLabel;
+	const settingsStakeRange =
+		mode === 'standard'
+			? (settingsSummary?.stakeRange ?? activeStakeRange)
+			: (settingsSummary?.stakeRange ?? null);
+	const handleRefreshGameSettings = React.useCallback(() => {
+		if (mode === 'standard') {
+			forceRefreshStandardGameParametersRef.current = true;
+			setStandardGameParametersRefreshKey((current) => current + 1);
+			return;
+		}
+
+		forceRefreshPvPGameParametersRef.current = true;
+		setPvPGameParametersRefreshKey((current) => current + 1);
+	}, [mode]);
 	const limboTargetMultiplierDescription = React.useMemo(() => {
 		if (
 			standardGame !== 'limbo' ||
@@ -1644,7 +1684,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 			<GameSettingsDialog
 				activeConfigOption={activeConfigOption}
-				activeStakeRange={settingsSummary?.stakeRange ?? activeStakeRange}
+				activeStakeRange={settingsStakeRange}
 				coinKey={effectiveSelectedCoin}
 				coinLabel={effectiveSelectedCoin.toUpperCase()}
 				configOptions={settingsConfigOptions}
@@ -1653,6 +1693,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				isLoading={isSettingsLoading}
 				isOpen={isGameSettingsDialogOpen}
 				onClose={() => setIsGameSettingsDialogOpen(false)}
+				onRefresh={handleRefreshGameSettings}
 				serializedGameSettings={serializedGameSettings}
 				settingsCallPreview={settingsCallPreview}
 				topLevelDetails={settingsSummary?.topLevelDetails}
