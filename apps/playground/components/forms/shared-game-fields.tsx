@@ -24,7 +24,7 @@ export function SharedGameFields<T extends SharedFields>({
 				type="number"
 				step="any"
 				inputMode="decimal"
-				className="h-11 rounded-2xl bg-background/55 px-4"
+				className="h-11 px-4 bg-background/55 rounded-2xl"
 				value={value.stake}
 				onChange={(event) =>
 					onChange({ stake: event.target.value } as Partial<T>)

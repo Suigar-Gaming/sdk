@@ -19,7 +19,7 @@ export function PvPCoinflipJoinForm({
 					value={value.gameId}
 					readOnly
 					aria-readonly="true"
-					className="h-11 cursor-default rounded-2xl bg-muted/35 px-4 font-mono text-xs md:text-sm"
+					className="h-11 font-mono text-xs md:text-sm px-4 bg-muted/35 cursor-default rounded-2xl"
 				/>
 			</Field>
 		</div>

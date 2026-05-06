@@ -41,7 +41,7 @@ function AccordionTrigger({
 			<AccordionPrimitive.Trigger
 				data-slot="accordion-trigger"
 				className={cn(
-					'group/accordion-trigger relative flex flex-1 items-start justify-between rounded-lg border border-transparent py-2.5 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:after:border-ring disabled:pointer-events-none disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground',
+					'relative flex flex-1 items-start justify-between **:data-[slot=accordion-trigger-icon]:size-4 text-sm font-medium hover:underline py-2.5 disabled:pointer-events-none **:data-[slot=accordion-trigger-icon]:ml-auto border-transparent text-left outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:after:border-ring disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:text-muted-foreground group/accordion-trigger rounded-lg border transition-all',
 					className,
 				)}
 				{...props}
@@ -49,11 +49,11 @@ function AccordionTrigger({
 				{children}
 				<ChevronDown
 					data-slot="accordion-trigger-icon"
-					className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
+					className="shrink-0 group-aria-expanded/accordion-trigger:hidden pointer-events-none"
 				/>
 				<ChevronUp
 					data-slot="accordion-trigger-icon"
-					className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+					className="hidden shrink-0 group-aria-expanded/accordion-trigger:inline pointer-events-none"
 				/>
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
@@ -68,12 +68,12 @@ function AccordionContent({
 	return (
 		<AccordionPrimitive.Content
 			data-slot="accordion-content"
-			className="text-sm data-open:animate-accordion-down data-closed:animate-accordion-up data-closed:overflow-hidden"
+			className="data-closed:overflow-hidden text-sm data-open:animate-accordion-down data-closed:animate-accordion-up"
 			{...props}
 		>
 			<div
 				className={cn(
-					'pt-0 pb-2.5 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
+					'[&_a]:underline [&_a]:underline-offset-3 pt-0 pb-2.5 [&_p:not(:last-child)]:mb-4 [&_a]:hover:text-foreground',
 					className,
 				)}
 			>

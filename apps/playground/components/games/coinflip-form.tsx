@@ -31,7 +31,7 @@ export function CoinflipForm({
 						onChange({ side: side as 'heads' | 'tails' })
 					}
 				>
-					<SelectTrigger className="h-11 rounded-2xl bg-background/55 px-4">
+					<SelectTrigger className="h-11 px-4 bg-background/55 rounded-2xl">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

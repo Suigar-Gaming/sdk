@@ -37,7 +37,7 @@ export function RangeForm({
 	return (
 		<div className="space-y-6">
 			{rangeBoundsDescription}
-			<FieldGroup className="grid gap-4 md:grid-cols-2">
+			<FieldGroup className="grid md:grid-cols-2 gap-4">
 				<Field>
 					<FieldLabel htmlFor="leftPoint">Left point</FieldLabel>
 					<Input
@@ -46,7 +46,7 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
-						className="h-11 rounded-2xl bg-background/55 px-4"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.leftPoint}
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
@@ -64,7 +64,7 @@ export function RangeForm({
 						step="any"
 						min="0"
 						max={maxPoint}
-						className="h-11 rounded-2xl bg-background/55 px-4"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.rightPoint}
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
@@ -74,7 +74,7 @@ export function RangeForm({
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
-			<FieldGroup className="grid gap-4 md:grid-cols-2">
+			<FieldGroup className="grid md:grid-cols-2 gap-4">
 				<Field>
 					<FieldLabel htmlFor="rangeScale">Scale (optional)</FieldLabel>
 					<Input
@@ -82,7 +82,7 @@ export function RangeForm({
 						type="number"
 						step="1"
 						min="1"
-						className="h-11 rounded-2xl bg-background/55 px-4"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.scale}
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"
@@ -94,7 +94,7 @@ export function RangeForm({
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
-					<Field className="w-full rounded-2xl border border-border/70 bg-background/45 px-4 py-4 md:max-w-sm">
+					<Field className="w-full md:max-w-sm px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
 						<div className="flex items-center justify-between gap-3">
 							<FieldTitle>Out of range</FieldTitle>
 							<Switch

@@ -63,7 +63,7 @@ function CopyableValue({
 				type="button"
 				variant="outline"
 				size="icon-sm"
-				className="h-7 w-7 rounded-full text-muted-foreground"
+				className="h-7 w-7 text-muted-foreground rounded-full"
 				onClick={copyValue}
 				title={`Copy ${label}`}
 				aria-label={`Copy ${label}`}
@@ -75,7 +75,7 @@ function CopyableValue({
 					asChild
 					variant="outline"
 					size="icon-sm"
-					className="h-7 w-7 rounded-full text-muted-foreground"
+					className="h-7 w-7 text-muted-foreground rounded-full"
 				>
 					<a
 						href={explorerHref}
@@ -132,9 +132,9 @@ export function EventsTable() {
 				</CardAction>
 			</CardHeader>
 			<CardContent className="min-h-[12rem]">
-				<div className="overflow-hidden rounded-2xl border border-border/70">
+				<div className="overflow-hidden border-border/70 rounded-2xl border">
 					<div className="max-h-[28rem] overflow-auto">
-						<Table className="min-w-[44rem] bg-background md:min-w-full">
+						<Table className="min-w-[44rem] md:min-w-full bg-background">
 							<TableHeader className="bg-accent">
 								<TableRow className="hover:bg-transparent">
 									<TableHead className="sticky top-0 z-10 bg-accent">
