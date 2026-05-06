@@ -67,7 +67,7 @@ export function suigar<const Name = 'suigar'>({
 }: SuigarExtensionOptions<Name> = {}) {
 	return {
 		name,
-		register: (client: ClientWithCoreApi) => {
+		register: (client: ClientWithCoreApi): SuigarClient => {
 			return new SuigarClient({
 				client,
 				name: String(name),
@@ -210,7 +210,7 @@ export class SuigarClient {
 		});
 
 		const { objects } = await this.#client.core.getObjects({
-			objectIds: dynamicFields.map(({ childId }) => childId),
+			objectIds: dynamicFields.map(({ childId }) => childId!),
 			signal: listOptions.signal,
 			include: {
 				content: true,

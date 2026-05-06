@@ -136,7 +136,9 @@ export function parseGameDetails(
 	gameDetails: BetResultGameDetails,
 ): ParsedGameDetails {
 	return gameDetails.contents.reduce<ParsedGameDetails>((details, entry) => {
-		const valueType = GAME_DETAILS_SCHEMA[entry.key] ?? 'string';
+		const valueType =
+			GAME_DETAILS_SCHEMA[entry.key as keyof typeof GAME_DETAILS_SCHEMA] ??
+			'string';
 		details[entry.key] = parseGameDetail(valueType, entry.value);
 		return details;
 	}, {});
