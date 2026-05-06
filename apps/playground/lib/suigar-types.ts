@@ -15,6 +15,7 @@ export type SharedFields = {
 export type StakeRangeSummary = {
 	min: string;
 	max: string;
+	kind?: 'range' | 'minimum';
 };
 
 export type NumberRangeSummary = {
@@ -42,11 +43,22 @@ export type GameConfigOption = {
 	stakeRange: StakeRangeSummary;
 };
 
+export type GameSettingsDetail = {
+	label: string;
+	value: string;
+};
+
 export type StandardGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
 	configOptions?: GameConfigOption[];
+	topLevelDetails?: GameSettingsDetail[];
 	targetMultiplierRange?: NumberRangeSummary;
 	rangeBounds?: RangeBoundsSummary;
+};
+
+export type PvPGameParametersSummary = {
+	stakeRange: StakeRangeSummary;
+	topLevelDetails?: GameSettingsDetail[];
 };
 
 export type CoinflipFormValues = SharedFields & {

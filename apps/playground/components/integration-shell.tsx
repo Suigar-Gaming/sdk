@@ -63,6 +63,7 @@ import { parseSuigarEvents } from '@/lib/event-parsing';
 import {
 	findGameConfigOption,
 	resolveStakeRangeForGame,
+	summarizePvPGameParameters,
 	summarizeStandardGameParameters,
 } from '@/lib/on-chain-parameters';
 import { withBasePath } from '@/lib/paths';
@@ -81,6 +82,7 @@ import type {
 	PvPCoinflipForms,
 	PvPCoinflipLobbyGame,
 	PvPGameId,
+	PvPGameParametersSummary,
 	StandardForms,
 	StandardGameId,
 	StandardGameParametersSummary,
@@ -279,6 +281,12 @@ function getStandardGameLabel(game: StandardGameId) {
 	);
 }
 
+function getPvPGameLabel(game: PvPGameId) {
+	return (
+		PVP_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game
+	);
+}
+
 function stringifyGameParameters(value: unknown) {
 	return JSON.stringify(
 		value,
@@ -353,6 +361,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [standardGameParametersError, setStandardGameParametersError] =
 		React.useState<string | null>(null);
 	const [isStandardGameParametersLoading, setIsStandardGameParametersLoading] =
+		React.useState(false);
+	const [pvpGameParameters, setPvPGameParameters] =
+		React.useState<PvPGameParametersSummary | null>(null);
+	const [pvpGameParametersPayload, setPvPGameParametersPayload] =
+		React.useState<unknown>(null);
+	const [pvpGameParametersError, setPvPGameParametersError] = React.useState<
+		string | null
+	>(null);
+	const [isPvPGameParametersLoading, setIsPvPGameParametersLoading] =
 		React.useState(false);
 	const [isGameSettingsDialogOpen, setIsGameSettingsDialogOpen] =
 		React.useState(false);
@@ -518,6 +535,61 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}, [coinType, currentClient, effectiveSelectedCoin, standardGame]);
 
 	React.useEffect(() => {
+		if (mode !== 'pvp') {
+			return;
+		}
+
+		let cancelled = false;
+
+		const fetchPvPGameParameters = async () => {
+			setIsPvPGameParametersLoading(true);
+			setPvPGameParameters(null);
+			setPvPGameParametersPayload(null);
+			setPvPGameParametersError(null);
+
+			try {
+				const parameters = await currentClient.suigar.getGameParameters(
+					pvpGame,
+					{
+						coinType,
+					},
+				);
+
+				if (cancelled) {
+					return;
+				}
+
+				setPvPGameParametersPayload(parameters);
+				setPvPGameParameters(
+					summarizePvPGameParameters(
+						pvpGame,
+						parameters,
+						COIN_DECIMALS[effectiveSelectedCoin],
+					),
+				);
+			} catch (parametersError) {
+				if (cancelled) {
+					return;
+				}
+
+				setPvPGameParameters(null);
+				setPvPGameParametersPayload(null);
+				setPvPGameParametersError(parseError(parametersError));
+			} finally {
+				if (!cancelled) {
+					setIsPvPGameParametersLoading(false);
+				}
+			}
+		};
+
+		void fetchPvPGameParameters();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [coinType, currentClient, effectiveSelectedCoin, mode, pvpGame]);
+
+	React.useEffect(() => {
 		const previousMode = previousModeRef.current;
 		const previousStandardGame = previousStandardGameRef.current;
 		const previousPvPGame = previousPvPGameRef.current;
@@ -662,18 +734,37 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		() => getStandardGameLabel(standardGame),
 		[standardGame],
 	);
+	const pvpGameLabel = React.useMemo(() => getPvPGameLabel(pvpGame), [pvpGame]);
 	const serializedGameSettings = React.useMemo(
 		() =>
-			standardGameParametersPayload
-				? stringifyGameParameters(standardGameParametersPayload)
-				: null,
-		[standardGameParametersPayload],
+			mode === 'standard'
+				? standardGameParametersPayload
+					? stringifyGameParameters(standardGameParametersPayload)
+					: null
+				: pvpGameParametersPayload
+					? stringifyGameParameters(pvpGameParametersPayload)
+					: null,
+		[mode, pvpGameParametersPayload, standardGameParametersPayload],
 	);
 	const settingsCallPreview = React.useMemo(
 		() =>
-			`client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`,
-		[coinType, standardGame],
+			mode === 'standard'
+				? `client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`
+				: `client.suigar.getGameParameters('${pvpGame}', { coinType: '${coinType}' })`,
+		[coinType, mode, pvpGame, standardGame],
 	);
+	const settingsSummary =
+		mode === 'standard' ? standardGameParameters : pvpGameParameters;
+	const settingsError =
+		mode === 'standard' ? standardGameParametersError : pvpGameParametersError;
+	const isSettingsLoading =
+		mode === 'standard'
+			? isStandardGameParametersLoading
+			: isPvPGameParametersLoading;
+	const settingsConfigOptions =
+		mode === 'standard' ? standardGameParameters?.configOptions : undefined;
+	const settingsGameLabel =
+		mode === 'standard' ? standardGameLabel : pvpGameLabel;
 	const limboTargetMultiplierDescription = React.useMemo(() => {
 		if (
 			standardGame !== 'limbo' ||
@@ -1289,18 +1380,16 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
 							}
 							action={
-								mode === 'standard' ? (
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => setIsGameSettingsDialogOpen(true)}
-										className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
-									>
-										<SlidersHorizontal className="size-4" />
-										View settings
-									</Button>
-								) : undefined
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									onClick={() => setIsGameSettingsDialogOpen(true)}
+									className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
+								>
+									<SlidersHorizontal className="size-4" />
+									View settings
+								</Button>
 							}
 						>
 							<div className="space-y-6">
@@ -1473,18 +1562,18 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 			<GameSettingsDialog
 				activeConfigOption={activeConfigOption}
-				activeStakeRange={activeStakeRange}
+				activeStakeRange={settingsSummary?.stakeRange ?? activeStakeRange}
 				coinKey={effectiveSelectedCoin}
 				coinLabel={effectiveSelectedCoin.toUpperCase()}
-				configOptions={standardGameParameters?.configOptions}
-				error={standardGameParametersError}
-				game={standardGame}
-				gameLabel={standardGameLabel}
-				isLoading={isStandardGameParametersLoading}
+				configOptions={settingsConfigOptions}
+				error={settingsError}
+				gameLabel={settingsGameLabel}
+				isLoading={isSettingsLoading}
 				isOpen={isGameSettingsDialogOpen}
 				onClose={() => setIsGameSettingsDialogOpen(false)}
 				serializedGameSettings={serializedGameSettings}
 				settingsCallPreview={settingsCallPreview}
+				topLevelDetails={settingsSummary?.topLevelDetails}
 			/>
 
 			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">

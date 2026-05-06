@@ -30,8 +30,8 @@ import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import type {
 	GameConfigOption,
+	GameSettingsDetail,
 	StakeRangeSummary,
-	StandardGameId,
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 
@@ -84,13 +84,13 @@ export function GameSettingsDialog({
 	coinLabel,
 	configOptions,
 	error,
-	game,
 	gameLabel,
 	isLoading,
 	isOpen,
 	onClose,
 	serializedGameSettings,
 	settingsCallPreview,
+	topLevelDetails,
 }: {
 	activeConfigOption: GameConfigOption | null;
 	activeStakeRange: StakeRangeSummary | null;
@@ -98,18 +98,21 @@ export function GameSettingsDialog({
 	coinLabel: string;
 	configOptions?: GameConfigOption[];
 	error: string | null;
-	game: StandardGameId;
 	gameLabel: string;
 	isLoading: boolean;
 	isOpen: boolean;
 	onClose: () => void;
 	serializedGameSettings: string | null;
 	settingsCallPreview: string;
+	topLevelDetails?: GameSettingsDetail[];
 }) {
 	const playableConfigCount =
 		configOptions?.filter((option) => option.isPlayable).length ?? 0;
 	const activeConfigDetails = activeConfigOption?.details?.slice(0, 3) ?? [];
 	const activeMultiplierValues = activeConfigOption?.multiplierValues ?? [];
+	const summarizedTopLevelDetails = topLevelDetails?.slice(0, 3) ?? [];
+	const hasConfigOptions = Boolean(configOptions?.length);
+	const isStakeMinimum = activeStakeRange?.kind === 'minimum';
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -170,17 +173,21 @@ export function GameSettingsDialog({
 					<div className="flex flex-col gap-6 pr-1">
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 							<SettingsSummaryCard
-								title="Stake range"
+								title={isStakeMinimum ? 'Stake minimum' : 'Stake range'}
 								value={
 									activeStakeRange ? (
 										<div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
 											<FieldCode className="shrink-0">
 												{activeStakeRange.min}
 											</FieldCode>
-											<span className="shrink-0">to</span>
-											<FieldCode className="shrink-0">
-												{activeStakeRange.max}
-											</FieldCode>
+											{isStakeMinimum ? null : (
+												<>
+													<span className="shrink-0">to</span>
+													<FieldCode className="shrink-0">
+														{activeStakeRange.max}
+													</FieldCode>
+												</>
+											)}
 											<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
 												<CoinIcon coinKey={coinKey} className="size-4" />
 												{coinLabel}
@@ -190,7 +197,11 @@ export function GameSettingsDialog({
 										'--'
 									)
 								}
-								description={null}
+								description={
+									isStakeMinimum
+										? 'Each player must stake at least this amount.'
+										: null
+								}
 							/>
 							<SettingsSummaryCard
 								title="Configs"
@@ -207,13 +218,13 @@ export function GameSettingsDialog({
 									)
 								}
 								description={
-									game === 'plinko' || game === 'wheel'
+									hasConfigOptions
 										? null
 										: 'This game uses top-level parameters only.'
 								}
 							/>
 							<SettingsSummaryCard
-								title="Current config"
+								title={hasConfigOptions ? 'Current config' : 'Top-level fields'}
 								value={
 									activeConfigOption ? (
 										<div className="flex flex-wrap items-center gap-2 text-base">
@@ -290,12 +301,26 @@ export function GameSettingsDialog({
 												</PopoverContent>
 											</Popover>
 										</div>
+									) : summarizedTopLevelDetails.length ? (
+										<div className="space-y-1.5 text-sm">
+											{summarizedTopLevelDetails.map((detail) => (
+												<div
+													key={`top-level-${detail.label}`}
+													className="flex items-center justify-between gap-3"
+												>
+													<span className="text-muted-foreground">
+														{detail.label}
+													</span>
+													<FieldCode>{detail.value}</FieldCode>
+												</div>
+											))}
+										</div>
 									) : (
 										<span className="text-base">N/A</span>
 									)
 								}
 								description={
-									activeConfigOption
+									activeConfigOption || summarizedTopLevelDetails.length
 										? null
 										: 'No per-config selection for the current game.'
 								}
