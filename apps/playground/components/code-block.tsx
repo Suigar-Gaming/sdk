@@ -29,7 +29,7 @@ export function CodeBlock({
 	}
 
 	return (
-		<div className="relative rounded-2xl border border-border/70 bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] p-4 pr-14 text-slate-100">
+		<div className="relative p-4 pr-14 border-border/70 bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] text-slate-100 rounded-2xl border">
 			{copyMode !== 'none' ? (
 				<div className="absolute top-4 right-4">
 					{copyMode === 'icon' ? (
@@ -37,7 +37,7 @@ export function CodeBlock({
 							type="button"
 							variant="outline"
 							size="icon-sm"
-							className="h-7 w-7 rounded-full border-white/12 bg-white/6 text-slate-300 hover:bg-white/10 hover:text-white"
+							className="h-7 w-7 border-white/12 bg-white/6 text-slate-300 hover:bg-white/10 hover:text-white rounded-full"
 							onClick={handleCopy}
 							title={copyTitle}
 							aria-label={copyTitle}

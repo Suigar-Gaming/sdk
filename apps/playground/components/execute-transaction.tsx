@@ -44,7 +44,7 @@ export function ExecuteTransactionCard({
 				<div className="flex flex-col items-center gap-4">
 					<Button
 						size="lg"
-						className="h-10 rounded-2xl px-5"
+						className="h-10 px-5 rounded-2xl"
 						onClick={onExecute}
 						disabled={isExecuting || !currentAccount}
 					>
@@ -59,7 +59,7 @@ export function ExecuteTransactionCard({
 						<Alert variant="success" className="w-full">
 							<CheckCircle2 />
 							<AlertTitle>Executed</AlertTitle>
-							<AlertDescription className="font-mono text-xs text-foreground break-all">
+							<AlertDescription className="font-mono text-xs break-all text-foreground">
 								{status}
 							</AlertDescription>
 						</Alert>
@@ -67,7 +67,7 @@ export function ExecuteTransactionCard({
 				</div>
 
 				{error ? (
-					<div className="rounded-2xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+					<div className="text-sm px-4 py-3 border-destructive/50 bg-destructive/10 text-destructive rounded-2xl border">
 						{error}
 					</div>
 				) : null}

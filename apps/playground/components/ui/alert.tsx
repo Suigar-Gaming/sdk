@@ -3,7 +3,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
-	"group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
+	"relative grid w-full has-data-[slot=alert-action]:relative has-[>svg]:grid-cols-[auto_1fr] *:[svg]:row-span-2 *:[svg:not([class*='size-'])]:size-4 text-sm gap-0.5 px-2.5 py-2 has-data-[slot=alert-action]:pr-18 has-[>svg]:gap-x-2 text-left *:[svg]:text-current group/alert rounded-lg border *:[svg]:translate-y-0.5",
 	{
 		variants: {
 			variant: {
@@ -40,7 +40,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
 		<div
 			data-slot="alert-title"
 			className={cn(
-				'font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground',
+				'group-has-[>svg]/alert:col-start-2 font-medium [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground',
 				className,
 			)}
 			{...props}
@@ -56,7 +56,7 @@ function AlertDescription({
 		<div
 			data-slot="alert-description"
 			className={cn(
-				'text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
+				'text-sm text-balance md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_p:not(:last-child)]:mb-4 text-muted-foreground [&_a]:hover:text-foreground',
 				className,
 			)}
 			{...props}

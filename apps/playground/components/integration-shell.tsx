@@ -180,7 +180,7 @@ function CoinSelectLabel({
 	amount: string;
 }) {
 	return (
-		<div className="flex min-w-0 items-center gap-1 whitespace-nowrap">
+		<div className="flex min-w-0 items-center whitespace-nowrap gap-1">
 			<CoinIcon coinKey={coinKey} className="size-5 shrink-0" />
 			<span className="min-w-0 truncate font-medium tabular-nums text-foreground">
 				{amount}
@@ -708,12 +708,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 		return (
 			<FieldDescription size="sm">
-				<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
+				<span className="inline-flex flex-nowrap items-center overflow-x-auto align-middle gap-2">
 					<span className="shrink-0">On-chain stake range:</span>
 					<FieldCode className="shrink-0">{activeStakeRange.min}</FieldCode>
 					<span className="shrink-0">to</span>
 					<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
-					<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-[0.12em]">
+					<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-[0.12em] gap-1">
 						<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
 						{effectiveSelectedCoin.toUpperCase()}
 					</span>
@@ -761,12 +761,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 
 		return (
 			<FieldDescription size="sm">
-				<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
+				<span className="inline-flex flex-nowrap items-center overflow-x-auto align-middle gap-2">
 					<span className="shrink-0">On-chain stake minimum:</span>
 					<FieldCode className="shrink-0">
 						{pvpGameParameters.stakeRange.min}
 					</FieldCode>
-					<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-[0.12em]">
+					<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-[0.12em] gap-1">
 						<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
 						{effectiveSelectedCoin.toUpperCase()}
 					</span>
@@ -1237,9 +1237,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	return (
 		<div className="min-h-screen">
 			<div className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5 md:pt-4 lg:px-8">
-				<div className="mx-auto max-w-[1500px]">
-					<nav className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] sm:px-4 md:rounded-3xl md:py-2.5">
-						<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full px-1 py-1">
+				<div className="max-w-[1500px] mx-auto">
+					<nav className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4 md:py-2.5 border-border/65 bg-card/58 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] rounded-[1.25rem] border backdrop-blur-2xl md:rounded-3xl">
+						<div className="inline-flex min-w-0 shrink-0 items-center gap-2 px-1 py-1 rounded-full">
 							<Link
 								href="/standard?game=coinflip"
 								scroll={false}
@@ -1264,7 +1264,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							</Link>
 						</div>
 
-						<div className="flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto">
+						<div className="flex min-w-0 flex-1 items-center justify-end overflow-x-auto gap-2">
 							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
 							{currentAccount ? (
 								<div className="shrink-0">
@@ -1274,7 +1274,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											setSelectedCoin(value as SupportedCoinKey)
 										}
 									>
-										<SelectTrigger className="h-10 w-auto min-w-[8.75rem] rounded-full border-border/70 bg-background/55 px-3">
+										<SelectTrigger className="h-10 w-auto min-w-[8.75rem] px-3 border-border/70 bg-background/55 rounded-full">
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -1311,31 +1311,31 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				</div>
 			</div>
 
-			<div className="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-3 pb-6 pt-20 md:px-5 md:pt-24 lg:px-8">
-				<main className="mt-2 flex flex-1 flex-col gap-6">
-					<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)] md:rounded-4xl md:px-5 md:py-5">
+			<div className="flex min-h-screen w-full max-w-[1500px] flex-col mx-auto px-3 pb-6 pt-20 md:px-5 md:pt-24 lg:px-8">
+				<main className="flex flex-1 flex-col mt-2 gap-6">
+					<section className="relative overflow-hidden px-4 py-4 md:px-5 md:py-5 border-border/70 bg-card/80 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)] rounded-3xl border backdrop-blur-xl md:rounded-4xl">
 						<div className="relative flex flex-col gap-4">
-							<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+							<div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
 								<div className="space-y-2">
-									<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
+									<h1 className="text-2xl leading-none md:text-4xl xl:text-5xl text-foreground">
 										Suigar SDK playground
 									</h1>
-									<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+									<p className="max-w-2xl text-sm leading-6 md:text-base text-muted-foreground">
 										Build standard and PvP transactions, inspect the exact
 										builder call, execute it, and keep a shared decoded event
 										log.
 									</p>
 								</div>
 
-								<div className="flex flex-col gap-3 lg:min-w-[360px] lg:items-end">
-									<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+								<div className="flex flex-col lg:min-w-[360px] lg:items-end gap-3">
+									<div className="flex flex-wrap items-center lg:justify-end gap-2">
 										<Button
 											asChild
 											variant={
 												mode === 'standard' ? 'control-active' : 'control'
 											}
 											size="sm"
-											className="h-10 rounded-full px-4"
+											className="h-10 px-4 rounded-full"
 										>
 											<Link href="/standard?game=coinflip" scroll={false}>
 												Standard
@@ -1345,7 +1345,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											asChild
 											variant={mode === 'pvp' ? 'control-active' : 'control'}
 											size="sm"
-											className="h-10 rounded-full px-4"
+											className="h-10 px-4 rounded-full"
 										>
 											<Link
 												href="/pvp?game=pvp-coinflip&action=create"
@@ -1366,7 +1366,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														updateQuery('game', value);
 													}}
 												>
-													<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
+													<SelectTrigger className="h-11 px-4 border-border/70 bg-background/55 rounded-full">
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
@@ -1388,7 +1388,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 															updateQuery('game', value);
 														}}
 													>
-														<SelectTrigger className="h-11 rounded-full border-border/70 bg-background/55 px-4">
+														<SelectTrigger className="h-11 px-4 border-border/70 bg-background/55 rounded-full">
 															<SelectValue />
 														</SelectTrigger>
 														<SelectContent>
@@ -1417,7 +1417,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 																updateQuery('action', action.value);
 															}}
 															className={cn(
-																'h-10 justify-start rounded-full px-4',
+																'h-10 justify-start px-4 rounded-full',
 																pvpAction === action.value && 'shadow-none',
 															)}
 														>
@@ -1432,7 +1432,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								</div>
 							</div>
 
-							<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
+							<div className="text-sm px-4 py-3 border-border/70 bg-background/35 text-muted-foreground rounded-2xl border">
 								Stake inputs use human values like{' '}
 								<span className="font-medium text-foreground">1</span> or{' '}
 								<span className="font-medium text-foreground">2.5</span> and are
@@ -1441,7 +1441,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						</div>
 					</section>
 
-					<div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+					<div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-6">
 						<SectionShell
 							title={
 								mode === 'standard'
@@ -1466,7 +1466,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									variant="ghost"
 									size="sm"
 									onClick={() => setIsGameSettingsDialogOpen(true)}
-									className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
+									className="h-10 px-4 border-border/70 bg-background/45 text-muted-foreground hover:bg-accent hover:text-foreground rounded-full border"
 								>
 									<Cog className="size-4" />
 									Settings
@@ -1537,7 +1537,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										) : null}
 										{pvpAction === 'join' ? (
 											<>
-												<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
+												<div className="p-4 border-border/70 bg-background/45 rounded-2xl border">
 													<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 														<div className="min-w-0 space-y-1">
 															<FieldLabel htmlFor="join-private-lobbies">
@@ -1551,7 +1551,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 														<Switch
 															id="join-private-lobbies"
 															size="default"
-															className="mt-0.5 justify-self-end self-start"
+															className="justify-self-end self-start mt-0.5"
 															checked={showPrivateJoinLobbies}
 															onCheckedChange={setShowPrivateJoinLobbies}
 														/>
@@ -1661,7 +1661,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
 				<Button
 					asChild
-					className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
+					className="h-12 md:h-14 px-4 md:px-5 shadow-lg rounded-full"
 				>
 					<a
 						href="https://docs.suigar.com/sdk"

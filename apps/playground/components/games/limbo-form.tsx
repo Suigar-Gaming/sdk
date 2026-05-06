@@ -33,14 +33,14 @@ export function LimboForm({
 
 	return (
 		<div className="space-y-6">
-			<FieldGroup className="grid gap-4 md:grid-cols-2">
+			<FieldGroup className="grid md:grid-cols-2 gap-4">
 				<Field>
 					<FieldLabel htmlFor="targetMultiplier">Target multiplier</FieldLabel>
 					<Input
 						id="targetMultiplier"
 						type="number"
 						step="any"
-						className="h-11 rounded-2xl bg-background/55 px-4"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.targetMultiplier}
 						onChange={(event) =>
 							onChange({ targetMultiplier: event.target.value })
@@ -63,7 +63,7 @@ export function LimboForm({
 						type="number"
 						step="1"
 						min="1"
-						className="h-11 rounded-2xl bg-background/55 px-4"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.scale}
 						onChange={(event) => onChange({ scale: event.target.value })}
 						placeholder="defaults to SDK scale"

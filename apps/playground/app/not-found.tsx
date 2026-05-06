@@ -17,7 +17,7 @@ export default function NotFound() {
 			<Card className="w-full max-w-lg bg-card/85 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)]">
 				<CardHeader className="gap-2 pb-4">
 					<div className="space-y-2 text-center">
-						<CardTitle className="font-serif text-4xl tracking-normal text-foreground sm:text-5xl">
+						<CardTitle className="font-serif text-4xl tracking-normal sm:text-5xl text-foreground">
 							Page not found
 						</CardTitle>
 						<CardDescription className="max-w-md text-base leading-7 text-muted-foreground">
@@ -27,7 +27,7 @@ export default function NotFound() {
 					</div>
 				</CardHeader>
 				<CardContent className="flex justify-center pt-0">
-					<Button asChild size="lg" className="rounded-full px-6">
+					<Button asChild size="lg" className="px-6 rounded-full">
 						<Link href={homeHref}>Take me home</Link>
 					</Button>
 				</CardContent>

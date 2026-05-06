@@ -100,7 +100,7 @@ export function PvPLobbyPicker({
 	return (
 		<Card className="bg-background/45">
 			<CardHeader className="gap-3">
-				<div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+				<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
 					<div className="space-y-1">
 						<CardTitle className="text-base">{title}</CardTitle>
 						<CardDescription>{description}</CardDescription>
@@ -109,7 +109,7 @@ export function PvPLobbyPicker({
 						type="button"
 						variant="outline"
 						size="sm"
-						className="h-10 rounded-full px-4"
+						className="h-10 px-4 rounded-full"
 						onClick={onRefresh}
 						disabled={isLoading}
 					>
@@ -124,19 +124,19 @@ export function PvPLobbyPicker({
 			</CardHeader>
 			<CardContent className="space-y-3">
 				{error ? (
-					<div className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+					<div className="text-sm px-4 py-3 border-destructive/40 bg-destructive/10 text-destructive rounded-2xl border">
 						{error}
 					</div>
 				) : null}
 
 				{!error && games.length === 0 && !isLoading ? (
-					<div className="rounded-2xl border border-dashed border-border/70 bg-background/50 px-4 py-5 text-sm text-muted-foreground">
+					<div className="text-sm px-4 py-5 border-dashed border-border/70 bg-background/50 text-muted-foreground rounded-2xl border">
 						{emptyMessage}
 					</div>
 				) : null}
 
 				{games.length > 0 ? (
-					<div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+					<div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
 						{games.map((game) => {
 							const creatorSide = game.creator_is_tails ? 'tails' : 'heads';
 							const amount = formatAmount(
@@ -159,7 +159,7 @@ export function PvPLobbyPicker({
 										}
 									}}
 									className={cn(
-										'w-full rounded-2xl border px-2.5 py-2.5 text-left transition-colors',
+										'w-full px-2.5 py-2.5 text-left rounded-2xl border transition-colors',
 										'cursor-pointer focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
 										selectedGameId === game.id
 											? 'border-secondary/60 bg-secondary/10 shadow-[0_18px_45px_-38px_rgba(8,47,91,0.5)]'
@@ -172,9 +172,9 @@ export function PvPLobbyPicker({
 												<p className="text-sm uppercase text-muted-foreground">
 													Amount
 												</p>
-												<div className="flex min-w-0 items-center gap-1 whitespace-nowrap text-sm font-semibold tabular-nums text-foreground">
+												<div className="flex min-w-0 items-center whitespace-nowrap text-sm font-semibold tabular-nums gap-1 text-foreground">
 													<span className="min-w-0 truncate">{amount}</span>
-													<span className="inline-flex shrink-0 items-center gap-1 text-[0.68rem] font-medium text-muted-foreground">
+													<span className="inline-flex shrink-0 items-center font-medium gap-1 text-[0.68rem] text-muted-foreground">
 														{coinKey ? (
 															<CoinIcon
 																coinKey={coinKey}
@@ -206,7 +206,7 @@ export function PvPLobbyPicker({
 												type="button"
 												variant="ghost"
 												size="sm"
-												className="h-8 rounded-full px-2.5 text-[0.72rem] text-muted-foreground"
+												className="h-8 px-2.5 text-[0.72rem] text-muted-foreground rounded-full"
 												onClick={(event) => handleCopyGameId(event, game.id)}
 											>
 												<Copy className="size-3.5" />
