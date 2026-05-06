@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal, X } from 'lucide-react';
+import { RefreshCw, SlidersHorizontal, X } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
@@ -88,6 +88,7 @@ export function GameSettingsDialog({
 	isLoading,
 	isOpen,
 	onClose,
+	onRefresh,
 	serializedGameSettings,
 	settingsCallPreview,
 	topLevelDetails,
@@ -102,6 +103,7 @@ export function GameSettingsDialog({
 	isLoading: boolean;
 	isOpen: boolean;
 	onClose: () => void;
+	onRefresh?: () => void;
 	serializedGameSettings: string | null;
 	settingsCallPreview: string;
 	topLevelDetails?: GameSettingsDetail[];
@@ -113,13 +115,18 @@ export function GameSettingsDialog({
 	const summarizedTopLevelDetails = topLevelDetails?.slice(0, 3) ?? [];
 	const hasConfigOptions = Boolean(configOptions?.length);
 	const isStakeMinimum = activeStakeRange?.kind === 'minimum';
+	const stakeTitle = isLoading
+		? 'Stake'
+		: isStakeMinimum
+			? 'Stake minimum'
+			: 'Stake range';
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent
 				size="xl"
 				showCloseButton={false}
-				className="flex h-[80dvh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden p-0 border-border/80 bg-card/92 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] border sm:h-[94dvh]"
+				className="flex h-[84dvh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden p-0 border-border/80 bg-card/92 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] border sm:h-[94dvh]"
 			>
 				<DialogHeader className="z-10 gap-4 px-4 py-4 md:px-6 md:py-5 border-b border-border/70 bg-card/95">
 					<div className="flex flex-wrap items-start justify-between gap-3">
@@ -133,15 +140,6 @@ export function GameSettingsDialog({
 									{coinLabel}
 								</span>
 							</Badge>
-							{isLoading ? (
-								<Badge
-									variant="outline"
-									className="normal-case gap-1 px-3 py-1"
-								>
-									<Spinner className="size-3.5" data-icon="inline-start" />
-									Loading
-								</Badge>
-							) : null}
 							{error ? (
 								<Badge variant="destructive" className="px-3 py-1">
 									Error
@@ -160,9 +158,28 @@ export function GameSettingsDialog({
 						</Button>
 					</div>
 					<div className="space-y-1">
-						<DialogTitle className="w-full text-xl md:text-2xl">
-							{gameLabel} live settings
-						</DialogTitle>
+						<div className="flex flex-wrap items-center justify-between gap-3">
+							<DialogTitle className="text-xl md:text-2xl">
+								{gameLabel} live settings
+							</DialogTitle>
+							{onRefresh ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={onRefresh}
+									disabled={isLoading}
+									className="ml-auto"
+								>
+									{isLoading ? (
+										<Spinner data-icon="size-4 inline-start" />
+									) : (
+										<RefreshCw className="size-4" />
+									)}
+									Refresh
+								</Button>
+							) : null}
+						</div>
 						<DialogDescription>
 							On-chain parameters for {gameLabel} game
 						</DialogDescription>
@@ -173,7 +190,7 @@ export function GameSettingsDialog({
 					<div className="flex flex-col gap-6 pr-1">
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 							<SettingsSummaryCard
-								title={isStakeMinimum ? 'Stake minimum' : 'Stake range'}
+								title={stakeTitle}
 								value={
 									activeStakeRange ? (
 										<div className="flex flex-nowrap items-center overflow-x-auto gap-2">
@@ -242,9 +259,9 @@ export function GameSettingsDialog({
 												>
 													<div className="text-sm space-y-3">
 														<div className="min-w-0 overflow-x-auto">
-															<div className="flex w-max min-w-full flex-nowrap items-center gap-2 text-muted-foreground">
+															<div className="flex w-max min-w-full flex-nowrap items-center gap-1 text-muted-foreground">
 																<span className="shrink-0 font-medium text-foreground">
-																	Stake range
+																	Stake range:
 																</span>
 																<FieldCode className="shrink-0">
 																	{activeConfigOption.stakeRange.min}
@@ -265,21 +282,21 @@ export function GameSettingsDialog({
 														{activeConfigDetails.length ? (
 															<div className="space-y-1">
 																{activeConfigDetails.map((detail) => (
-																	<p
+																	<div
 																		key={`active-config-${detail.label}`}
-																		className="flex items-center justify-between gap-3 text-muted-foreground"
+																		className="flex items-center gap-1 text-muted-foreground"
 																	>
-																		<span>{detail.label}</span>
+																		<span>{detail.label}: </span>
 																		<FieldCode>{detail.value}</FieldCode>
-																	</p>
+																	</div>
 																))}
 															</div>
 														) : null}
 														{activeMultiplierValues.length ? (
 															<>
-																<div className="font-medium mb-2 text-foreground">
-																	Multipliers:{' '}
-																	<FieldCode>
+																<div className="flex items-center gap-1 mb-2 text-foreground">
+																	<span>Multipliers:</span>
+																	<FieldCode className="font-medium">
 																		{activeMultiplierValues.length}
 																	</FieldCode>
 																</div>
@@ -331,7 +348,7 @@ export function GameSettingsDialog({
 
 						<Accordion
 							type="multiple"
-							className="overflow-hidden border-border/70 bg-background/30 rounded-2xl border"
+							className="overflow-hidden rounded-2xl border border-border/70 bg-background/30"
 							defaultValue={['request']}
 						>
 							<AccordionItem
@@ -359,7 +376,7 @@ export function GameSettingsDialog({
 									<AccordionTrigger className="hover:no-underline px-0 border-0 rounded-none">
 										Config options
 									</AccordionTrigger>
-									<AccordionContent className="space-y-3">
+									<AccordionContent className="space-y-1">
 										<p className="text-sm text-muted-foreground">
 											Playable configs stay enabled in the form selector.
 										</p>
@@ -382,7 +399,7 @@ export function GameSettingsDialog({
 								<AccordionContent>
 									{isLoading ? (
 										<SettingsStateCard className="inline-flex bg-background/40 text-muted-foreground shadow-none">
-											<div className="flex items-center gap-2">
+											<div className="flex items-center gap-1">
 												<Spinner />
 												Loading game settings from on-chain parameters.
 											</div>
