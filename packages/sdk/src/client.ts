@@ -202,7 +202,9 @@ export class SuigarClient {
 		> = {
 			limit: 50,
 		},
-	): Promise<(typeof PvPCoinflipGame)['$inferType'][]> {
+	): Promise<
+		((typeof PvPCoinflipGame)['$inferType'] & { coinType: string })[]
+	> {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
