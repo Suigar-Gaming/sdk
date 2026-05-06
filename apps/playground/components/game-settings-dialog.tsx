@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
@@ -119,7 +119,7 @@ export function GameSettingsDialog({
 			<DialogContent
 				size="xl"
 				showCloseButton={false}
-				className="flex h-[96vh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden p-0 border-border/80 bg-card/92 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] border"
+				className="flex h-[80dvh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden p-0 border-border/80 bg-card/92 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] border sm:h-[94dvh]"
 			>
 				<DialogHeader className="z-10 gap-4 px-4 py-4 md:px-6 md:py-5 border-b border-border/70 bg-card/95">
 					<div className="flex flex-wrap items-start justify-between gap-3">
@@ -156,7 +156,7 @@ export function GameSettingsDialog({
 							className="rounded-full"
 							aria-label="Close settings dialog"
 						>
-							<span className="text-lg leading-none">×</span>
+							<X />
 						</Button>
 					</div>
 					<div className="space-y-1">

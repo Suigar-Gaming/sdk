@@ -26,7 +26,47 @@ export const metadata: Metadata = {
 	title: 'Suigar SDK Playground',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
-	icons: withBasePath('/icon.png'),
+	icons: {
+		icon: [
+			{
+				url: withBasePath('/favicon/favicon-16x16.png'),
+				sizes: '16x16',
+				type: 'image/png',
+			},
+			{
+				url: withBasePath('/favicon/favicon-32x32.png'),
+				sizes: '32x32',
+				type: 'image/png',
+			},
+			{
+				url: withBasePath('/favicon/favicon.ico'),
+				sizes: 'any',
+				type: 'image/x-icon',
+			},
+		],
+		apple: [
+			{
+				url: withBasePath('/favicon/apple-touch-icon.png'),
+				sizes: '180x180',
+				type: 'image/png',
+			},
+		],
+		other: [
+			{
+				rel: 'android-chrome',
+				url: withBasePath('/favicon/android-chrome-192x192.png'),
+				sizes: '192x192',
+				type: 'image/png',
+			},
+			{
+				rel: 'android-chrome',
+				url: withBasePath('/favicon/android-chrome-512x512.png'),
+				sizes: '512x512',
+				type: 'image/png',
+			},
+		],
+	},
+	manifest: withBasePath('/manifest.json'),
 	appleWebApp: true,
 	authors: {
 		name: 'Suigar Team',
