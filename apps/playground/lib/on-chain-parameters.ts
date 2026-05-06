@@ -4,6 +4,8 @@ import type { SuigarClient } from '@suigar/sdk';
 import { fromMoveFloat, toBigInt } from '@suigar/sdk/utils';
 import type {
 	GameConfigOption,
+	PvPGameId,
+	PvPGameParametersSummary,
 	StakeRangeSummary,
 	StandardGameId,
 	StandardGameParametersSummary,
@@ -54,6 +56,17 @@ function toStakeRange(
 	return {
 		min: formatAtomicAmount(minStake, decimals),
 		max: formatAtomicAmount(maxStake, decimals),
+		kind: 'range',
+	};
+}
+
+function toStakeMinimum(minStake: bigint, decimals: number): StakeRangeSummary {
+	const formattedMinimum = formatAtomicAmount(minStake, decimals);
+
+	return {
+		min: formattedMinimum,
+		max: formattedMinimum,
+		kind: 'minimum',
 	};
 }
 
@@ -217,6 +230,42 @@ export function summarizeStandardGameParameters(
 				stakeRange: {
 					min: '0',
 					max: '0',
+				},
+			};
+	}
+}
+
+export function summarizePvPGameParameters(
+	game: PvPGameId,
+	parameters: StandardGameParametersResult,
+	decimals: number,
+): PvPGameParametersSummary {
+	switch (game) {
+		case 'pvp-coinflip': {
+			const pvpCoinflipParameters = parameters as {
+				house_edge_bps: bigint | string | number;
+				min_stake: bigint | string | number;
+			};
+
+			return {
+				stakeRange: toStakeMinimum(
+					toBigInt(pvpCoinflipParameters.min_stake),
+					decimals,
+				),
+				topLevelDetails: [
+					{
+						label: 'House edge (bps)',
+						value: String(pvpCoinflipParameters.house_edge_bps),
+					},
+				],
+			};
+		}
+		default:
+			return {
+				stakeRange: {
+					min: '0',
+					max: '0',
+					kind: 'range',
 				},
 			};
 	}

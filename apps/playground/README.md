@@ -25,7 +25,7 @@ The example reflects the current package export split:
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - Standard game forms backed by `client.suigar.getGameParameters()` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Wheel config selection
-- A game-settings dialog in the standard controls card that shows the current typed `getGameParameters()` result, available configs, selected config, lookup request, raw payload, and expandable per-config details such as parsed multiplier values
+- A game-settings dialog in the controls card that shows the current typed `getGameParameters()` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP coinflip
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
@@ -64,7 +64,7 @@ pnpm turbo run typecheck --filter='./apps/playground'
 - Limbo also clamps `targetMultiplier` to the on-chain `min_target_multiplier` and `max_target_multiplier` bounds. Those fields are generated Move float structs, so the playground parses them with `fromMoveFloat()` before using them as JavaScript numbers.
 - Range also clamps the current inputs to the on-chain zone-size bounds for the active scale and surfaces the current RTP bounds in the field description.
 - Plinko and Wheel switch to live config options when those on-chain parameters are available. The form only offers playable configs in the selector and automatically moves away from missing or disabled selections.
-- The settings dialog is available from the top-right of the standard game controls card and is useful for inspecting the live parsed parameter object without leaving the playground.
+- The settings dialog is available from the top-right of both the standard and PvP controls cards and is useful for inspecting the live parsed parameter object without leaving the playground.
 - Limbo uses the exported SDK default multiplier scale, so the form shows how `targetMultiplier` is converted with `Math.round(targetMultiplier * scale)`.
 - Range point inputs are human values, not pre-scaled integers. The form derives the allowed max from the exported SDK constants `RANGE_POINT_LIMIT / scale`, so the default SDK scale allows `0` to `100`.
 - Full decoded event payloads are also logged to the browser console.
