@@ -524,7 +524,7 @@ class TestClient extends CoreClient {
 		({ success: true }) as SuiClientTypes.ZkLoginVerifyResponse;
 
 	getMoveFunction: CoreClient['getMoveFunction'] = async () =>
-		({ function: null }) as SuiClientTypes.GetMoveFunctionResponse;
+		({ function: null }) as unknown as SuiClientTypes.GetMoveFunctionResponse;
 
 	defaultNameServiceName: CoreClient['defaultNameServiceName'] = async () =>
 		({
