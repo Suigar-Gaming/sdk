@@ -1,5 +1,16 @@
 # @suigar/sdk
 
+## 2.0.0-beta.14
+
+### Patch Changes
+
+- f846d27: Rename exported SDK config types to distinguish key unions from ID maps more clearly.
+  - Rename `SuigarPackageKey` to `SuigarPackage`.
+  - Rename the old `SuigarPackage` record type to `SuigarPackageIds`.
+  - Rename `SuigarRegistryKey` to `SuigarRegistry`.
+  - Rename the old `SuigarRegistry` record type to `SuigarRegistryIds`.
+  - Rename `SuigarPriceInfoObjectId` to `SuigarPriceInfoObjectIds`.
+
 ## 2.0.0-beta.13
 
 ### Patch Changes
