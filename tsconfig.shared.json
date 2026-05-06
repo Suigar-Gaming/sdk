@@ -7,14 +7,13 @@
 		"declarationMap": true,
 		"sourceMap": true,
 		"strict": true,
-		"isolatedDeclarations": true,
+		"isolatedDeclarations": false,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
-		"isolatedModules": true,
 		"lib": ["ES2022"]
 	}
 }
