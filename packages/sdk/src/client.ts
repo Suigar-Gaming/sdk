@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
-import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
+import {
+	BuildTransactionOptions,
+	Transaction,
+	TransactionResult,
+} from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { BetResultEvent } from './contracts/core/core';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name';
@@ -121,7 +125,7 @@ export class SuigarClient {
 	 *
 	 * @returns Network-resolved Suigar configuration.
 	 */
-	getConfig() {
+	getConfig(): SuigarConfig {
 		return this.#config;
 	}
 
@@ -139,7 +143,7 @@ export class SuigarClient {
 	async serializeTransactionToBase64(
 		transaction: Transaction,
 		options?: Omit<BuildTransactionOptions, 'client'>,
-	) {
+	): Promise<string> {
 		const bytes = await transaction.build({ ...options, client: this.#client });
 		return toBase64(bytes);
 	}
@@ -198,7 +202,7 @@ export class SuigarClient {
 		> = {
 			limit: 50,
 		},
-	) {
+	): Promise<(typeof PvPCoinflipGame)['$inferType'][]> {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
@@ -295,7 +299,7 @@ export class SuigarClient {
 		createBetTransaction: <GameId extends StandardGame>(
 			gameId: GameId,
 			options: BuildGameOptions<GameId>,
-		) => {
+		): Transaction => {
 			switch (gameId) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
@@ -341,7 +345,7 @@ export class SuigarClient {
 		createPvPCoinflipTransaction: <Action extends PvPCoinflipAction>(
 			action: Action,
 			options: BuildPvPCoinflipTransactionOptions<Action>,
-		) => {
+		): Transaction => {
 			switch (action) {
 				case 'create':
 					return buildPvPCoinflipTransaction('create', {
@@ -370,7 +374,9 @@ export class SuigarClient {
 		},
 	};
 
-	#createPvPCoinflipBetCoin(options: BuildJoinPvPCoinflipTransactionOptions) {
+	#createPvPCoinflipBetCoin(
+		options: BuildJoinPvPCoinflipTransactionOptions,
+	): (tx: Transaction) => Promise<TransactionResult> {
 		return async (tx: Transaction) => {
 			const { json } = await PvPCoinflipGame.get({
 				client: this.#client,
