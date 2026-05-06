@@ -1,9 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { SuigarRegistry } from '../types';
+import { SuigarRegistryIds } from '../types';
 
-export const TESTNET_REGISTRY_IDS: SuigarRegistry = {
+export const TESTNET_REGISTRY_IDS: SuigarRegistryIds = {
 	pvpCoinflip:
 		'0x99f20d8e4be012ea14a681144ae72ac349d0a1a1585205880183eb167f075bad',
 };

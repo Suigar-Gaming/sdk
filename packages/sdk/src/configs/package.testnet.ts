@@ -3,12 +3,12 @@
 
 import type {
 	SuigarCoinTypes,
-	SuigarPackage,
+	SuigarPackageIds,
 	SuigarPriceInfoObjectId,
 } from '../types/suigar-config.type.js';
 
 // `sweetHouse` is preserved manually because it is not currently resolved from MVR.
-export const TESTNET_PACKAGE_IDS: SuigarPackage = {
+export const TESTNET_PACKAGE_IDS: SuigarPackageIds = {
 	sweetHouse:
 		'0xb7f64e5a273aba1ede00caa0a6f8027cc7490c279d17eab12e7100ed20660603',
 	core: '0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc',

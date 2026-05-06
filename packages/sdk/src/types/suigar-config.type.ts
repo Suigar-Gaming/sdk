@@ -24,7 +24,7 @@ export type SuigarCoin = 'sui' | 'usdc';
 
 export type SuigarCoinTypes = Record<SuigarCoin, string>;
 
-export type SuigarPackageKey =
+export type SuigarPackage =
 	| 'sweetHouse'
 	| 'core'
 	| 'coinflip'
@@ -33,18 +33,18 @@ export type SuigarPackageKey =
 	| 'pvpCoinflip'
 	| 'range'
 	| 'wheel';
-export type SuigarPackage = Record<SuigarPackageKey, string>;
+export type SuigarPackageIds = Record<SuigarPackage, string>;
 
-export type SuigarRegistryKey = 'pvpCoinflip';
-export type SuigarRegistry = Record<SuigarRegistryKey, string>;
+export type SuigarRegistry = 'pvpCoinflip';
+export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
 export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
 
-export type SuiNetworkMap<T> = Record<SuiNetwork, T>;
+export type SuiNetworkRegistry<T> = Record<SuiNetwork, T>;
 
 export type SuigarConfig = {
-	packageIds: SuigarPackage;
-	registryIds: SuigarRegistry;
+	packageIds: SuigarPackageIds;
+	registryIds: SuigarRegistryIds;
 	coinTypes: SuigarCoinTypes;
 	priceInfoObjectIds: SuigarPriceInfoObjectId;
 };

@@ -3,9 +3,9 @@
 
 import type {
 	SuigarCoinTypes,
-	SuigarPackage,
+	SuigarPackageIds,
 	SuigarPriceInfoObjectId,
-	SuiNetworkMap,
+	SuiNetworkRegistry,
 } from '../types/suigar-config.type.js';
 import {
 	MAINNET_COIN_TYPES,
@@ -18,17 +18,18 @@ import {
 	TESTNET_PRICE_INFO_OBJECT_IDS,
 } from './package.testnet.js';
 
-export const PACKAGE_IDS: SuiNetworkMap<SuigarPackage> = {
+export const PACKAGE_IDS: SuiNetworkRegistry<SuigarPackageIds> = {
 	mainnet: { ...MAINNET_PACKAGE_IDS },
 	testnet: { ...TESTNET_PACKAGE_IDS },
 };
 
-export const COIN_TYPES: SuiNetworkMap<SuigarCoinTypes> = {
+export const COIN_TYPES: SuiNetworkRegistry<SuigarCoinTypes> = {
 	mainnet: { ...MAINNET_COIN_TYPES },
 	testnet: { ...TESTNET_COIN_TYPES },
 };
 
-export const PRICE_INFO_OBJECT_IDS: SuiNetworkMap<SuigarPriceInfoObjectId> = {
-	mainnet: { ...MAINNET_PRICE_INFO_OBJECT_IDS },
-	testnet: { ...TESTNET_PRICE_INFO_OBJECT_IDS },
-};
+export const PRICE_INFO_OBJECT_IDS: SuiNetworkRegistry<SuigarPriceInfoObjectId> =
+	{
+		mainnet: { ...MAINNET_PRICE_INFO_OBJECT_IDS },
+		testnet: { ...TESTNET_PRICE_INFO_OBJECT_IDS },
+	};
