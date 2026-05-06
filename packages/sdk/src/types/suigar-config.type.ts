@@ -40,7 +40,7 @@ export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
 export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
 
-export type SuiNetworkRegistry<T> = Record<SuiNetwork, T>;
+export type SuiNetworkRegistry<TRegistry> = Record<SuiNetwork, TRegistry>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
