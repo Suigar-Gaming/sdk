@@ -1,6 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SuiNetwork } from './network.type';
+
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
 	/**
@@ -37,6 +39,8 @@ export type SuigarRegistryKey = 'pvpCoinflip';
 export type SuigarRegistry = Record<SuigarRegistryKey, string>;
 
 export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
+
+export type SuiNetworkMap<T> = Record<SuiNetwork, T>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackage;
