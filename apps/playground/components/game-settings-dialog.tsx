@@ -1,6 +1,6 @@
 'use client';
 
-import { Cog } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
@@ -232,8 +232,8 @@ export function GameSettingsDialog({
 											<Popover>
 												<PopoverTrigger asChild>
 													<Button type="button" variant="outline" size="xs">
-														<Cog />
-														Config details
+														<SlidersHorizontal />
+														Details
 													</Button>
 												</PopoverTrigger>
 												<PopoverContent

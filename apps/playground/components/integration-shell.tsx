@@ -9,9 +9,9 @@ import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	BookOpenText,
 	CirclePlus,
+	Cog,
 	Gamepad2,
 	ShieldX,
-	SlidersHorizontal,
 	Swords,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -1468,8 +1468,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									onClick={() => setIsGameSettingsDialogOpen(true)}
 									className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
 								>
-									<SlidersHorizontal className="size-4" />
-									View settings
+									<Cog className="size-4" />
+									Settings
 								</Button>
 							}
 						>
