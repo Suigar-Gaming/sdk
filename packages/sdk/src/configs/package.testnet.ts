@@ -4,7 +4,7 @@
 import type {
 	SuigarCoinTypes,
 	SuigarPackageIds,
-	SuigarPriceInfoObjectId,
+	SuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
 
 // `sweetHouse` is preserved manually because it is not currently resolved from MVR.
@@ -27,7 +27,7 @@ export const TESTNET_COIN_TYPES: SuigarCoinTypes = {
 	usdc: '0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
 };
 
-export const TESTNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
+export const TESTNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectIds = {
 	sui: '0x1ebb295c789cc42b3b2a1606482cd1c7124076a0f5676718501fda8c7fd075a0',
 	usdc: '0x9c4dd4008297ffa5e480684b8100ec21cc934405ed9a25d4e4d7b6259aad9c81',
 };

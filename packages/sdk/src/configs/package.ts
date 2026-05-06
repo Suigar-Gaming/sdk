@@ -4,7 +4,7 @@
 import type {
 	SuigarCoinTypes,
 	SuigarPackageIds,
-	SuigarPriceInfoObjectId,
+	SuigarPriceInfoObjectIds,
 	SuiNetworkRegistry,
 } from '../types/suigar-config.type.js';
 import {
@@ -28,7 +28,7 @@ export const COIN_TYPES: SuiNetworkRegistry<SuigarCoinTypes> = {
 	testnet: { ...TESTNET_COIN_TYPES },
 };
 
-export const PRICE_INFO_OBJECT_IDS: SuiNetworkRegistry<SuigarPriceInfoObjectId> =
+export const PRICE_INFO_OBJECT_IDS: SuiNetworkRegistry<SuigarPriceInfoObjectIds> =
 	{
 		mainnet: { ...MAINNET_PRICE_INFO_OBJECT_IDS },
 		testnet: { ...TESTNET_PRICE_INFO_OBJECT_IDS },

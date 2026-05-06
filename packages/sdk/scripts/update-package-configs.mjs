@@ -78,7 +78,7 @@ function renderNetworkFile(
 import type {
 \tSuigarCoinTypes,
 \tSuigarPackageIds,
-\tSuigarPriceInfoObjectId,
+\tSuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
 
 // \`sweetHouse\` is preserved manually because it is not currently resolved from MVR.
@@ -101,7 +101,7 @@ export const ${uppercaseNetwork}_COIN_TYPES: SuigarCoinTypes = {
 \tusdc: '${coinTypes.usdc}',
 };
 
-export const ${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectId = {
+export const ${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectIds = {
 \tsui: '${priceInfoObjectIds.sui}',
 \tusdc: '${priceInfoObjectIds.usdc}',
 };

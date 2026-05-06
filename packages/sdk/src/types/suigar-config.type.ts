@@ -38,7 +38,7 @@ export type SuigarPackageIds = Record<SuigarPackage, string>;
 export type SuigarRegistry = 'pvpCoinflip';
 export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
-export type SuigarPriceInfoObjectId = Record<SuigarCoin, string>;
+export type SuigarPriceInfoObjectIds = Record<SuigarCoin, string>;
 
 export type SuiNetworkRegistry<TRegistry> = Record<SuiNetwork, TRegistry>;
 
@@ -46,5 +46,5 @@ export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
 	registryIds: SuigarRegistryIds;
 	coinTypes: SuigarCoinTypes;
-	priceInfoObjectIds: SuigarPriceInfoObjectId;
+	priceInfoObjectIds: SuigarPriceInfoObjectIds;
 };
