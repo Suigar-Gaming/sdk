@@ -5,13 +5,15 @@
 		"moduleResolution": "bundler",
 		"declaration": true,
 		"declarationMap": true,
-		"sourceMap": false,
-		"strict": false,
+		"sourceMap": true,
+		"strict": true,
+		"isolatedDeclarations": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
-		"isolatedModules": true,
 		"lib": ["ES2022"]
 	}
 }
