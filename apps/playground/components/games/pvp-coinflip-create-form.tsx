@@ -1,5 +1,6 @@
 'use client';
 
+import type * as React from 'react';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
 import {
 	Field,
@@ -21,9 +22,11 @@ import type { PvPCoinflipCreateFormValues } from '@/lib/suigar-types';
 export function PvPCoinflipCreateForm({
 	value,
 	onChange,
+	stakeDescription,
 }: {
 	value: PvPCoinflipCreateFormValues;
 	onChange: (patch: Partial<PvPCoinflipCreateFormValues>) => void;
+	stakeDescription?: React.ReactNode;
 }) {
 	return (
 		<div className="space-y-6">
@@ -58,7 +61,11 @@ export function PvPCoinflipCreateForm({
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
-			<SharedGameFields value={value} onChange={onChange} />
+			<SharedGameFields
+				value={value}
+				onChange={onChange}
+				description={stakeDescription}
+			/>
 		</div>
 	);
 }

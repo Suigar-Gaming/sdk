@@ -730,6 +730,58 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		isStandardGameParametersLoading,
 		standardGameParametersError,
 	]);
+	const pvpStakeDescription = React.useMemo(() => {
+		if (mode !== 'pvp' || pvpAction !== 'create') {
+			return null;
+		}
+
+		if (isPvPGameParametersLoading) {
+			return (
+				<FieldDescription
+					size="sm"
+					className="inline-flex items-center gap-1.5"
+				>
+					<Spinner className="size-3.5" />
+					Loading on-chain stake minimum for this coin.
+				</FieldDescription>
+			);
+		}
+
+		if (pvpGameParametersError) {
+			return (
+				<FieldDescription size="sm">
+					Unable to load on-chain stake minimum: {pvpGameParametersError}
+				</FieldDescription>
+			);
+		}
+
+		if (!pvpGameParameters?.stakeRange) {
+			return null;
+		}
+
+		return (
+			<FieldDescription size="sm">
+				<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
+					<span className="shrink-0">On-chain stake minimum:</span>
+					<FieldCode className="shrink-0">
+						{pvpGameParameters.stakeRange.min}
+					</FieldCode>
+					<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-[0.12em]">
+						<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
+						{effectiveSelectedCoin.toUpperCase()}
+					</span>
+				</span>
+				.
+			</FieldDescription>
+		);
+	}, [
+		effectiveSelectedCoin,
+		isPvPGameParametersLoading,
+		mode,
+		pvpAction,
+		pvpGameParameters,
+		pvpGameParametersError,
+	]);
 	const standardGameLabel = React.useMemo(
 		() => getStandardGameLabel(standardGame),
 		[standardGame],
@@ -964,6 +1016,35 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		standardGame,
 		standardGameParameters,
 	]);
+
+	React.useEffect(() => {
+		if (
+			mode !== 'pvp' ||
+			pvpAction !== 'create' ||
+			!pvpGameParameters?.stakeRange
+		) {
+			return;
+		}
+
+		const currentStake = parseOptionalNumber(pvpForms.create.stake);
+		const minStake = parseOptionalNumber(pvpGameParameters.stakeRange.min);
+
+		if (
+			currentStake === undefined ||
+			minStake === undefined ||
+			currentStake >= minStake
+		) {
+			return;
+		}
+
+		setPvpForms((current) => ({
+			...current,
+			create: {
+				...current.create,
+				stake: pvpGameParameters.stakeRange.min,
+			},
+		}));
+	}, [mode, pvpAction, pvpForms.create.stake, pvpGameParameters, setPvpForms]);
 
 	const joinLobbyGames = React.useMemo(
 		() =>
@@ -1451,6 +1532,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											<PvPCoinflipCreateForm
 												value={pvpForms.create}
 												onChange={(patch) => updatePvPForm('create', patch)}
+												stakeDescription={pvpStakeDescription}
 											/>
 										) : null}
 										{pvpAction === 'join' ? (
