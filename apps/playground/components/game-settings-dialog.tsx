@@ -1,6 +1,6 @@
 'use client';
 
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/game-settings-config-list';
@@ -156,7 +156,7 @@ export function GameSettingsDialog({
 							className="rounded-full"
 							aria-label="Close settings dialog"
 						>
-							<span className="text-lg leading-none">×</span>
+							<X />
 						</Button>
 					</div>
 					<div className="space-y-1">
