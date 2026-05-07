@@ -155,6 +155,7 @@ Use:
 - `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
 - `client.suigar.bcs.PvPCoinflipGameResolvedEvent`
 - `client.suigar.bcs.PvPCoinflipGameCancelledEvent`
+- `parseGameEvent(event)` from `@suigar/sdk/utils` when the product needs the normalized `{ gameId, eventName }` for a raw Suigar event
 
 Use `getPvPCoinflipGames()` when you need the current unresolved lobby from the
 registry. Use the generated `PvPCoinflipGame` helper when you need the current
@@ -201,10 +202,11 @@ const game = await client.suigar.bcs.PvPCoinflipGame.get({
 When a flow also decodes `BetResultEvent`, use the generated standard event helper and the SDK game-details parser:
 
 ```ts
-import { parseGameDetails } from '@suigar/sdk/utils';
+import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 
+const { gameId, eventName } = parseGameEvent(event)!;
 const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails(decoded.game_details);
+const gameDetails = parseGameDetails(gameId, decoded.game_details);
 ```
 
 Guardrails:
@@ -216,7 +218,7 @@ Guardrails:
 - After join and resolution, inspect `PvPCoinflipGameResolvedEvent` or other emitted events instead of expecting the `Game` object to remain on-chain.
 - Use `event.bcs` as the event payload input when available.
 - Do not route PvP coinflip transaction creation through standard bet builders.
-- Do not hand-decode `BetResultEvent.game_details`; use `parseGameDetails`, which understands `pvp_result` along with standard game keys.
+- Do not hand-decode `BetResultEvent.game_details`; use `parseGameEvent(event)` to retrieve `gameId`, then `parseGameDetails(gameId, ...)`, which understands `pvp_result` along with standard game keys.
 
 ## Implementation checklist
 
