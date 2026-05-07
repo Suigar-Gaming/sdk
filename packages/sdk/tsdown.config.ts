@@ -10,6 +10,5 @@ export default defineConfig({
 		utils: 'src/utils/index.ts',
 	},
 	format: 'esm',
-	target: 'es2022',
 	unbundle: true,
 });
