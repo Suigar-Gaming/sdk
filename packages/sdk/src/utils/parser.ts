@@ -56,7 +56,6 @@ export function parseGameEvent(
 	event: SuiClientTypes.Event,
 ): SuigarGameEvent | null {
 	const { name: eventName, typeParams } = parseStructTag(event.eventType);
-	console.log({ event, eventName, typeParams });
 	const module = event.module.replaceAll('_', '-');
 	const gameId = GAMES.includes(module as Game) ? module : typeParams[0];
 
