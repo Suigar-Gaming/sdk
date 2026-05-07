@@ -19,32 +19,31 @@
 		"CHANGELOG.md",
 		"README.md"
 	],
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs",
+			"default": "./dist/index.mjs"
 		},
 		"./games": {
-			"types": "./dist/games.d.ts",
-			"import": "./dist/games.js",
-			"require": "./dist/games.cjs"
+			"types": "./dist/games.d.mts",
+			"import": "./dist/games.mjs",
+			"default": "./dist/games.mjs"
 		},
 		"./utils": {
-			"types": "./dist/utils.d.ts",
-			"import": "./dist/utils.js",
-			"require": "./dist/utils.cjs"
+			"types": "./dist/utils.d.mts",
+			"import": "./dist/utils.mjs",
+			"default": "./dist/utils.mjs"
 		}
 	},
 	"engines": {
-		"node": ">=24"
+		"node": "^22.18.0 || >=24"
 	},
 	"scripts": {
-		"build": "pnpm clean && pnpm codegen && tsup",
-		"build:ci": "rm -rf dist && tsup",
+		"build": "pnpm clean && pnpm codegen && tsdown",
+		"build:ci": "rm -rf dist && tsdown",
 		"clean": "rm -rf dist src/contracts .vitest-cache",
 		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm lint",
 		"eslint:fix": "eslint . --fix",
@@ -74,7 +73,7 @@
 		"@mysten/codegen": "^0.10.4",
 		"@mysten/sui": "^2.16.0",
 		"@types/node": "^24.0.0",
-		"tsup": "^8.5.1",
+		"tsdown": "^0.22.0",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.1.5"

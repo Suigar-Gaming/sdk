@@ -34,6 +34,7 @@ import {
 	fromMoveFloat,
 	fromMoveI64,
 	parseCoinType,
+	parseGameEvent,
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
@@ -61,6 +62,7 @@ describe('public source subpath modules', () => {
 		expect(
 			fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
 		).toBe(0);
+		expect(parseGameEvent).toBeTypeOf('function');
 		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
@@ -81,9 +83,9 @@ describe('public source subpath modules', () => {
 		]);
 
 		expect(packageJson.exports['./games']).toEqual({
-			types: './dist/games.d.ts',
-			import: './dist/games.js',
-			require: './dist/games.cjs',
+			types: './dist/games.d.mts',
+			import: './dist/games.mjs',
+			default: './dist/games.mjs',
 		});
 	});
 

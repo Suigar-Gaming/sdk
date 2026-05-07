@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
 	entry: {
@@ -9,10 +9,6 @@ export default defineConfig({
 		index: 'src/index.ts',
 		utils: 'src/utils/index.ts',
 	},
-	format: ['esm', 'cjs'],
-	dts: true,
-	sourcemap: false,
-	clean: true,
-	target: 'es2022',
-	treeshake: true,
+	format: 'esm',
+	unbundle: true,
 });

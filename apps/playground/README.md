@@ -27,7 +27,7 @@ The example reflects the current package export split:
 - Standard game forms backed by `client.suigar.getGameParameters()` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Wheel config selection
 - A game-settings dialog in the controls card that shows the current typed `getGameParameters()` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP coinflip
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
-- Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
+- Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, using each returned lobby's `coin_type` field for coin selection and display, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
 - A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreatedEvent`, `PvPCoinflipGameResolvedEvent`, and `PvPCoinflipGameCancelledEvent`

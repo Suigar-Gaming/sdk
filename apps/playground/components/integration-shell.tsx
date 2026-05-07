@@ -1182,7 +1182,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		game: PvPCoinflipLobbyGame,
 	) {
 		updatePvPForm(action, { gameId: game.id });
-		const matchingCoinKey = resolveCoinKeyForType(game.coinType, coinTypes);
+		const matchingCoinKey = resolveCoinKeyForType(game.coin_type, coinTypes);
 		if (matchingCoinKey) {
 			setSelectedCoin(matchingCoinKey);
 		}

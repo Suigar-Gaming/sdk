@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable package is `@suigar/sdk` under `packages/sdk`, built with TypeScript, `tsup`, and generated Move contract bindings. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable package is `@suigar/sdk` under `packages/sdk`, built with TypeScript, `tsdown`, and generated Move contract bindings. The package is ESM-only. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -85,7 +85,7 @@ pnpm release
 ### Build System
 
 - Uses pnpm workspaces from the private `@suigar/ts-sdks` root package and `pnpm-workspace.yaml`
-- Uses `tsup` to emit both ESM and CJS outputs into `packages/sdk/dist/`
+- Uses `tsdown` to emit ESM-only outputs into `packages/sdk/dist/`
 - Uses `sui-ts-codegen generate` to regenerate `packages/sdk/src/contracts/`
 - Generated contract bindings are runtime-critical and should stay aligned with the current Suigar packages
 
@@ -128,7 +128,7 @@ There are two transaction families and they must not be mixed:
 
 - **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
 - **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
-- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; this bulk-loads lobby objects with `client.core.getObjects()`, skips per-object fetch or parse failures by default, and only rejects when `throwOnError: true` is passed.
+- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; this bulk-loads lobby objects with `client.core.getObjects()`, skips per-object fetch or parse failures by default, only rejects when `throwOnError: true` is passed, and returns each parsed game with a derived `coin_type` string from the Move object type.
 - **Specific PvP coinflip game object lookups** should use the exported generated helper, `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })`, when a product needs one live game object outside the registry list.
 
 When making changes:

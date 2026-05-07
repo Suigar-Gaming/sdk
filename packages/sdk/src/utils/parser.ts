@@ -2,72 +2,30 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { bcs } from '@mysten/sui/bcs';
+import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
-import { Float } from '../contracts/core/float';
 import {
 	BetResultGameDetails,
-	GAME_DETAILS_SCHEMA,
-	ParsedGameDetails,
-	ParsedGameDetailValue,
+	GAME_DETAIL_BCS,
+	GAME_DETAILS_SCHEMAS,
+	GAME_EVENTS,
+	GameDetail,
+	GameDetails,
+	GameEvent,
+	GAMES,
+	MoveFloat,
+	SuigarGameEvent,
+	type Game,
 	type GameDetailValueType,
 } from '../types';
-
-type MoveFloat = ReturnType<(typeof Float)['parse']>;
+import { fromMoveFloat } from './numeric';
 
 const textDecoder = new TextDecoder();
-
-const GAME_DETAIL_BCS = {
-	u8: bcs.U8,
-	u64: bcs.U64,
-	bool: bcs.Bool,
-	float: Float,
-	string: bcs.String,
-} as const;
-
-/**
- * Converts a generated Move `i64` wrapper into a JavaScript number.
- *
- * The generated bindings expose signed 64-bit integers through a `{ bits }`
- * field that stores the raw two's-complement bit pattern. This helper
- * reinterprets those bits as a signed `i64` and returns a plain JS number.
- * Invalid or missing input falls back to `0`.
- *
- * @param i64 Generated Move `i64` value, typically used for float exponents.
- * @returns The signed 64-bit value as a JavaScript number.
- */
-export function fromMoveI64(i64: MoveFloat['exp']): number {
-	try {
-		return Number(BigInt.asIntN(64, BigInt(i64.bits ?? 0)));
-	} catch {
-		return 0;
-	}
-}
-
-/**
- * Converts a generated Move `Float` struct into a JavaScript number.
- *
- * Suigar float values are represented as a sign flag, an unsigned mantissa,
- * and a Move `i64` exponent. This helper rebuilds the numeric value using the
- * same normalization expected by the on-chain format and applies the sign at
- * the end. Missing mantissas are treated as `0`, and a zero mantissa returns `0`.
- *
- * @param float Generated Move float value with `mant`, `exp`, and `is_negative`.
- * @returns The decoded floating-point value as a JavaScript number.
- */
-export function fromMoveFloat(float: MoveFloat): number {
-	const mantissa = BigInt(float.mant ?? 0);
-	if (mantissa === 0n) {
-		return 0;
-	}
-	const exponent = fromMoveI64(float.exp) - 52;
-	const magnitude = Number(mantissa) * 2 ** exponent;
-	return float.is_negative ? -magnitude : magnitude;
-}
 
 /**
  * Extracts and normalizes the first generic coin type from a Move object type.
  *
- * PvP game object types encode the wager coin as their first type parameter,
+ * PvP Coinflip game object types encode the wager coin as their first type parameter,
  * for example `Game<0x2::sui::SUI>`. This helper converts that generic type
  * argument into the SDK's canonical struct tag string.
  *
@@ -83,19 +41,36 @@ export function parseCoinType(type: string): string {
 	return normalizeStructTag(coinType);
 }
 
-function normalizeGameDetailValue(
-	valueType: GameDetailValueType,
-	parsed: unknown,
-): ParsedGameDetailValue {
-	if (valueType === 'float') {
-		return fromMoveFloat(parsed as MoveFloat);
+/**
+ * Resolves a supported Suigar event into its normalized SDK game id and event name.
+ *
+ * This helper recognizes all supported Suigar event names in `GAME_EVENTS`.
+ * Standard `BetResultEvent` payloads encode the game family through the core
+ * client event module or generic type parameter, while PvP coinflip events
+ * resolve to the `pvp-coinflip` game id from their `pvp_coinflip` module.
+ *
+ * @param event Sui event returned by the core client.
+ * @returns Parsed SDK game id and raw Move event name, or `null` when the event
+ * name is unsupported or the game id cannot be resolved.
+ */
+export function parseGameEvent(
+	event: SuiClientTypes.Event,
+): SuigarGameEvent | null {
+	const { name: eventName, typeParams } = parseStructTag(event.eventType);
+	const module = event.module.replaceAll('_', '-');
+	const gameId = GAMES.includes(module as Game) ? module : typeParams[0];
+
+	if (
+		!GAME_EVENTS.includes(eventName as GameEvent) ||
+		typeof gameId !== 'string'
+	) {
+		return null;
 	}
 
-	if (valueType === 'u64') {
-		return Number(parsed);
-	}
-
-	return parsed as ParsedGameDetailValue;
+	return {
+		gameId,
+		eventName,
+	} as SuigarGameEvent;
 }
 
 function parseStringGameDetail(value: number[]): string {
@@ -108,38 +83,61 @@ function parseStringGameDetail(value: number[]): string {
 	}
 }
 
-function parseGameDetail(
-	valueType: GameDetailValueType,
+function parseGameDetail<TValueType extends GameDetailValueType>(
+	valueType: TValueType,
 	value: number[],
-): ParsedGameDetailValue {
+): GameDetail<TValueType> {
 	if (valueType === 'string') {
-		return parseStringGameDetail(value);
+		return parseStringGameDetail(value) as GameDetail<TValueType>;
 	}
 
 	const parsed = GAME_DETAIL_BCS[valueType].parse(Uint8Array.from(value));
-	return normalizeGameDetailValue(valueType, parsed);
+
+	switch (valueType) {
+		case 'float':
+			return fromMoveFloat(parsed as MoveFloat) as GameDetail<TValueType>;
+		case 'u64':
+			return Number(parsed) as GameDetail<TValueType>;
+		default:
+			return parsed as GameDetail<TValueType>;
+	}
 }
 
 /**
  * Decodes `BetResultEvent.game_details` into plain application values.
  *
- * Suigar stores game detail entries as `VecMap<string, vector<u8>>`, so raw BCS
- * decoding leaves each value as bytes. This helper looks up the known schema for
- * each key, parses the bytes into the expected runtime type, and preserves the
- * original on-chain keys in the returned object. Unknown keys fall back to
- * string decoding so newer detail fields remain readable by default.
+ * Use this only with the `game_details` field from a decoded `BetResultEvent`.
+ * Suigar stores those entries as `VecMap<string, vector<u8>>`, so raw BCS
+ * decoding leaves each value as bytes. This helper uses the provided `gameId`
+ * to narrow the known detail schema, parses each byte array into the expected
+ * runtime type, and preserves the original on-chain keys in the returned
+ * object. Unknown keys fall back to string decoding so newer detail fields
+ * remain readable by default.
  *
- * @param gameDetails Raw `game_details` map from a decoded bet result event.
- * @returns A plain object with the same keys and decoded string, number, or boolean values.
+ * Call `parseGameEvent(event)` first when you need to derive the matching
+ * `gameId` from the raw `SuiClientTypes.Event` before decoding
+ * `decoded.game_details`.
+ *
+ * @param gameId Suigar game id used to narrow the known detail keys and value
+ * types for this bet result payload.
+ * @param gameDetails Raw `game_details` map from a decoded `BetResultEvent`.
+ * @returns A plain object with decoded values for the known keys of the
+ * selected game.
  */
-export function parseGameDetails(
+export function parseGameDetails<TGame extends Game>(
+	gameId: TGame,
 	gameDetails: BetResultGameDetails,
-): ParsedGameDetails {
-	return gameDetails.contents.reduce<ParsedGameDetails>((details, entry) => {
-		const valueType =
-			GAME_DETAILS_SCHEMA[entry.key as keyof typeof GAME_DETAILS_SCHEMA] ??
-			'string';
-		details[entry.key] = parseGameDetail(valueType, entry.value);
-		return details;
-	}, {});
+): GameDetails<TGame> {
+	const schema: Record<string, GameDetailValueType> =
+		GAME_DETAILS_SCHEMAS[gameId];
+	const details = gameDetails.contents.reduce<Record<string, unknown>>(
+		(parsedDetails, entry) => {
+			const valueType = schema[entry.key] ?? 'string';
+			parsedDetails[entry.key] = parseGameDetail(valueType, entry.value);
+			return parsedDetails;
+		},
+		{},
+	);
+
+	return details as GameDetails<TGame>;
 }

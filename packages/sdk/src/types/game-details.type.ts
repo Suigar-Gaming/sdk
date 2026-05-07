@@ -1,17 +1,36 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { bcs } from '@mysten/sui/bcs';
 import { BetResultEvent } from '../contracts/core/core';
+import { Float } from '../contracts/core/float';
+import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = ReturnType<
 	(typeof BetResultEvent)['parse']
 >['game_details'];
 
-export type ParsedGameDetailValue = string | number | boolean;
-export type ParsedGameDetails = Record<string, ParsedGameDetailValue>;
-
 export type GameDetailValueType = 'u8' | 'u64' | 'bool' | 'float' | 'string';
 export type GameDetailsSchema = Record<string, GameDetailValueType>;
+
+export type GameDetail<TValueType extends GameDetailValueType> =
+	TValueType extends 'float' | 'u64'
+		? number
+		: ReturnType<(typeof GAME_DETAIL_BCS)[TValueType]['parse']>;
+
+export type GameDetails<TGame extends Game> = {
+	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<
+		(typeof GAME_DETAILS_SCHEMAS)[TGame][K] & GameDetailValueType
+	>;
+};
+
+export const GAME_DETAIL_BCS = {
+	u8: bcs.U8,
+	u64: bcs.U64,
+	bool: bcs.Bool,
+	float: Float,
+	string: bcs.String,
+} as const;
 
 const COINFLIP_GAME_DETAILS_SCHEMA = {
 	player_bet: 'string',
@@ -64,11 +83,11 @@ const WHEEL_GAME_DETAILS_SCHEMA = {
 	spin_value: 'u64',
 } satisfies GameDetailsSchema;
 
-export const GAME_DETAILS_SCHEMA = {
-	...COINFLIP_GAME_DETAILS_SCHEMA,
-	...PVP_COINFLIP_GAME_DETAILS_SCHEMA,
-	...LIMBO_GAME_DETAILS_SCHEMA,
-	...RANGE_GAME_DETAILS_SCHEMA,
-	...PLINKO_GAME_DETAILS_SCHEMA,
-	...WHEEL_GAME_DETAILS_SCHEMA,
-} satisfies GameDetailsSchema;
+export const GAME_DETAILS_SCHEMAS = {
+	coinflip: COINFLIP_GAME_DETAILS_SCHEMA,
+	limbo: LIMBO_GAME_DETAILS_SCHEMA,
+	plinko: PLINKO_GAME_DETAILS_SCHEMA,
+	'pvp-coinflip': PVP_COINFLIP_GAME_DETAILS_SCHEMA,
+	range: RANGE_GAME_DETAILS_SCHEMA,
+	wheel: WHEEL_GAME_DETAILS_SCHEMA,
+} satisfies Record<Game, GameDetailsSchema>;

@@ -10,7 +10,7 @@ npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 
 Runtime requirements:
 
-- Node.js `>=22`
+- Node.js `^22.18.0 || >=24`
 - ESM project configuration (`"type": "module"`)
 - `@mysten/sui` v2
 - `@mysten/bcs` v2
@@ -71,7 +71,7 @@ Numeric helper behavior:
   JavaScript `number`
 - `parseCoinType(type)` extracts the normalized first generic coin type from a
   Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
   preserving the original on-chain keys
 
@@ -267,6 +267,9 @@ By default, per-object fetch or parse failures are skipped so one broken or
 already-deleted registry entry does not reject the full lookup. Pass
 `throwOnError: true` if you want the call to reject instead.
 
+Each returned entry includes the parsed game fields plus a derived
+`coin_type` string from the underlying Move object type.
+
 Any supported `listDynamicFields()` options such as `limit`, `cursor`, or
 `signal` can be passed through `options`.
 
@@ -275,7 +278,7 @@ const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
 
 for (const game of games) {
 	console.log(game.id);
-	console.log(game.coinType);
+	console.log(game.coin_type);
 }
 ```
 
@@ -460,7 +463,7 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>`
   and throws `TypeError` when the type string does not include a first generic coin type
-- `parseGameDetails(game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
+- `parseGameDetails(gameId, game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
 
@@ -525,16 +528,27 @@ Parsed fields include:
 - `game_details`
 - `metadata`
 
-`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameDetails` from `@suigar/sdk/utils` to decode `game_details` with the SDK's known game-detail schemas.
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameEvent(event)` from `@suigar/sdk/utils` to retrieve the normalized `gameId` and `eventName`, then pass that `gameId` to `parseGameDetails(gameId, decoded.game_details)` for game-specific key and value typing.
 
 ```ts
-import { parseGameDetails } from '@suigar/sdk/utils';
+import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 
+const { gameId, eventName } = parseGameEvent(event)!;
 const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails(decoded.game_details);
+const gameDetails = parseGameDetails(gameId, decoded.game_details);
 ```
 
 `parseGameDetails` preserves the on-chain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
+
+`parseGameDetails(gameId, decoded.game_details)` narrows based on the parsed event game id. For example, when `gameId === 'coinflip'` it narrows to:
+
+- `{ player_bet: string; coin_outcome: string }`
+
+`parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
+
+- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
+- `{ gameId: 'pvp-coinflip', eventName: 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
+- `null` for unsupported event names or non-Suigar event payloads
 
 When the extension is configured with `partner`, decoded event `metadata` will
 contain that partner wallet address under the `partner` entry.
@@ -545,7 +559,7 @@ contain that partner wallet address under the `partner` entry.
 > - unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
 > - parse emitted events from the unwrapped transaction result
 > - use `event.bcs` for consistent decoding across transports
-> - use `parseGameDetails(decoded.game_details)` instead of hand-decoding standard game detail byte arrays
+> - use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails(gameId, decoded.game_details)` instead of hand-decoding standard game detail byte arrays
 
 > **Tip:**
 >

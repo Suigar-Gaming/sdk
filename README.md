@@ -10,9 +10,14 @@ This SDK builds on the Sui TypeScript SDK. For Sui client, transaction, and netw
 
 ## Suigar TypeScript SDK
 
-The publishable package in this repository is [`@suigar/sdk`](packages/sdk). It provides utility classes, types, generated Move bindings, and transaction builders for applications that build Suigar v2 game transactions on Sui.
+The publishable package in this repository is [`@suigar/sdk`](packages/sdk). It provides utility classes, types, generated Move bindings, and transaction builders for applications that build Suigar v2 game transactions on Sui. The package is ESM-only and is built with `tsdown`.
 
 The main integration path is the `suigar()` extension on top of a Sui client such as `SuiGrpcClient`. The SDK targets Sui TypeScript SDK 2.0+ and supports standard Suigar games plus PvP coinflip flows.
+
+Runtime requirements for `@suigar/sdk`:
+
+- Node.js `^22.18.0 || >=24`
+- ESM project configuration (`"type": "module"`)
 
 Public package entrypoints:
 
@@ -38,7 +43,7 @@ Utility behavior from `@suigar/sdk/utils`:
   JavaScript `number`
 - `parseCoinType(type)` extracts the normalized first generic coin type from a
   Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
   preserving the original on-chain keys
 
@@ -277,6 +282,11 @@ List unresolved PvP coinflip lobbies:
 
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
+
+for (const game of games) {
+	console.log(game.id);
+	console.log(game.coin_type);
+}
 ```
 
 Fetch one live PvP coinflip game object with the generated BCS helper:
@@ -290,13 +300,19 @@ const game = await client.suigar.bcs.PvPCoinflipGame.get({
 
 ## Reading Events
 
-Generated event decoders are available under `client.suigar.bcs`. Parser helpers such as `parseGameDetails`, `fromMoveFloat`, `fromMoveI64`, and `parseCoinType` are exported from `@suigar/sdk/utils`.
+Generated event decoders are available under `client.suigar.bcs`. Parser helpers such as `parseGameEvent`, `parseGameDetails`, `fromMoveFloat`, `fromMoveI64`, and `parseCoinType` are exported from `@suigar/sdk/utils`.
 
 ```ts
-import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
+import {
+	fromMoveFloat,
+	parseGameDetails,
+	parseGameEvent,
+} from '@suigar/sdk/utils';
 
-const parsedDetails = parseGameDetails('coinflip', event.game_details);
-const price = fromMoveFloat(event.price);
+const { gameId, eventName } = parseGameEvent(event)!;
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+const parsedDetails = parseGameDetails(gameId, decoded.game_details);
+const price = fromMoveFloat(decoded.adjusted_oracle_usd_coin_price);
 ```
 
 ## Useful Package Docs

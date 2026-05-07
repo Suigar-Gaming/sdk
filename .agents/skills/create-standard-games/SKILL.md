@@ -197,10 +197,15 @@ Guardrails:
 Use the generated BCS event decoder for standard bet results:
 
 ```ts
-import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
+import {
+	fromMoveFloat,
+	parseGameDetails,
+	parseGameEvent,
+} from '@suigar/sdk/utils';
 
+const { gameId, eventName } = parseGameEvent(event)!;
 const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails(decoded.game_details);
+const gameDetails = parseGameDetails(gameId, decoded.game_details);
 const adjustedOraclePrice = fromMoveFloat(
 	decoded.adjusted_oracle_usd_coin_price,
 );
@@ -209,7 +214,8 @@ const adjustedOraclePrice = fromMoveFloat(
 Guardrails:
 
 - Use `event.bcs` as the event payload input when available.
-- Do not hand-decode `game_details` byte arrays in app code; use `parseGameDetails`.
+- Use `parseGameEvent(event)` to retrieve the normalized `gameId`, then pass that to `parseGameDetails(gameId, ...)` so TypeScript narrows the returned detail keys.
+- Do not hand-decode `game_details` byte arrays in app code; use `parseGameDetails(gameId, ...)`.
 - `parseGameDetails` preserves the on-chain keys and returns decoded string, number, and boolean values.
 - Metadata remains generic `VecMap<string, vector<u8>>` data; decode it according to the app's own metadata contract.
 
