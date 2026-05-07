@@ -4,14 +4,14 @@
 import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
-import { Float } from '../contracts/core/float';
 import {
 	BetResultGameDetails,
-	GAME_DETAILS_SCHEMA,
+	GAME_DETAIL_BCS,
+	GAME_DETAILS_SCHEMAS,
+	GameDetail,
+	GameDetails,
 	GAMES,
 	MoveFloat,
-	ParsedGameDetails,
-	ParsedGameDetailValue,
 	SuigarGameEvent,
 	type Game,
 	type GameDetailValueType,
@@ -19,14 +19,6 @@ import {
 import { fromMoveFloat } from './numeric';
 
 const textDecoder = new TextDecoder();
-
-const GAME_DETAIL_BCS = {
-	u8: bcs.U8,
-	u64: bcs.U64,
-	bool: bcs.Bool,
-	float: Float,
-	string: bcs.String,
-} as const;
 
 /**
  * Extracts and normalizes the first generic coin type from a Move object type.
@@ -77,21 +69,6 @@ export function parseGameEvent(
 	} as SuigarGameEvent;
 }
 
-function normalizeGameDetailValue(
-	valueType: GameDetailValueType,
-	parsed: unknown,
-): ParsedGameDetailValue {
-	if (valueType === 'float') {
-		return fromMoveFloat(parsed as MoveFloat);
-	}
-
-	if (valueType === 'u64') {
-		return Number(parsed);
-	}
-
-	return parsed as ParsedGameDetailValue;
-}
-
 function parseStringGameDetail(value: number[]): string {
 	const bytes = Uint8Array.from(value);
 
@@ -102,16 +79,24 @@ function parseStringGameDetail(value: number[]): string {
 	}
 }
 
-function parseGameDetail(
-	valueType: GameDetailValueType,
+function parseGameDetail<TValueType extends GameDetailValueType>(
+	valueType: TValueType,
 	value: number[],
-): ParsedGameDetailValue {
+): GameDetail<TValueType> {
 	if (valueType === 'string') {
-		return parseStringGameDetail(value);
+		return parseStringGameDetail(value) as GameDetail<TValueType>;
 	}
 
 	const parsed = GAME_DETAIL_BCS[valueType].parse(Uint8Array.from(value));
-	return normalizeGameDetailValue(valueType, parsed);
+
+	switch (valueType) {
+		case 'float':
+			return fromMoveFloat(parsed as MoveFloat) as GameDetail<TValueType>;
+		case 'u64':
+			return Number(parsed) as GameDetail<TValueType>;
+		default:
+			return parsed as GameDetail<TValueType>;
+	}
 }
 
 /**
@@ -123,17 +108,23 @@ function parseGameDetail(
  * original on-chain keys in the returned object. Unknown keys fall back to
  * string decoding so newer detail fields remain readable by default.
  *
+ * @param gameId Suigar game id used to narrow the known detail keys and value types.
  * @param gameDetails Raw `game_details` map from a decoded bet result event.
- * @returns A plain object with the same keys and decoded string, number, or boolean values.
+ * @returns A plain object with decoded values for the known keys of the selected game.
  */
-export function parseGameDetails(
+export function parseGameDetails<TGame extends Game>(
+	gameId: TGame,
 	gameDetails: BetResultGameDetails,
-): ParsedGameDetails {
-	return gameDetails.contents.reduce<ParsedGameDetails>((details, entry) => {
-		const valueType =
-			GAME_DETAILS_SCHEMA[entry.key as keyof typeof GAME_DETAILS_SCHEMA] ??
-			'string';
-		details[entry.key] = parseGameDetail(valueType, entry.value);
-		return details;
+): GameDetails<TGame> {
+	const schema: Record<string, GameDetailValueType> =
+		GAME_DETAILS_SCHEMAS[gameId];
+	const details = gameDetails.contents.reduce<
+		Record<string, string | number | boolean>
+	>((parsedDetails, entry) => {
+		const valueType = schema[entry.key] ?? 'string';
+		parsedDetails[entry.key] = parseGameDetail(valueType, entry.value);
+		return parsedDetails;
 	}, {});
+
+	return details as GameDetails<TGame>;
 }
