@@ -8,8 +8,10 @@ import {
 	BetResultGameDetails,
 	GAME_DETAIL_BCS,
 	GAME_DETAILS_SCHEMAS,
+	GAME_EVENTS,
 	GameDetail,
 	GameDetails,
+	GameEvent,
 	GAMES,
 	MoveFloat,
 	SuigarGameEvent,
@@ -53,19 +55,21 @@ export function parseCoinType(type: string): string {
 export function parseGameEvent(
 	event: SuiClientTypes.Event,
 ): SuigarGameEvent | null {
-	const eventType = parseStructTag(event.eventType);
-	const module = eventType.module.replaceAll('_', '-');
-	const gameId = GAMES.includes(module as Game)
-		? module
-		: eventType.typeParams[0];
+	const { name: eventName, typeParams } = parseStructTag(event.eventType);
+	console.log({ event, eventName, typeParams });
+	const module = event.module.replaceAll('_', '-');
+	const gameId = GAMES.includes(module as Game) ? module : typeParams[0];
 
-	if (!gameId || typeof gameId !== 'string') {
+	if (
+		!GAME_EVENTS.includes(eventName as GameEvent) ||
+		typeof gameId !== 'string'
+	) {
 		return null;
 	}
 
 	return {
 		gameId,
-		eventName: eventType.name,
+		eventName,
 	} as SuigarGameEvent;
 }
 
@@ -118,13 +122,14 @@ export function parseGameDetails<TGame extends Game>(
 ): GameDetails<TGame> {
 	const schema: Record<string, GameDetailValueType> =
 		GAME_DETAILS_SCHEMAS[gameId];
-	const details = gameDetails.contents.reduce<
-		Record<string, string | number | boolean>
-	>((parsedDetails, entry) => {
-		const valueType = schema[entry.key] ?? 'string';
-		parsedDetails[entry.key] = parseGameDetail(valueType, entry.value);
-		return parsedDetails;
-	}, {});
+	const details = gameDetails.contents.reduce<Record<string, unknown>>(
+		(parsedDetails, entry) => {
+			const valueType = schema[entry.key] ?? 'string';
+			parsedDetails[entry.key] = parseGameDetail(valueType, entry.value);
+			return parsedDetails;
+		},
+		{},
+	);
 
 	return details as GameDetails<TGame>;
 }
