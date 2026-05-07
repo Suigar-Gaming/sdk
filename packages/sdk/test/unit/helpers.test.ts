@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { BetResultGameDetails } from '../../src/types/index.js';
 import {
 	parseCoinType,
@@ -41,6 +41,7 @@ describe('parseGameDetails', () => {
 	it('parses coinflip detail strings and preserves event keys', () => {
 		expect(
 			parseGameDetails(
+				'coinflip',
 				gameDetails([
 					{ key: 'player_bet', value: encodeString('heads') },
 					{ key: 'coin_outcome', value: encodeString('tails') },
@@ -56,6 +57,7 @@ describe('parseGameDetails', () => {
 
 	it('parses numeric, boolean, and float range details', () => {
 		const details = parseGameDetails(
+			'range',
 			gameDetails([
 				{ key: 'roll_value', value: writeU64(42n) },
 				{ key: 'win', value: [1] },
@@ -77,6 +79,7 @@ describe('parseGameDetails', () => {
 	it('parses pvp coinflip result details', () => {
 		expect(
 			parseGameDetails(
+				'pvp-coinflip',
 				gameDetails([{ key: 'pvp_result', value: encodeString('heads') }]),
 			),
 		).toEqual({ pvp_result: 'heads' });
@@ -85,9 +88,27 @@ describe('parseGameDetails', () => {
 	it('parses raw UTF-8 pvp coinflip result details', () => {
 		expect(
 			parseGameDetails(
+				'pvp-coinflip',
 				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
 			),
 		).toEqual({ pvp_result: 'loss' });
+	});
+
+	it('narrows the parsed detail keys and value types by game id', () => {
+		const coinflipDetails = parseGameDetails(
+			'coinflip',
+			gameDetails([
+				{ key: 'player_bet', value: encodeString('heads') },
+				{ key: 'coin_outcome', value: encodeString('tails') },
+			]),
+		);
+
+		expectTypeOf(coinflipDetails).toEqualTypeOf<{
+			player_bet: string;
+			coin_outcome: string;
+		}>();
+		expectTypeOf(coinflipDetails.player_bet).toEqualTypeOf<string>();
+		expectTypeOf(coinflipDetails.coin_outcome).toEqualTypeOf<string>();
 	});
 });
 
