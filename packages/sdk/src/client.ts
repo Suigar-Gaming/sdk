@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { InferBcsType } from '@mysten/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import {
 	BuildTransactionOptions,
@@ -202,9 +203,7 @@ export class SuigarClient {
 		> = {
 			limit: 50,
 		},
-	): Promise<
-		((typeof PvPCoinflipGame)['$inferType'] & { coinType: string })[]
-	> {
+	): Promise<(InferBcsType<typeof PvPCoinflipGame> & { coin_type: string })[]> {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
@@ -233,8 +232,10 @@ export class SuigarClient {
 
 				return {
 					...PvPCoinflipGame.parse(object.content),
-					coinType: parseCoinType(object.type),
-				};
+					coin_type: parseCoinType(object.type),
+				} satisfies Awaited<
+					ReturnType<SuigarClient['getPvPCoinflipGames']>
+				>[number];
 			} catch (error) {
 				return error instanceof Error ? error : new Error(String(error));
 			}
