@@ -10,7 +10,7 @@ npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 
 Runtime requirements:
 
-- Node.js `>=22`
+- Node.js `>=24`
 - ESM project configuration (`"type": "module"`)
 - `@mysten/sui` v2
 - `@mysten/bcs` v2
@@ -267,6 +267,9 @@ By default, per-object fetch or parse failures are skipped so one broken or
 already-deleted registry entry does not reject the full lookup. Pass
 `throwOnError: true` if you want the call to reject instead.
 
+Each returned entry includes the parsed game fields plus a derived
+`coin_type` string from the underlying Move object type.
+
 Any supported `listDynamicFields()` options such as `limit`, `cursor`, or
 `signal` can be passed through `options`.
 
@@ -275,7 +278,7 @@ const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
 
 for (const game of games) {
 	console.log(game.id);
-	console.log(game.coinType);
+	console.log(game.coin_type);
 }
 ```
 

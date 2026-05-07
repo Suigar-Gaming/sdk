@@ -166,7 +166,7 @@ const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
 
 for (const game of games) {
 	console.log(game.id);
-	console.log(game.coinType);
+	console.log(game.coin_type);
 }
 ```
 

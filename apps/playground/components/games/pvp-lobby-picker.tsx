@@ -141,10 +141,10 @@ export function PvPLobbyPicker({
 							const creatorSide = game.creator_is_tails ? 'tails' : 'heads';
 							const amount = formatAmount(
 								BigInt(game.stake_per_player),
-								getCoinDecimals(game.coinType),
+								getCoinDecimals(game.coin_type),
 							);
-							const coinKey = parseCoinKey(game.coinType, coinTypes);
-							const coinLabel = parseCoinTypeLabel(game.coinType, coinTypes);
+							const coinKey = parseCoinKey(game.coin_type, coinTypes);
+							const coinLabel = parseCoinTypeLabel(game.coin_type, coinTypes);
 
 							return (
 								<div
