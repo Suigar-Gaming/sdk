@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { bcs } from '@mysten/sui/bcs';
+import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 import { Float } from '../contracts/core/float';
 import {
 	BetResultGameDetails,
 	GAME_DETAILS_SCHEMA,
+	GAMES,
 	MoveFloat,
 	ParsedGameDetails,
 	ParsedGameDetailValue,
+	SuigarGameEvent,
+	type Game,
 	type GameDetailValueType,
 } from '../types';
 import { fromMoveFloat } from './numeric';
@@ -41,6 +45,36 @@ export function parseCoinType(type: string): string {
 	}
 
 	return normalizeStructTag(coinType);
+}
+
+/**
+ * Resolves a Suigar event into its SDK game id and public event helper name.
+ *
+ * Standard bet result events are shared across games and encode the game family
+ * in their first generic type parameter. PvP coinflip events use dedicated Move
+ * event structs and are normalized to the public SDK helper names exposed under
+ * `client.suigar.bcs`.
+ *
+ * @param event Sui event returned by the core client.
+ * @returns Parsed SDK game id and event name.
+ */
+export function parseGameEvent(
+	event: SuiClientTypes.Event,
+): SuigarGameEvent | null {
+	const eventType = parseStructTag(event.eventType);
+	const module = eventType.module.replaceAll('_', '-');
+	const gameId = GAMES.includes(module as Game)
+		? module
+		: eventType.typeParams[0];
+
+	if (!gameId || typeof gameId !== 'string') {
+		return null;
+	}
+
+	return {
+		gameId,
+		eventName: eventType.name,
+	} as SuigarGameEvent;
 }
 
 function normalizeGameDetailValue(
