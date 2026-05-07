@@ -38,7 +38,7 @@ Utility behavior from `@suigar/sdk/utils`:
   JavaScript `number`
 - `parseCoinType(type)` extracts the normalized first generic coin type from a
   Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails(gameDetails)` decodes standard `BetResultEvent.game_details`
+- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details`
   byte arrays into the expected string, number, and boolean values while
   preserving the original on-chain keys
 
@@ -295,13 +295,19 @@ const game = await client.suigar.bcs.PvPCoinflipGame.get({
 
 ## Reading Events
 
-Generated event decoders are available under `client.suigar.bcs`. Parser helpers such as `parseGameDetails`, `fromMoveFloat`, `fromMoveI64`, and `parseCoinType` are exported from `@suigar/sdk/utils`.
+Generated event decoders are available under `client.suigar.bcs`. Parser helpers such as `parseGameEvent`, `parseGameDetails`, `fromMoveFloat`, `fromMoveI64`, and `parseCoinType` are exported from `@suigar/sdk/utils`.
 
 ```ts
-import { fromMoveFloat, parseGameDetails } from '@suigar/sdk/utils';
+import {
+	fromMoveFloat,
+	parseGameDetails,
+	parseGameEvent,
+} from '@suigar/sdk/utils';
 
-const parsedDetails = parseGameDetails('coinflip', event.game_details);
-const price = fromMoveFloat(event.price);
+const { gameId, eventName } = parseGameEvent(event)!;
+const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
+const parsedDetails = parseGameDetails(gameId, decoded.game_details);
+const price = fromMoveFloat(decoded.adjusted_oracle_usd_coin_price);
 ```
 
 ## Useful Package Docs
