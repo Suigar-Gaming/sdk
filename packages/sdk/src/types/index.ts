@@ -3,6 +3,7 @@
 
 export * from './bet-metadata.type';
 export * from './build-game-transaction-options.type';
+export * from './events.type';
 export * from './game-details.type';
 export * from './game.type';
 export * from './move-float.type';
