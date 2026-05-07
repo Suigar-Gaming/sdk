@@ -14,6 +14,11 @@ The publishable package in this repository is [`@suigar/sdk`](packages/sdk). It 
 
 The main integration path is the `suigar()` extension on top of a Sui client such as `SuiGrpcClient`. The SDK targets Sui TypeScript SDK 2.0+ and supports standard Suigar games plus PvP coinflip flows.
 
+Runtime requirements for `@suigar/sdk`:
+
+- Node.js `^22.18.0 || >=24`
+- ESM project configuration (`"type": "module"`)
+
 Public package entrypoints:
 
 - `@suigar/sdk` for `suigar()` and `SuigarClient`

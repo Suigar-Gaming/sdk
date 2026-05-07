@@ -10,7 +10,7 @@ npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 
 Runtime requirements:
 
-- Node.js `>=24`
+- Node.js `^22.18.0 || >=24`
 - ESM project configuration (`"type": "module"`)
 - `@mysten/sui` v2
 - `@mysten/bcs` v2
