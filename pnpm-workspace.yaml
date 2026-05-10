@@ -1,6 +1,12 @@
-autoInstallPeers: false
 packages:
   - 'packages/*'
   - 'apps/*'
   - '!**/dist/**'
   - '!**/.next/**'
+
+allowBuilds: {}
+autoInstallPeers: true
+
+blockExoticSubdeps: true
+
+# minimumReleaseAge: 2880
