@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.16
+
+### Patch Changes
+
+- 4463bbf: Update `@mysten/*` dependencies to latest patch versions
+
 ## 2.0.0-beta.15
 
 ### Patch Changes
