@@ -114,7 +114,7 @@ const client = new SuiGrpcClient({
 }).$extend(suigar());
 
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
@@ -305,7 +305,7 @@ Use `createBetTransaction(gameId, options)` for:
 
 ```ts
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'tails',
@@ -314,7 +314,7 @@ const tx = client.suigar.tx.createBetTransaction('coinflip', {
 
 Shared option shape:
 
-- `playerAddress: string`
+- `owner: string`
 - `coinType: string`
 - `stake: number | bigint`
 - `cashStake?: number | bigint`
@@ -332,7 +332,7 @@ Shared behavior:
 - `partner` configured via `suigar({ partner })` is prepended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
-- the reward object is transferred back to `playerAddress`
+- the reward object is transferred back to `owner`
 
 Error behavior:
 
@@ -352,14 +352,14 @@ Examples:
 
 ```ts
 const limboTx = client.suigar.tx.createBetTransaction('limbo', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	targetMultiplier: 2.5,
 });
 
 const rangeTx = client.suigar.tx.createBetTransaction('range', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	leftPoint: 25,
@@ -394,7 +394,7 @@ Create:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
@@ -406,7 +406,7 @@ Join:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
 });
@@ -416,7 +416,7 @@ Cancel:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
 });
@@ -427,7 +427,7 @@ id for `coinType`.
 
 PvP shared options:
 
-- `playerAddress: string`
+- `owner: string`
 - `coinType: string`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`

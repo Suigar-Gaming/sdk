@@ -45,7 +45,7 @@ Use `create` when the first player opens a new PvP coinflip match.
 
 Required fields:
 
-- `playerAddress`
+- `owner`
 - `coinType`
 - `stake`
 - `side`
@@ -61,7 +61,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
-	playerAddress,
+	owner,
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'tails',
@@ -80,7 +80,7 @@ Use `join` when a second player accepts an existing PvP match.
 
 Required fields:
 
-- `playerAddress`
+- `owner`
 - `coinType`
 - `gameId`
 
@@ -94,7 +94,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
-	playerAddress,
+	owner,
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME',
 });
@@ -112,7 +112,7 @@ Use `cancel` when the creator cancels an unresolved PvP match.
 
 Required fields:
 
-- `playerAddress`
+- `owner`
 - `coinType`
 - `gameId`
 
@@ -126,7 +126,7 @@ Example:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
-	playerAddress,
+	owner,
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME',
 });

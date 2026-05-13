@@ -174,7 +174,7 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 - `packages/sdk/test/unit/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
 - `packages/sdk/test/unit/config.test.ts` covers config resolution and defaults.
-- When changing transaction behavior, update tests to cover package id resolution, player-address normalization, and action-specific argument mapping.
+- When changing transaction behavior, update tests to cover package id resolution, owner-address normalization, and action-specific argument mapping.
 
 ### Changeset Conventions
 

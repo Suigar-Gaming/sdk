@@ -20,7 +20,7 @@ export type WithThrowOnError<T = object> = T & {
 
 export type BaseTransactionOptions = WithGasBudget & {
 	config: SuigarConfig;
-	playerAddress: string;
+	owner: string;
 };
 
 export type CoinTransactionOptions = {

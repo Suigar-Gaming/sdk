@@ -32,7 +32,7 @@ type StrictStakeTransactionOptions = {
 
 export type BuildSharedBetTransactionContext = Pick<
 	BaseTransactionOptions,
-	'config' | 'playerAddress'
+	'config' | 'owner'
 > &
 	Pick<CoinTransactionOptions, 'coinType'> &
 	StrictStakeTransactionOptions & {
@@ -58,13 +58,13 @@ export type BuildSharedBetTransactionOptions = WithPartner<
 export function createBaseGameTransaction({
 	config,
 	game,
-	playerAddress,
+	owner,
 	gasBudget,
 }: CreateBaseGameTransactionOptions): Transaction {
 	assertConfiguredBetGame(config, game);
 
 	const tx = new Transaction();
-	tx.setSenderIfNotSet(normalizeSuiAddress(playerAddress));
+	tx.setSenderIfNotSet(normalizeSuiAddress(owner));
 	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);
 
 	return tx;
@@ -72,7 +72,7 @@ export function createBaseGameTransaction({
 
 export function buildSharedStandardGameBetCall({
 	config,
-	playerAddress,
+	owner,
 	coinType,
 	stake,
 	cashStake,
@@ -83,7 +83,7 @@ export function buildSharedStandardGameBetCall({
 	buildRewardCoin,
 }: BuildSharedBetTransactionOptions): (tx: Transaction) => TransactionArgument {
 	return (tx: Transaction) => {
-		const normalizedPlayerAddress = normalizeSuiAddress(playerAddress);
+		const normalizedOwner = normalizeSuiAddress(owner);
 		const normalizedCoinType = normalizeStructTag(coinType);
 		const resolvedStake = toBigInt(stake);
 		const resolvedCashStake = toBigInt(cashStake ?? stake);
@@ -103,7 +103,7 @@ export function buildSharedStandardGameBetCall({
 		const rewardCoin = buildRewardCoin({
 			tx,
 			config,
-			playerAddress: normalizedPlayerAddress,
+			owner: normalizedOwner,
 			coinType: normalizedCoinType,
 			stake: resolvedStake,
 			cashStake: resolvedCashStake,
@@ -113,7 +113,7 @@ export function buildSharedStandardGameBetCall({
 			betCoin,
 		});
 
-		tx.transferObjects([rewardCoin], tx.pure.address(normalizedPlayerAddress));
+		tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
 		return rewardCoin;
 	};
 }

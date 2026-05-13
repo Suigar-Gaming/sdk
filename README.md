@@ -159,7 +159,7 @@ const client = new SuiGrpcClient({
 }).$extend(suigar());
 
 const tx = client.suigar.tx.createBetTransaction('coinflip', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
@@ -220,20 +220,20 @@ Use `createBetTransaction(gameId, options)` for standard games:
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
 - `wheel`: `configId: number`
 
-Shared options include `playerAddress`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `allowGasCoinShortcut`.
+Shared options include `owner`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `allowGasCoinShortcut`.
 
 `stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into on-chain byte arrays.
 
 ```ts
 const limboTx = client.suigar.tx.createBetTransaction('limbo', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	targetMultiplier: 2.5,
 });
 
 const rangeTx = client.suigar.tx.createBetTransaction('range', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	leftPoint: 25,
@@ -250,7 +250,7 @@ Create a public PvP coinflip lobby:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
@@ -262,7 +262,7 @@ Join a PvP coinflip lobby:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
 });
@@ -272,7 +272,7 @@ Cancel a PvP coinflip lobby:
 
 ```ts
 const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
-	playerAddress: '0x123',
+	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
 });
