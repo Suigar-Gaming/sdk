@@ -562,7 +562,7 @@ function createSuigarTestClient({
 describe('transaction builders', () => {
 	it('builds a coinflip transaction with the configured package id', () => {
 		const tx = buildCoinflipTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1_000,
 			side: 'heads',
@@ -584,7 +584,7 @@ describe('transaction builders', () => {
 
 	it('builds pvp coinflip create and cancel transactions with the configured package id', () => {
 		const createTx = buildPvPCoinflipTransaction('create', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1_000,
 			side: 'tails',
@@ -592,7 +592,7 @@ describe('transaction builders', () => {
 			config: TEST_CONFIG,
 		});
 		const cancelTx = buildPvPCoinflipTransaction('cancel', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
 			config: TEST_CONFIG,
@@ -623,14 +623,14 @@ describe('transaction builders', () => {
 });
 
 describe('shared transaction helpers', () => {
-	it('creates a base transaction with normalized player address and configured gas budget', async () => {
+	it('creates a base transaction with normalized owner address and configured gas budget', async () => {
 		const { createBaseGameTransaction } =
 			await import('../../src/transactions/shared.js');
 
 		const tx = createBaseGameTransaction({
 			config: TEST_CONFIG,
 			game: 'coinflip',
-			playerAddress: '0xabc',
+			owner: '0xabc',
 			gasBudget: 999,
 		});
 		const data = tx.getData() as {
@@ -657,7 +657,7 @@ describe('shared transaction helpers', () => {
 		const reward = buildSharedStandardGameBetCall({
 			config: TEST_CONFIG,
 			game: 'coinflip',
-			playerAddress: '0xabc',
+			owner: '0xabc',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			cashStake: 2500,
@@ -677,7 +677,7 @@ describe('shared transaction helpers', () => {
 
 		expect(reward).toBeDefined();
 		expect(context!).toBeDefined();
-		expect(context!.playerAddress).toBe(normalizeSuiAddress('0xabc'));
+		expect(context!.owner).toBe(normalizeSuiAddress('0xabc'));
 		expect(context!.coinType).toBe(normalizeStructTag('0x2::sui::SUI'));
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
@@ -700,7 +700,7 @@ describe('shared transaction helpers', () => {
 		buildSharedStandardGameBetCall({
 			config: TEST_CONFIG,
 			game: 'coinflip',
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			metadata: {
@@ -739,7 +739,7 @@ describe('shared transaction helpers', () => {
 		buildSharedStandardGameBetCall({
 			config: TEST_CONFIG,
 			game: 'coinflip',
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			metadata: {
@@ -779,7 +779,7 @@ describe('coinflip transaction wrapper', () => {
 		const partner = normalizeSuiAddress('0x456');
 
 		buildCoinflipTransactionWithMock({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			betCount: 2,
@@ -826,7 +826,7 @@ describe('limbo transaction wrapper', () => {
 		);
 
 		buildLimboTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			targetMultiplier: 2.5,
@@ -853,7 +853,7 @@ describe('limbo transaction wrapper', () => {
 		);
 
 		buildLimboTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			targetMultiplier: 2.5,
@@ -883,7 +883,7 @@ describe('plinko transaction wrapper', () => {
 		);
 
 		buildPlinkoTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			configId: 7,
@@ -902,7 +902,7 @@ describe('plinko transaction wrapper', () => {
 
 		expect(() =>
 			buildPlinkoTransaction({
-				playerAddress: '0x123',
+				owner: '0x123',
 				coinType: '0x2::sui::SUI',
 				stake: 1000,
 				configId: 256,
@@ -926,7 +926,7 @@ describe('range transaction wrapper', () => {
 		);
 
 		buildRangeTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			leftPoint: 0.95,
@@ -958,7 +958,7 @@ describe('wheel transaction wrapper', () => {
 		);
 
 		buildWheelTransaction({
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			configId: 9,
@@ -977,7 +977,7 @@ describe('wheel transaction wrapper', () => {
 
 		expect(() =>
 			buildWheelTransaction({
-				playerAddress: '0x123',
+				owner: '0x123',
 				coinType: '0x2::sui::SUI',
 				stake: 1000,
 				configId: -1,
@@ -1003,7 +1003,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		const partner = normalizeSuiAddress('0x456');
 
 		buildPvPCoinflipTransactionWithMock('create', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
 			side: 'tails',
@@ -1047,7 +1047,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		const partner = normalizeSuiAddress('0x456');
 
 		buildPvPCoinflipTransactionWithMock('join', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
 			metadata: { label: 'vip' },
@@ -1085,7 +1085,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			);
 
 		buildPvPCoinflipTransactionWithMock('cancel', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
 			config: TEST_CONFIG,
@@ -1142,7 +1142,7 @@ describe('SuigarClient', () => {
 		) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coinTypes.sui;
 		client.suigar.tx.createBetTransaction('coinflip', {
-			playerAddress: '0x123',
+			owner: '0x123',
 			coinType,
 			stake: 1000,
 			side: 'heads',
