@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.17
+
+### Major Changes
+
+- bd8499e: Rename transaction builder option `playerAddress` to `owner` across standard and PvP transaction APIs.
+
 ## 2.0.0-beta.16
 
 ### Patch Changes
