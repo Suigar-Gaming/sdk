@@ -259,16 +259,16 @@ function getPvPGameFromParams(params: URLSearchParams) {
 function buildPvPPreviewFallback(
 	action: 'join' | 'cancel',
 	{
-		playerAddress,
+		owner,
 		coinType,
 	}: {
-		playerAddress: string;
+		owner: string;
 		coinType: string;
 	},
 ) {
 	return [
 		`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}', {`,
-		`\tplayerAddress: '${playerAddress}',`,
+		`\towner: '${owner}',`,
 		`\tcoinType: '${coinType}',`,
 		`\tgameId: '0xGAME_ID',`,
 		`});`,
@@ -399,8 +399,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		? selectedCoin
 		: (coinOptions[0]?.[0] ?? 'sui');
 	const coinType = coinTypes[effectiveSelectedCoin];
-	const previewPlayerAddress =
-		currentAccount?.address ?? PREVIEW_PLAYER_ADDRESS;
+	const previewOwner = currentAccount?.address ?? PREVIEW_PLAYER_ADDRESS;
 	const visibleStatus = currentAccount ? status : null;
 	const [coinBalances, setCoinBalances] = React.useState<
 		Record<SupportedCoinKey, CoinBalanceState>
@@ -1123,20 +1122,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						currentClient,
 						standardGame,
 						standardForms[standardGame],
-						previewPlayerAddress,
+						previewOwner,
 						effectiveSelectedCoin,
 						coinType,
 					).code
 				: isMissingPvPGameSelection
 					? buildPvPPreviewFallback(pvpAction, {
-							playerAddress: previewPlayerAddress,
+							owner: previewOwner,
 							coinType,
 						})
 					: buildPvPTransaction(
 							currentClient,
 							pvpAction,
 							pvpForms[pvpAction],
-							previewPlayerAddress,
+							previewOwner,
 							effectiveSelectedCoin,
 							coinType,
 						).code;
@@ -1207,14 +1206,14 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				);
 			}
 
-			const playerAddress = currentAccount.address;
+			const owner = currentAccount.address;
 			const buildResult =
 				mode === 'standard'
 					? buildStandardTransaction(
 							currentClient,
 							standardGame,
 							standardForms[standardGame],
-							playerAddress,
+							owner,
 							effectiveSelectedCoin,
 							coinType,
 						)
@@ -1222,7 +1221,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							currentClient,
 							pvpAction,
 							pvpForms[pvpAction],
-							playerAddress,
+							owner,
 							effectiveSelectedCoin,
 							coinType,
 						);
