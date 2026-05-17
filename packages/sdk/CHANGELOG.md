@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.18
+
+### Patch Changes
+
+- de9e425: Update SDK dependency metadata to use the shared Mysten and TypeScript pnpm catalogs, including the `@mysten/sui` and `tsx` dependency updates.
+
 ## 2.0.0-beta.17
 
 ### Major Changes
