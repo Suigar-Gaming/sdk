@@ -4,9 +4,17 @@ packages:
   - '!**/dist/**'
   - '!**/.next/**'
 
+catalogs:
+  mysten:
+    '@mysten/bcs': '^2.0.5'
+    '@mysten/sui': '^2.16.3'
+  typescript:
+    '@types/node': '^24.0.0'
+    'typescript': '^5.9.3'
+
 allowBuilds: {}
 autoInstallPeers: true
 
 blockExoticSubdeps: true
 
-# minimumReleaseAge: 2880
+minimumReleaseAge: 2880

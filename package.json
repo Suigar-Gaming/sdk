@@ -3,10 +3,10 @@
 	"private": true,
 	"license": "Apache-2.0",
 	"type": "module",
-	"packageManager": "pnpm@10.33.2",
+	"packageManager": "pnpm@10.33.4",
 	"engines": {
 		"node": "^22.18.0 || >=24",
-		"pnpm": ">=10.33.2"
+		"pnpm": ">=10.33.4"
 	},
 	"scripts": {
 		"changeset": "changeset",
@@ -24,13 +24,13 @@
 		"@changesets/cli": "^2.31.0",
 		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-		"eslint": "^10.3.0",
+		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.0.4",
 		"prettier": "^3.8.3",
-		"turbo": "^2.9.12",
-		"typescript": "^5.9.3",
+		"turbo": "^2.9.14",
+		"typescript": "catalog:typescript",
 		"typescript-eslint": "^8.59.3"
 	}
 }

@@ -18,15 +18,16 @@ concurrency:
 
 jobs:
   deprecate:
-    if: github.event.workflow_run.conclusion == 'success'
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
@@ -36,45 +37,27 @@ jobs:
       - name: Detect released packages
         id: release
         shell: bash
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          node <<'NODE' >> "$GITHUB_OUTPUT"
-          const { execSync } = require('node:child_process');
-          const { readFileSync } = require('node:fs');
-          const { join } = require('node:path');
+          BEFORE_SHA=$(git rev-parse "$HEAD_SHA^")
 
-          const changedFiles = execSync('git diff --name-only HEAD^ HEAD', { encoding: 'utf8' })
-            .trim()
-            .split('\n')
-            .filter(Boolean);
+          RELEASED_DIRS=$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA" | grep -E '/(package\.json|CHANGELOG\.md)$' | sed -E 's/\/(package\.json|CHANGELOG\.md)$//' | sort | uniq -c | awk '$1==2 {print $2}')
 
-          const pkgJsonDirs = new Set();
-          const changelogDirs = new Set();
+          RELEASED_PACKAGES="[]"
 
-          for (const file of changedFiles) {
-            const packageJsonMatch = file.match(/^(packages\/[^/]+)\/package\.json$/);
-            if (packageJsonMatch) {
-              pkgJsonDirs.add(packageJsonMatch[1]);
-            }
+          if [ -n "$RELEASED_DIRS" ]; then
+            RELEASED_PACKAGES=$(
+              for dir in $RELEASED_DIRS; do
+                git show "$HEAD_SHA:$dir/package.json" | jq -c --arg dir "$dir" '{dir: $dir, name: .name, version: .version}'
+              done | jq -s -c '.'
+            )
+          fi
 
-            const changelogMatch = file.match(/^(packages\/[^/]+)\/CHANGELOG\.md$/);
-            if (changelogMatch) {
-              changelogDirs.add(changelogMatch[1]);
-            }
-          }
+          SHOULD_DEPRECATE=$([ "$RELEASED_PACKAGES" != "[]" ] && echo "true" || echo "false")
 
-          const releasedDirs = [...pkgJsonDirs].filter((dir) => changelogDirs.has(dir));
-          const releasedPackages = releasedDirs.map((dir) => {
-            const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
-            return {
-              dir,
-              name: pkg.name,
-              version: pkg.version,
-            };
-          });
-
-          process.stdout.write(`should_deprecate=${releasedPackages.length > 0}\n`);
-          process.stdout.write(`released_packages=${JSON.stringify(releasedPackages)}\n`);
-          NODE
+          echo "should_deprecate=$SHOULD_DEPRECATE" >> "$GITHUB_OUTPUT"
+          echo "released_packages=$RELEASED_PACKAGES" >> "$GITHUB_OUTPUT"
 
       - name: Skip deprecation
         if: steps.release.outputs.should_deprecate != 'true'
@@ -94,44 +77,31 @@ jobs:
             exit 0
           fi
 
-          node <<'NODE'
-          const { execSync } = require('node:child_process');
+          echo "$RELEASED_PACKAGES" | jq -c '.[]' | while read -r pkg; do
+            NAME=$(echo "$pkg" | jq -r '.name')
+            VERSION=$(echo "$pkg" | jq -r '.version')
 
-          const releasedPackages = JSON.parse(process.env.RELEASED_PACKAGES);
+            if [[ "$VERSION" =~ [-+] ]]; then
+              continue
+            fi
 
-          for (const { name, version } of releasedPackages) {
-            const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-            if (!match) {
-              continue;
-            }
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
 
-            const [, major, minor, patch, prerelease] = match;
-            if (prerelease) {
-              continue;
-            }
+            PREVIOUS_PATCH=$((PATCH - 1))
+            if [ "$PREVIOUS_PATCH" -lt 0 ]; then
+              continue
+            fi
 
-            const previousPatch = Number(patch) - 1;
-            if (previousPatch < 0) {
-              continue;
-            }
+            PREVIOUS_VERSION="$MAJOR.$MINOR.$PREVIOUS_PATCH"
 
-            const previousVersion = `${major}.${minor}.${previousPatch}`;
+            if ! npm view "${NAME}@${PREVIOUS_VERSION}" version &>/dev/null; then
+              echo "Version ${NAME}@${PREVIOUS_VERSION} not found on npm; skipping deprecation."
+              continue
+            fi
 
-            try {
-              execSync(`npm view "${name}@${previousVersion}" version`, { stdio: 'ignore' });
-            } catch {
-              console.log(`Version ${name}@${previousVersion} not found on npm; skipping deprecation.`);
-              continue;
-            }
-
-            try {
-              execSync(
-                `npm deprecate "${name}@${previousVersion}" "Deprecated in favor of ${name}@${version}"`,
-                { stdio: 'inherit' },
-              );
-              console.log(`Deprecated ${name}@${previousVersion}.`);
-            } catch {
-              console.log(`Deprecation failed for ${name}@${previousVersion}; continuing without failing publish.`);
-            }
-          }
-          NODE
+            if npm deprecate "${NAME}@${PREVIOUS_VERSION}" "Deprecated in favor of ${NAME}@${VERSION}"; then
+              echo "Deprecated ${NAME}@${PREVIOUS_VERSION}."
+            else
+              echo "Deprecation failed for ${NAME}@${PREVIOUS_VERSION}; continuing without failing publish."
+            fi
+          done

@@ -65,17 +65,17 @@
 	},
 	"homepage": "https://docs.suigar.com/sdk",
 	"peerDependencies": {
-		"@mysten/bcs": "^2.0.5",
-		"@mysten/sui": "^2.16.2"
+		"@mysten/bcs": "catalog:mysten",
+		"@mysten/sui": "catalog:mysten"
 	},
 	"devDependencies": {
-		"@mysten/bcs": "^2.0.5",
+		"@mysten/bcs": "catalog:mysten",
 		"@mysten/codegen": "^0.10.6",
-		"@mysten/sui": "^2.16.2",
-		"@types/node": "^24.0.0",
+		"@mysten/sui": "catalog:mysten",
+		"@types/node": "catalog:typescript",
 		"tsdown": "^0.22.0",
-		"tsx": "^4.21.0",
-		"typescript": "^5.9.3",
+		"tsx": "^4.22.0",
+		"typescript": "catalog:typescript",
 		"vitest": "^4.1.6"
 	}
 }

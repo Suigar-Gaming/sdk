@@ -35,24 +35,45 @@ jobs:
           files_ignore: |
             .changeset/README.md
 
+      - name: Check SDK-affecting catalog changes
+        id: catalog-changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          CATALOG_NAMES=("mysten" "typescript")
+
+          PATTERN=$(IFS="|"; echo "${CATALOG_NAMES[*]}")
+          CATALOG_DIFF=$(git diff "$BASE_SHA"..HEAD -- pnpm-workspace.yaml | grep -E "^\+[[:space:]]+($PATTERN):" || true)
+          ANY_CHANGED="false"
+          ALL_CHANGED_FILES=""
+
+          if [ -n "$CATALOG_DIFF" ]; then
+            ANY_CHANGED="true"
+            ALL_CHANGED_FILES=$(echo "$CATALOG_DIFF" | awk -F'[ :]+' '{printf "pnpm-workspace.yaml:catalogs."$2" "}' | xargs)
+          fi
+
+          echo "any_changed=$ANY_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "all_changed_files=$ALL_CHANGED_FILES" >> "$GITHUB_OUTPUT"
+
       - name: Create missing changeset note
-        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        if: (steps.src-changes.outputs.any_changed == 'true' || steps.catalog-changes.outputs.any_changed == 'true') && steps.changeset-files.outputs.any_changed != 'true'
         env:
           CHANGED_SRC_FILES: ${{ steps.src-changes.outputs.all_changed_files }}
+          CHANGED_CATALOG_FILES: ${{ steps.catalog-changes.outputs.all_changed_files }}
         run: |
           {
-            echo "This pull request changes files under packages/*/src/ but does not include a changeset file in .changeset/."
+            echo "This pull request changes SDK source files or SDK-affecting pnpm catalogs but does not include a changeset file in .changeset/."
             echo
             echo "Add a changeset with pnpm changeset so this PR can merge."
             echo
             echo "Files that triggered this check:"
-            for file in $CHANGED_SRC_FILES; do
-              echo "- $file"
+            for file in $CHANGED_SRC_FILES $CHANGED_CATALOG_FILES; do
+              [ -n "$file" ] && echo "- $file"
             done
           } > missing-changeset.txt
 
       - name: Upload missing changeset artifact
-        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        if: (steps.src-changes.outputs.any_changed == 'true' || steps.catalog-changes.outputs.any_changed == 'true') && steps.changeset-files.outputs.any_changed != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: missing-changeset
@@ -64,7 +85,7 @@ jobs:
         run: pnpm changeset:version
 
       - name: Fail when changeset is missing
-        if: steps.src-changes.outputs.any_changed == 'true' && steps.changeset-files.outputs.any_changed != 'true'
+        if: (steps.src-changes.outputs.any_changed == 'true' || steps.catalog-changes.outputs.any_changed == 'true') && steps.changeset-files.outputs.any_changed != 'true'
         run: |
-          echo "This pull request modifies files under packages/*/src/ but does not include a changeset file in .changeset/."
+          echo "This pull request modifies SDK source files or SDK-affecting pnpm catalogs but does not include a changeset file in .changeset/."
           exit 1

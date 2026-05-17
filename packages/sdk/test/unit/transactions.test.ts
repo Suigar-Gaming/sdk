@@ -579,7 +579,7 @@ describe('transaction builders', () => {
 		expect(
 			(data.commands[1] as unknown as { MoveCall: { package: string } })
 				.MoveCall.package,
-		).toBe(normalizeSuiAddress('0xabc'));
+		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.coinflip));
 	});
 
 	it('builds pvp coinflip create and cancel transactions with the configured package id', () => {
@@ -614,11 +614,11 @@ describe('transaction builders', () => {
 		expect(
 			(createData.commands[1] as unknown as { MoveCall: { package: string } })
 				.MoveCall.package,
-		).toBe(normalizeSuiAddress('0x3'));
+		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip));
 		expect(
 			(cancelData.commands[0] as unknown as { MoveCall: { package: string } })
 				.MoveCall.package,
-		).toBe(normalizeSuiAddress('0x3'));
+		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip));
 	});
 });
 
@@ -682,7 +682,7 @@ describe('shared transaction helpers', () => {
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
 		expect(context!.betCount).toBe(3n);
-		expect(context!.priceInfoObjectId).toBe('0x789');
+		expect(context!.priceInfoObjectId).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
 		expect(context!.metadata).toEqual({
 			keys: ['partner', 'label'],
 			values: [
@@ -795,11 +795,11 @@ describe('coinflip transaction wrapper', () => {
 			arguments: unknown[];
 		}>(play);
 
-		expect(options.package).toBe('0xabc');
+		expect(options.package).toBe(TEST_CONFIG.packageIds.coinflip);
 		expect(options.typeArguments).toEqual([
 			normalizeStructTag('0x2::sui::SUI'),
 		]);
-		expect(options.arguments[0]).toBe('0x456');
+		expect(options.arguments[0]).toBe(TEST_CONFIG.packageIds.sweetHouse);
 		expect(options.arguments[1]).toBe(1000n);
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
@@ -808,7 +808,7 @@ describe('coinflip transaction wrapper', () => {
 			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
-		expect(options.arguments[7]).toBe('0x789');
+		expect(options.arguments[7]).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
 	});
 });
 
@@ -1018,11 +1018,11 @@ describe('pvp coinflip transaction wrapper', () => {
 			typeArguments: string[];
 			arguments: unknown[];
 		}>(createGame);
-		expect(options.package).toBe('0x3');
+		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.typeArguments).toEqual([
 			normalizeStructTag('0x2::sui::SUI'),
 		]);
-		expect(options.arguments[0]).toBe('0x456');
+		expect(options.arguments[0]).toBe(TEST_CONFIG.packageIds.sweetHouse);
 		expect(options.arguments[2]).toBe(true);
 		expect(options.arguments[3]).toBe(true);
 		expect(options.arguments[4]).toEqual(['partner', 'label']);
@@ -1060,15 +1060,15 @@ describe('pvp coinflip transaction wrapper', () => {
 			package: string;
 			arguments: unknown[];
 		}>(joinGame);
-		expect(options.package).toBe('0x3');
+		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments[0]).toBe('0x999');
-		expect(options.arguments[1]).toBe('0x456');
+		expect(options.arguments[1]).toBe(TEST_CONFIG.packageIds.sweetHouse);
 		expect(options.arguments[3]).toEqual(['partner', 'label']);
 		expect(options.arguments[4]).toEqual([
 			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
-		expect(options.arguments[5]).toBe('0x789');
+		expect(options.arguments[5]).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {
@@ -1094,7 +1094,10 @@ describe('pvp coinflip transaction wrapper', () => {
 		const options = getFirstMockArg<{
 			arguments: unknown[];
 		}>(cancelGame);
-		expect(options.arguments).toEqual(['0x999', '0x456']);
+		expect(options.arguments).toEqual([
+			'0x999',
+			TEST_CONFIG.packageIds.sweetHouse,
+		]);
 	});
 });
 
