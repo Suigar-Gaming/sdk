@@ -67,11 +67,8 @@ jobs:
             echo "Add a changeset with pnpm changeset so this PR can merge."
             echo
             echo "Files that triggered this check:"
-            for file in $CHANGED_SRC_FILES; do
-              echo "- $file"
-            done
-            for file in $CHANGED_CATALOG_FILES; do
-              echo "- $file"
+            for file in $CHANGED_SRC_FILES $CHANGED_CATALOG_FILES; do
+              [ -n "$file" ] && echo "- $file"
             done
           } > missing-changeset.txt
 
