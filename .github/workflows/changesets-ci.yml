@@ -40,14 +40,17 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          CATALOG_NAMES=("mysten" "typescript" "another-catalog")
+          CATALOG_NAMES=("mysten" "typescript")
 
           PATTERN=$(IFS="|"; echo "${CATALOG_NAMES[*]}")
+          CATALOG_DIFF=$(git diff "$BASE_SHA"..HEAD -- pnpm-workspace.yaml | grep -E "^\+[[:space:]]+($PATTERN):" || true)
+          ANY_CHANGED="false"
+          ALL_CHANGED_FILES=""
 
-          CATALOG_DIFF=$(git diff $BASE_SHA..HEAD -- pnpm-workspace.yaml | grep -E "^\+[[:space:]]+($PATTERN):")
-
-          ANY_CHANGED=$([ -n "$CATALOG_DIFF" ] && echo "true" || echo "false")
-          ALL_CHANGED_FILES=$(echo "$CATALOG_DIFF" | awk -F: '{print "pnpm-workspace.yaml:catalogs."$1}' | sed 's/\+//g' | tr '\n' ' ' | xargs)
+          if [ -n "$CATALOG_DIFF" ]; then
+            ANY_CHANGED="true"
+            ALL_CHANGED_FILES=$(echo "$CATALOG_DIFF" | awk -F'[ :]+' '{printf "pnpm-workspace.yaml:catalogs."$2" "}' | xargs)
+          fi
 
           echo "any_changed=$ANY_CHANGED" >> "$GITHUB_OUTPUT"
           echo "all_changed_files=$ALL_CHANGED_FILES" >> "$GITHUB_OUTPUT"
