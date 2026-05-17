@@ -40,7 +40,6 @@ jobs:
         env:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          # Safely find the absolute parent commit in the branch history context
           BEFORE_SHA=$(git rev-parse "$HEAD_SHA^")
 
           RELEASED_DIRS=$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA" | grep -E '/(package\.json|CHANGELOG\.md)$' | sed -E 's/\/(package\.json|CHANGELOG\.md)$//' | sort | uniq -c | awk '$1==2 {print $2}')
