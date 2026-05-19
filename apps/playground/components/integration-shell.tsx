@@ -56,6 +56,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { Switch } from '@/components/ui/switch';
 import { parseSuigarEvents } from '@/lib/event-parsing';
@@ -125,7 +126,7 @@ const ConnectButton = dynamic(
 	{
 		ssr: false,
 		loading: () => (
-			<div className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
+			<Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
 		),
 	},
 );
@@ -1298,6 +1299,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							<Link
 								href="/standard?game=coinflip"
 								scroll={false}
+								prefetch={false}
 								className="inline-flex min-w-0 items-center gap-2"
 							>
 								<Image
@@ -1361,7 +1363,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										</SelectContent>
 									</Select>
 								</div>
-							) : null}
+							) : (
+								<Skeleton
+									aria-hidden="true"
+									className="h-10 w-[10.5rem] shrink rounded-full"
+								/>
+							)}
 							<div className="min-w-0 shrink-0">
 								<ConnectButton className="wallet-connect" />
 							</div>

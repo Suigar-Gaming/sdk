@@ -4,6 +4,7 @@ import { Moon, SunMedium } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 function subscribe() {
@@ -40,7 +41,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 					<Moon className="size-4" />
 				)
 			) : (
-				<span aria-hidden="true" className="size-4" />
+				<Skeleton aria-hidden="true" className="size-4 rounded-full" />
 			)}
 		</Button>
 	);
