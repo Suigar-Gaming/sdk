@@ -7,7 +7,6 @@ import {
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
-	FieldTitle,
 } from '@/components/ui/field';
 import {
 	Select,
@@ -53,8 +52,9 @@ export function PvPCoinflipCreateForm({
 				</Field>
 				<Field className="h-full px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
 					<div className="flex items-center justify-between gap-3">
-						<FieldTitle>Private lobby</FieldTitle>
+						<FieldLabel htmlFor="pvp-private-lobby">Private lobby</FieldLabel>
 						<Switch
+							id="pvp-private-lobby"
 							checked={value.isPrivate}
 							onCheckedChange={(checked: boolean) =>
 								onChange({ isPrivate: checked })
