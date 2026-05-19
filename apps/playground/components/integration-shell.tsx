@@ -175,19 +175,28 @@ function getCoinDisplayAmount({
 function CoinSelectLabel({
 	coinKey,
 	amount,
+	hideTickerOnMobile = false,
 }: {
 	coinKey: SupportedCoinKey;
 	amount: string;
+	hideTickerOnMobile?: boolean;
 }) {
 	return (
-		<div className="flex min-w-0 items-center whitespace-nowrap gap-1">
+		<div className="flex min-w-0 items-center gap-2 whitespace-nowrap">
 			<CoinIcon coinKey={coinKey} className="size-5 shrink-0" />
-			<span className="min-w-0 truncate font-medium tabular-nums text-foreground">
-				{amount}
-			</span>
-			<span className="shrink-0 text-[0.65rem] text-muted-foreground md:text-[0.7rem]">
-				{coinKey.toUpperCase()}
-			</span>
+			<div className="flex min-w-0 items-center gap-1.5 leading-none">
+				<span className="min-w-0 truncate font-medium tabular-nums leading-none text-foreground">
+					{amount}
+				</span>
+				<span
+					className={cn(
+						'shrink-0 text-[0.68rem] leading-none font-semibold tracking-[0.08em] text-muted-foreground',
+						hideTickerOnMobile && 'hidden sm:inline',
+					)}
+				>
+					{coinKey.toUpperCase()}
+				</span>
+			</div>
 		</div>
 	);
 }
@@ -1277,7 +1286,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		<div className="min-h-screen">
 			<div className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5 md:pt-4 lg:px-8">
 				<div className="max-w-[1500px] mx-auto">
-					<nav className="flex items-center justify-between gap-3 px-3 py-2 sm:px-4 md:py-2.5 border-border/65 bg-card/58 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] rounded-[1.25rem] border backdrop-blur-2xl md:rounded-3xl">
+					<nav className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 sm:flex-nowrap sm:px-4 md:py-2.5 border-border/65 bg-card/58 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)] rounded-[1.25rem] border backdrop-blur-2xl md:rounded-3xl">
 						<div className="inline-flex min-w-0 shrink-0 items-center gap-2 px-1 py-1 rounded-full">
 							<Link
 								href="/standard?game=coinflip"
@@ -1303,17 +1312,17 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							</Link>
 						</div>
 
-						<div className="flex min-w-0 flex-1 items-center justify-end overflow-x-auto gap-2">
-							<ThemeToggle className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
+						<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
+							<ThemeToggle className="size-9 shrink-0 sm:size-10" />
 							{currentAccount ? (
-								<div className="shrink-0">
+								<div className="min-w-0 shrink">
 									<Select
 										value={selectedCoin}
-										onValueChange={(value) =>
+										onValueChange={(value: string) =>
 											setSelectedCoin(value as SupportedCoinKey)
 										}
 									>
-										<SelectTrigger className="h-10 w-auto min-w-[8.75rem] px-3 border-border/70 bg-background/55 rounded-full">
+										<SelectTrigger className="h-10 w-full min-w-0 max-w-[10.5rem] px-3 border-border/70 bg-background/55 rounded-full sm:w-auto sm:min-w-[8.75rem] sm:max-w-none">
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -1321,6 +1330,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 													balanceOwner,
 													balanceState: coinBalances[effectiveSelectedCoin],
 												})}
+												hideTickerOnMobile
 											/>
 										</SelectTrigger>
 										<SelectContent>
@@ -1342,8 +1352,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									</Select>
 								</div>
 							) : null}
-							<div className="shrink-0">
-								<ConnectButton />
+							<div className="min-w-0 shrink-0">
+								<ConnectButton className="wallet-connect" />
 							</div>
 						</div>
 					</nav>
@@ -1400,7 +1410,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											<div className="w-full sm:w-[12rem]">
 												<Select
 													value={standardGame}
-													onValueChange={(value) => {
+													onValueChange={(value: string) => {
 														setStandardGame(value as StandardGameId);
 														updateQuery('game', value);
 													}}
@@ -1422,7 +1432,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												<div className="w-full sm:w-[13rem]">
 													<Select
 														value={pvpGame}
-														onValueChange={(value) => {
+														onValueChange={(value: string) => {
 															setPvPGame(value as PvPGameId);
 															updateQuery('game', value);
 														}}
