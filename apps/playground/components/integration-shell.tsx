@@ -357,7 +357,7 @@ function FormSkeleton() {
 					<Skeleton className="h-4 w-28" />
 					<Skeleton className="h-11 rounded-2xl" />
 				</div>
-				<div className="space-y-2 rounded-2xl border border-border/70 bg-background/45 px-4 py-4">
+				<div className="space-y-2 pt-1">
 					<div className="flex items-center justify-between gap-3">
 						<Skeleton className="h-4 w-24" />
 						<Skeleton className="h-6 w-10 rounded-full" />
@@ -1423,12 +1423,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 										</SelectContent>
 									</Select>
 								</div>
-							) : (
-								<Skeleton
-									aria-hidden="true"
-									className="h-10 w-[10.5rem] shrink rounded-full"
-								/>
-							)}
+							) : null}
 							<div className="min-w-0 shrink-0">
 								<ConnectButton className="wallet-connect" />
 							</div>

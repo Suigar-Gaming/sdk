@@ -302,6 +302,7 @@ pre {
 }
 
 .wallet-connect::part(trigger) {
+	cursor: pointer;
 	height: 2.5rem;
 	min-inline-size: 9.5rem;
 	border-radius: calc(infinity * 1px);
