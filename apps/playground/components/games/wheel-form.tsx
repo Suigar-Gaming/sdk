@@ -41,10 +41,11 @@ export function WheelForm({
 				{playableConfigOptions.length > 0 ? (
 					<Select
 						value={value.configId}
-						onValueChange={(configId) => onChange({ configId })}
+						onValueChange={(configId: string) => onChange({ configId })}
 					>
 						<SelectTrigger
 							id="wheelConfigId"
+							aria-label="Select Wheel config"
 							className="h-11 px-4 bg-background/55 rounded-2xl"
 						>
 							<SelectValue />

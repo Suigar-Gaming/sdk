@@ -27,11 +27,14 @@ export function CoinflipForm({
 				<FieldLabel>Side</FieldLabel>
 				<Select
 					value={value.side}
-					onValueChange={(side) =>
-						onChange({ side: side as 'heads' | 'tails' })
+					onValueChange={(side: CoinflipFormValues['side']) =>
+						onChange({ side })
 					}
 				>
-					<SelectTrigger className="h-11 px-4 bg-background/55 rounded-2xl">
+					<SelectTrigger
+						aria-label="Select coinflip side"
+						className="h-11 px-4 bg-background/55 rounded-2xl"
+					>
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

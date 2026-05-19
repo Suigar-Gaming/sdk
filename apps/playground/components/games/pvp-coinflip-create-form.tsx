@@ -35,11 +35,14 @@ export function PvPCoinflipCreateForm({
 					<FieldLabel>Creator side</FieldLabel>
 					<Select
 						value={value.side}
-						onValueChange={(side) =>
-							onChange({ side: side as PvPCoinflipCreateFormValues['side'] })
+						onValueChange={(side: PvPCoinflipCreateFormValues['side']) =>
+							onChange({ side })
 						}
 					>
-						<SelectTrigger className="h-11 px-4 bg-background/55 rounded-2xl">
+						<SelectTrigger
+							aria-label="Select creator side"
+							className="h-11 px-4 bg-background/55 rounded-2xl"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -53,7 +56,9 @@ export function PvPCoinflipCreateForm({
 						<FieldTitle>Private lobby</FieldTitle>
 						<Switch
 							checked={value.isPrivate}
-							onCheckedChange={(checked) => onChange({ isPrivate: checked })}
+							onCheckedChange={(checked: boolean) =>
+								onChange({ isPrivate: checked })
+							}
 						/>
 					</div>
 					<FieldDescription size="sm">

@@ -41,10 +41,11 @@ export function PlinkoForm({
 				{playableConfigOptions.length > 0 ? (
 					<Select
 						value={value.configId}
-						onValueChange={(configId) => onChange({ configId })}
+						onValueChange={(configId: string) => onChange({ configId })}
 					>
 						<SelectTrigger
 							id="plinkoConfigId"
+							aria-label="Select Plinko board config"
 							className="h-11 px-4 bg-background/55 rounded-2xl"
 						>
 							<SelectValue />

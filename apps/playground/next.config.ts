@@ -4,6 +4,7 @@ import { basePath } from './lib/paths';
 
 const nextConfig: NextConfig = {
 	output: 'export',
+	productionBrowserSourceMaps: true,
 	trailingSlash: true,
 	basePath,
 	images: {

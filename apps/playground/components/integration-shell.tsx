@@ -5,7 +5,6 @@ import {
 	useCurrentClient,
 	useDAppKit,
 } from '@mysten/dapp-kit-react';
-import { ConnectButton } from '@mysten/dapp-kit-react/ui';
 import {
 	BookOpenText,
 	CirclePlus,
@@ -14,9 +13,9 @@ import {
 	ShieldX,
 	Swords,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { CodeSample } from '@/components/code-sample';
@@ -117,6 +116,19 @@ const PVP_ACTION_OPTIONS = [
 const PVP_GAME_OPTIONS = [
 	{ value: 'pvp-coinflip', label: 'PvP Coinflip' },
 ] as const satisfies ReadonlyArray<{ value: PvPGameId; label: string }>;
+
+const ConnectButton = dynamic(
+	() =>
+		import('@mysten/dapp-kit-react/ui').then((mod) => ({
+			default: mod.ConnectButton,
+		})),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
+		),
+	},
+);
 
 const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
@@ -336,7 +348,6 @@ function SectionShell({
 }
 
 function IntegrationContent({ mode }: { mode: Mode }) {
-	const searchParams = useSearchParams();
 	const dAppKit = useDAppKit();
 	const currentClient = useCurrentClient();
 	const currentAccount = useCurrentAccount();
@@ -389,15 +400,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const [isGameSettingsDialogOpen, setIsGameSettingsDialogOpen] =
 		React.useState(false);
 
-	const [standardGame, setStandardGame] = React.useState<StandardGameId>(() =>
-		getStandardGameFromParams(searchParams),
-	);
-	const [pvpAction, setPvPAction] = React.useState<PvPAction>(() =>
-		getPvPActionFromParams(searchParams),
-	);
-	const [pvpGame, setPvPGame] = React.useState<PvPGameId>(() =>
-		getPvPGameFromParams(searchParams),
-	);
+	const [standardGame, setStandardGame] =
+		React.useState<StandardGameId>('coinflip');
+	const [pvpAction, setPvPAction] = React.useState<PvPAction>('create');
+	const [pvpGame, setPvPGame] = React.useState<PvPGameId>('pvp-coinflip');
 
 	const coinTypes = currentClient.suigar.getConfig().coinTypes;
 	const coinOptions = React.useMemo(
@@ -437,6 +443,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			setPvPGame(getPvPGameFromParams(params));
 		};
 
+		syncFromLocation();
 		window.addEventListener('popstate', syncFromLocation);
 		return () => window.removeEventListener('popstate', syncFromLocation);
 	}, []);
@@ -1318,11 +1325,14 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								<div className="min-w-0 shrink">
 									<Select
 										value={selectedCoin}
-										onValueChange={(value: string) =>
-											setSelectedCoin(value as SupportedCoinKey)
+										onValueChange={(value: SupportedCoinKey) =>
+											setSelectedCoin(value)
 										}
 									>
-										<SelectTrigger className="h-10 w-full min-w-0 max-w-[10.5rem] px-3 border-border/70 bg-background/55 rounded-full sm:w-auto sm:min-w-[8.75rem] sm:max-w-none">
+										<SelectTrigger
+											aria-label="Select active coin"
+											className="h-10 w-full min-w-0 max-w-[10.5rem] px-3 border-border/70 bg-background/55 rounded-full sm:w-auto sm:min-w-[8.75rem] sm:max-w-none"
+										>
 											<CoinSelectLabel
 												coinKey={effectiveSelectedCoin}
 												amount={getCoinDisplayAmount({
@@ -1386,7 +1396,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											size="sm"
 											className="h-10 px-4 rounded-full"
 										>
-											<Link href="/standard?game=coinflip" scroll={false}>
+											<Link
+												href="/standard?game=coinflip"
+												scroll={false}
+												prefetch={false}
+											>
 												Standard
 											</Link>
 										</Button>
@@ -1399,6 +1413,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											<Link
 												href="/pvp?game=pvp-coinflip&action=create"
 												scroll={false}
+												prefetch={false}
 											>
 												PvP
 											</Link>
@@ -1410,12 +1425,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 											<div className="w-full sm:w-[12rem]">
 												<Select
 													value={standardGame}
-													onValueChange={(value: string) => {
-														setStandardGame(value as StandardGameId);
+													onValueChange={(value: StandardGameId) => {
+														setStandardGame(value);
 														updateQuery('game', value);
 													}}
 												>
-													<SelectTrigger className="h-11 px-4 border-border/70 bg-background/55 rounded-full">
+													<SelectTrigger
+														aria-label="Select standard game"
+														className="h-11 px-4 border-border/70 bg-background/55 rounded-full"
+													>
 														<SelectValue />
 													</SelectTrigger>
 													<SelectContent>
@@ -1432,12 +1450,15 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 												<div className="w-full sm:w-[13rem]">
 													<Select
 														value={pvpGame}
-														onValueChange={(value: string) => {
-															setPvPGame(value as PvPGameId);
+														onValueChange={(value: PvPGameId) => {
+															setPvPGame(value);
 															updateQuery('game', value);
 														}}
 													>
-														<SelectTrigger className="h-11 px-4 border-border/70 bg-background/55 rounded-full">
+														<SelectTrigger
+															aria-label="Select PvP game"
+															className="h-11 px-4 border-border/70 bg-background/55 rounded-full"
+														>
 															<SelectValue />
 														</SelectTrigger>
 														<SelectContent>
@@ -1490,6 +1511,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						</div>
 					</section>
 
+					<h2 className="sr-only">
+						{mode === 'standard'
+							? `${getStandardGameLabel(standardGame)} playground controls`
+							: 'PvP Coinflip playground controls'}
+					</h2>
 					<div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-6">
 						<SectionShell
 							title={
@@ -1717,7 +1743,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						href="https://docs.suigar.com/sdk"
 						target="_blank"
 						rel="noreferrer"
-						aria-label="Open SDK documentation"
+						aria-label="SDK Docs, opens in a new tab"
 						title="SDK Docs"
 					>
 						<BookOpenText className="size-5 md:size-6" />
