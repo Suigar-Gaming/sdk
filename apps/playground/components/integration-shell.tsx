@@ -9,6 +9,7 @@ import {
 	BookOpenText,
 	CirclePlus,
 	Cog,
+	FileCode2,
 	Gamepad2,
 	ShieldX,
 	Swords,
@@ -348,6 +349,63 @@ function SectionShell({
 	);
 }
 
+function FormSkeleton() {
+	return (
+		<div className="space-y-6">
+			<div className="grid gap-4 md:grid-cols-2">
+				<div className="space-y-2">
+					<Skeleton className="h-4 w-28" />
+					<Skeleton className="h-11 rounded-2xl" />
+				</div>
+				<div className="space-y-2 rounded-2xl border border-border/70 bg-background/45 px-4 py-4">
+					<div className="flex items-center justify-between gap-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-6 w-10 rounded-full" />
+					</div>
+					<Skeleton className="h-4 w-40" />
+				</div>
+			</div>
+			<div className="space-y-2">
+				<Skeleton className="h-4 w-20" />
+				<Skeleton className="h-11 rounded-2xl" />
+			</div>
+			<div className="space-y-2">
+				<Skeleton className="h-4 w-44" />
+				<Skeleton className="h-4 w-72" />
+			</div>
+		</div>
+	);
+}
+
+function CodeSampleSkeleton() {
+	return (
+		<Card className="h-full">
+			<CardHeader>
+				<div className="space-y-2">
+					<CardTitle className="flex items-center gap-2">
+						<FileCode2 className="size-5 text-secondary dark:text-primary" />
+						Transaction code
+					</CardTitle>
+					<CardDescription>
+						The code block updates live from the current form state and matches
+						the builder call executed by the wallet.
+					</CardDescription>
+				</div>
+			</CardHeader>
+			<CardContent>
+				<div className="space-y-3 rounded-2xl border border-border/70 bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] p-4">
+					<Skeleton className="h-4 w-[92%] bg-white/10" />
+					<Skeleton className="h-4 w-[86%] bg-white/10" />
+					<Skeleton className="h-4 w-[78%] bg-white/10" />
+					<Skeleton className="h-4 w-[88%] bg-white/10" />
+					<Skeleton className="h-4 w-[64%] bg-white/10" />
+					<Skeleton className="h-4 w-[72%] bg-white/10" />
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
 function IntegrationContent({ mode }: { mode: Mode }) {
 	const dAppKit = useDAppKit();
 	const currentClient = useCurrentClient();
@@ -405,6 +463,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		React.useState<StandardGameId>('coinflip');
 	const [pvpAction, setPvPAction] = React.useState<PvPAction>('create');
 	const [pvpGame, setPvPGame] = React.useState<PvPGameId>('pvp-coinflip');
+	const [isRouteReady, setIsRouteReady] = React.useState(false);
 
 	const coinTypes = currentClient.suigar.getConfig().coinTypes;
 	const coinOptions = React.useMemo(
@@ -442,6 +501,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			setStandardGame(getStandardGameFromParams(params));
 			setPvPAction(getPvPActionFromParams(params));
 			setPvPGame(getPvPGameFromParams(params));
+			setIsRouteReady(true);
 		};
 
 		syncFromLocation();
@@ -1428,7 +1488,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 									</div>
 
 									<div className="flex flex-wrap items-center gap-2">
-										{mode === 'standard' ? (
+										{!isRouteReady ? (
+											mode === 'standard' ? (
+												<Skeleton className="h-11 w-full rounded-full sm:w-[12rem]" />
+											) : (
+												<div className="flex flex-wrap items-center gap-2">
+													<Skeleton className="h-11 w-full rounded-full sm:w-[13rem]" />
+													<div className="flex flex-wrap gap-2">
+														<Skeleton className="h-10 w-24 rounded-full" />
+														<Skeleton className="h-10 w-20 rounded-full" />
+														<Skeleton className="h-10 w-24 rounded-full" />
+													</div>
+												</div>
+											)
+										) : mode === 'standard' ? (
 											<div className="w-full sm:w-[12rem]">
 												<Select
 													value={standardGame}
@@ -1519,16 +1592,24 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					</section>
 
 					<h2 className="sr-only">
-						{mode === 'standard'
-							? `${getStandardGameLabel(standardGame)} playground controls`
-							: 'PvP Coinflip playground controls'}
+						{!isRouteReady
+							? mode === 'standard'
+								? 'Standard playground controls'
+								: 'PvP playground controls'
+							: mode === 'standard'
+								? `${getStandardGameLabel(standardGame)} playground controls`
+								: 'PvP Coinflip playground controls'}
 					</h2>
 					<div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-6">
 						<SectionShell
 							title={
-								mode === 'standard'
-									? `${getStandardGameLabel(standardGame)} controls`
-									: 'PvP Coinflip controls'
+								!isRouteReady
+									? mode === 'standard'
+										? 'Game controls'
+										: 'PvP controls'
+									: mode === 'standard'
+										? `${getStandardGameLabel(standardGame)} controls`
+										: 'PvP Coinflip controls'
 							}
 							icon={
 								mode === 'standard' ? (
@@ -1538,9 +1619,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								)
 							}
 							description={
-								mode === 'standard'
-									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
-									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
+								!isRouteReady
+									? 'Loading the route-specific game controls.'
+									: mode === 'standard'
+										? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
+										: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
 							}
 							action={
 								<Button
@@ -1556,7 +1639,9 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 							}
 						>
 							<div className="space-y-6">
-								{mode === 'standard' ? (
+								{!isRouteReady ? (
+									<FormSkeleton />
+								) : mode === 'standard' ? (
 									<>
 										{standardGame === 'coinflip' ? (
 											<CoinflipForm
@@ -1709,7 +1794,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						</SectionShell>
 
 						<div className="flex flex-col gap-6">
-							<CodeSample code={currentCode} />
+							{isRouteReady ? (
+								<CodeSample code={currentCode} />
+							) : (
+								<CodeSampleSkeleton />
+							)}
 
 							<ExecuteTransactionCard
 								onExecute={handleExecute}
