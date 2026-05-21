@@ -1834,7 +1834,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 						href="https://docs.suigar.com/sdk"
 						target="_blank"
 						rel="noreferrer"
-						aria-label="SDK Docs, opens in a new tab"
+						aria-label="Open SDK Docs in a new tab"
 						title="SDK Docs"
 					>
 						<BookOpenText className="size-5 md:size-6" />
