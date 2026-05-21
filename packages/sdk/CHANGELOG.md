@@ -1,5 +1,12 @@
 # @suigar/sdk
 
+## 2.0.0-beta.19
+
+### Minor Changes
+
+- 10f49e2: Bump the SDK's `@mysten/sui` dependency to the latest shared workspace minor
+  release and align the package metadata and lockfile with that update.
+
 ## 2.0.0-beta.18
 
 ### Patch Changes
