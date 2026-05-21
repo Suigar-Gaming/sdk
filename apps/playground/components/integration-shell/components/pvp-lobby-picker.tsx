@@ -4,6 +4,10 @@ import { Copy, RefreshCw } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
 import { CoinIcon } from '@/components/coins';
+import {
+	parseCoinKey,
+	parseCoinTypeLabel,
+} from '@/components/integration-shell/helpers/coin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,33 +39,6 @@ type Props = {
 	onRefresh: () => void;
 	onSelectGame: (game: PvPCoinflipLobbyGame) => void;
 };
-
-function parseCoinTypeLabel(
-	coinType: string,
-	coinTypes: Record<SupportedCoinKey, string>,
-) {
-	const matchingEntry = (
-		Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>
-	).find(([, configuredCoinType]) => configuredCoinType === coinType);
-
-	if (matchingEntry) {
-		return matchingEntry[0].toUpperCase();
-	}
-
-	const segments = coinType.split('::');
-	return segments[segments.length - 1] ?? coinType;
-}
-
-function parseCoinKey(
-	coinType: string,
-	coinTypes: Record<SupportedCoinKey, string>,
-) {
-	return (
-		(Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>).find(
-			([, configuredCoinType]) => configuredCoinType === coinType,
-		)?.[0] ?? null
-	);
-}
 
 export function PvPLobbyPicker({
 	title,
