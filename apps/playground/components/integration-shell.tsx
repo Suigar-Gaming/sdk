@@ -9,7 +9,6 @@ import {
 	BookOpenText,
 	CirclePlus,
 	Cog,
-	FileCode2,
 	Gamepad2,
 	ShieldX,
 	Swords,
@@ -19,7 +18,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
-import { CodeSample } from '@/components/code-sample';
+import { CodeSample, CodeSampleSkeleton } from '@/components/code-sample';
 import { CoinIcon } from '@/components/coins';
 import { EventsTable } from '@/components/events-table';
 import { ExecuteTransactionCard } from '@/components/execute-transaction';
@@ -374,35 +373,6 @@ function FormSkeleton() {
 				<Skeleton className="h-4 w-72" />
 			</div>
 		</div>
-	);
-}
-
-function CodeSampleSkeleton() {
-	return (
-		<Card className="h-full">
-			<CardHeader>
-				<div className="space-y-2">
-					<CardTitle className="flex items-center gap-2">
-						<FileCode2 className="size-5 text-secondary dark:text-primary" />
-						Transaction code
-					</CardTitle>
-					<CardDescription>
-						The code block updates live from the current form state and matches
-						the builder call executed by the wallet.
-					</CardDescription>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<div className="space-y-3 rounded-2xl border border-border/70 bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] p-4">
-					<Skeleton className="h-4 w-[92%] bg-white/10" />
-					<Skeleton className="h-4 w-[86%] bg-white/10" />
-					<Skeleton className="h-4 w-[78%] bg-white/10" />
-					<Skeleton className="h-4 w-[88%] bg-white/10" />
-					<Skeleton className="h-4 w-[64%] bg-white/10" />
-					<Skeleton className="h-4 w-[72%] bg-white/10" />
-				</div>
-			</CardContent>
-		</Card>
 	);
 }
 
