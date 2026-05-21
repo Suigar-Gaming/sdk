@@ -136,11 +136,11 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	const { addRows } = useEventLog();
 
 	const [standardForms, setStandardForms] = usePersistentForms<StandardForms>(
-		'suigar-example-standard-forms-v2',
+		'suigar-playground:standard-game:forms',
 		DEFAULT_STANDARD_FORMS,
 	);
 	const [pvpForms, setPvpForms] = usePersistentForms<PvPCoinflipForms>(
-		'suigar-example-pvp-forms-v2',
+		'suigar-playground:pvp-game:forms',
 		DEFAULT_PVP_FORMS,
 	);
 	const [selectedCoin, setSelectedCoin] =
