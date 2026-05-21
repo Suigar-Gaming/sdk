@@ -7,7 +7,6 @@ import {
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
-	FieldTitle,
 } from '@/components/ui/field';
 import {
 	Select,
@@ -35,11 +34,14 @@ export function PvPCoinflipCreateForm({
 					<FieldLabel>Creator side</FieldLabel>
 					<Select
 						value={value.side}
-						onValueChange={(side) =>
-							onChange({ side: side as PvPCoinflipCreateFormValues['side'] })
+						onValueChange={(side: PvPCoinflipCreateFormValues['side']) =>
+							onChange({ side })
 						}
 					>
-						<SelectTrigger className="h-11 px-4 bg-background/55 rounded-2xl">
+						<SelectTrigger
+							aria-label="Select creator side"
+							className="h-11 px-4 bg-background/55 rounded-2xl"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -50,10 +52,13 @@ export function PvPCoinflipCreateForm({
 				</Field>
 				<Field className="h-full px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
 					<div className="flex items-center justify-between gap-3">
-						<FieldTitle>Private lobby</FieldTitle>
+						<FieldLabel htmlFor="pvp-private-lobby">Private lobby</FieldLabel>
 						<Switch
+							id="pvp-private-lobby"
 							checked={value.isPrivate}
-							onCheckedChange={(checked) => onChange({ isPrivate: checked })}
+							onCheckedChange={(checked: boolean) =>
+								onChange({ isPrivate: checked })
+							}
 						/>
 					</div>
 					<FieldDescription size="sm">

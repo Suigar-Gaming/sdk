@@ -114,19 +114,6 @@ function FieldLabel({
 	);
 }
 
-function FieldTitle({ className, ...props }: React.ComponentProps<'div'>) {
-	return (
-		<div
-			data-slot="field-label"
-			className={cn(
-				'flex w-fit items-center text-sm font-medium gap-2 group-data-[disabled=true]/field:opacity-50',
-				className,
-			)}
-			{...props}
-		/>
-	);
-}
-
 const fieldDescriptionVariants = cva(
 	'font-normal group-has-data-horizontal/field:text-balance [&>a]:underline [&>a]:underline-offset-4 [[data-variant=legend]+&]:-mt-1.5 last:mt-0 nth-last-2:-mt-1 text-left text-muted-foreground [&>a:hover]:text-primary',
 	{
@@ -263,5 +250,4 @@ export {
 	FieldSeparator,
 	FieldSet,
 	FieldContent,
-	FieldTitle,
 };

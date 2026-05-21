@@ -301,6 +301,14 @@ pre {
 	font-family: var(--font-mono), monospace;
 }
 
+.wallet-connect::part(trigger) {
+	cursor: pointer;
+	height: 2.5rem;
+	min-inline-size: 9.5rem;
+	border-radius: calc(infinity * 1px);
+	padding-inline: 1rem;
+}
+
 @media (max-width: 1536px) {
 	html {
 		font-size: 15.5px;
@@ -328,5 +336,14 @@ pre {
 @media (max-width: 640px) {
 	html {
 		font-size: 14px;
+	}
+}
+
+@media (max-width: 480px) {
+	.wallet-connect::part(trigger) {
+		height: 2.25rem;
+		min-inline-size: 8.5rem;
+		padding-inline: 0.8rem;
+		font-size: 0.875rem;
 	}
 }

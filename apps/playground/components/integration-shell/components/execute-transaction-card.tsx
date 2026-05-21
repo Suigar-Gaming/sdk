@@ -2,6 +2,7 @@
 
 import { useCurrentAccount } from '@mysten/dapp-kit-react';
 import { CheckCircle2, SendHorizontal, Swords } from 'lucide-react';
+import * as React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,13 @@ export function ExecuteTransactionCard({
 	error,
 }: Props) {
 	const currentAccount = useCurrentAccount();
+	const isHydrated = React.useSyncExternalStore(
+		() => () => {},
+		() => true,
+		() => false,
+	);
+
+	const isExecuteDisabled = !isHydrated || isExecuting || !currentAccount;
 
 	return (
 		<Card>
@@ -46,7 +54,7 @@ export function ExecuteTransactionCard({
 						size="lg"
 						className="h-10 px-5 rounded-2xl"
 						onClick={onExecute}
-						disabled={isExecuting || !currentAccount}
+						disabled={isExecuteDisabled}
 					>
 						{isExecuting ? (
 							<Spinner data-icon="size-4 inline-start" />

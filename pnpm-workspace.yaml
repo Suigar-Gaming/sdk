@@ -7,12 +7,12 @@ packages:
 catalogs:
   mysten:
     '@mysten/bcs': '^2.0.5'
-    '@mysten/sui': '^2.16.3'
+    '@mysten/sui': '^2.17.0'
   typescript:
     '@types/node': '^24.0.0'
     'typescript': '^5.9.3'
 
-allowBuilds: {}
+allowBuilds: { esbuild: false, sharp: false, unrs-resolver: false }
 autoInstallPeers: true
 
 blockExoticSubdeps: true

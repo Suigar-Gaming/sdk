@@ -23,6 +23,8 @@ import type {
 
 type TxApi = SuigarClient['tx'];
 
+export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
+
 function buildSharedOptions(
 	owner: string,
 	coinType: string,
@@ -50,6 +52,22 @@ function buildSharedOptions(
 
 function toCodeBlock(factoryLine: string, codeLines: string[]) {
 	return `${factoryLine} {\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
+}
+
+export function buildPvPPreviewFallback(
+	action: 'join' | 'cancel',
+	{
+		owner,
+		coinType,
+	}: {
+		owner: string;
+		coinType: string;
+	},
+) {
+	return toCodeBlock(
+		`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
+		[`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '0xGAME_ID',`],
+	);
 }
 
 export function buildStandardTransaction<K extends StandardGameId>(

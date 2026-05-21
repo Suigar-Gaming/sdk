@@ -12,9 +12,9 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { GameConfigOption, WheelFormValues } from '@/lib/suigar-types';
+import type { GameConfigOption, PlinkoFormValues } from '@/lib/suigar-types';
 
-export function WheelForm({
+export function PlinkoForm({
 	value,
 	onChange,
 	configOptions,
@@ -22,8 +22,8 @@ export function WheelForm({
 	configError,
 	stakeDescription,
 }: {
-	value: WheelFormValues;
-	onChange: (patch: Partial<WheelFormValues>) => void;
+	value: PlinkoFormValues;
+	onChange: (patch: Partial<PlinkoFormValues>) => void;
 	configOptions?: GameConfigOption[];
 	isConfigLoading?: boolean;
 	configError?: string | null;
@@ -37,14 +37,15 @@ export function WheelForm({
 	return (
 		<div className="space-y-6">
 			<Field>
-				<FieldLabel htmlFor="wheelConfigId">Wheel config ID</FieldLabel>
+				<FieldLabel htmlFor="plinkoConfigId">Board config ID</FieldLabel>
 				{playableConfigOptions.length > 0 ? (
 					<Select
 						value={value.configId}
-						onValueChange={(configId) => onChange({ configId })}
+						onValueChange={(configId: string) => onChange({ configId })}
 					>
 						<SelectTrigger
-							id="wheelConfigId"
+							id="plinkoConfigId"
+							aria-label="Select Plinko board config"
 							className="h-11 px-4 bg-background/55 rounded-2xl"
 						>
 							<SelectValue />
@@ -59,7 +60,7 @@ export function WheelForm({
 					</Select>
 				) : (
 					<Input
-						id="wheelConfigId"
+						id="plinkoConfigId"
 						type="number"
 						step="1"
 						className="h-11 px-4 bg-background/55 rounded-2xl"
@@ -73,12 +74,12 @@ export function WheelForm({
 					) : isConfigLoading ? (
 						<span className="inline-flex items-center gap-1.5">
 							<Spinner className="size-3.5" />
-							Loading Wheel configs from on-chain parameters.
+							Loading Plinko configs from on-chain parameters.
 						</span>
 					) : configError ? (
-						`Unable to load on-chain Wheel configs: ${configError}`
+						`Unable to load on-chain Plinko configs: ${configError}`
 					) : (
-						'Enter a wheel config id manually if on-chain configs are unavailable.'
+						'Enter a board config id manually if on-chain configs are unavailable.'
 					)}
 				</FieldDescription>
 			</Field>

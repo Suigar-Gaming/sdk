@@ -9,7 +9,6 @@ import {
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
-	FieldTitle,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -96,11 +95,14 @@ export function RangeForm({
 				<div className="flex h-full w-full items-start md:justify-start">
 					<Field className="w-full md:max-w-sm px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
 						<div className="flex items-center justify-between gap-3">
-							<FieldTitle>Out of range</FieldTitle>
+							<FieldLabel htmlFor="range-out-of-range">Out of range</FieldLabel>
 							<Switch
+								id="range-out-of-range"
 								size="default"
 								checked={value.outOfRange}
-								onCheckedChange={(checked) => onChange({ outOfRange: checked })}
+								onCheckedChange={(checked: boolean) =>
+									onChange({ outOfRange: checked })
+								}
 							/>
 						</div>
 						<FieldDescription size="sm">
