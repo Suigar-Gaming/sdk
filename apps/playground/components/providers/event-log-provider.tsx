@@ -70,7 +70,7 @@ export function EventLogProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useEventLog() {
-	const context = React.useContext(EventLogContext);
+	const context = React.use(EventLogContext);
 
 	if (!context) {
 		throw new Error('useEventLog must be used inside EventLogProvider');

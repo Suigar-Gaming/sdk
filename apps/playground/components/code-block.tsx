@@ -37,7 +37,7 @@ export function CodeBlock({
 							type="button"
 							variant="outline"
 							size="icon-sm"
-							className="h-7 w-7 border-white/12 bg-white/6 text-slate-300 hover:bg-white/10 hover:text-white rounded-full"
+							className="size-7 border-white/12 bg-white/6 text-slate-300 hover:bg-white/10 hover:text-white rounded-full"
 							onClick={handleCopy}
 							title={copyTitle}
 							aria-label={copyTitle}

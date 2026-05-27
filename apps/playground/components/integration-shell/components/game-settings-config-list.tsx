@@ -60,7 +60,7 @@ export function GameSettingsConfigList({
 									>
 										{option.isPlayable ? 'Playable' : 'Disabled'}
 									</Badge>
-									<AccordionTrigger className="flex h-8 w-8 flex-none items-center justify-center **:data-[slot=accordion-trigger-icon]:ml-0 border-border/70 hover:bg-foreground/10 rounded-full border cursor-pointer">
+									<AccordionTrigger className="flex size-8 flex-none items-center justify-center **:data-[slot=accordion-trigger-icon]:ml-0 border-border/70 hover:bg-foreground/10 rounded-full border cursor-pointer">
 										<span className="sr-only">
 											Toggle {option.label} details
 										</span>
@@ -105,9 +105,9 @@ export function GameSettingsConfigList({
 											<FieldCode>{option.multiplierValues.length}</FieldCode>
 										</div>
 										<div className="flex flex-wrap gap-1.5">
-											{option.multiplierValues.map((value, index) => (
+											{option.multiplierValues.map((value) => (
 												<FieldCode
-													key={`${option.id}-multiplier-${index}`}
+													key={`${option.id}-multiplier-${value}`}
 													className="shrink-0"
 												>
 													{value}

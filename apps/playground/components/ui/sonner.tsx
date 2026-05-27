@@ -1,26 +1,33 @@
 'use client';
 
-import { useTheme } from 'next-themes';
 import * as React from 'react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import { useTheme } from '@/components/providers/theme-provider';
+
+function subscribeToMobileViewport(onStoreChange: () => void) {
+	if (typeof window === 'undefined') {
+		return () => {};
+	}
+
+	const mediaQuery = window.matchMedia('(max-width: 640px)');
+	mediaQuery.addEventListener('change', onStoreChange);
+
+	return () => {
+		mediaQuery.removeEventListener('change', onStoreChange);
+	};
+}
+
+function getMobileViewportSnapshot() {
+	return window.matchMedia('(max-width: 640px)').matches;
+}
 
 function Toaster({ ...props }: ToasterProps) {
 	const { theme = 'system' } = useTheme();
-	const [isMobile, setIsMobile] = React.useState(false);
-
-	React.useEffect(() => {
-		const mediaQuery = window.matchMedia('(max-width: 640px)');
-		const updateMatches = (event: MediaQueryList | MediaQueryListEvent) => {
-			setIsMobile(event.matches);
-		};
-
-		updateMatches(mediaQuery);
-		mediaQuery.addEventListener('change', updateMatches);
-
-		return () => {
-			mediaQuery.removeEventListener('change', updateMatches);
-		};
-	}, []);
+	const isMobile = React.useSyncExternalStore(
+		subscribeToMobileViewport,
+		getMobileViewportSnapshot,
+		() => false,
+	);
 
 	return (
 		<Sonner
