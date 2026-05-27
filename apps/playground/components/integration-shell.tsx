@@ -9,6 +9,7 @@ import { BookOpenText, Cog, Gamepad2, Swords } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { EventsTable } from '@/components/events-table';
@@ -26,7 +27,6 @@ import {
 } from '@/components/integration-shell/components/code-sample';
 import { CoinSelectLabel } from '@/components/integration-shell/components/coin-select-label';
 import { ExecuteTransactionCard } from '@/components/integration-shell/components/execute-transaction-card';
-import { FormSkeleton } from '@/components/integration-shell/components/form-skeleton';
 import { GameSettingsDialog } from '@/components/integration-shell/components/game-settings-dialog';
 import { IntegrationShellLayout } from '@/components/integration-shell/components/integration-shell-layout';
 import { PvPLobbyPicker } from '@/components/integration-shell/components/pvp-lobby-picker';
@@ -115,6 +115,249 @@ import {
 import { cn } from '@/lib/utils';
 
 type Mode = 'standard' | 'pvp';
+type UiState = {
+	selectedCoin: SupportedCoinKey;
+	status: string | null;
+	error: string | null;
+	isExecuting: boolean;
+	showPrivateJoinLobbies: boolean;
+	isGameSettingsDialogOpen: boolean;
+};
+type CoinBalancesState = {
+	coinBalances: Record<SupportedCoinKey, CoinBalanceState>;
+	balanceOwner: string | null;
+};
+type LobbyState = {
+	games: PvPCoinflipLobbyGame[];
+	error: string | null;
+	isLoading: boolean;
+};
+type StandardParametersState = {
+	summary: StandardGameParametersSummary | null;
+	payload: unknown;
+	error: string | null;
+	isLoading: boolean;
+};
+type PvPParametersState = {
+	summary: PvPGameParametersSummary | null;
+	payload: unknown;
+	error: string | null;
+	isLoading: boolean;
+};
+
+const DEFAULT_COIN_BALANCES: Record<SupportedCoinKey, CoinBalanceState> = {
+	sui: { balance: null, isLoading: false, error: null },
+	usdc: { balance: null, isLoading: false, error: null },
+};
+const initialUiState: UiState = {
+	selectedCoin: 'sui',
+	status: null,
+	error: null,
+	isExecuting: false,
+	showPrivateJoinLobbies: false,
+	isGameSettingsDialogOpen: false,
+};
+const initialCoinBalancesState: CoinBalancesState = {
+	coinBalances: DEFAULT_COIN_BALANCES,
+	balanceOwner: null,
+};
+const initialLobbyState: LobbyState = {
+	games: [],
+	error: null,
+	isLoading: false,
+};
+const initialStandardParametersState: StandardParametersState = {
+	summary: null,
+	payload: null,
+	error: null,
+	isLoading: false,
+};
+const initialPvPParametersState: PvPParametersState = {
+	summary: null,
+	payload: null,
+	error: null,
+	isLoading: false,
+};
+
+type UiAction =
+	| { type: 'set-selected-coin'; value: SupportedCoinKey }
+	| { type: 'set-status'; value: string | null }
+	| { type: 'set-error'; value: string | null }
+	| { type: 'set-is-executing'; value: boolean }
+	| { type: 'set-show-private-join-lobbies'; value: boolean }
+	| { type: 'set-is-game-settings-dialog-open'; value: boolean }
+	| { type: 'clear-feedback' };
+type CoinBalancesAction =
+	| { type: 'reset' }
+	| { type: 'loading'; coinKeys: SupportedCoinKey[] }
+	| {
+			type: 'loaded';
+			owner: string;
+			results: Array<[SupportedCoinKey, CoinBalanceState]>;
+	  };
+type LobbyAction =
+	| { type: 'loading' }
+	| { type: 'loaded'; games: PvPCoinflipLobbyGame[] }
+	| { type: 'error'; error: string };
+type StandardParametersAction =
+	| { type: 'loading' }
+	| { type: 'loaded'; payload: unknown; summary: StandardGameParametersSummary }
+	| { type: 'error'; error: string };
+type PvPParametersAction =
+	| { type: 'loading' }
+	| { type: 'loaded'; payload: unknown; summary: PvPGameParametersSummary }
+	| { type: 'error'; error: string }
+	| { type: 'reset' };
+
+function uiReducer(state: UiState, action: UiAction): UiState {
+	switch (action.type) {
+		case 'set-selected-coin':
+			return { ...state, selectedCoin: action.value };
+		case 'set-status':
+			return { ...state, status: action.value };
+		case 'set-error':
+			return { ...state, error: action.value };
+		case 'set-is-executing':
+			return { ...state, isExecuting: action.value };
+		case 'set-show-private-join-lobbies':
+			return { ...state, showPrivateJoinLobbies: action.value };
+		case 'set-is-game-settings-dialog-open':
+			return { ...state, isGameSettingsDialogOpen: action.value };
+		case 'clear-feedback':
+			return { ...state, status: null, error: null };
+	}
+}
+
+function coinBalancesReducer(
+	state: CoinBalancesState,
+	action: CoinBalancesAction,
+): CoinBalancesState {
+	switch (action.type) {
+		case 'reset':
+			return initialCoinBalancesState;
+		case 'loading': {
+			const nextBalances = { ...state.coinBalances };
+			for (const coinKey of action.coinKeys) {
+				nextBalances[coinKey] = {
+					...nextBalances[coinKey],
+					isLoading: true,
+					error: null,
+				};
+			}
+			return { ...state, coinBalances: nextBalances };
+		}
+		case 'loaded': {
+			const nextBalances = { ...state.coinBalances };
+			for (const [coinKey, value] of action.results) {
+				nextBalances[coinKey] = value;
+			}
+			return {
+				balanceOwner: action.owner,
+				coinBalances: nextBalances,
+			};
+		}
+	}
+}
+
+function lobbyReducer(state: LobbyState, action: LobbyAction): LobbyState {
+	switch (action.type) {
+		case 'loading':
+			return { ...state, isLoading: true, error: null };
+		case 'loaded':
+			return { games: action.games, error: null, isLoading: false };
+		case 'error':
+			return { games: [], error: action.error, isLoading: false };
+	}
+}
+
+function standardParametersReducer(
+	state: StandardParametersState,
+	action: StandardParametersAction,
+): StandardParametersState {
+	switch (action.type) {
+		case 'loading':
+			return { ...initialStandardParametersState, isLoading: true };
+		case 'loaded':
+			return {
+				summary: action.summary,
+				payload: action.payload,
+				error: null,
+				isLoading: false,
+			};
+		case 'error':
+			return { ...initialStandardParametersState, error: action.error };
+	}
+}
+
+function pvpParametersReducer(
+	state: PvPParametersState,
+	action: PvPParametersAction,
+): PvPParametersState {
+	switch (action.type) {
+		case 'loading':
+			return { ...initialPvPParametersState, isLoading: true };
+		case 'loaded':
+			return {
+				summary: action.summary,
+				payload: action.payload,
+				error: null,
+				isLoading: false,
+			};
+		case 'error':
+			return { ...initialPvPParametersState, error: action.error };
+		case 'reset':
+			return initialPvPParametersState;
+	}
+}
+
+function clampStakeValue(
+	stake: string,
+	stakeRange?: { min: string; max: string },
+) {
+	if (!stakeRange) {
+		return stake;
+	}
+
+	const currentStake = parseOptionalNumber(stake);
+	const minStake = parseOptionalNumber(stakeRange.min);
+	const maxStake = parseOptionalNumber(stakeRange.max);
+
+	if (
+		currentStake === undefined ||
+		minStake === undefined ||
+		maxStake === undefined
+	) {
+		return stake;
+	}
+
+	if (currentStake < minStake) {
+		return stakeRange.min;
+	}
+
+	if (currentStake > maxStake) {
+		return stakeRange.max;
+	}
+
+	return stake;
+}
+
+function resolvePlayableConfigId(
+	currentConfigId: string,
+	configOptions?: StandardGameParametersSummary['configOptions'],
+) {
+	if (!configOptions?.length) {
+		return currentConfigId;
+	}
+
+	const nextConfig =
+		configOptions.find(
+			(option) => option.id === currentConfigId && option.isPlayable,
+		) ??
+		configOptions.find((option) => option.isPlayable) ??
+		configOptions[0];
+
+	return nextConfig?.id ?? currentConfigId;
+}
 
 const ConnectButton = dynamic(
 	() =>
@@ -129,118 +372,544 @@ const ConnectButton = dynamic(
 	},
 );
 
-function IntegrationContent({ mode }: { mode: Mode }) {
+const floatingActionNode = (
+	<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
+		<Button
+			asChild
+			className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
+		>
+			<a
+				href="https://docs.suigar.com/sdk"
+				target="_blank"
+				rel="noreferrer"
+				aria-label="Open SDK Docs in a new tab"
+				title="SDK Docs"
+			>
+				<BookOpenText className="size-5 md:size-6" />
+				SDK Docs
+			</a>
+		</Button>
+	</div>
+);
+const eventsNode = <EventsTable />;
+
+function subscribe() {
+	return () => {};
+}
+
+function IntegrationHero({
+	mode,
+	standardGame,
+	pvpGame,
+	pvpAction,
+	onStandardGameChange,
+	onPvPGameChange,
+	onPvPActionChange,
+}: {
+	mode: Mode;
+	standardGame: StandardGameId;
+	pvpGame: PvPGameId;
+	pvpAction: PvPAction;
+	onStandardGameChange: (value: StandardGameId) => void;
+	onPvPGameChange: (value: PvPGameId) => void;
+	onPvPActionChange: (value: PvPAction) => void;
+}) {
+	return (
+		<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+			<div className="relative flex flex-col gap-4">
+				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+					<div className="space-y-2">
+						<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
+							Suigar SDK playground
+						</h1>
+						<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+							Build standard and PvP transactions, inspect the exact builder
+							call, execute it, and keep a shared decoded event log.
+						</p>
+					</div>
+
+					<div className="flex flex-col gap-3 lg:min-w-[360px] lg:items-end">
+						<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+							<Button
+								asChild
+								variant={mode === 'standard' ? 'control-active' : 'control'}
+								size="sm"
+								className="h-10 rounded-full px-4"
+							>
+								<Link
+									href="/standard?game=coinflip"
+									scroll={false}
+									prefetch={false}
+								>
+									Standard
+								</Link>
+							</Button>
+							<Button
+								asChild
+								variant={mode === 'pvp' ? 'control-active' : 'control'}
+								size="sm"
+								className="h-10 rounded-full px-4"
+							>
+								<Link
+									href="/pvp?game=pvp-coinflip&action=create"
+									scroll={false}
+									prefetch={false}
+								>
+									PvP
+								</Link>
+							</Button>
+						</div>
+
+						<div className="flex flex-wrap items-center gap-2">
+							{mode === 'standard' ? (
+								<div className="w-full sm:w-[12rem]">
+									<Select
+										value={standardGame}
+										onValueChange={onStandardGameChange}
+									>
+										<SelectTrigger
+											aria-label="Select standard game"
+											className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+										>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											{STANDARD_GAME_OPTIONS.map((game) => (
+												<SelectItem key={game.value} value={game.value}>
+													{game.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+							) : (
+								<div className="flex flex-wrap items-center gap-2">
+									<div className="w-full sm:w-[13rem]">
+										<Select value={pvpGame} onValueChange={onPvPGameChange}>
+											<SelectTrigger
+												aria-label="Select PvP game"
+												className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+											>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{PVP_GAME_OPTIONS.map((game) => (
+													<SelectItem key={game.value} value={game.value}>
+														{game.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</div>
+									<div className="flex flex-wrap gap-2">
+										{PVP_ACTION_OPTIONS.map((action) => (
+											<Button
+												key={action.value}
+												type="button"
+												size="sm"
+												variant={
+													pvpAction === action.value
+														? 'control-active'
+														: 'control'
+												}
+												onClick={() => onPvPActionChange(action.value)}
+												className={cn(
+													'h-10 justify-start rounded-full px-4',
+													pvpAction === action.value && 'shadow-none',
+												)}
+											>
+												<action.icon className="size-4" />
+												{action.label}
+											</Button>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+
+				<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
+					Stake inputs use human values like{' '}
+					<span className="font-medium text-foreground">1</span> or{' '}
+					<span className="font-medium text-foreground">2.5</span> and are
+					converted to atomic units in the generated transaction.
+				</div>
+			</div>
+		</section>
+	);
+}
+
+function IntegrationSidebar({
+	currentCode,
+	handleExecute,
+	isExecuting,
+	status,
+	error,
+}: {
+	currentCode: string;
+	handleExecute: () => Promise<void>;
+	isExecuting: boolean;
+	status: string | null;
+	error: string | null;
+}) {
+	return (
+		<div className="flex flex-col gap-6">
+			<CodeSample code={currentCode} />
+			<ExecuteTransactionCard
+				onExecute={handleExecute}
+				isExecuting={isExecuting}
+				status={status}
+				error={error}
+			/>
+		</div>
+	);
+}
+
+function IntegrationControls({
+	mode,
+	standardGame,
+	pvpAction,
+	currentAccount,
+	effectiveStandardForms,
+	effectivePvpForms,
+	standardGameParameters,
+	isStandardGameParametersLoading,
+	standardGameParametersError,
+	stakeDescription,
+	limboTargetMultiplierDescription,
+	rangeBoundsDescription,
+	pvpStakeDescription,
+	showPrivateJoinLobbies,
+	setShowPrivateJoinLobbies,
+	joinLobbyGames,
+	cancelLobbyGames,
+	pvpLobbyError,
+	isPvPLobbyLoading,
+	pvpForms,
+	coinTypes,
+	onRefreshPvPLobbies,
+	onSelectPvPLobby,
+	updateStandardForm,
+	updatePvPForm,
+	openSettings,
+}: {
+	mode: Mode;
+	standardGame: StandardGameId;
+	pvpAction: PvPAction;
+	currentAccount: ReturnType<typeof useCurrentAccount>;
+	effectiveStandardForms: StandardForms;
+	effectivePvpForms: PvPCoinflipForms;
+	standardGameParameters: StandardGameParametersSummary | null;
+	isStandardGameParametersLoading: boolean;
+	standardGameParametersError: string | null;
+	stakeDescription: React.ReactNode;
+	limboTargetMultiplierDescription: React.ReactNode;
+	rangeBoundsDescription: React.ReactNode;
+	pvpStakeDescription: React.ReactNode;
+	showPrivateJoinLobbies: boolean;
+	setShowPrivateJoinLobbies: (value: boolean) => void;
+	joinLobbyGames: PvPCoinflipLobbyGame[];
+	cancelLobbyGames: PvPCoinflipLobbyGame[];
+	pvpLobbyError: string | null;
+	isPvPLobbyLoading: boolean;
+	pvpForms: PvPCoinflipForms;
+	coinTypes: Record<SupportedCoinKey, string>;
+	onRefreshPvPLobbies: () => void;
+	onSelectPvPLobby: (
+		action: 'join' | 'cancel',
+		game: PvPCoinflipLobbyGame,
+	) => void;
+	updateStandardForm: <K extends StandardGameId>(
+		game: K,
+		patch: Partial<StandardForms[K]>,
+	) => void;
+	updatePvPForm: <K extends PvPAction>(
+		action: K,
+		patch: Partial<PvPCoinflipForms[K]>,
+	) => void;
+	openSettings: () => void;
+}) {
+	const controlsIcon =
+		mode === 'standard' ? (
+			<Gamepad2 className="size-5 text-secondary dark:text-primary" />
+		) : (
+			<Swords className="size-5 text-secondary dark:text-primary" />
+		);
+
+	return (
+		<>
+			<h2 className="sr-only">
+				{mode === 'standard'
+					? `${getStandardGameLabel(standardGame)} playground controls`
+					: 'PvP Coinflip playground controls'}
+			</h2>
+			<SectionShell
+				title={
+					mode === 'standard'
+						? `${getStandardGameLabel(standardGame)} controls`
+						: 'PvP Coinflip controls'
+				}
+				icon={controlsIcon}
+				description={
+					mode === 'standard'
+						? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
+						: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
+				}
+				action={
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						onClick={openSettings}
+						className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
+					>
+						<Cog className="size-4" />
+						Settings
+					</Button>
+				}
+			>
+				<div className="space-y-6">
+					{mode === 'standard' ? (
+						<>
+							{standardGame === 'coinflip' ? (
+								<CoinflipForm
+									value={effectiveStandardForms.coinflip}
+									onChange={(patch) => updateStandardForm('coinflip', patch)}
+									stakeDescription={stakeDescription}
+								/>
+							) : null}
+							{standardGame === 'limbo' ? (
+								<LimboForm
+									value={effectiveStandardForms.limbo}
+									onChange={(patch) => updateStandardForm('limbo', patch)}
+									stakeDescription={stakeDescription}
+									targetMultiplierDescription={limboTargetMultiplierDescription}
+								/>
+							) : null}
+							{standardGame === 'plinko' ? (
+								<PlinkoForm
+									value={effectiveStandardForms.plinko}
+									onChange={(patch) => updateStandardForm('plinko', patch)}
+									configOptions={standardGameParameters?.configOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+								/>
+							) : null}
+							{standardGame === 'range' ? (
+								<RangeForm
+									value={effectiveStandardForms.range}
+									onChange={(patch) => updateStandardForm('range', patch)}
+									stakeDescription={stakeDescription}
+									rangeBoundsDescription={rangeBoundsDescription}
+								/>
+							) : null}
+							{standardGame === 'wheel' ? (
+								<WheelForm
+									value={effectiveStandardForms.wheel}
+									onChange={(patch) => updateStandardForm('wheel', patch)}
+									configOptions={standardGameParameters?.configOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+								/>
+							) : null}
+						</>
+					) : (
+						<>
+							{pvpAction === 'create' ? (
+								<PvPCoinflipCreateForm
+									value={effectivePvpForms.create}
+									onChange={(patch) => updatePvPForm('create', patch)}
+									stakeDescription={pvpStakeDescription}
+								/>
+							) : null}
+							{pvpAction === 'join' ? (
+								<>
+									<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
+										<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+											<div className="min-w-0 space-y-1">
+												<FieldLabel htmlFor="join-private-lobbies">
+													Show private lobbies
+												</FieldLabel>
+												<FieldDescription size="sm">
+													Public unresolved lobbies stay visible even when the
+													wallet is disconnected.
+												</FieldDescription>
+											</div>
+											<Switch
+												id="join-private-lobbies"
+												size="default"
+												className="mt-0.5 justify-self-end self-start"
+												checked={showPrivateJoinLobbies}
+												onCheckedChange={setShowPrivateJoinLobbies}
+											/>
+										</FieldGroup>
+									</div>
+									<PvPLobbyPicker
+										title="Open lobbies to join"
+										description="Unresolved PvP lobbies are shown here. Selecting one fills the join form and switches the selected coin when needed."
+										games={joinLobbyGames}
+										selectedGameId={pvpForms.join.gameId}
+										isLoading={isPvPLobbyLoading}
+										error={pvpLobbyError}
+										emptyMessage="No matching unresolved PvP lobbies were found."
+										coinTypes={coinTypes}
+										formatAmount={formatBalance}
+										getCoinDecimals={(value) => {
+											const matchingCoinKey = resolveCoinKeyForType(
+												value,
+												coinTypes,
+											);
+											return matchingCoinKey
+												? COIN_DECIMALS[matchingCoinKey]
+												: 9;
+										}}
+										onRefresh={onRefreshPvPLobbies}
+										onSelectGame={(game) => onSelectPvPLobby('join', game)}
+									/>
+									<PvPCoinflipJoinForm value={effectivePvpForms.join} />
+								</>
+							) : null}
+							{pvpAction === 'cancel' ? (
+								<>
+									<PvPLobbyPicker
+										title="Your unresolved lobbies"
+										description="Only PvP games created by the connected wallet are shown here. Selecting one fills the cancel form and keeps execution tied to that on-chain game."
+										games={cancelLobbyGames}
+										selectedGameId={pvpForms.cancel.gameId}
+										isLoading={isPvPLobbyLoading}
+										error={pvpLobbyError}
+										emptyMessage={
+											currentAccount
+												? 'No matching unresolved PvP lobbies were found.'
+												: 'Connect a wallet to load the unresolved PvP lobbies you can cancel.'
+										}
+										coinTypes={coinTypes}
+										formatAmount={formatBalance}
+										getCoinDecimals={(value) => {
+											const matchingCoinKey = resolveCoinKeyForType(
+												value,
+												coinTypes,
+											);
+											return matchingCoinKey
+												? COIN_DECIMALS[matchingCoinKey]
+												: 9;
+										}}
+										onRefresh={onRefreshPvPLobbies}
+										onSelectGame={(game) => onSelectPvPLobby('cancel', game)}
+									/>
+									<PvPCoinflipCancelForm value={effectivePvpForms.cancel} />
+								</>
+							) : null}
+						</>
+					)}
+				</div>
+			</SectionShell>
+		</>
+	);
+}
+
+function useIntegrationState({
+	mode,
+	routeParams,
+	isRouteReady,
+	setRouteSearch,
+}: {
+	mode: Mode;
+	routeParams: URLSearchParams;
+	isRouteReady: boolean;
+	setRouteSearch: React.Dispatch<React.SetStateAction<string>>;
+}) {
+	const pathname = usePathname();
+	const { replace } = useRouter();
 	const dAppKit = useDAppKit();
 	const currentClient = useCurrentClient();
 	const currentAccount = useCurrentAccount();
 	const { addRows } = useEventLog();
+	const standardGame = getStandardGameFromParams(routeParams);
+	const pvpAction = getPvPActionFromParams(routeParams);
+	const pvpGame = getPvPGameFromParams(routeParams);
 
 	const [standardForms, setStandardForms] = usePersistentForms<StandardForms>(
-		'suigar-example-standard-forms-v2',
+		'suigar-playground:standard-game:forms',
 		DEFAULT_STANDARD_FORMS,
 	);
 	const [pvpForms, setPvpForms] = usePersistentForms<PvPCoinflipForms>(
-		'suigar-example-pvp-forms-v2',
+		'suigar-playground:pvp-game:forms',
 		DEFAULT_PVP_FORMS,
 	);
-	const [selectedCoin, setSelectedCoin] =
-		React.useState<SupportedCoinKey>('sui');
-	const [status, setStatus] = React.useState<string | null>(null);
-	const [error, setError] = React.useState<string | null>(null);
-	const [isExecuting, setIsExecuting] = React.useState(false);
-	const [pvpLobbyGames, setPvPLobbyGames] = React.useState<
-		PvPCoinflipLobbyGame[]
-	>([]);
-	const [pvpLobbyError, setPvPLobbyError] = React.useState<string | null>(null);
-	const [isPvPLobbyLoading, setIsPvPLobbyLoading] = React.useState(false);
-	const [pvpLobbyRefreshKey, setPvPLobbyRefreshKey] = React.useState(0);
-	const [
-		standardGameParametersRefreshKey,
-		setStandardGameParametersRefreshKey,
-	] = React.useState(0);
-	const [pvpGameParametersRefreshKey, setPvPGameParametersRefreshKey] =
-		React.useState(0);
-	const [showPrivateJoinLobbies, setShowPrivateJoinLobbies] =
-		React.useState(false);
-	const [standardGameParameters, setStandardGameParameters] =
-		React.useState<StandardGameParametersSummary | null>(null);
-	const [standardGameParametersPayload, setStandardGameParametersPayload] =
-		React.useState<unknown>(null);
-	const [standardGameParametersError, setStandardGameParametersError] =
-		React.useState<string | null>(null);
-	const [isStandardGameParametersLoading, setIsStandardGameParametersLoading] =
-		React.useState(false);
-	const [pvpGameParameters, setPvPGameParameters] =
-		React.useState<PvPGameParametersSummary | null>(null);
-	const [pvpGameParametersPayload, setPvPGameParametersPayload] =
-		React.useState<unknown>(null);
-	const [pvpGameParametersError, setPvPGameParametersError] = React.useState<
-		string | null
-	>(null);
-	const [isPvPGameParametersLoading, setIsPvPGameParametersLoading] =
-		React.useState(false);
-	const [isGameSettingsDialogOpen, setIsGameSettingsDialogOpen] =
-		React.useState(false);
-
-	const [standardGame, setStandardGame] =
-		React.useState<StandardGameId>('coinflip');
-	const [pvpAction, setPvPAction] = React.useState<PvPAction>('create');
-	const [pvpGame, setPvPGame] = React.useState<PvPGameId>('pvp-coinflip');
-	const [isRouteReady, setIsRouteReady] = React.useState(false);
+	const [uiState, dispatchUi] = React.useReducer(uiReducer, initialUiState);
+	const [coinBalancesState, dispatchCoinBalances] = React.useReducer(
+		coinBalancesReducer,
+		initialCoinBalancesState,
+	);
+	const [lobbyState, dispatchLobby] = React.useReducer(
+		lobbyReducer,
+		initialLobbyState,
+	);
+	const [standardParametersState, dispatchStandardParameters] =
+		React.useReducer(standardParametersReducer, initialStandardParametersState);
+	const [pvpParametersState, dispatchPvPParameters] = React.useReducer(
+		pvpParametersReducer,
+		initialPvPParametersState,
+	);
 
 	const coinTypes = currentClient.suigar.getConfig().coinTypes;
 	const coinOptions = React.useMemo(
 		() => Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>,
 		[coinTypes],
 	);
+	const {
+		selectedCoin,
+		status,
+		error,
+		isExecuting,
+		showPrivateJoinLobbies,
+		isGameSettingsDialogOpen,
+	} = uiState;
 	const effectiveSelectedCoin = coinTypes[selectedCoin]
 		? selectedCoin
 		: (coinOptions[0]?.[0] ?? 'sui');
 	const coinType = coinTypes[effectiveSelectedCoin];
 	const previewOwner = currentAccount?.address ?? PREVIEW_PLAYER_ADDRESS;
 	const visibleStatus = currentAccount ? status : null;
-	const [coinBalances, setCoinBalances] = React.useState<
-		Record<SupportedCoinKey, CoinBalanceState>
-	>({
-		sui: { balance: null, isLoading: false, error: null },
-		usdc: { balance: null, isLoading: false, error: null },
-	});
-	const [balanceOwner, setBalanceOwner] = React.useState<string | null>(null);
-	const [balanceRefreshKey, setBalanceRefreshKey] = React.useState(0);
-	const previousModeRef = React.useRef<Mode>(mode);
-	const previousStandardGameRef = React.useRef<StandardGameId>(standardGame);
-	const previousPvPGameRef = React.useRef<PvPGameId>(pvpGame);
-	const previousPvPActionRef = React.useRef<PvPAction>(pvpAction);
-	const forceRefreshStandardGameParametersRef = React.useRef(false);
-	const forceRefreshPvPGameParametersRef = React.useRef(false);
-
-	React.useEffect(() => {
-		if (typeof window === 'undefined') {
+	const { coinBalances, balanceOwner } = coinBalancesState;
+	const {
+		games: pvpLobbyGames,
+		error: pvpLobbyError,
+		isLoading: isPvPLobbyLoading,
+	} = lobbyState;
+	const {
+		summary: standardGameParameters,
+		payload: standardGameParametersPayload,
+		error: standardGameParametersError,
+		isLoading: isStandardGameParametersLoading,
+	} = standardParametersState;
+	const {
+		summary: pvpGameParameters,
+		payload: pvpGameParametersPayload,
+		error: pvpGameParametersError,
+		isLoading: isPvPGameParametersLoading,
+	} = pvpParametersState;
+	const refreshBalances = React.useCallback(async () => {
+		if (!isRouteReady) {
 			return;
 		}
 
-		const syncFromLocation = () => {
-			const params = new URLSearchParams(window.location.search);
-			setStandardGame(getStandardGameFromParams(params));
-			setPvPAction(getPvPActionFromParams(params));
-			setPvPGame(getPvPGameFromParams(params));
-			setIsRouteReady(true);
-		};
-
-		syncFromLocation();
-		window.addEventListener('popstate', syncFromLocation);
-		return () => window.removeEventListener('popstate', syncFromLocation);
-	}, []);
-
-	React.useEffect(() => {
 		if (!currentAccount) {
+			dispatchCoinBalances({ type: 'reset' });
 			return;
 		}
 
-		let cancelled = false;
+		dispatchCoinBalances({
+			type: 'loading',
+			coinKeys: coinOptions.map(([coinKey]) => coinKey),
+		});
 
-		const fetchBalances = async () => {
-			const results = await Promise.all(
+		const results: Array<[SupportedCoinKey, CoinBalanceState]> =
+			await Promise.all(
 				coinOptions.map(async ([coinKey, value]) => {
 					try {
 						const response = await currentClient.getBalance({
@@ -257,7 +926,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								isLoading: false,
 								error: null,
 							},
-						] as const;
+						];
 					} catch (balanceError) {
 						return [
 							coinKey,
@@ -266,223 +935,141 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 								isLoading: false,
 								error: parseError(balanceError),
 							},
-						] as const;
+						];
 					}
 				}),
 			);
 
-			if (cancelled) {
+		dispatchCoinBalances({
+			type: 'loaded',
+			owner: currentAccount.address,
+			results,
+		});
+	}, [coinOptions, currentAccount, currentClient, isRouteReady]);
+
+	React.useEffect(() => {
+		void refreshBalances();
+	}, [refreshBalances]);
+
+	const refreshStandardGameParameters = React.useCallback(
+		async (ignoreCache = false) => {
+			if (!isRouteReady) {
 				return;
 			}
 
-			setBalanceOwner(currentAccount.address);
-			setCoinBalances((current) => {
-				const next = { ...current };
-				for (const [coinKey, state] of results) {
-					next[coinKey] = state;
-				}
-				return next;
-			});
-		};
-
-		void fetchBalances();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [balanceRefreshKey, coinOptions, currentAccount, currentClient]);
-
-	React.useEffect(() => {
-		let cancelled = false;
-		const shouldIgnoreCache = forceRefreshStandardGameParametersRef.current;
-		forceRefreshStandardGameParametersRef.current = false;
-
-		const fetchStandardGameParameters = async () => {
-			setIsStandardGameParametersLoading(true);
-			setStandardGameParameters(null);
-			setStandardGameParametersPayload(null);
-			setStandardGameParametersError(null);
+			dispatchStandardParameters({ type: 'loading' });
 
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
 					standardGame,
-					{ coinType, ignoreCache: shouldIgnoreCache },
+					{ coinType, ignoreCache },
 				);
 
-				if (cancelled) {
-					return;
-				}
-
-				setStandardGameParametersPayload(parameters);
-				setStandardGameParameters(
-					summarizeStandardGameParameters(
+				dispatchStandardParameters({
+					type: 'loaded',
+					payload: parameters,
+					summary: summarizeStandardGameParameters(
 						standardGame,
 						parameters,
 						COIN_DECIMALS[effectiveSelectedCoin],
 					),
-				);
+				});
 			} catch (parametersError) {
-				if (cancelled) {
-					return;
-				}
-
-				setStandardGameParameters(null);
-				setStandardGameParametersPayload(null);
-				setStandardGameParametersError(parseError(parametersError));
-			} finally {
-				if (!cancelled) {
-					setIsStandardGameParametersLoading(false);
-				}
+				dispatchStandardParameters({
+					type: 'error',
+					error: parseError(parametersError),
+				});
 			}
-		};
-
-		void fetchStandardGameParameters();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [
-		coinType,
-		currentClient,
-		effectiveSelectedCoin,
-		standardGame,
-		standardGameParametersRefreshKey,
-	]);
+		},
+		[
+			coinType,
+			currentClient,
+			effectiveSelectedCoin,
+			isRouteReady,
+			standardGame,
+		],
+	);
 
 	React.useEffect(() => {
-		if (mode !== 'pvp') {
-			return;
-		}
+		void refreshStandardGameParameters();
+	}, [refreshStandardGameParameters]);
 
-		let cancelled = false;
-		const shouldIgnoreCache = forceRefreshPvPGameParametersRef.current;
-		forceRefreshPvPGameParametersRef.current = false;
+	const refreshPvPGameParameters = React.useCallback(
+		async (ignoreCache = false) => {
+			if (!isRouteReady) {
+				return;
+			}
 
-		const fetchPvPGameParameters = async () => {
-			setIsPvPGameParametersLoading(true);
-			setPvPGameParameters(null);
-			setPvPGameParametersPayload(null);
-			setPvPGameParametersError(null);
+			if (mode !== 'pvp') {
+				dispatchPvPParameters({ type: 'reset' });
+				return;
+			}
+
+			dispatchPvPParameters({ type: 'loading' });
 
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
 					pvpGame,
 					{
 						coinType,
-						ignoreCache: shouldIgnoreCache,
+						ignoreCache,
 					},
 				);
 
-				if (cancelled) {
-					return;
-				}
-
-				setPvPGameParametersPayload(parameters);
-				setPvPGameParameters(
-					summarizePvPGameParameters(
+				dispatchPvPParameters({
+					type: 'loaded',
+					payload: parameters,
+					summary: summarizePvPGameParameters(
 						pvpGame,
 						parameters,
 						COIN_DECIMALS[effectiveSelectedCoin],
 					),
-				);
+				});
 			} catch (parametersError) {
-				if (cancelled) {
-					return;
-				}
-
-				setPvPGameParameters(null);
-				setPvPGameParametersPayload(null);
-				setPvPGameParametersError(parseError(parametersError));
-			} finally {
-				if (!cancelled) {
-					setIsPvPGameParametersLoading(false);
-				}
+				dispatchPvPParameters({
+					type: 'error',
+					error: parseError(parametersError),
+				});
 			}
-		};
-
-		void fetchPvPGameParameters();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [
-		coinType,
-		currentClient,
-		effectiveSelectedCoin,
-		mode,
-		pvpGame,
-		pvpGameParametersRefreshKey,
-	]);
+		},
+		[
+			coinType,
+			currentClient,
+			effectiveSelectedCoin,
+			isRouteReady,
+			mode,
+			pvpGame,
+		],
+	);
 
 	React.useEffect(() => {
-		const previousMode = previousModeRef.current;
-		const previousStandardGame = previousStandardGameRef.current;
-		const previousPvPGame = previousPvPGameRef.current;
-		const previousPvPAction = previousPvPActionRef.current;
+		void refreshPvPGameParameters();
+	}, [refreshPvPGameParameters]);
 
-		const modeChanged = previousMode !== mode;
-		const standardGameChanged = previousStandardGame !== standardGame;
-		const pvpGameChanged = previousPvPGame !== pvpGame;
-		const pvpActionChanged = previousPvPAction !== pvpAction;
-
-		if (modeChanged || (mode === 'standard' && standardGameChanged)) {
-			setStandardForms(DEFAULT_STANDARD_FORMS);
-			setStatus(null);
-			setError(null);
+	const refreshPvPLobbies = React.useCallback(async () => {
+		if (!isRouteReady) {
+			return;
 		}
 
-		if (
-			modeChanged ||
-			(mode === 'pvp' && (pvpGameChanged || pvpActionChanged))
-		) {
-			setPvpForms(DEFAULT_PVP_FORMS);
-			setStatus(null);
-			setError(null);
-		}
-
-		previousModeRef.current = mode;
-		previousStandardGameRef.current = standardGame;
-		previousPvPGameRef.current = pvpGame;
-		previousPvPActionRef.current = pvpAction;
-	}, [mode, pvpAction, pvpGame, setPvpForms, setStandardForms, standardGame]);
-
-	React.useEffect(() => {
 		if (mode !== 'pvp') {
 			return;
 		}
 
-		let cancelled = false;
+		dispatchLobby({ type: 'loading' });
 
-		const fetchPvPLobbies = async () => {
-			setIsPvPLobbyLoading(true);
-			setPvPLobbyError(null);
+		try {
+			const games = await currentClient.suigar.getPvPCoinflipGames({
+				limit: 50,
+			});
+			dispatchLobby({ type: 'loaded', games });
+		} catch (lobbyError) {
+			dispatchLobby({ type: 'error', error: parseError(lobbyError) });
+		}
+	}, [currentClient, isRouteReady, mode]);
 
-			try {
-				const games = await currentClient.suigar.getPvPCoinflipGames({
-					limit: 50,
-				});
-
-				if (!cancelled) {
-					setPvPLobbyGames(games);
-				}
-			} catch (lobbyError) {
-				if (!cancelled) {
-					setPvPLobbyGames([]);
-					setPvPLobbyError(parseError(lobbyError));
-				}
-			} finally {
-				if (!cancelled) {
-					setIsPvPLobbyLoading(false);
-				}
-			}
-		};
-
-		void fetchPvPLobbies();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [currentClient, mode, pvpLobbyRefreshKey]);
+	React.useEffect(() => {
+		void refreshPvPLobbies();
+	}, [refreshPvPLobbies]);
 
 	const normalizedCurrentAccount =
 		currentAccount?.address.toLowerCase() ?? null;
@@ -506,8 +1093,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			),
 		[activeConfigId, standardGame, standardGameParameters],
 	);
-	const stakeDescription = React.useMemo(() => {
-		return (
+	const stakeDescription = React.useMemo(
+		() => (
 			<StakeDescription
 				stakeRange={activeStakeRange}
 				isLoading={isStandardGameParametersLoading}
@@ -517,16 +1104,17 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					activeConfigOption && !activeConfigOption.isPlayable,
 				)}
 			/>
-		);
-	}, [
-		activeConfigOption,
-		activeStakeRange,
-		effectiveSelectedCoin,
-		isStandardGameParametersLoading,
-		standardGameParametersError,
-	]);
-	const pvpStakeDescription = React.useMemo(() => {
-		return (
+		),
+		[
+			activeConfigOption,
+			activeStakeRange,
+			effectiveSelectedCoin,
+			isStandardGameParametersLoading,
+			standardGameParametersError,
+		],
+	);
+	const pvpStakeDescription = React.useMemo(
+		() => (
 			<PvPStakeDescription
 				mode={mode}
 				pvpAction={pvpAction}
@@ -535,20 +1123,18 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				error={pvpGameParametersError}
 				effectiveSelectedCoin={effectiveSelectedCoin}
 			/>
-		);
-	}, [
-		effectiveSelectedCoin,
-		isPvPGameParametersLoading,
-		mode,
-		pvpAction,
-		pvpGameParameters,
-		pvpGameParametersError,
-	]);
-	const standardGameLabel = React.useMemo(
-		() => getStandardGameLabel(standardGame),
-		[standardGame],
+		),
+		[
+			effectiveSelectedCoin,
+			isPvPGameParametersLoading,
+			mode,
+			pvpAction,
+			pvpGameParameters,
+			pvpGameParametersError,
+		],
 	);
-	const pvpGameLabel = React.useMemo(() => getPvPGameLabel(pvpGame), [pvpGame]);
+	const standardGameLabel = getStandardGameLabel(standardGame);
+	const pvpGameLabel = getPvPGameLabel(pvpGame);
 	const serializedGameSettings = React.useMemo(
 		() =>
 			mode === 'standard'
@@ -560,13 +1146,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					: null,
 		[mode, pvpGameParametersPayload, standardGameParametersPayload],
 	);
-	const settingsCallPreview = React.useMemo(
-		() =>
-			mode === 'standard'
-				? `client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`
-				: `client.suigar.getGameParameters('${pvpGame}', { coinType: '${coinType}' })`,
-		[coinType, mode, pvpGame, standardGame],
-	);
+	const settingsCallPreview =
+		mode === 'standard'
+			? `client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`
+			: `client.suigar.getGameParameters('${pvpGame}', { coinType: '${coinType}' })`;
 	const settingsSummary =
 		mode === 'standard' ? standardGameParameters : pvpGameParameters;
 	const settingsError =
@@ -585,14 +1168,12 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			: (settingsSummary?.stakeRange ?? null);
 	const handleRefreshGameSettings = React.useCallback(() => {
 		if (mode === 'standard') {
-			forceRefreshStandardGameParametersRef.current = true;
-			setStandardGameParametersRefreshKey((current) => current + 1);
+			void refreshStandardGameParameters(true);
 			return;
 		}
 
-		forceRefreshPvPGameParametersRef.current = true;
-		setPvPGameParametersRefreshKey((current) => current + 1);
-	}, [mode]);
+		void refreshPvPGameParameters(true);
+	}, [mode, refreshPvPGameParameters, refreshStandardGameParameters]);
 	const limboTargetMultiplierDescription = React.useMemo(() => {
 		if (
 			standardGame !== 'limbo' ||
@@ -653,81 +1234,87 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
 
-	React.useEffect(() => {
-		if (standardGame !== 'plinko' && standardGame !== 'wheel') {
-			return;
-		}
-
-		const configOptions = standardGameParameters?.configOptions;
-		if (!configOptions?.length) {
-			return;
-		}
-
-		const currentConfigId = standardForms[standardGame].configId;
-		const nextConfig =
-			configOptions.find(
-				(option) => option.id === currentConfigId && option.isPlayable,
-			) ??
-			configOptions.find((option) => option.isPlayable) ??
-			configOptions[0];
-
-		if (!nextConfig || nextConfig.id === currentConfigId) {
-			return;
-		}
-
-		setStandardForms((current) => ({
-			...current,
-			[standardGame]: {
-				...current[standardGame],
-				configId: nextConfig.id,
+	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
+		const nextForms: StandardForms = {
+			...standardForms,
+			coinflip: {
+				...standardForms.coinflip,
+				stake: clampStakeValue(
+					standardForms.coinflip.stake,
+					standardGame === 'coinflip'
+						? (activeStakeRange ?? undefined)
+						: undefined,
+				),
 			},
-		}));
-	}, [setStandardForms, standardForms, standardGame, standardGameParameters]);
+			limbo: {
+				...standardForms.limbo,
+				stake: clampStakeValue(
+					standardForms.limbo.stake,
+					standardGame === 'limbo'
+						? (activeStakeRange ?? undefined)
+						: undefined,
+				),
+			},
+			plinko: {
+				...standardForms.plinko,
+				stake: clampStakeValue(
+					standardForms.plinko.stake,
+					standardGame === 'plinko'
+						? (activeStakeRange ?? undefined)
+						: undefined,
+				),
+			},
+			range: {
+				...standardForms.range,
+				stake: clampStakeValue(
+					standardForms.range.stake,
+					standardGame === 'range'
+						? (activeStakeRange ?? undefined)
+						: undefined,
+				),
+			},
+			wheel: {
+				...standardForms.wheel,
+				stake: clampStakeValue(
+					standardForms.wheel.stake,
+					standardGame === 'wheel'
+						? (activeStakeRange ?? undefined)
+						: undefined,
+				),
+			},
+		};
 
-	React.useEffect(() => {
-		const currentForm = standardForms[standardGame];
-		const patch: Record<string, string | boolean> = {};
-
-		if (activeStakeRange) {
-			const currentStake = parseOptionalNumber(currentForm.stake);
-			const minStake = parseOptionalNumber(activeStakeRange.min);
-			const maxStake = parseOptionalNumber(activeStakeRange.max);
-
-			if (
-				currentStake !== undefined &&
-				minStake !== undefined &&
-				maxStake !== undefined
-			) {
-				if (currentStake < minStake) {
-					patch.stake = activeStakeRange.min;
-				} else if (currentStake > maxStake) {
-					patch.stake = activeStakeRange.max;
-				}
-			}
+		if (standardGame === 'plinko') {
+			nextForms.plinko.configId = resolvePlayableConfigId(
+				standardForms.plinko.configId,
+				standardGameParameters?.configOptions,
+			);
 		}
 
-		if (
-			standardGame === 'limbo' &&
-			standardGameParameters?.targetMultiplierRange
-		) {
+		if (standardGame === 'wheel') {
+			nextForms.wheel.configId = resolvePlayableConfigId(
+				standardForms.wheel.configId,
+				standardGameParameters?.configOptions,
+			);
+		}
+
+		if (standardGameParameters?.targetMultiplierRange) {
 			const targetMultiplier = parseOptionalNumber(
 				standardForms.limbo.targetMultiplier,
 			);
-
 			if (targetMultiplier !== undefined) {
 				const clampedTargetMultiplier = clampNumber(
 					targetMultiplier,
 					standardGameParameters.targetMultiplierRange.min,
 					standardGameParameters.targetMultiplierRange.max,
 				);
-
-				if (clampedTargetMultiplier !== targetMultiplier) {
-					patch.targetMultiplier = formatInputNumber(clampedTargetMultiplier);
-				}
+				nextForms.limbo.targetMultiplier = formatInputNumber(
+					clampedTargetMultiplier,
+				);
 			}
 		}
 
-		if (standardGame === 'range' && standardGameParameters?.rangeBounds) {
+		if (standardGameParameters?.rangeBounds) {
 			const configuredScale = parseOptionalNumber(standardForms.range.scale);
 			const effectiveScale =
 				configuredScale &&
@@ -764,63 +1351,28 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					nextRightPoint = Math.min(maxPoint, nextLeftPoint + maxZoneSize);
 				}
 
-				if (nextLeftPoint !== leftPoint) {
-					patch.leftPoint = formatInputNumber(nextLeftPoint);
-				}
-
-				if (nextRightPoint !== rightPoint) {
-					patch.rightPoint = formatInputNumber(nextRightPoint);
-				}
+				nextForms.range.leftPoint = formatInputNumber(nextLeftPoint);
+				nextForms.range.rightPoint = formatInputNumber(nextRightPoint);
 			}
 		}
 
-		if (Object.keys(patch).length === 0) {
-			return;
-		}
+		return nextForms;
+	}, [activeStakeRange, standardForms, standardGame, standardGameParameters]);
 
-		setStandardForms((current) => ({
-			...current,
-			[standardGame]: {
-				...current[standardGame],
-				...patch,
-			},
-		}));
-	}, [
-		activeStakeRange,
-		setStandardForms,
-		standardForms,
-		standardGame,
-		standardGameParameters,
-	]);
+	const effectivePvpForms = React.useMemo<PvPCoinflipForms>(() => {
+		const minimumCreateStake = clampStakeValue(
+			pvpForms.create.stake,
+			pvpGameParameters?.stakeRange,
+		);
 
-	React.useEffect(() => {
-		if (
-			mode !== 'pvp' ||
-			pvpAction !== 'create' ||
-			!pvpGameParameters?.stakeRange
-		) {
-			return;
-		}
-
-		const currentStake = parseOptionalNumber(pvpForms.create.stake);
-		const minStake = parseOptionalNumber(pvpGameParameters.stakeRange.min);
-
-		if (
-			currentStake === undefined ||
-			minStake === undefined ||
-			currentStake >= minStake
-		) {
-			return;
-		}
-
-		setPvpForms((current) => ({
-			...current,
+		return {
+			...pvpForms,
 			create: {
-				...current.create,
-				stake: pvpGameParameters.stakeRange.min,
+				...pvpForms.create,
+				stake: minimumCreateStake,
 			},
-		}));
-	}, [mode, pvpAction, pvpForms.create.stake, pvpGameParameters, setPvpForms]);
+		};
+	}, [pvpForms, pvpGameParameters]);
 
 	const joinLobbyGames = React.useMemo(
 		() =>
@@ -858,7 +1410,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				? buildStandardTransaction(
 						currentClient,
 						standardGame,
-						standardForms[standardGame],
+						effectiveStandardForms[standardGame],
 						previewOwner,
 						effectiveSelectedCoin,
 						coinType,
@@ -871,7 +1423,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					: buildPvPTransaction(
 							currentClient,
 							pvpAction,
-							pvpForms[pvpAction],
+							effectivePvpForms[pvpAction],
 							previewOwner,
 							effectiveSelectedCoin,
 							coinType,
@@ -881,22 +1433,20 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}
 
 	function updateQuery(key: string, value: string) {
-		if (typeof window === 'undefined') {
-			return;
-		}
-
-		const currentUrl = new URL(window.location.href);
-		const params = new URLSearchParams(currentUrl.search);
+		const params = new URLSearchParams(routeParams.toString());
 		params.set(key, value);
 		const nextSearch = params.toString();
-		const nextUrl = `${currentUrl.pathname}${nextSearch ? `?${nextSearch}` : ''}${currentUrl.hash}`;
-		window.history.replaceState(window.history.state, '', nextUrl);
+		setRouteSearch(nextSearch ? `?${nextSearch}` : '');
+		replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
+			scroll: false,
+		});
 	}
 
 	function updateStandardForm<K extends StandardGameId>(
 		game: K,
 		patch: Partial<StandardForms[K]>,
 	) {
+		dispatchUi({ type: 'clear-feedback' });
 		setStandardForms((current) => ({
 			...current,
 			[game]: { ...current[game], ...patch },
@@ -907,6 +1457,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		action: K,
 		patch: Partial<PvPCoinflipForms[K]>,
 	) {
+		dispatchUi({ type: 'clear-feedback' });
 		setPvpForms((current) => ({
 			...current,
 			[action]: { ...current[action], ...patch },
@@ -920,21 +1471,22 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		updatePvPForm(action, { gameId: game.id });
 		const matchingCoinKey = resolveCoinKeyForType(game.coin_type, coinTypes);
 		if (matchingCoinKey) {
-			setSelectedCoin(matchingCoinKey);
+			dispatchUi({ type: 'set-selected-coin', value: matchingCoinKey });
 		}
-		setError(null);
-		setStatus(null);
+		dispatchUi({ type: 'clear-feedback' });
 	}
 
 	async function handleExecute() {
 		if (!currentAccount) {
-			setError('Connect a wallet before executing a transaction.');
+			dispatchUi({
+				type: 'set-error',
+				value: 'Connect a wallet before executing a transaction.',
+			});
 			return;
 		}
 
-		setError(null);
-		setStatus(null);
-		setIsExecuting(true);
+		dispatchUi({ type: 'clear-feedback' });
+		dispatchUi({ type: 'set-is-executing', value: true });
 
 		try {
 			if (mode === 'pvp' && isMissingPvPGameSelection) {
@@ -949,7 +1501,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					? buildStandardTransaction(
 							currentClient,
 							standardGame,
-							standardForms[standardGame],
+							effectiveStandardForms[standardGame],
 							owner,
 							effectiveSelectedCoin,
 							coinType,
@@ -957,7 +1509,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					: buildPvPTransaction(
 							currentClient,
 							pvpAction,
-							pvpForms[pvpAction],
+							effectivePvpForms[pvpAction],
 							owner,
 							effectiveSelectedCoin,
 							coinType,
@@ -972,7 +1524,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 			}
 
 			const digest = execution.Transaction.digest;
-			setStatus(digest);
+			dispatchUi({ type: 'set-status', value: digest });
 
 			const finalResult = await currentClient.waitForTransaction({
 				digest,
@@ -1001,506 +1553,376 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 				}));
 			}
 
-			setBalanceRefreshKey((current) => current + 1);
-			setPvPLobbyRefreshKey((current) => current + 1);
+			await Promise.all([refreshBalances(), refreshPvPLobbies()]);
 		} catch (executionError) {
-			setError(parseError(executionError));
+			dispatchUi({ type: 'set-error', value: parseError(executionError) });
 		} finally {
-			setIsExecuting(false);
+			dispatchUi({ type: 'set-is-executing', value: false });
 		}
 	}
+	const navNode = React.useMemo(
+		() => (
+			<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
+				<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full p-1">
+					<Link
+						href="/standard?game=coinflip"
+						scroll={false}
+						prefetch={false}
+						className="inline-flex min-w-0 items-center gap-2"
+					>
+						<Image
+							src={withBasePath('/logo/icon.svg')}
+							alt="Suigar"
+							width={36}
+							height={36}
+							className="size-8 md:hidden"
+							priority
+						/>
+						<Image
+							src={withBasePath('/logo/suigar-logo-full.svg')}
+							alt="Suigar"
+							width={132}
+							height={36}
+							className="hidden w-auto md:block md:h-10"
+							priority
+						/>
+					</Link>
+				</div>
 
+				<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
+					<ThemeToggle className="size-9 shrink-0 sm:size-10" />
+					{currentAccount ? (
+						<div className="min-w-0 shrink">
+							<Select
+								value={selectedCoin}
+								onValueChange={(value: SupportedCoinKey) =>
+									dispatchUi({ type: 'set-selected-coin', value })
+								}
+							>
+								<SelectTrigger
+									aria-label="Select active coin"
+									className="h-10 w-full min-w-0 max-w-[10.5rem] rounded-full border-border/70 bg-background/55 px-3 sm:w-auto sm:min-w-[8.75rem] sm:max-w-none"
+								>
+									<CoinSelectLabel
+										coinKey={effectiveSelectedCoin}
+										amount={getCoinDisplayAmount({
+											currentAccountAddress: currentAccount?.address,
+											balanceOwner,
+											balanceState: coinBalances[effectiveSelectedCoin],
+										})}
+										hideTickerOnMobile
+									/>
+								</SelectTrigger>
+								<SelectContent>
+									{coinOptions.map(([key]) => (
+										<SelectItem key={key} value={key}>
+											<CoinSelectLabel
+												coinKey={key}
+												amount={getCoinDisplayAmount({
+													currentAccountAddress: currentAccount?.address,
+													balanceOwner,
+													balanceState: coinBalances[key],
+												})}
+											/>
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+					) : null}
+					<div className="min-w-0 shrink-0">
+						<ConnectButton className="wallet-connect" />
+					</div>
+				</div>
+			</nav>
+		),
+		[
+			balanceOwner,
+			coinBalances,
+			coinOptions,
+			currentAccount,
+			effectiveSelectedCoin,
+			selectedCoin,
+		],
+	);
+
+	return {
+		navNode,
+		standardGame,
+		pvpGame,
+		pvpAction,
+		currentAccount,
+		effectiveStandardForms,
+		effectivePvpForms,
+		standardGameParameters,
+		isStandardGameParametersLoading,
+		standardGameParametersError,
+		stakeDescription,
+		limboTargetMultiplierDescription,
+		rangeBoundsDescription,
+		pvpStakeDescription,
+		showPrivateJoinLobbies,
+		joinLobbyGames,
+		cancelLobbyGames,
+		pvpLobbyError,
+		isPvPLobbyLoading,
+		pvpForms,
+		coinTypes,
+		currentCode,
+		handleExecute,
+		isExecuting,
+		visibleStatus,
+		error,
+		activeConfigOption,
+		settingsStakeRange,
+		effectiveSelectedCoin,
+		settingsConfigOptions,
+		settingsError,
+		settingsGameLabel,
+		isSettingsLoading,
+		isGameSettingsDialogOpen,
+		serializedGameSettings,
+		settingsCallPreview,
+		settingsSummary,
+		updateStandardForm,
+		updatePvPForm,
+		handleSelectPvPLobby,
+		handleRefreshGameSettings,
+		refreshPvPLobbies,
+		updateQuery,
+		setShowPrivateJoinLobbies: (value: boolean) =>
+			dispatchUi({
+				type: 'set-show-private-join-lobbies',
+				value,
+			}),
+		openSettings: () =>
+			dispatchUi({
+				type: 'set-is-game-settings-dialog-open',
+				value: true,
+			}),
+		closeSettings: () =>
+			dispatchUi({
+				type: 'set-is-game-settings-dialog-open',
+				value: false,
+			}),
+	};
+}
+
+const loadingNavNode = (
+	<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
+		<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full p-1">
+			<Image
+				src={withBasePath('/logo/icon.svg')}
+				alt="Suigar"
+				width={36}
+				height={36}
+				className="size-8 md:hidden"
+				priority
+			/>
+			<Image
+				src={withBasePath('/logo/suigar-logo-full.svg')}
+				alt="Suigar"
+				width={132}
+				height={36}
+				className="hidden w-auto md:block md:h-10"
+				priority
+			/>
+		</div>
+		<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
+			<Skeleton className="size-9 shrink-0 rounded-full sm:size-10" />
+			<Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
+		</div>
+	</nav>
+);
+
+const loadingHeroNode = (
+	<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+		<div className="relative flex flex-col gap-4">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+				<div className="space-y-2">
+					<Skeleton className="h-10 w-56 rounded-full md:h-12 md:w-80" />
+					<Skeleton className="h-5 w-full max-w-2xl rounded-full" />
+					<Skeleton className="h-5 w-5/6 max-w-xl rounded-full" />
+				</div>
+				<div className="flex flex-col gap-3 lg:min-w-[360px] lg:items-end">
+					<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+						<Skeleton className="h-10 w-28 rounded-full" />
+						<Skeleton className="h-10 w-20 rounded-full" />
+					</div>
+					<Skeleton className="h-11 w-full rounded-full sm:w-[12rem]" />
+				</div>
+			</div>
+			<Skeleton className="h-14 rounded-2xl" />
+		</div>
+	</section>
+);
+
+const loadingControlsNode = (
+	<SectionShell
+		title="Loading controls"
+		icon={<Gamepad2 className="size-5 text-secondary dark:text-primary" />}
+		description="Preparing the current route state and playground controls."
+	>
+		<div className="space-y-4">
+			<Skeleton className="h-24 rounded-2xl" />
+			<Skeleton className="h-24 rounded-2xl" />
+			<Skeleton className="h-24 rounded-2xl" />
+		</div>
+	</SectionShell>
+);
+
+const loadingSidebarNode = (
+	<div className="flex flex-col gap-6">
+		<CodeSampleSkeleton />
+		<Skeleton className="h-56 rounded-3xl" />
+	</div>
+);
+
+const loadingEventsNode = <Skeleton className="h-72 rounded-3xl" />;
+
+function IntegrationLoadingState() {
 	return (
 		<IntegrationShellLayout
-			nav={
-				<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
-					<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full px-1 py-1">
-						<Link
-							href="/standard?game=coinflip"
-							scroll={false}
-							prefetch={false}
-							className="inline-flex min-w-0 items-center gap-2"
-						>
-							<Image
-								src={withBasePath('/logo/icon.svg')}
-								alt="Suigar"
-								width={36}
-								height={36}
-								className="size-8 md:hidden"
-								priority
-							/>
-							<Image
-								src={withBasePath('/logo/suigar-logo-full.svg')}
-								alt="Suigar"
-								width={132}
-								height={36}
-								className="hidden w-auto md:block md:h-10"
-								priority
-							/>
-						</Link>
-					</div>
-
-					<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
-						<ThemeToggle className="size-9 shrink-0 sm:size-10" />
-						{currentAccount ? (
-							<div className="min-w-0 shrink">
-								<Select
-									value={selectedCoin}
-									onValueChange={(value: SupportedCoinKey) =>
-										setSelectedCoin(value)
-									}
-								>
-									<SelectTrigger
-										aria-label="Select active coin"
-										className="h-10 w-full min-w-0 max-w-[10.5rem] rounded-full border-border/70 bg-background/55 px-3 sm:w-auto sm:min-w-[8.75rem] sm:max-w-none"
-									>
-										<CoinSelectLabel
-											coinKey={effectiveSelectedCoin}
-											amount={getCoinDisplayAmount({
-												currentAccountAddress: currentAccount?.address,
-												balanceOwner,
-												balanceState: coinBalances[effectiveSelectedCoin],
-											})}
-											hideTickerOnMobile
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										{coinOptions.map(([key]) => (
-											<SelectItem key={key} value={key}>
-												<CoinSelectLabel
-													coinKey={key}
-													amount={getCoinDisplayAmount({
-														currentAccountAddress: currentAccount?.address,
-														balanceOwner,
-														balanceState: coinBalances[key],
-													})}
-												/>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						) : null}
-						<div className="min-w-0 shrink-0">
-							<ConnectButton className="wallet-connect" />
-						</div>
-					</div>
-				</nav>
-			}
-			hero={
-				<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
-					<div className="relative flex flex-col gap-4">
-						<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
-							<div className="space-y-2">
-								<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
-									Suigar SDK playground
-								</h1>
-								<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-									Build standard and PvP transactions, inspect the exact builder
-									call, execute it, and keep a shared decoded event log.
-								</p>
-							</div>
-
-							<div className="flex flex-col gap-3 lg:min-w-[360px] lg:items-end">
-								<div className="flex flex-wrap items-center gap-2 lg:justify-end">
-									<Button
-										asChild
-										variant={mode === 'standard' ? 'control-active' : 'control'}
-										size="sm"
-										className="h-10 rounded-full px-4"
-									>
-										<Link
-											href="/standard?game=coinflip"
-											scroll={false}
-											prefetch={false}
-										>
-											Standard
-										</Link>
-									</Button>
-									<Button
-										asChild
-										variant={mode === 'pvp' ? 'control-active' : 'control'}
-										size="sm"
-										className="h-10 rounded-full px-4"
-									>
-										<Link
-											href="/pvp?game=pvp-coinflip&action=create"
-											scroll={false}
-											prefetch={false}
-										>
-											PvP
-										</Link>
-									</Button>
-								</div>
-
-								<div className="flex flex-wrap items-center gap-2">
-									{!isRouteReady ? (
-										mode === 'standard' ? (
-											<Skeleton className="h-11 w-full rounded-full sm:w-[12rem]" />
-										) : (
-											<div className="flex flex-wrap items-center gap-2">
-												<Skeleton className="h-11 w-full rounded-full sm:w-[13rem]" />
-												<div className="flex flex-wrap gap-2">
-													<Skeleton className="h-10 w-24 rounded-full" />
-													<Skeleton className="h-10 w-20 rounded-full" />
-													<Skeleton className="h-10 w-24 rounded-full" />
-												</div>
-											</div>
-										)
-									) : mode === 'standard' ? (
-										<div className="w-full sm:w-[12rem]">
-											<Select
-												value={standardGame}
-												onValueChange={(value: StandardGameId) => {
-													setStandardGame(value);
-													updateQuery('game', value);
-												}}
-											>
-												<SelectTrigger
-													aria-label="Select standard game"
-													className="h-11 rounded-full border-border/70 bg-background/55 px-4"
-												>
-													<SelectValue />
-												</SelectTrigger>
-												<SelectContent>
-													{STANDARD_GAME_OPTIONS.map((game) => (
-														<SelectItem key={game.value} value={game.value}>
-															{game.label}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-									) : (
-										<div className="flex flex-wrap items-center gap-2">
-											<div className="w-full sm:w-[13rem]">
-												<Select
-													value={pvpGame}
-													onValueChange={(value: PvPGameId) => {
-														setPvPGame(value);
-														updateQuery('game', value);
-													}}
-												>
-													<SelectTrigger
-														aria-label="Select PvP game"
-														className="h-11 rounded-full border-border/70 bg-background/55 px-4"
-													>
-														<SelectValue />
-													</SelectTrigger>
-													<SelectContent>
-														{PVP_GAME_OPTIONS.map((game) => (
-															<SelectItem key={game.value} value={game.value}>
-																{game.label}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											</div>
-											<div className="flex flex-wrap gap-2">
-												{PVP_ACTION_OPTIONS.map((action) => (
-													<Button
-														key={action.value}
-														type="button"
-														size="sm"
-														variant={
-															pvpAction === action.value
-																? 'control-active'
-																: 'control'
-														}
-														onClick={() => {
-															setPvPAction(action.value);
-															updateQuery('game', pvpGame);
-															updateQuery('action', action.value);
-														}}
-														className={cn(
-															'h-10 justify-start rounded-full px-4',
-															pvpAction === action.value && 'shadow-none',
-														)}
-													>
-														<action.icon className="size-4" />
-														{action.label}
-													</Button>
-												))}
-											</div>
-										</div>
-									)}
-								</div>
-							</div>
-						</div>
-
-						<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
-							Stake inputs use human values like{' '}
-							<span className="font-medium text-foreground">1</span> or{' '}
-							<span className="font-medium text-foreground">2.5</span> and are
-							converted to atomic units in the generated transaction.
-						</div>
-					</div>
-				</section>
-			}
-			controls={
-				<>
-					<h2 className="sr-only">
-						{!isRouteReady
-							? mode === 'standard'
-								? 'Standard playground controls'
-								: 'PvP playground controls'
-							: mode === 'standard'
-								? `${getStandardGameLabel(standardGame)} playground controls`
-								: 'PvP Coinflip playground controls'}
-					</h2>
-					<SectionShell
-						title={
-							!isRouteReady
-								? mode === 'standard'
-									? 'Game controls'
-									: 'PvP controls'
-								: mode === 'standard'
-									? `${getStandardGameLabel(standardGame)} controls`
-									: 'PvP Coinflip controls'
-						}
-						icon={
-							mode === 'standard' ? (
-								<Gamepad2 className="size-5 text-secondary dark:text-primary" />
-							) : (
-								<Swords className="size-5 text-secondary dark:text-primary" />
-							)
-						}
-						description={
-							!isRouteReady
-								? 'Loading the route-specific game controls.'
-								: mode === 'standard'
-									? 'Adjust the active game inputs on the left while the transaction builder stays in sync on the right.'
-									: 'Create, join, or cancel PvP Coinflip games while keeping the exact transaction builder visible.'
-						}
-						action={
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								onClick={() => setIsGameSettingsDialogOpen(true)}
-								className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
-							>
-								<Cog className="size-4" />
-								Settings
-							</Button>
-						}
-					>
-						<div className="space-y-6">
-							{!isRouteReady ? (
-								<FormSkeleton />
-							) : mode === 'standard' ? (
-								<>
-									{standardGame === 'coinflip' ? (
-										<CoinflipForm
-											value={standardForms.coinflip}
-											onChange={(patch) =>
-												updateStandardForm('coinflip', patch)
-											}
-											stakeDescription={stakeDescription}
-										/>
-									) : null}
-									{standardGame === 'limbo' ? (
-										<LimboForm
-											value={standardForms.limbo}
-											onChange={(patch) => updateStandardForm('limbo', patch)}
-											stakeDescription={stakeDescription}
-											targetMultiplierDescription={
-												limboTargetMultiplierDescription
-											}
-										/>
-									) : null}
-									{standardGame === 'plinko' ? (
-										<PlinkoForm
-											value={standardForms.plinko}
-											onChange={(patch) => updateStandardForm('plinko', patch)}
-											configOptions={standardGameParameters?.configOptions}
-											isConfigLoading={isStandardGameParametersLoading}
-											configError={standardGameParametersError}
-											stakeDescription={stakeDescription}
-										/>
-									) : null}
-									{standardGame === 'range' ? (
-										<RangeForm
-											value={standardForms.range}
-											onChange={(patch) => updateStandardForm('range', patch)}
-											stakeDescription={stakeDescription}
-											rangeBoundsDescription={rangeBoundsDescription}
-										/>
-									) : null}
-									{standardGame === 'wheel' ? (
-										<WheelForm
-											value={standardForms.wheel}
-											onChange={(patch) => updateStandardForm('wheel', patch)}
-											configOptions={standardGameParameters?.configOptions}
-											isConfigLoading={isStandardGameParametersLoading}
-											configError={standardGameParametersError}
-											stakeDescription={stakeDescription}
-										/>
-									) : null}
-								</>
-							) : (
-								<>
-									{pvpAction === 'create' ? (
-										<PvPCoinflipCreateForm
-											value={pvpForms.create}
-											onChange={(patch) => updatePvPForm('create', patch)}
-											stakeDescription={pvpStakeDescription}
-										/>
-									) : null}
-									{pvpAction === 'join' ? (
-										<>
-											<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
-												<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-													<div className="min-w-0 space-y-1">
-														<FieldLabel htmlFor="join-private-lobbies">
-															Show private lobbies
-														</FieldLabel>
-														<FieldDescription size="sm">
-															Public unresolved lobbies stay visible even when
-															the wallet is disconnected.
-														</FieldDescription>
-													</div>
-													<Switch
-														id="join-private-lobbies"
-														size="default"
-														className="mt-0.5 justify-self-end self-start"
-														checked={showPrivateJoinLobbies}
-														onCheckedChange={setShowPrivateJoinLobbies}
-													/>
-												</FieldGroup>
-											</div>
-											<PvPLobbyPicker
-												title="Open lobbies to join"
-												description="Unresolved PvP lobbies are shown here. Selecting one fills the join form and switches the selected coin when needed."
-												games={joinLobbyGames}
-												selectedGameId={pvpForms.join.gameId}
-												isLoading={isPvPLobbyLoading}
-												error={pvpLobbyError}
-												emptyMessage="No matching unresolved PvP lobbies were found."
-												coinTypes={coinTypes}
-												formatAmount={formatBalance}
-												getCoinDecimals={(value) => {
-													const matchingCoinKey = resolveCoinKeyForType(
-														value,
-														coinTypes,
-													);
-													return matchingCoinKey
-														? COIN_DECIMALS[matchingCoinKey]
-														: 9;
-												}}
-												onRefresh={() =>
-													setPvPLobbyRefreshKey((current) => current + 1)
-												}
-												onSelectGame={(game) =>
-													handleSelectPvPLobby('join', game)
-												}
-											/>
-											<PvPCoinflipJoinForm value={pvpForms.join} />
-										</>
-									) : null}
-									{pvpAction === 'cancel' ? (
-										<>
-											<PvPLobbyPicker
-												title="Your unresolved lobbies"
-												description="Only PvP games created by the connected wallet are shown here. Selecting one fills the cancel form and keeps execution tied to that on-chain game."
-												games={cancelLobbyGames}
-												selectedGameId={pvpForms.cancel.gameId}
-												isLoading={isPvPLobbyLoading}
-												error={pvpLobbyError}
-												emptyMessage={
-													currentAccount
-														? 'No matching unresolved PvP lobbies were found.'
-														: 'Connect a wallet to load the unresolved PvP lobbies you can cancel.'
-												}
-												coinTypes={coinTypes}
-												formatAmount={formatBalance}
-												getCoinDecimals={(value) => {
-													const matchingCoinKey = resolveCoinKeyForType(
-														value,
-														coinTypes,
-													);
-													return matchingCoinKey
-														? COIN_DECIMALS[matchingCoinKey]
-														: 9;
-												}}
-												onRefresh={() =>
-													setPvPLobbyRefreshKey((current) => current + 1)
-												}
-												onSelectGame={(game) =>
-													handleSelectPvPLobby('cancel', game)
-												}
-											/>
-											<PvPCoinflipCancelForm value={pvpForms.cancel} />
-										</>
-									) : null}
-								</>
-							)}
-						</div>
-					</SectionShell>
-				</>
-			}
-			sidebar={
-				<div className="flex flex-col gap-6">
-					{isRouteReady ? (
-						<CodeSample code={currentCode} />
-					) : (
-						<CodeSampleSkeleton />
-					)}
-
-					<ExecuteTransactionCard
-						onExecute={handleExecute}
-						isExecuting={isExecuting}
-						status={visibleStatus}
-						error={error}
-					/>
-				</div>
-			}
-			events={<EventsTable />}
-			dialog={
-				<GameSettingsDialog
-					activeConfigOption={activeConfigOption}
-					activeStakeRange={settingsStakeRange}
-					coinKey={effectiveSelectedCoin}
-					coinLabel={effectiveSelectedCoin.toUpperCase()}
-					configOptions={settingsConfigOptions}
-					error={settingsError}
-					gameLabel={settingsGameLabel}
-					isLoading={isSettingsLoading}
-					isOpen={isGameSettingsDialogOpen}
-					onClose={() => setIsGameSettingsDialogOpen(false)}
-					onRefresh={handleRefreshGameSettings}
-					serializedGameSettings={serializedGameSettings}
-					settingsCallPreview={settingsCallPreview}
-					topLevelDetails={settingsSummary?.topLevelDetails}
-				/>
-			}
-			floatingAction={
-				<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
-					<Button
-						asChild
-						className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
-					>
-						<a
-							href="https://docs.suigar.com/sdk"
-							target="_blank"
-							rel="noreferrer"
-							aria-label="Open SDK Docs in a new tab"
-							title="SDK Docs"
-						>
-							<BookOpenText className="size-5 md:size-6" />
-							SDK Docs
-						</a>
-					</Button>
-				</div>
-			}
+			nav={loadingNavNode}
+			hero={loadingHeroNode}
+			controls={loadingControlsNode}
+			sidebar={loadingSidebarNode}
+			events={loadingEventsNode}
+			floatingAction={floatingActionNode}
 		/>
 	);
 }
 
-export function StandardIntegrationPage() {
+function IntegrationContent({ mode }: { mode: Mode }) {
+	const isMounted = React.useSyncExternalStore(
+		subscribe,
+		() => true,
+		() => false,
+	);
+	const [routeSearch, setRouteSearch] = React.useState(() =>
+		typeof window === 'undefined' ? '' : window.location.search,
+	);
+
+	React.useEffect(() => {
+		if (!isMounted) {
+			return;
+		}
+
+		const syncRouteSearch = () => {
+			setRouteSearch(window.location.search);
+		};
+
+		window.addEventListener('popstate', syncRouteSearch);
+		return () => {
+			window.removeEventListener('popstate', syncRouteSearch);
+		};
+	}, [isMounted]);
+
+	const routeParams = React.useMemo(
+		() => new URLSearchParams(routeSearch),
+		[routeSearch],
+	);
+	const integration = useIntegrationState({
+		mode,
+		routeParams,
+		isRouteReady: isMounted,
+		setRouteSearch,
+	});
+
+	if (!isMounted) {
+		return <IntegrationLoadingState />;
+	}
+
+	return (
+		<IntegrationShellLayout
+			nav={integration.navNode}
+			hero={
+				<IntegrationHero
+					mode={mode}
+					standardGame={integration.standardGame}
+					pvpGame={integration.pvpGame}
+					pvpAction={integration.pvpAction}
+					onStandardGameChange={(value) =>
+						integration.updateQuery('game', value)
+					}
+					onPvPGameChange={(value) => integration.updateQuery('game', value)}
+					onPvPActionChange={(value) => {
+						integration.updateQuery('game', integration.pvpGame);
+						integration.updateQuery('action', value);
+					}}
+				/>
+			}
+			controls={
+				<IntegrationControls
+					mode={mode}
+					standardGame={integration.standardGame}
+					pvpAction={integration.pvpAction}
+					currentAccount={integration.currentAccount}
+					effectiveStandardForms={integration.effectiveStandardForms}
+					effectivePvpForms={integration.effectivePvpForms}
+					standardGameParameters={integration.standardGameParameters}
+					isStandardGameParametersLoading={
+						integration.isStandardGameParametersLoading
+					}
+					standardGameParametersError={integration.standardGameParametersError}
+					stakeDescription={integration.stakeDescription}
+					limboTargetMultiplierDescription={
+						integration.limboTargetMultiplierDescription
+					}
+					rangeBoundsDescription={integration.rangeBoundsDescription}
+					pvpStakeDescription={integration.pvpStakeDescription}
+					showPrivateJoinLobbies={integration.showPrivateJoinLobbies}
+					setShowPrivateJoinLobbies={integration.setShowPrivateJoinLobbies}
+					joinLobbyGames={integration.joinLobbyGames}
+					cancelLobbyGames={integration.cancelLobbyGames}
+					pvpLobbyError={integration.pvpLobbyError}
+					isPvPLobbyLoading={integration.isPvPLobbyLoading}
+					pvpForms={integration.pvpForms}
+					coinTypes={integration.coinTypes}
+					onRefreshPvPLobbies={() => void integration.refreshPvPLobbies()}
+					onSelectPvPLobby={integration.handleSelectPvPLobby}
+					updateStandardForm={integration.updateStandardForm}
+					updatePvPForm={integration.updatePvPForm}
+					openSettings={integration.openSettings}
+				/>
+			}
+			sidebar={
+				<IntegrationSidebar
+					currentCode={integration.currentCode}
+					handleExecute={integration.handleExecute}
+					isExecuting={integration.isExecuting}
+					status={integration.visibleStatus}
+					error={integration.error}
+				/>
+			}
+			events={eventsNode}
+			dialog={
+				<GameSettingsDialog
+					activeConfigOption={integration.activeConfigOption}
+					activeStakeRange={integration.settingsStakeRange}
+					coinKey={integration.effectiveSelectedCoin}
+					coinLabel={integration.effectiveSelectedCoin.toUpperCase()}
+					configOptions={integration.settingsConfigOptions}
+					error={integration.settingsError}
+					gameLabel={integration.settingsGameLabel}
+					isLoading={integration.isSettingsLoading}
+					isOpen={integration.isGameSettingsDialogOpen}
+					onClose={integration.closeSettings}
+					onRefresh={integration.handleRefreshGameSettings}
+					serializedGameSettings={integration.serializedGameSettings}
+					settingsCallPreview={integration.settingsCallPreview}
+					topLevelDetails={integration.settingsSummary?.topLevelDetails}
+				/>
+			}
+			floatingAction={floatingActionNode}
+		/>
+	);
+}
+
+export function StandardIntegrationPage({}: Record<never, never>) {
 	return <IntegrationContent mode="standard" />;
 }
 
-export function PvPIntegrationPage() {
+export function PvPIntegrationPage({}: Record<never, never>) {
 	return <IntegrationContent mode="pvp" />;
 }

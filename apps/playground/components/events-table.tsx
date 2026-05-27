@@ -63,7 +63,7 @@ function CopyableValue({
 				type="button"
 				variant="outline"
 				size="icon-sm"
-				className="h-7 w-7 text-muted-foreground rounded-full"
+				className="size-7 text-muted-foreground rounded-full"
 				onClick={copyValue}
 				title={`Copy ${label}`}
 				aria-label={`Copy ${label}`}
@@ -75,7 +75,7 @@ function CopyableValue({
 					asChild
 					variant="outline"
 					size="icon-sm"
-					className="h-7 w-7 text-muted-foreground rounded-full"
+					className="size-7 text-muted-foreground rounded-full"
 				>
 					<a
 						href={explorerHref}

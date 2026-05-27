@@ -1,11 +1,8 @@
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
-	PvPAction,
 	PvPCoinflipForms,
-	PvPGameId,
 	SharedFields,
 	StandardForms,
-	StandardGameId,
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 
@@ -19,14 +16,12 @@ export const STANDARD_GAMES = [
 
 export const PVP_GAMES = ['pvp-coinflip'] as const;
 
-export const PVP_ACTIONS = ['create', 'join', 'cancel'] as const;
-
 export const COIN_DECIMALS: Record<SupportedCoinKey, number> = {
 	sui: 9,
 	usdc: 6,
 };
 
-export const DEFAULT_SHARED_FIELDS: SharedFields = {
+const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',
 };
 
@@ -70,18 +65,6 @@ export const DEFAULT_PVP_FORMS: PvPCoinflipForms = {
 		gameId: '',
 	},
 };
-
-export function isStandardGame(value: string | null): value is StandardGameId {
-	return STANDARD_GAMES.includes(value as (typeof STANDARD_GAMES)[number]);
-}
-
-export function isPvPGame(value: string | null): value is PvPGameId {
-	return PVP_GAMES.includes(value as (typeof PVP_GAMES)[number]);
-}
-
-export function isPvPAction(value: string | null): value is PvPAction {
-	return PVP_ACTIONS.includes(value as (typeof PVP_ACTIONS)[number]);
-}
 
 export function parseOptionalNumber(value: string) {
 	const trimmed = value.trim().replace(',', '.');

@@ -50,7 +50,7 @@ export function PvPCoinflipCreateForm({
 						</SelectContent>
 					</Select>
 				</Field>
-				<Field className="h-full px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
+				<Field className="h-full p-4 border-border/70 bg-background/45 rounded-2xl border">
 					<div className="flex items-center justify-between gap-3">
 						<FieldLabel htmlFor="pvp-private-lobby">Private lobby</FieldLabel>
 						<Switch

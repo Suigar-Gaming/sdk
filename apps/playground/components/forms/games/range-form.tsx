@@ -93,7 +93,7 @@ export function RangeForm({
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
-					<Field className="w-full md:max-w-sm px-4 py-4 border-border/70 bg-background/45 rounded-2xl border">
+					<Field className="w-full md:max-w-sm p-4 border-border/70 bg-background/45 rounded-2xl border">
 						<div className="flex items-center justify-between gap-3">
 							<FieldLabel htmlFor="range-out-of-range">Out of range</FieldLabel>
 							<Switch

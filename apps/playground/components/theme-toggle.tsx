@@ -1,8 +1,8 @@
 'use client';
 
 import { Moon, SunMedium } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import * as React from 'react';
+import { useTheme } from '@/components/providers/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';

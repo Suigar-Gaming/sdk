@@ -1,7 +1,6 @@
 'use client';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -75,7 +74,6 @@ function Field({
 }: React.ComponentProps<'div'> & VariantProps<typeof fieldVariants>) {
 	return (
 		<div
-			role="group"
 			data-slot="field"
 			data-orientation={orientation}
 			className={cn(fieldVariants({ orientation }), className)}
@@ -196,32 +194,38 @@ function FieldError({
 }: React.ComponentProps<'div'> & {
 	errors?: Array<{ message?: string } | undefined>;
 }) {
-	const content = useMemo(() => {
-		if (children) {
-			return children;
-		}
-
-		if (!errors?.length) {
-			return null;
-		}
-
-		const uniqueErrors = [
-			...new Map(errors.map((error) => [error?.message, error])).values(),
-		];
-
-		if (uniqueErrors?.length == 1) {
-			return uniqueErrors[0]?.message;
-		}
-
+	if (children) {
 		return (
+			<div
+				role="alert"
+				data-slot="field-error"
+				className={cn('text-sm font-normal text-destructive', className)}
+				{...props}
+			>
+				{children}
+			</div>
+		);
+	}
+
+	if (!errors?.length) {
+		return null;
+	}
+
+	const uniqueErrors = [
+		...new Map(errors.map((error) => [error?.message, error])).values(),
+	];
+
+	const content =
+		uniqueErrors.length === 1 ? (
+			uniqueErrors[0]?.message
+		) : (
 			<ul className="flex flex-col list-disc ml-4 gap-1">
 				{uniqueErrors.map(
-					(error, index) =>
-						error?.message && <li key={index}>{error.message}</li>,
+					(error) =>
+						error?.message && <li key={error.message}>{error.message}</li>,
 				)}
 			</ul>
 		);
-	}, [children, errors]);
 
 	if (!content) {
 		return null;

@@ -15,6 +15,7 @@ export const dAppKit = createDAppKit({
 			network,
 			baseUrl: GRPC_URLS[network],
 		}).$extend(suigar()),
+	storageKey: 'suigar-playground:dapp-kit:wallet',
 });
 
 declare module '@mysten/dapp-kit-react' {
