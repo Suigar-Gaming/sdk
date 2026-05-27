@@ -392,44 +392,9 @@ const floatingActionNode = (
 	</div>
 );
 const eventsNode = <EventsTable />;
-let hasHydratedRouteSearch = false;
 
-function subscribeToRouteSearch(onStoreChange: () => void) {
-	if (typeof window === 'undefined') {
-		return () => {};
-	}
-
-	const notify = () => {
-		onStoreChange();
-	};
-
-	if (!hasHydratedRouteSearch) {
-		hasHydratedRouteSearch = true;
-		queueMicrotask(notify);
-	}
-
-	const originalPushState = window.history.pushState;
-	const originalReplaceState = window.history.replaceState;
-
-	window.addEventListener('popstate', notify);
-	window.history.pushState = function pushState(...args) {
-		originalPushState.apply(this, args);
-		notify();
-	};
-	window.history.replaceState = function replaceState(...args) {
-		originalReplaceState.apply(this, args);
-		notify();
-	};
-
-	return () => {
-		window.removeEventListener('popstate', notify);
-		window.history.pushState = originalPushState;
-		window.history.replaceState = originalReplaceState;
-	};
-}
-
-function getRouteSearchSnapshot() {
-	return hasHydratedRouteSearch ? window.location.search : null;
+function subscribe() {
+	return () => {};
 }
 
 function IntegrationHero({
@@ -849,9 +814,13 @@ function IntegrationControls({
 function useIntegrationState({
 	mode,
 	routeParams,
+	isRouteReady,
+	setRouteSearch,
 }: {
 	mode: Mode;
 	routeParams: URLSearchParams;
+	isRouteReady: boolean;
+	setRouteSearch: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	const pathname = usePathname();
 	const { replace } = useRouter();
@@ -925,6 +894,10 @@ function useIntegrationState({
 		isLoading: isPvPGameParametersLoading,
 	} = pvpParametersState;
 	const refreshBalances = React.useCallback(async () => {
+		if (!isRouteReady) {
+			return;
+		}
+
 		if (!currentAccount) {
 			dispatchCoinBalances({ type: 'reset' });
 			return;
@@ -972,7 +945,7 @@ function useIntegrationState({
 			owner: currentAccount.address,
 			results,
 		});
-	}, [coinOptions, currentAccount, currentClient]);
+	}, [coinOptions, currentAccount, currentClient, isRouteReady]);
 
 	React.useEffect(() => {
 		void refreshBalances();
@@ -980,6 +953,10 @@ function useIntegrationState({
 
 	const refreshStandardGameParameters = React.useCallback(
 		async (ignoreCache = false) => {
+			if (!isRouteReady) {
+				return;
+			}
+
 			dispatchStandardParameters({ type: 'loading' });
 
 			try {
@@ -1004,7 +981,13 @@ function useIntegrationState({
 				});
 			}
 		},
-		[coinType, currentClient, effectiveSelectedCoin, standardGame],
+		[
+			coinType,
+			currentClient,
+			effectiveSelectedCoin,
+			isRouteReady,
+			standardGame,
+		],
 	);
 
 	React.useEffect(() => {
@@ -1013,6 +996,10 @@ function useIntegrationState({
 
 	const refreshPvPGameParameters = React.useCallback(
 		async (ignoreCache = false) => {
+			if (!isRouteReady) {
+				return;
+			}
+
 			if (mode !== 'pvp') {
 				dispatchPvPParameters({ type: 'reset' });
 				return;
@@ -1045,7 +1032,14 @@ function useIntegrationState({
 				});
 			}
 		},
-		[coinType, currentClient, effectiveSelectedCoin, mode, pvpGame],
+		[
+			coinType,
+			currentClient,
+			effectiveSelectedCoin,
+			isRouteReady,
+			mode,
+			pvpGame,
+		],
 	);
 
 	React.useEffect(() => {
@@ -1053,6 +1047,10 @@ function useIntegrationState({
 	}, [refreshPvPGameParameters]);
 
 	const refreshPvPLobbies = React.useCallback(async () => {
+		if (!isRouteReady) {
+			return;
+		}
+
 		if (mode !== 'pvp') {
 			return;
 		}
@@ -1067,7 +1065,7 @@ function useIntegrationState({
 		} catch (lobbyError) {
 			dispatchLobby({ type: 'error', error: parseError(lobbyError) });
 		}
-	}, [currentClient, mode]);
+	}, [currentClient, isRouteReady, mode]);
 
 	React.useEffect(() => {
 		void refreshPvPLobbies();
@@ -1438,6 +1436,7 @@ function useIntegrationState({
 		const params = new URLSearchParams(routeParams.toString());
 		params.set(key, value);
 		const nextSearch = params.toString();
+		setRouteSearch(nextSearch ? `?${nextSearch}` : '');
 		replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
 			scroll: false,
 		});
@@ -1795,19 +1794,42 @@ function IntegrationLoadingState() {
 }
 
 function IntegrationContent({ mode }: { mode: Mode }) {
-	const routeSearch = React.useSyncExternalStore(
-		subscribeToRouteSearch,
-		getRouteSearchSnapshot,
-		() => null,
+	const isMounted = React.useSyncExternalStore(
+		subscribe,
+		() => true,
+		() => false,
 	);
+	const [routeSearch, setRouteSearch] = React.useState(() =>
+		typeof window === 'undefined' ? '' : window.location.search,
+	);
+
+	React.useEffect(() => {
+		if (!isMounted) {
+			return;
+		}
+
+		const syncRouteSearch = () => {
+			setRouteSearch(window.location.search);
+		};
+
+		window.addEventListener('popstate', syncRouteSearch);
+		return () => {
+			window.removeEventListener('popstate', syncRouteSearch);
+		};
+	}, [isMounted]);
 
 	const routeParams = React.useMemo(
-		() => new URLSearchParams(routeSearch ?? ''),
+		() => new URLSearchParams(routeSearch),
 		[routeSearch],
 	);
-	const integration = useIntegrationState({ mode, routeParams });
+	const integration = useIntegrationState({
+		mode,
+		routeParams,
+		isRouteReady: isMounted,
+		setRouteSearch,
+	});
 
-	if (routeSearch === null) {
+	if (!isMounted) {
 		return <IntegrationLoadingState />;
 	}
 
