@@ -19,7 +19,7 @@ export default tseslint.config(
 			'dist/**',
 			'packages/*/dist/**',
 			'node_modules/**',
-			'apps/playground/**',
+			'playground/**',
 			'.changeset/*.md',
 		],
 	},

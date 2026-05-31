@@ -79,7 +79,7 @@ pnpm release
 - `packages/sdk/test/unit/` - Vitest coverage for config resolution, cache helpers, and transaction builders
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
-- `apps/playground/` - workspace-local Next.js integration playground
+- `playground/` - workspace-local Next.js integration playground
 - `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System

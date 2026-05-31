@@ -11,7 +11,7 @@
 		"lint": "pnpm eslint:fix && pnpm prettier:fix",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"typecheck": "tsc --noEmit",
-		"doctor": "react-doctor"
+		"doctor": "react-doctor --yes --no-score --fail-on warning"
 	},
 	"dependencies": {
 		"@mysten/dapp-kit-core": "^1.3.2",
@@ -35,18 +35,18 @@
 		"react-dom": "^19.2.6",
 		"sonner": "^2.0.7",
 		"tailwind-merge": "^3.6.0",
-		"zustand": "^5.0.13"
+		"zustand": "^5.0.14"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.0",
 		"@types/node": "catalog:typescript",
 		"@types/react": "^19.2.15",
 		"@types/react-dom": "^19.2.3",
-		"eslint": "^10.4.0",
+		"eslint": "^9.3.4",
 		"eslint-config-next": "^16.2.6",
 		"eslint-config-prettier": "^10.1.8",
 		"prettier": "^3.8.3",
-		"react-doctor": "^0.2.6",
+		"react-doctor": "^0.2.11",
 		"tailwindcss": "^4.3.0",
 		"typescript": "catalog:typescript"
 	}

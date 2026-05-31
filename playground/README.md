@@ -40,7 +40,7 @@ From the repository root:
 
 ```bash
 pnpm install
-pnpm turbo run dev --filter='./apps/playground'
+pnpm turbo run dev --filter='./playground'
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
@@ -50,9 +50,9 @@ The playground resolves the workspace-local `@suigar/sdk` package through `works
 Useful local checks:
 
 ```bash
-pnpm --dir apps/playground format
-pnpm --dir apps/playground lint
-pnpm turbo run typecheck --filter='./apps/playground'
+pnpm --dir playground format
+pnpm --dir playground lint
+pnpm turbo run typecheck --filter='./playground'
 ```
 
 ## Notes
