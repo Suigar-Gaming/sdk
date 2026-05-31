@@ -7,13 +7,13 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'apps/playground/**'
+      - 'playground/**'
       - 'turbo.json'
   pull_request:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/deploy-playground-pages.yml'
-      - 'apps/playground/**'
+      - 'playground/**'
       - 'turbo.json'
   workflow_dispatch:
 
@@ -43,7 +43,7 @@ jobs:
         uses: actions/configure-pages@v6
 
       - name: Build playground site
-        run: pnpm turbo run build --filter='./apps/playground'
+        run: pnpm turbo run build --filter='./playground'
         env:
           BASE_PATH: ${{ steps.github-pages.outputs.base_path }}
 
@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           name: playground-pages-${{ github.run_number }}
-          path: apps/playground/out
+          path: playground/out
 
   deploy:
     if: github.event_name != 'pull_request'

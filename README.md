@@ -95,12 +95,12 @@ pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with t
 
 ## Playground
 
-The repository includes a Next.js integration playground in [`apps/playground`](apps/playground). It demonstrates standard game transactions, PvP coinflip transactions, wallet integration, live transaction code previews, and event decoding.
+The repository includes a Next.js integration playground in [`playground`](playground). It demonstrates standard game transactions, PvP coinflip transactions, wallet integration, live transaction code previews, and event decoding.
 
 Run it locally:
 
 ```bash
-pnpm turbo run dev --filter='./apps/playground'
+pnpm turbo run dev --filter='./playground'
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
@@ -318,5 +318,5 @@ const price = fromMoveFloat(decoded.adjusted_oracle_usd_coin_price);
 ## Useful Package Docs
 
 - [`packages/sdk/README.md`](packages/sdk/README.md) contains the complete package API guide.
-- [`apps/playground/README.md`](apps/playground/README.md) documents the integration playground.
+- [`playground/README.md`](playground/README.md) documents the integration playground.
 - [`AGENTS.md`](AGENTS.md) documents repository conventions for AI-assisted development.

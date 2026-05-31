@@ -8,7 +8,7 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/turborepo.yml'
-      - 'apps/**'
+      - 'playground/**'
       - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -18,7 +18,7 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yml'
       - '.github/workflows/turborepo.yml'
-      - 'apps/**'
+      - 'playground/**'
       - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -48,8 +48,8 @@ jobs:
       - name: Lint packages
         run: pnpm turbo run lint --filter='./packages/*'
 
-      - name: Lint apps
-        run: pnpm turbo run lint --filter='./apps/*'
+      - name: Lint Playground
+        run: pnpm turbo run lint --filter='./playground'
 
       - name: Run package tests
         run: pnpm turbo run test --filter='./packages/*'
@@ -60,8 +60,8 @@ jobs:
       - name: Run package builds
         run: pnpm turbo run build:ci --filter='./packages/*'
 
-      - name: Run app typecheck
-        run: pnpm turbo run typecheck --filter='./apps/*'
+      - name: Run Playground typecheck
+        run: pnpm turbo run typecheck --filter='./playground'
 
-      - name: Run app builds
-        run: pnpm turbo run build --filter='./apps/*'
+      - name: Run Playground build
+        run: pnpm turbo run build --filter='./playground'
