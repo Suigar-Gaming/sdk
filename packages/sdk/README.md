@@ -584,7 +584,7 @@ pnpm --dir packages/sdk test
 
 ## Example App
 
-This repository includes a Next.js integration playground in [apps/playground](../../apps/playground).
+This repository includes a Next.js integration playground in [playground](../../playground).
 
 It demonstrates:
 
@@ -602,5 +602,5 @@ Run it from the repo root with:
 
 ```bash
 pnpm install
-pnpm turbo run dev --filter='./apps/playground'
+pnpm turbo run dev --filter='./playground'
 ```
