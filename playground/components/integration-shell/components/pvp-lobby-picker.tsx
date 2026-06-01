@@ -40,6 +40,22 @@ type Props = {
 	onSelectGame: (game: PvPCoinflipLobbyGame) => void;
 };
 
+async function handleCopyGameId(
+	event: MouseEvent<HTMLButtonElement>,
+	gameId: string,
+) {
+	event.stopPropagation();
+
+	try {
+		await navigator.clipboard.writeText(gameId);
+		toast.success('Copied game id', {
+			description: gameId,
+		});
+	} catch {
+		toast.error('Unable to copy game id');
+	}
+}
+
 export function PvPLobbyPicker({
 	title,
 	description,
@@ -56,22 +72,6 @@ export function PvPLobbyPicker({
 }: Props) {
 	function handleSelect(game: PvPCoinflipLobbyGame) {
 		onSelectGame(game);
-	}
-
-	async function handleCopyGameId(
-		event: MouseEvent<HTMLButtonElement>,
-		gameId: string,
-	) {
-		event.stopPropagation();
-
-		try {
-			await navigator.clipboard.writeText(gameId);
-			toast.success('Copied game id', {
-				description: gameId,
-			});
-		} catch {
-			toast.error('Unable to copy game id');
-		}
 	}
 
 	return (

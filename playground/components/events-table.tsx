@@ -26,6 +26,22 @@ function toTitleCase(value: string) {
 	return value.replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+function toTransactionUrl(digest: string) {
+	return `https://testnet.suivision.xyz/txblock/${digest}?tab=Changes`;
+}
+
+function toAccountUrl(address: string) {
+	return `https://testnet.suivision.xyz/account/${address}`;
+}
+
+function handleCopied(label: string) {
+	const titleCaseLabel = toTitleCase(label);
+
+	toast.success('Copied to clipboard', {
+		description: `${titleCaseLabel} copied.`,
+	});
+}
+
 function CopyableValue({
 	label,
 	value,
@@ -94,22 +110,6 @@ function CopyableValue({
 
 export function EventsTable() {
 	const { rows, clearRows } = useEventLog();
-
-	function toTransactionUrl(digest: string) {
-		return `https://testnet.suivision.xyz/txblock/${digest}?tab=Changes`;
-	}
-
-	function toAccountUrl(address: string) {
-		return `https://testnet.suivision.xyz/account/${address}`;
-	}
-
-	function handleCopied(label: string) {
-		const titleCaseLabel = toTitleCase(label);
-
-		toast.success('Copied to clipboard', {
-			description: `${titleCaseLabel} copied.`,
-		});
-	}
 
 	return (
 		<Card className="shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
