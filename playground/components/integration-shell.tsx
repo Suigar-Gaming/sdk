@@ -1075,7 +1075,10 @@ function useIntegrationState({
 		currentAccount?.address.toLowerCase() ?? null;
 	const activeConfigId =
 		standardGame === 'plinko' || standardGame === 'wheel'
-			? standardForms[standardGame].configId
+			? resolvePlayableConfigId(
+					standardForms[standardGame].configId,
+					standardGameParameters?.configOptions,
+				)
 			: undefined;
 	const activeConfigOption = React.useMemo(
 		() =>
@@ -1432,15 +1435,20 @@ function useIntegrationState({
 		currentCode = `// Unable to build sample code yet\n// ${parseError(buildError)}`;
 	}
 
-	function updateQuery(key: string, value: string) {
-		const params = new URLSearchParams(routeParams.toString());
-		params.set(key, value);
-		const nextSearch = params.toString();
-		setRouteSearch(nextSearch ? `?${nextSearch}` : '');
-		replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
-			scroll: false,
-		});
-	}
+	const updateQuery = React.useCallback(
+		(updates: Record<string, string>) => {
+			const params = new URLSearchParams(routeParams.toString());
+			for (const [key, value] of Object.entries(updates)) {
+				params.set(key, value);
+			}
+			const nextSearch = params.toString();
+			setRouteSearch(nextSearch ? `?${nextSearch}` : '');
+			replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
+				scroll: false,
+			});
+		},
+		[pathname, replace, routeParams, setRouteSearch],
+	);
 
 	function updateStandardForm<K extends StandardGameId>(
 		game: K,
@@ -1843,12 +1851,14 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					pvpGame={integration.pvpGame}
 					pvpAction={integration.pvpAction}
 					onStandardGameChange={(value) =>
-						integration.updateQuery('game', value)
+						integration.updateQuery({ game: value })
 					}
-					onPvPGameChange={(value) => integration.updateQuery('game', value)}
+					onPvPGameChange={(value) => integration.updateQuery({ game: value })}
 					onPvPActionChange={(value) => {
-						integration.updateQuery('game', integration.pvpGame);
-						integration.updateQuery('action', value);
+						integration.updateQuery({
+							game: integration.pvpGame,
+							action: value,
+						});
 					}}
 				/>
 			}
