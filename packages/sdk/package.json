@@ -74,7 +74,7 @@
 		"@mysten/sui": "catalog:mysten",
 		"@types/node": "catalog:typescript",
 		"tsdown": "^0.22.1",
-		"tsx": "^4.22.2",
+		"tsx": "^4.22.4",
 		"typescript": "catalog:typescript",
 		"vitest": "^4.1.7"
 	}
