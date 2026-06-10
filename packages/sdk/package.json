@@ -70,12 +70,12 @@
 	},
 	"devDependencies": {
 		"@mysten/bcs": "catalog:mysten",
-		"@mysten/codegen": "^0.10.6",
+		"@mysten/codegen": "catalog:mysten",
 		"@mysten/sui": "catalog:mysten",
 		"@types/node": "catalog:typescript",
-		"tsdown": "^0.22.1",
-		"tsx": "^4.22.4",
+		"tsdown": "catalog:tooling",
+		"tsx": "catalog:tooling",
 		"typescript": "catalog:typescript",
-		"vitest": "^4.1.7"
+		"vitest": "catalog:test"
 	}
 }
