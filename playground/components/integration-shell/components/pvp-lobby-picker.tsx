@@ -70,10 +70,6 @@ export function PvPLobbyPicker({
 	onRefresh,
 	onSelectGame,
 }: Props) {
-	function handleSelect(game: PvPCoinflipLobbyGame) {
-		onSelectGame(game);
-	}
-
 	return (
 		<Card className="bg-background/45">
 			<CardHeader className="gap-3">
@@ -133,10 +129,11 @@ export function PvPLobbyPicker({
 											: 'border-border/70 bg-card/75 hover:border-secondary/40 hover:bg-secondary/5',
 									)}
 								>
-									<button
+									<Button
 										type="button"
-										onClick={() => handleSelect(game)}
-										className="absolute inset-0 rounded-2xl focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+										variant="ghost"
+										onClick={() => onSelectGame(game)}
+										className="absolute inset-0 h-auto w-auto rounded-2xl border-0 bg-transparent p-0 hover:bg-transparent active:translate-y-0 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
 										aria-label={`Select PvP lobby ${compactAddress(game.id)}`}
 									/>
 									<div className="relative flex flex-col gap-2">
