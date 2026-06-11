@@ -11,7 +11,7 @@
 		"lint": "pnpm eslint:fix && pnpm prettier:fix",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"typecheck": "tsc --noEmit",
-		"doctor": "react-doctor --yes --no-score --blocking warning"
+		"doctor": "react-doctor --yes"
 	},
 	"dependencies": {
 		"@mysten/dapp-kit-core": "^1.3.2",
