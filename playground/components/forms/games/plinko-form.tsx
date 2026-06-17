@@ -17,6 +17,7 @@ import type { GameConfigOption, PlinkoFormValues } from '@/lib/suigar-types';
 export function PlinkoForm({
 	value,
 	onChange,
+	onStakeBlur,
 	configOptions,
 	isConfigLoading,
 	configError,
@@ -24,6 +25,7 @@ export function PlinkoForm({
 }: {
 	value: PlinkoFormValues;
 	onChange: (patch: Partial<PlinkoFormValues>) => void;
+	onStakeBlur?: () => void;
 	configOptions?: GameConfigOption[];
 	isConfigLoading?: boolean;
 	configError?: string | null;
@@ -86,6 +88,7 @@ export function PlinkoForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>

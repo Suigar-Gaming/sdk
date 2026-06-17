@@ -18,11 +18,13 @@ import type { RangeFormValues } from '@/lib/suigar-types';
 export function RangeForm({
 	value,
 	onChange,
+	onStakeBlur,
 	stakeDescription,
 	rangeBoundsDescription,
 }: {
 	value: RangeFormValues;
 	onChange: (patch: Partial<RangeFormValues>) => void;
+	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	rangeBoundsDescription?: React.ReactNode;
 }) {
@@ -114,6 +116,7 @@ export function RangeForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>

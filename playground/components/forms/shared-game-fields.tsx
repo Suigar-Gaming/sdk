@@ -8,12 +8,14 @@ import type { SharedFields } from '@/lib/suigar-types';
 type SharedGameFieldsProps<T extends SharedFields> = {
 	value: T;
 	onChange: (patch: Partial<T>) => void;
+	onStakeBlur?: () => void;
 	description?: React.ReactNode;
 };
 
 export function SharedGameFields<T extends SharedFields>({
 	value,
 	onChange,
+	onStakeBlur,
 	description,
 }: SharedGameFieldsProps<T>) {
 	return (
@@ -29,6 +31,7 @@ export function SharedGameFields<T extends SharedFields>({
 				onChange={(event) =>
 					onChange({ stake: event.target.value } as Partial<T>)
 				}
+				onBlur={onStakeBlur}
 				placeholder="1"
 			/>
 			{description}

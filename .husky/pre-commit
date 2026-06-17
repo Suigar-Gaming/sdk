@@ -1,1 +1,2 @@
+pnpm --filter playground doctor --staged
 pnpm exec lint-staged

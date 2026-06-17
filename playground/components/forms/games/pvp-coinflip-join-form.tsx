@@ -1,7 +1,6 @@
 'use client';
 
-import { Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { CopyableGameIdField } from '@/components/forms/copyable-game-id-field';
 import type { PvPCoinflipJoinFormValues } from '@/lib/suigar-types';
 
 export function PvPCoinflipJoinForm({
@@ -11,17 +10,12 @@ export function PvPCoinflipJoinForm({
 }) {
 	return (
 		<div className="space-y-6">
-			<Field>
-				<FieldLabel htmlFor="pvpGameId">Game ID</FieldLabel>
-				<Input
-					id="pvpGameId"
-					placeholder="Select a lobby card to fill the game id"
-					value={value.gameId}
-					readOnly
-					aria-readonly="true"
-					className="h-11 font-mono text-xs md:text-sm px-4 bg-muted/35 cursor-default rounded-2xl"
-				/>
-			</Field>
+			<CopyableGameIdField
+				id="pvpGameId"
+				label="Game ID"
+				placeholder="Select a lobby card to fill the game id"
+				value={value.gameId}
+			/>
 		</div>
 	);
 }

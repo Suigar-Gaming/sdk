@@ -15,10 +15,12 @@ import type { CoinflipFormValues } from '@/lib/suigar-types';
 export function CoinflipForm({
 	value,
 	onChange,
+	onStakeBlur,
 	stakeDescription,
 }: {
 	value: CoinflipFormValues;
 	onChange: (patch: Partial<CoinflipFormValues>) => void;
+	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 }) {
 	return (
@@ -46,6 +48,7 @@ export function CoinflipForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>
