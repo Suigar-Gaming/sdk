@@ -101,6 +101,7 @@ import type {
 	PvPCoinflipLobbyGame,
 	PvPGameId,
 	PvPGameParametersSummary,
+	StakeRangeSummary,
 	StandardForms,
 	StandardGameId,
 	StandardGameParametersSummary,
@@ -310,10 +311,7 @@ function pvpParametersReducer(
 	}
 }
 
-function clampStakeValue(
-	stake: string,
-	stakeRange?: { min: string; max: string },
-) {
+function clampStakeValue(stake: string, stakeRange?: StakeRangeSummary) {
 	if (!stakeRange) {
 		return stake;
 	}
@@ -334,7 +332,7 @@ function clampStakeValue(
 		return stakeRange.min;
 	}
 
-	if (currentStake > maxStake) {
+	if (stakeRange.kind !== 'minimum' && currentStake > maxStake) {
 		return stakeRange.max;
 	}
 
@@ -590,6 +588,8 @@ function IntegrationControls({
 	coinTypes,
 	onRefreshPvPLobbies,
 	onSelectPvPLobby,
+	onStandardStakeBlur,
+	onPvPCreateStakeBlur,
 	updateStandardForm,
 	updatePvPForm,
 	openSettings,
@@ -620,6 +620,8 @@ function IntegrationControls({
 		action: 'join' | 'cancel',
 		game: PvPCoinflipLobbyGame,
 	) => void;
+	onStandardStakeBlur: (game: StandardGameId) => void;
+	onPvPCreateStakeBlur: () => void;
 	updateStandardForm: <K extends StandardGameId>(
 		game: K,
 		patch: Partial<StandardForms[K]>,
@@ -676,6 +678,7 @@ function IntegrationControls({
 								<CoinflipForm
 									value={effectiveStandardForms.coinflip}
 									onChange={(patch) => updateStandardForm('coinflip', patch)}
+									onStakeBlur={() => onStandardStakeBlur('coinflip')}
 									stakeDescription={stakeDescription}
 								/>
 							) : null}
@@ -683,6 +686,7 @@ function IntegrationControls({
 								<LimboForm
 									value={effectiveStandardForms.limbo}
 									onChange={(patch) => updateStandardForm('limbo', patch)}
+									onStakeBlur={() => onStandardStakeBlur('limbo')}
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
 								/>
@@ -691,6 +695,7 @@ function IntegrationControls({
 								<PlinkoForm
 									value={effectiveStandardForms.plinko}
 									onChange={(patch) => updateStandardForm('plinko', patch)}
+									onStakeBlur={() => onStandardStakeBlur('plinko')}
 									configOptions={standardGameParameters?.configOptions}
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
@@ -701,6 +706,7 @@ function IntegrationControls({
 								<RangeForm
 									value={effectiveStandardForms.range}
 									onChange={(patch) => updateStandardForm('range', patch)}
+									onStakeBlur={() => onStandardStakeBlur('range')}
 									stakeDescription={stakeDescription}
 									rangeBoundsDescription={rangeBoundsDescription}
 								/>
@@ -709,6 +715,7 @@ function IntegrationControls({
 								<WheelForm
 									value={effectiveStandardForms.wheel}
 									onChange={(patch) => updateStandardForm('wheel', patch)}
+									onStakeBlur={() => onStandardStakeBlur('wheel')}
 									configOptions={standardGameParameters?.configOptions}
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
@@ -720,8 +727,9 @@ function IntegrationControls({
 						<>
 							{pvpAction === 'create' ? (
 								<PvPCoinflipCreateForm
-									value={effectivePvpForms.create}
+									value={pvpForms.create}
 									onChange={(patch) => updatePvPForm('create', patch)}
+									onStakeBlur={onPvPCreateStakeBlur}
 									stakeDescription={pvpStakeDescription}
 								/>
 							) : null}
@@ -1240,51 +1248,11 @@ function useIntegrationState({
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
 		const nextForms: StandardForms = {
 			...standardForms,
-			coinflip: {
-				...standardForms.coinflip,
-				stake: clampStakeValue(
-					standardForms.coinflip.stake,
-					standardGame === 'coinflip'
-						? (activeStakeRange ?? undefined)
-						: undefined,
-				),
-			},
-			limbo: {
-				...standardForms.limbo,
-				stake: clampStakeValue(
-					standardForms.limbo.stake,
-					standardGame === 'limbo'
-						? (activeStakeRange ?? undefined)
-						: undefined,
-				),
-			},
-			plinko: {
-				...standardForms.plinko,
-				stake: clampStakeValue(
-					standardForms.plinko.stake,
-					standardGame === 'plinko'
-						? (activeStakeRange ?? undefined)
-						: undefined,
-				),
-			},
-			range: {
-				...standardForms.range,
-				stake: clampStakeValue(
-					standardForms.range.stake,
-					standardGame === 'range'
-						? (activeStakeRange ?? undefined)
-						: undefined,
-				),
-			},
-			wheel: {
-				...standardForms.wheel,
-				stake: clampStakeValue(
-					standardForms.wheel.stake,
-					standardGame === 'wheel'
-						? (activeStakeRange ?? undefined)
-						: undefined,
-				),
-			},
+			coinflip: { ...standardForms.coinflip },
+			limbo: { ...standardForms.limbo },
+			plinko: { ...standardForms.plinko },
+			range: { ...standardForms.range },
+			wheel: { ...standardForms.wheel },
 		};
 
 		if (standardGame === 'plinko') {
@@ -1360,22 +1328,9 @@ function useIntegrationState({
 		}
 
 		return nextForms;
-	}, [activeStakeRange, standardForms, standardGame, standardGameParameters]);
+	}, [standardForms, standardGame, standardGameParameters]);
 
-	const effectivePvpForms = React.useMemo<PvPCoinflipForms>(() => {
-		const minimumCreateStake = clampStakeValue(
-			pvpForms.create.stake,
-			pvpGameParameters?.stakeRange,
-		);
-
-		return {
-			...pvpForms,
-			create: {
-				...pvpForms.create,
-				stake: minimumCreateStake,
-			},
-		};
-	}, [pvpForms, pvpGameParameters]);
+	const effectivePvpForms = pvpForms;
 
 	const joinLobbyGames = React.useMemo(
 		() =>
@@ -1470,6 +1425,57 @@ function useIntegrationState({
 			...current,
 			[action]: { ...current[action], ...patch },
 		}));
+	}
+
+	function handleStandardStakeBlur(game: StandardGameId) {
+		if (!activeStakeRange) {
+			return;
+		}
+
+		setStandardForms((current) => {
+			const currentGameForm = current[game];
+			const nextStake = clampStakeValue(
+				currentGameForm.stake,
+				activeStakeRange,
+			);
+
+			if (nextStake === currentGameForm.stake) {
+				return current;
+			}
+
+			return {
+				...current,
+				[game]: {
+					...currentGameForm,
+					stake: nextStake,
+				},
+			};
+		});
+	}
+
+	function handlePvPCreateStakeBlur() {
+		if (!pvpGameParameters?.stakeRange) {
+			return;
+		}
+
+		setPvpForms((current) => {
+			const nextStake = clampStakeValue(
+				current.create.stake,
+				pvpGameParameters.stakeRange,
+			);
+
+			if (nextStake === current.create.stake) {
+				return current;
+			}
+
+			return {
+				...current,
+				create: {
+					...current.create,
+					stake: nextStake,
+				},
+			};
+		});
 	}
 
 	function handleSelectPvPLobby(
@@ -1678,6 +1684,8 @@ function useIntegrationState({
 		coinTypes,
 		currentCode,
 		handleExecute,
+		handleStandardStakeBlur,
+		handlePvPCreateStakeBlur,
 		isExecuting,
 		visibleStatus,
 		error,
@@ -1891,6 +1899,8 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					coinTypes={integration.coinTypes}
 					onRefreshPvPLobbies={() => void integration.refreshPvPLobbies()}
 					onSelectPvPLobby={integration.handleSelectPvPLobby}
+					onStandardStakeBlur={integration.handleStandardStakeBlur}
+					onPvPCreateStakeBlur={integration.handlePvPCreateStakeBlur}
 					updateStandardForm={integration.updateStandardForm}
 					updatePvPForm={integration.updatePvPForm}
 					openSettings={integration.openSettings}

@@ -17,6 +17,7 @@ import type { GameConfigOption, WheelFormValues } from '@/lib/suigar-types';
 export function WheelForm({
 	value,
 	onChange,
+	onStakeBlur,
 	configOptions,
 	isConfigLoading,
 	configError,
@@ -24,6 +25,7 @@ export function WheelForm({
 }: {
 	value: WheelFormValues;
 	onChange: (patch: Partial<WheelFormValues>) => void;
+	onStakeBlur?: () => void;
 	configOptions?: GameConfigOption[];
 	isConfigLoading?: boolean;
 	configError?: string | null;
@@ -86,6 +88,7 @@ export function WheelForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>

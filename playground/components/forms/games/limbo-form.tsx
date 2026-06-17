@@ -17,11 +17,13 @@ import type { LimboFormValues } from '@/lib/suigar-types';
 export function LimboForm({
 	value,
 	onChange,
+	onStakeBlur,
 	stakeDescription,
 	targetMultiplierDescription,
 }: {
 	value: LimboFormValues;
 	onChange: (patch: Partial<LimboFormValues>) => void;
+	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	targetMultiplierDescription?: React.ReactNode;
 }) {
@@ -77,6 +79,7 @@ export function LimboForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>

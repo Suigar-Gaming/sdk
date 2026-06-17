@@ -21,10 +21,12 @@ import type { PvPCoinflipCreateFormValues } from '@/lib/suigar-types';
 export function PvPCoinflipCreateForm({
 	value,
 	onChange,
+	onStakeBlur,
 	stakeDescription,
 }: {
 	value: PvPCoinflipCreateFormValues;
 	onChange: (patch: Partial<PvPCoinflipCreateFormValues>) => void;
+	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 }) {
 	return (
@@ -69,6 +71,7 @@ export function PvPCoinflipCreateForm({
 			<SharedGameFields
 				value={value}
 				onChange={onChange}
+				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 			/>
 		</div>
