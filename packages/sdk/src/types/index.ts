@@ -1,11 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-export * from './bet-metadata.type';
-export * from './build-game-transaction-options.type';
-export * from './game-details.type';
-export * from './game.type';
-export * from './move-float.type';
-export * from './network.type';
-export * from './suigar-config.type';
-export * from './transaction-options.type';
+export * from './bet-metadata.type.js';
+export * from './build-game-transaction-options.type.js';
+export * from './game-details.type.js';
+export * from './game.type.js';
+export * from './move-float.type.js';
+export * from './network.type.js';
+export * from './suigar-config.type.js';
+export * from './transaction-options.type.js';

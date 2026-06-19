@@ -8,7 +8,12 @@ import {
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
 } from '../configs/index.js';
-import type { Game, SuigarCoin, SuigarConfig, SuiNetwork } from '../types';
+import type {
+	Game,
+	SuigarCoin,
+	SuigarConfig,
+	SuiNetwork,
+} from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 

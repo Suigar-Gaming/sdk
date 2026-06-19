@@ -5,27 +5,27 @@ import { SuiClientTypes } from '@mysten/sui/client';
 import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,
-} from '../contracts/coinflip/coinflip';
+} from '../contracts/coinflip/coinflip.js';
 import {
 	Parameters as LimboParameters,
 	LimboSettingsKey,
-} from '../contracts/limbo/limbo';
+} from '../contracts/limbo/limbo.js';
 import {
 	Parameters as PlinkoParameters,
 	PlinkoSettingsKey,
-} from '../contracts/plinko/plinko';
+} from '../contracts/plinko/plinko.js';
 import {
 	Parameters as PvPCoinflipParameters,
 	PvpCoinflipSettingsKey,
-} from '../contracts/pvp-coinflip/pvp_coinflip';
+} from '../contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	Parameters as RangeParameters,
 	RangeSettingsKey,
-} from '../contracts/range/range';
+} from '../contracts/range/range.js';
 import {
 	Parameters as WheelParameters,
 	WheelSettingsKey,
-} from '../contracts/wheel/wheel';
+} from '../contracts/wheel/wheel.js';
 import type { Game } from './game.type.js';
 
 export const GAME_SETTINGS = {

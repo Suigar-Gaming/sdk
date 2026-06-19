@@ -3,7 +3,10 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/wheel/wheel.js';
-import type { BuildWheelTransactionOptions, WithPartner } from '../types';
+import type {
+	BuildWheelTransactionOptions,
+	WithPartner,
+} from '../types/index.js';
 import { toU8 } from '../utils/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

@@ -9,14 +9,14 @@ import {
 	TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
-import { BetResultEvent } from './contracts/core/core';
-import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name';
+import { BetResultEvent } from './contracts/core/core.js';
+import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
 	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
-} from './contracts/pvp-coinflip/pvp_coinflip';
+} from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
 	resolveCoinTypeNameForTypeNameKey,
@@ -31,8 +31,13 @@ import {
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
 	buildWheelTransaction,
-} from './transactions';
+} from './transactions/index.js';
 import { TtlClientCache } from './ttl-cache.js';
+import {
+	GAME_SETTINGS,
+	type GameParameters,
+	type GetGameParametersOptions,
+} from './types/game-settings.type.js';
 import {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
@@ -53,12 +58,7 @@ import {
 	SUPPORTED_SUI_NETWORKS,
 	WithPartner,
 	WithThrowOnError,
-} from './types';
-import {
-	GAME_SETTINGS,
-	type GameParameters,
-	type GetGameParametersOptions,
-} from './types/game-settings.type.js';
+} from './types/index.js';
 import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
