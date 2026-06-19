@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { SuiNetwork } from './network.type';
+import { SuiNetwork } from './network.type.js';
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;

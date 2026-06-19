@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { StandardGame } from './game.type';
+import type { StandardGame } from './game.type.js';
 import type {
 	BuildCoinflipTransactionOptions,
 	BuildLimboTransactionOptions,
@@ -10,7 +10,7 @@ import type {
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
 	PvPCoinflipAction,
-} from './transaction-options.type';
+} from './transaction-options.type.js';
 
 type WithoutConfig<T> = Omit<T, 'config'>;
 

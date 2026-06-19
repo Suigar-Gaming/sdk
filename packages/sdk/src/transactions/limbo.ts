@@ -3,7 +3,10 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/limbo/limbo.js';
-import type { BuildLimboTransactionOptions, WithPartner } from '../types';
+import type {
+	BuildLimboTransactionOptions,
+	WithPartner,
+} from '../types/index.js';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

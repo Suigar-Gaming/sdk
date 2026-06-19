@@ -1,24 +1,26 @@
 packages:
-  - 'packages/*'
-  - 'playground'
+  - packages/*
+  - playground
   - '!**/dist/**'
   - '!**/.next/**'
 
 catalogs:
   mysten:
-    '@mysten/bcs': '^2.0.5'
-    '@mysten/codegen': '^0.10.6'
-    '@mysten/sui': '^2.17.0'
+    '@mysten/bcs': ^2.1.0
+    '@mysten/codegen': ^0.11.1
+    '@mysten/sui': ^2.19.0
   test:
-    'vitest': '^4.1.9'
+    'vitest': ^4.1.9
   tooling:
-    'eslint-config-prettier': '^10.1.8'
-    'prettier': '^3.8.4'
-    'tsdown': '^0.22.2'
-    'tsx': '^4.22.4'
+    'eslint-config-prettier': ^10.1.8
+    'prettier': ^3.8.4
+    'tsdown': ^0.22.3
+    'tsx': ^4.22.4
   typescript:
-    '@types/node': '^24.0.0'
-    'typescript': '^5.9.3'
+    '@types/node': ^24.0.0
+    'typescript': ^5.9.3
+  typescript6:
+    'typescript': ^6.0.3
 
 allowBuilds:
   esbuild: false
@@ -26,8 +28,11 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
 
-autoInstallPeers: true
+autoInstallPeers: false
 
 blockExoticSubdeps: true
 
 minimumReleaseAge: 2880
+
+minimumReleaseAgeExclude:
+  - '@mysten/*'

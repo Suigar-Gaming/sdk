@@ -17,8 +17,8 @@ import {
 	SuigarGameEvent,
 	type Game,
 	type GameDetailValueType,
-} from '../types';
-import { fromMoveFloat } from './numeric';
+} from '../types/index.js';
+import { fromMoveFloat } from './numeric.js';
 
 const textDecoder = new TextDecoder();
 

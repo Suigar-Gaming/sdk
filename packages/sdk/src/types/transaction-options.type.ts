@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction, TransactionResult } from '@mysten/sui/transactions';
-import type { BetMetadataInput } from './bet-metadata.type';
-import type { CoinSide } from './game.type';
-import type { SuigarConfig } from './suigar-config.type';
+import type { BetMetadataInput } from './bet-metadata.type.js';
+import type { CoinSide } from './game.type.js';
+import type { SuigarConfig } from './suigar-config.type.js';
 
 export type WithGasBudget = {
 	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];

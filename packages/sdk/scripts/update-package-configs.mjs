@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 
-const NETWORKS = ['mainnet', 'testnet'];
+const NETWORKS = ['testnet', 'mainnet'];
 
 const REGISTRY_PACKAGE_NAMES = {
 	core: '@suigar/core',

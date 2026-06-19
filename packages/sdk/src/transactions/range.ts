@@ -3,7 +3,10 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/range/range.js';
-import type { BuildRangeTransactionOptions, WithPartner } from '../types';
+import type {
+	BuildRangeTransactionOptions,
+	WithPartner,
+} from '../types/index.js';
 import { DEFAULT_RANGE_SCALE } from '../utils/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

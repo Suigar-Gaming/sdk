@@ -20,7 +20,7 @@ import type {
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	WithPartner,
-} from '../types';
+} from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST, toBigInt } from '../utils/index.js';
 
 type StrictStakeTransactionOptions = {

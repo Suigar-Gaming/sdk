@@ -3,7 +3,10 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/plinko/plinko.js';
-import type { BuildPlinkoTransactionOptions, WithPartner } from '../types';
+import type {
+	BuildPlinkoTransactionOptions,
+	WithPartner,
+} from '../types/index.js';
 import { toU8 } from '../utils/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

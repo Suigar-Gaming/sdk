@@ -8,7 +8,7 @@ import {
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
-} from '../../src/configs';
+} from '../../src/configs/index.js';
 import { PlinkoSettingsKey } from '../../src/contracts/plinko/plinko.js';
 import {
 	resolveCoinTypeNameForTypeNameKey,

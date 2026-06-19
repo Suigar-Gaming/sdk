@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { MoveFloat } from '../types';
+import { MoveFloat } from '../types/index.js';
 
 /**
  * Converts a generated Move `i64` wrapper into a JavaScript number.
