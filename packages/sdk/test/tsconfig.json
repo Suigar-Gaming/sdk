@@ -5,8 +5,7 @@
 		"types": ["node", "vitest/globals"],
 		"composite": false,
 		"declaration": false,
-		"declarationMap": false,
-		"outDir": "../.vitest-cache"
+		"declarationMap": false
 	},
-	"include": ["./**/*.ts", "../src", "../vitest.config.ts"]
+	"include": ["./**/*.ts", "../src"]
 }

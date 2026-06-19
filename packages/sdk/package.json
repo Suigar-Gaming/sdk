@@ -44,7 +44,7 @@
 	"scripts": {
 		"build": "pnpm clean && pnpm codegen && tsdown",
 		"build:ci": "rm -rf dist && tsdown",
-		"clean": "rm -rf dist src/contracts .vitest-cache",
+		"clean": "rm -rf dist src/contracts",
 		"codegen": "node ./scripts/update-package-configs.mjs && sui-ts-codegen generate && pnpm lint",
 		"eslint:fix": "eslint . --fix",
 		"format": "pnpm prettier:fix",
