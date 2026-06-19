@@ -75,7 +75,7 @@
 		"@types/node": "catalog:typescript",
 		"tsdown": "catalog:tooling",
 		"tsx": "catalog:tooling",
-		"typescript": "catalog:typescript",
+		"typescript": "catalog:typescript6",
 		"vitest": "catalog:test"
 	}
 }
