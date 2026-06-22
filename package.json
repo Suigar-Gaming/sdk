@@ -9,6 +9,7 @@
 		"pnpm": ">=11.8.0"
 	},
 	"scripts": {
+		"prepare": "husky",
 		"changeset": "changeset",
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",
@@ -16,7 +17,6 @@
 		"eslint:fix": "eslint . --fix",
 		"format": "pnpm prettier:fix",
 		"lint": "pnpm eslint:fix && pnpm prettier:fix",
-		"prepare": "husky",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"release": "pnpm turbo run build:ci --filter='./packages/*' && changeset publish"
 	},
