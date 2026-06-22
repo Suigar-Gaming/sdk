@@ -1,5 +1,12 @@
 # @suigar/sdk
 
+## 2.0.0-beta.20
+
+### Minor Changes
+
+- 84feb08: Refresh SDK dependency metadata for the latest Mysten package set and normalize the published Node engine range.
+- bed0775: Update the SDK to the latest Mysten package set, NodeNext TypeScript module resolution, and explicit ESM source imports. Regenerated contract wrappers now expose helpers for building and resolving Move type tags from generated BCS types.
+
 ## 2.0.0-beta.19
 
 ### Minor Changes
