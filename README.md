@@ -16,7 +16,7 @@ The main integration path is the `suigar()` extension on top of a Sui client suc
 
 Runtime requirements for `@suigar/sdk`:
 
-- Node.js `^22.18.0 || >=24`
+- Node.js `^22.18.0 || >=24.0.0`
 - ESM project configuration (`"type": "module"`)
 
 Public package entrypoints:
