@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- e524cd1: Refresh SDK dependency metadata for the latest Mysten package catalog updates.
+
 ## 2.0.0-beta.20
 
 ### Minor Changes
