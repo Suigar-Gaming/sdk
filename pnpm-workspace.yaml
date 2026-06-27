@@ -7,8 +7,8 @@ packages:
 catalogs:
   mysten:
     '@mysten/bcs': ^2.1.0
-    '@mysten/codegen': ^0.11.2
-    '@mysten/sui': ^2.20.0
+    '@mysten/codegen': ^0.11.3
+    '@mysten/sui': ^2.20.1
   test:
     'vitest': ^4.1.9
   tooling:
