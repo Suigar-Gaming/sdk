@@ -188,6 +188,25 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 );
 ```
 
+Patch network config at extension setup when package ids, supported `sui`/`usdc`
+coin metadata, or price info object ids need to move ahead of the published SDK
+defaults.
+
+```ts
+const client = new SuiGrpcClient({ network, baseUrl }).$extend(
+	suigar({
+		config: {
+			coins: {
+				usdc: { coinType: '0xPACKAGE::usdc::USDC', decimals: 6 },
+			},
+			priceInfoObjectIds: {
+				usdc: '0xPYTH_PRICE_INFO',
+			},
+		},
+	}),
+);
+```
+
 Read typed on-chain game parameters with `getGameParameters(game, options?)`.
 Use this when an app needs current game bounds such as min/max stake or
 game-specific configuration limits. The SDK first reads the selected game's
@@ -220,7 +239,7 @@ Use `createBetTransaction(gameId, options)` for standard games:
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
 - `wheel`: `configId: number`
 
-Shared options include `owner`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `allowGasCoinShortcut`.
+Shared options include `owner`, `coinType`, `stake`, optional `cashStake`, optional `betCount`, optional `metadata`, optional `gasBudget`, and optional `useGasCoin`.
 
 `stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into on-chain byte arrays.
 

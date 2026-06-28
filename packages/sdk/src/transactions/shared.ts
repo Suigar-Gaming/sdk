@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+	coinWithBalance,
 	Transaction,
-	type TransactionArgument,
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -36,7 +36,6 @@ export type BuildSharedBetTransactionContext = Pick<
 > &
 	Pick<CoinTransactionOptions, 'coinType'> &
 	StrictStakeTransactionOptions & {
-		tx: Transaction;
 		metadata: EncodedBetMetadata;
 		priceInfoObjectId: string;
 		betCoin: TransactionResult;
@@ -51,7 +50,7 @@ export type BuildSharedBetTransactionOptions = WithPartner<
 		game: Game;
 		buildRewardCoin: (
 			context: BuildSharedBetTransactionContext,
-		) => TransactionResult;
+		) => (tx: Transaction) => TransactionResult;
 	}
 >;
 
@@ -70,38 +69,42 @@ export function createBaseGameTransaction({
 	return tx;
 }
 
-export function buildSharedStandardGameBetCall({
+export function buildSharedStandardGameBetTransaction({
 	config,
 	owner,
+	gasBudget,
+	game,
 	coinType,
 	stake,
 	cashStake,
 	betCount,
 	metadata,
 	partner,
-	allowGasCoinShortcut = true,
+	useGasCoin = true,
 	buildRewardCoin,
-}: BuildSharedBetTransactionOptions): (tx: Transaction) => TransactionArgument {
-	return (tx: Transaction) => {
-		const normalizedOwner = normalizeSuiAddress(owner);
-		const normalizedCoinType = normalizeStructTag(coinType);
-		const resolvedStake = toBigInt(stake);
-		const resolvedCashStake = toBigInt(cashStake ?? stake);
-		const resolvedBetCount = toBigInt(betCount ?? 1);
-		const encodedMetadata = encodeBetMetadata(metadata, partner);
-		const priceInfoObjectId = resolvePriceInfoObjectId(
-			config,
-			normalizedCoinType,
-		);
+}: BuildSharedBetTransactionOptions): Transaction {
+	const tx = createBaseGameTransaction({ config, game, owner, gasBudget });
+	const normalizedOwner = normalizeSuiAddress(owner);
+	const normalizedCoinType = normalizeStructTag(coinType);
+	const resolvedStake = toBigInt(stake);
+	const resolvedCashStake = toBigInt(cashStake ?? stake);
+	const resolvedBetCount = toBigInt(betCount ?? 1);
+	const encodedMetadata = encodeBetMetadata(metadata, partner);
+	const priceInfoObjectId = resolvePriceInfoObjectId(
+		config,
+		normalizedCoinType,
+	);
 
-		const betCoin = tx.coin({
+	const betCoin = tx.add(
+		coinWithBalance({
 			type: normalizedCoinType,
 			balance: resolvedCashStake,
-			useGasCoin: allowGasCoinShortcut,
-		});
+			useGasCoin,
+		}),
+	);
 
-		const rewardCoin = buildRewardCoin({
-			tx,
+	const rewardCoin = tx.add(
+		buildRewardCoin({
 			config,
 			owner: normalizedOwner,
 			coinType: normalizedCoinType,
@@ -111,17 +114,9 @@ export function buildSharedStandardGameBetCall({
 			metadata: encodedMetadata,
 			priceInfoObjectId,
 			betCoin,
-		});
+		}),
+	);
 
-		tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
-		return rewardCoin;
-	};
-}
-
-export function buildSharedStandardGameBetTransaction(
-	options: BuildSharedBetTransactionOptions,
-): Transaction {
-	const tx = createBaseGameTransaction(options);
-	tx.add(buildSharedStandardGameBetCall(options));
+	tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
 	return tx;
 }

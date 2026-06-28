@@ -165,7 +165,7 @@ client.games.bcs;
 `suigar(options?)` resolves config from:
 
 - internal package ids by network
-- internal supported coin types by network
+- internal supported coin metadata by network
 - internal price info object ids by network
 - the connected client network
 - the extension name
@@ -175,6 +175,32 @@ Supported override areas:
 - `name`
 - `partner`
 - `cacheTtl`
+- `config.packageIds`
+- `config.registryIds`
+- `config.coins`
+- `config.priceInfoObjectIds`
+
+Use `config` when the application needs to patch package ids, supported
+`sui`/`usdc` coin metadata, or price info object ids before a new SDK release is
+published.
+
+```ts
+const client = new SuiGrpcClient({ network, baseUrl }).$extend(
+	suigar({
+		config: {
+			coins: {
+				usdc: {
+					coinType: '0xPACKAGE::usdc::USDC',
+					decimals: 6,
+				},
+			},
+			priceInfoObjectIds: {
+				usdc: '0xPYTH_PRICE_INFO',
+			},
+		},
+	}),
+);
+```
 
 If `partner` is configured, the SDK automatically writes that partner wallet
 address into the on-chain metadata vec-map. Transaction builder options may also
@@ -206,12 +232,13 @@ It includes:
 
 - `packageIds`
 - `registryIds`
-- `coinTypes`
+- `coins`
 - `priceInfoObjectIds`
 
 ```ts
 const config = client.suigar.getConfig();
 console.log(config.packageIds);
+console.log(config.coins.sui.coinType);
 ```
 
 ### `getGameParameters(game, options?)`
@@ -321,7 +348,7 @@ Shared option shape:
 - `betCount?: number | bigint`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `allowGasCoinShortcut?: boolean`
+- `useGasCoin?: boolean`
 
 Shared behavior:
 
@@ -431,7 +458,7 @@ PvP shared options:
 - `coinType: string`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `allowGasCoinShortcut?: boolean`
+- `useGasCoin?: boolean`
 
 Action-specific options:
 

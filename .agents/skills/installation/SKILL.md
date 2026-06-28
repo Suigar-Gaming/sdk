@@ -113,7 +113,7 @@ client.casino;
 ## Required config guardrails
 
 - Standard games rely on the SDK's network-resolved `priceInfoObjectIds` for supported coins.
-- Prefer the SDK's resolved supported coin types from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
+- Prefer the SDK's resolved supported coin metadata from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
 - Do not invent package exports that do not exist or move runtime builders out of `client.suigar.tx`.
 - Keep wallet address ownership explicit and pass the same connected account through the integration.
 - If partner attribution is required, set `suigar({ partner: '<wallet-address>' })` once at extension registration time instead of passing `partner` through transaction `metadata`.
@@ -179,6 +179,6 @@ Guardrails:
 
 1. Install and import `@suigar/sdk`, `@mysten/sui`, and `@mysten/bcs`.
 2. Extend the existing client with `suigar()`.
-3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin types, and price info object ids.
+3. Ensure the client is connected to the intended supported network so the SDK resolves the right package ids, coin metadata, and price info object ids.
 4. Keep transaction serialization inside the same registered client instance.
 5. Keep the consuming app on ESM and pass the explicit `network` required by current client constructors.

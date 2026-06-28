@@ -32,7 +32,7 @@ Supported game ids:
 - `betCount?: number | bigint`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `allowGasCoinShortcut?: boolean`
+- `useGasCoin?: boolean`
 
 Extension-level option:
 

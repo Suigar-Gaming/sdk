@@ -19,7 +19,6 @@ export function buildWheelTransaction(
 		...options,
 		game: 'wheel',
 		buildRewardCoin: ({
-			tx,
 			config,
 			coinType,
 			stake,
@@ -41,6 +40,6 @@ export function buildWheelTransaction(
 					metadata.values,
 					priceInfoObjectId,
 				],
-			})(tx),
+			}),
 	});
 }

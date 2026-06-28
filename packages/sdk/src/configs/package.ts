@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
-	SuigarCoinTypes,
+	SuigarCoinMetadataMap,
 	SuigarPackageIds,
 	SuigarPriceInfoObjectIds,
 	SuiNetworkRegistry,
 } from '../types/suigar-config.type.js';
 import {
-	MAINNET_COIN_TYPES,
+	MAINNET_COINS,
 	MAINNET_PACKAGE_IDS,
 	MAINNET_PRICE_INFO_OBJECT_IDS,
 } from './package.mainnet.js';
 import {
-	TESTNET_COIN_TYPES,
+	TESTNET_COINS,
 	TESTNET_PACKAGE_IDS,
 	TESTNET_PRICE_INFO_OBJECT_IDS,
 } from './package.testnet.js';
@@ -23,9 +23,9 @@ export const PACKAGE_IDS: SuiNetworkRegistry<SuigarPackageIds> = {
 	testnet: { ...TESTNET_PACKAGE_IDS },
 };
 
-export const COIN_TYPES: SuiNetworkRegistry<SuigarCoinTypes> = {
-	mainnet: { ...MAINNET_COIN_TYPES },
-	testnet: { ...TESTNET_COIN_TYPES },
+export const COINS: SuiNetworkRegistry<SuigarCoinMetadataMap> = {
+	mainnet: { ...MAINNET_COINS },
+	testnet: { ...TESTNET_COINS },
 };
 
 export const PRICE_INFO_OBJECT_IDS: SuiNetworkRegistry<SuigarPriceInfoObjectIds> =

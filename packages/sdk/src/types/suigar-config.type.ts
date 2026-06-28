@@ -3,8 +3,28 @@
 
 import { SuiNetwork } from './network.type.js';
 
+export type SuigarCoinMetadata = {
+	coinType: string;
+	decimals: number;
+};
+
+export type SuigarConfigOverrides = {
+	packageIds?: Partial<SuigarPackageIds>;
+	registryIds?: Partial<SuigarRegistryIds>;
+	coins?: Partial<Record<SuigarCoin, Partial<SuigarCoinMetadata>>>;
+	priceInfoObjectIds?: Partial<SuigarPriceInfoObjectIds>;
+};
+
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;
+	/**
+	 * Network-resolved configuration overrides.
+	 *
+	 * Use this to patch package ids, registry ids, supported coins, or price
+	 * info object ids when on-chain deployments move faster than the published
+	 * SDK defaults.
+	 */
+	config?: SuigarConfigOverrides;
 	/**
 	 * Partner wallet address injected into bet metadata for attribution.
 	 *
@@ -22,7 +42,7 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 
 export type SuigarCoin = 'sui' | 'usdc';
 
-export type SuigarCoinTypes = Record<SuigarCoin, string>;
+export type SuigarCoinMetadataMap = Record<SuigarCoin, SuigarCoinMetadata>;
 
 export type SuigarPackage =
 	| 'sweetHouse'
@@ -45,6 +65,6 @@ export type SuiNetworkRegistry<TRegistry> = Record<SuiNetwork, TRegistry>;
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
 	registryIds: SuigarRegistryIds;
-	coinTypes: SuigarCoinTypes;
+	coins: SuigarCoinMetadataMap;
 	priceInfoObjectIds: SuigarPriceInfoObjectIds;
 };

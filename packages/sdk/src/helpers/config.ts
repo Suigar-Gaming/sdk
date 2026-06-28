@@ -3,7 +3,7 @@
 
 import { normalizeStructTag } from '@mysten/sui/utils';
 import {
-	COIN_TYPES,
+	COINS,
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
@@ -12,28 +12,48 @@ import type {
 	Game,
 	SuigarCoin,
 	SuigarConfig,
+	SuigarConfigOverrides,
 	SuiNetwork,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 
-export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
+export function resolveSuigarConfig(
+	network: SuiNetwork,
+	overrides: SuigarConfigOverrides = {},
+): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
-	const coinTypes = COIN_TYPES[network];
+	const coins = COINS[network];
 	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 
+	const resolvedCoins = Object.fromEntries(
+		Object.entries(coins).map(([key, value]) => {
+			const supportedCoin = key as keyof SuigarConfig['coins'];
+			const coin = { ...value, ...overrides.coins?.[supportedCoin] };
+			if (!coin.coinType || coin.decimals === undefined) {
+				throw new Error(
+					`Missing coin metadata configuration for supported coin ${key}`,
+				);
+			}
+			return [
+				key,
+				{
+					...coin,
+					coinType: normalizeStructTag(coin.coinType),
+				},
+			];
+		}),
+	);
+
 	return {
-		packageIds: { ...packageIds },
-		registryIds: { ...registryIds },
-		coinTypes: {
-			sui: normalizeStructTag(coinTypes.sui),
-			usdc: normalizeStructTag(coinTypes.usdc),
-		},
+		packageIds: { ...packageIds, ...overrides.packageIds },
+		registryIds: { ...registryIds, ...overrides.registryIds },
+		coins: resolvedCoins as SuigarConfig['coins'],
 		priceInfoObjectIds: {
-			sui: priceInfoObjectIds.sui,
-			usdc: priceInfoObjectIds.usdc,
-		},
+			...priceInfoObjectIds,
+			...overrides.priceInfoObjectIds,
+		} as SuigarConfig['priceInfoObjectIds'],
 	};
 }
 
@@ -85,14 +105,17 @@ function resolveSupportedCoin(
 	coinType: string,
 ): SuigarCoin {
 	const [supportedCoin] =
-		Object.entries(config.coinTypes).find(([_, value]) => value === coinType) ??
-		[];
+		Object.entries(config.coins).find(
+			([_, value]) => value.coinType === coinType,
+		) ?? [];
 
 	if (!supportedCoin) {
 		throw new RangeError(
 			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(
-				config.coinTypes,
-			).join(', ')}`,
+				config.coins,
+			)
+				.map(({ coinType }) => coinType)
+				.join(', ')}`,
 		);
 	}
 

@@ -55,7 +55,7 @@ Optional fields:
 - `isPrivate`
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin`
 
 Example:
 
@@ -88,7 +88,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin`
 
 Example:
 
@@ -120,7 +120,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin`
 
 Example:
 

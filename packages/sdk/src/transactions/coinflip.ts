@@ -16,7 +16,6 @@ export function buildCoinflipTransaction(
 		...options,
 		game: 'coinflip',
 		buildRewardCoin: ({
-			tx,
 			config,
 			coinType,
 			stake,
@@ -38,6 +37,6 @@ export function buildCoinflipTransaction(
 					metadata.values,
 					priceInfoObjectId,
 				],
-			})(tx),
+			}),
 	});
 }

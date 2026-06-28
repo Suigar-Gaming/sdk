@@ -5,6 +5,7 @@ import type { InferBcsType } from '@mysten/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import {
 	BuildTransactionOptions,
+	coinWithBalance,
 	Transaction,
 	TransactionResult,
 } from '@mysten/sui/transactions';
@@ -63,6 +64,7 @@ import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
+	config,
 	partner,
 	cacheTtl,
 }: SuigarExtensionOptions<Name> = {}) {
@@ -72,6 +74,7 @@ export function suigar<const Name = 'suigar'>({
 			return new SuigarClient({
 				client,
 				name: String(name),
+				config,
 				partner,
 				cacheTtl,
 			});
@@ -91,11 +94,13 @@ export class SuigarClient {
 	constructor({
 		client,
 		name,
+		config,
 		partner,
 		cacheTtl,
 	}: {
 		client: ClientWithCoreApi;
 		name: string;
+		config?: SuigarExtensionOptions['config'];
 		partner?: string;
 		cacheTtl?: number;
 	}) {
@@ -114,14 +119,14 @@ export class SuigarClient {
 			throw new RangeError(`Unsupported network: ${network}`);
 		}
 
-		this.#config = resolveSuigarConfig(network);
+		this.#config = resolveSuigarConfig(network, config);
 	}
 
 	/**
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * registry ids, supported coin types, and price info object ids the SDK
+	 * registry ids, supported coin metadata, and price info object ids the SDK
 	 * resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
@@ -167,7 +172,7 @@ export class SuigarClient {
 		options: GetGameParametersOptions = {},
 	): Promise<GameParameters<TGame>> {
 		const coinType = normalizeStructTag(
-			options.coinType ?? this.#config.coinTypes.sui,
+			options.coinType ?? this.#config.coins.sui.coinType,
 		);
 		return this.#cache.read(
 			['parameters', this.#client.network, game, coinType],
@@ -386,11 +391,13 @@ export class SuigarClient {
 				objectId: options.gameId,
 			});
 
-			return tx.coin({
-				type: options.coinType,
-				balance: BigInt(json.stake_per_player),
-				useGasCoin: options.allowGasCoinShortcut,
-			});
+			return tx.add(
+				coinWithBalance({
+					type: options.coinType,
+					balance: BigInt(json.stake_per_player),
+					useGasCoin: options.useGasCoin,
+				}),
+			);
 		};
 	}
 

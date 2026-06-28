@@ -3,7 +3,7 @@
 
 import { bcs } from '@mysten/sui/bcs';
 import { CoreClient, type SuiClientTypes } from '@mysten/sui/client';
-import { Transaction, type TransactionResult } from '@mysten/sui/transactions';
+import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import {
 	deriveDynamicFieldID,
 	normalizeStructTag,
@@ -12,7 +12,7 @@ import {
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { suigar, type SuigarClient } from '../../src/client.js';
-import { COIN_TYPES, PACKAGE_IDS } from '../../src/configs/index.js';
+import { COINS, PACKAGE_IDS } from '../../src/configs/index.js';
 import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
@@ -39,9 +39,15 @@ const TEST_CONFIG = {
 	registryIds: {
 		pvpCoinflip: '0xregistry',
 	},
-	coinTypes: {
-		sui: normalizeStructTag('0x2::sui::SUI'),
-		usdc: normalizeStructTag('0xusdc::coin::USDC'),
+	coins: {
+		sui: {
+			coinType: normalizeStructTag('0x2::sui::SUI'),
+			decimals: 9,
+		},
+		usdc: {
+			coinType: normalizeStructTag('0xusdc::coin::USDC'),
+			decimals: 6,
+		},
 	},
 	priceInfoObjectIds: {
 		sui: '0x789',
@@ -643,18 +649,17 @@ describe('shared transaction helpers', () => {
 	});
 
 	it('resolves standard game bet context before invoking the reward builder', async () => {
-		const { buildSharedStandardGameBetCall } =
+		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
 
 		let context: Parameters<
-			typeof buildSharedStandardGameBetCall
+			typeof buildSharedStandardGameBetTransaction
 		>[0]['buildRewardCoin'] extends (ctx: infer T) => unknown
 			? T
 			: never | undefined;
 
-		const tx = new Transaction();
 		const partner = normalizeSuiAddress('0x123');
-		const reward = buildSharedStandardGameBetCall({
+		const tx = buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
 			game: 'coinflip',
 			owner: '0xabc',
@@ -666,16 +671,18 @@ describe('shared transaction helpers', () => {
 				label: 'vip',
 			},
 			partner,
-			allowGasCoinShortcut: false,
+			useGasCoin: false,
 			buildRewardCoin: (resolvedContext) => {
 				context = resolvedContext;
-				return resolvedContext.tx.object(
-					'0x777',
-				) as unknown as TransactionResult;
+				return (tx) =>
+					tx.moveCall({
+						target: '0x2::coin::zero',
+						typeArguments: [resolvedContext.coinType],
+					});
 			},
-		})(tx);
+		});
 
-		expect(reward).toBeDefined();
+		expect(tx).toBeDefined();
 		expect(context!).toBeDefined();
 		expect(context!.owner).toBe(normalizeSuiAddress('0xabc'));
 		expect(context!.coinType).toBe(normalizeStructTag('0x2::sui::SUI'));
@@ -693,11 +700,11 @@ describe('shared transaction helpers', () => {
 	});
 
 	it('warns and skips reserved metadata keys', async () => {
-		const { buildSharedStandardGameBetCall } =
+		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-		buildSharedStandardGameBetCall({
+		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
 			game: 'coinflip',
 			owner: '0x123',
@@ -713,11 +720,13 @@ describe('shared transaction helpers', () => {
 					keys: ['label'],
 					values: [encodeUtf8('vip')],
 				});
-				return resolvedContext.tx.object(
-					'0x777',
-				) as unknown as TransactionResult;
+				return (tx) =>
+					tx.moveCall({
+						target: '0x2::coin::zero',
+						typeArguments: [resolvedContext.coinType],
+					});
 			},
-		})(new Transaction());
+		});
 
 		expect(warn).toHaveBeenCalledTimes(2);
 		expect(warn).toHaveBeenNthCalledWith(
@@ -732,11 +741,11 @@ describe('shared transaction helpers', () => {
 	});
 
 	it('encodes wallet addresses in non-reserved metadata values', async () => {
-		const { buildSharedStandardGameBetCall } =
+		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
 		const accountManager = normalizeSuiAddress('0x456');
 
-		buildSharedStandardGameBetCall({
+		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
 			game: 'coinflip',
 			owner: '0x123',
@@ -754,11 +763,13 @@ describe('shared transaction helpers', () => {
 						encodeUtf8('vip'),
 					],
 				});
-				return resolvedContext.tx.object(
-					'0x777',
-				) as unknown as TransactionResult;
+				return (tx) =>
+					tx.moveCall({
+						target: '0x2::coin::zero',
+						typeArguments: [resolvedContext.coinType],
+					});
 			},
-		})(new Transaction());
+		});
 	});
 });
 
@@ -1053,7 +1064,8 @@ describe('pvp coinflip transaction wrapper', () => {
 			metadata: { label: 'vip' },
 			partner,
 			config: TEST_CONFIG,
-			betCoin: (tx: Transaction) => Promise.resolve(tx.coin({ balance: 1000 })),
+			betCoin: (tx: Transaction) =>
+				Promise.resolve(tx.add(coinWithBalance({ balance: 1000 }))),
 		});
 
 		const options = getFirstMockArg<{
@@ -1143,7 +1155,7 @@ describe('SuigarClient', () => {
 		const client = new TestClient().$extend(
 			mockedSuigar({ partner }),
 		) as SuigarTestClient;
-		const coinType = client.suigar.getConfig().coinTypes.sui;
+		const coinType = client.suigar.getConfig().coins.sui.coinType;
 		client.suigar.tx.createBetTransaction('coinflip', {
 			owner: '0x123',
 			coinType,
@@ -1177,7 +1189,7 @@ describe('SuigarClient', () => {
 			dynamicFields: [
 				createTypeNameDynamicField(
 					'0x111',
-					normalizeStructTag(COIN_TYPES.testnet.sui),
+					normalizeStructTag(COINS.testnet.sui.coinType),
 				),
 			],
 			dynamicFieldLookups: [
@@ -1227,7 +1239,7 @@ describe('SuigarClient', () => {
 
 		await expect(client.suigar.getGameParameters('coinflip')).rejects.toThrow(
 			`Missing parameters object content for coinflip and coin type ${normalizeStructTag(
-				COIN_TYPES.testnet.sui,
+				COINS.testnet.sui.coinType,
 			)}`,
 		);
 	});
@@ -1240,7 +1252,7 @@ describe('SuigarClient', () => {
 			dynamicFields: [
 				createTypeNameDynamicField(
 					'0x111',
-					normalizeStructTag(COIN_TYPES.testnet.sui),
+					normalizeStructTag(COINS.testnet.sui.coinType),
 				),
 			],
 			dynamicFieldLookups: [
@@ -1290,7 +1302,7 @@ describe('SuigarClient', () => {
 		baseClient.mockDynamicFields = [
 			createTypeNameDynamicField(
 				'0x111',
-				normalizeStructTag(COIN_TYPES.testnet.sui),
+				normalizeStructTag(COINS.testnet.sui.coinType),
 			),
 		];
 		baseClient.mockDynamicFieldLookups = [

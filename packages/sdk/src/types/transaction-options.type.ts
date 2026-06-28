@@ -26,7 +26,7 @@ export type BaseTransactionOptions = WithGasBudget & {
 export type CoinTransactionOptions = {
 	coinType: string;
 	metadata?: BetMetadataInput;
-	allowGasCoinShortcut?: boolean;
+	useGasCoin?: boolean;
 };
 
 export type StakeTransactionOptions = {
