@@ -82,6 +82,14 @@ function getFirstMockArg<T>(mock: { mock: { calls: unknown[][] } }): T {
 	return mock.mock.calls[0]?.[0] as T;
 }
 
+function createZeroCoinThunk(coinType: string) {
+	return (tx: Transaction) =>
+		tx.moveCall({
+			target: '0x2::coin::zero',
+			typeArguments: [coinType],
+		});
+}
+
 function createDynamicField(childId: string): SuiClientTypes.DynamicFieldEntry {
 	return {
 		fieldId: `${childId}-field`,
@@ -674,15 +682,11 @@ describe('shared transaction helpers', () => {
 			useGasCoin: false,
 			buildRewardCoin: (resolvedContext) => {
 				context = resolvedContext;
-				return (tx) =>
-					tx.moveCall({
-						target: '0x2::coin::zero',
-						typeArguments: [resolvedContext.coinType],
-					});
+				return createZeroCoinThunk(resolvedContext.coinType);
 			},
 		});
 
-		expect(tx).toBeDefined();
+		expect(tx.getData().commands).toHaveLength(3);
 		expect(context!).toBeDefined();
 		expect(context!.owner).toBe(normalizeSuiAddress('0xabc'));
 		expect(context!.coinType).toBe(normalizeStructTag('0x2::sui::SUI'));
@@ -720,11 +724,7 @@ describe('shared transaction helpers', () => {
 					keys: ['label'],
 					values: [encodeUtf8('vip')],
 				});
-				return (tx) =>
-					tx.moveCall({
-						target: '0x2::coin::zero',
-						typeArguments: [resolvedContext.coinType],
-					});
+				return createZeroCoinThunk(resolvedContext.coinType);
 			},
 		});
 
@@ -763,11 +763,7 @@ describe('shared transaction helpers', () => {
 						encodeUtf8('vip'),
 					],
 				});
-				return (tx) =>
-					tx.moveCall({
-						target: '0x2::coin::zero',
-						typeArguments: [resolvedContext.coinType],
-					});
+				return createZeroCoinThunk(resolvedContext.coinType);
 			},
 		});
 	});
@@ -1065,7 +1061,9 @@ describe('pvp coinflip transaction wrapper', () => {
 			partner,
 			config: TEST_CONFIG,
 			betCoin: (tx: Transaction) =>
-				Promise.resolve(tx.add(coinWithBalance({ balance: 1000 }))),
+				Promise.resolve(
+					tx.add(coinWithBalance({ type: '0x2::sui::SUI', balance: 1000 })),
+				),
 		});
 
 		const options = getFirstMockArg<{
