@@ -226,7 +226,7 @@ The registered extension instance exposes the main runtime surface:
 Returns the resolved SDK configuration for the connected network.
 
 This is intended mainly for debugging and inspection, for example to verify the
-resolved package ids or supported coin mappings for the active client network.
+resolved package ids or supported coin metadata for the active client network.
 
 It includes:
 
