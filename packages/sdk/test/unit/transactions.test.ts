@@ -1061,10 +1061,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			metadata: { label: 'vip' },
 			partner,
 			config: TEST_CONFIG,
-			betCoin: (tx: Transaction) =>
-				Promise.resolve(
-					tx.add(coinWithBalance({ type: '0x2::sui::SUI', balance: 1000 })),
-				),
+			betCoin: coinWithBalance({ type: '0x2::sui::SUI', balance: 1000 }),
 		});
 
 		const options = getFirstMockArg<{
