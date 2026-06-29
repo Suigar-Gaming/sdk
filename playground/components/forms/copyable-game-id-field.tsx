@@ -44,7 +44,7 @@ export function CopyableGameIdField({
 					value={value}
 					readOnly
 					aria-readonly="true"
-					className="h-11 pr-12 font-mono text-xs md:text-sm px-4 bg-muted/35 cursor-default rounded-2xl"
+					className="h-11 pl-4 pr-12 font-mono text-xs md:text-sm bg-muted/35 cursor-default rounded-2xl"
 				/>
 				<Button
 					type="button"
