@@ -1,7 +1,10 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction, TransactionResult } from '@mysten/sui/transactions';
+import type {
+	Transaction,
+	TransactionArgument,
+} from '@mysten/sui/transactions';
 import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
@@ -82,7 +85,7 @@ export type BuildJoinPvPCoinflipTransactionOptions =
 
 export type ResolvedJoinPvPCoinflipTransactionOptions =
 	BuildJoinPvPCoinflipTransactionOptions & {
-		betCoin: (tx: Transaction) => Promise<TransactionResult>;
+		betCoin: TransactionArgument;
 	};
 
 export type BuildCancelPvPCoinflipTransactionOptions =

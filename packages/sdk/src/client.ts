@@ -6,7 +6,7 @@ import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import {
 	BuildTransactionOptions,
 	Transaction,
-	TransactionResult,
+	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { BetResultEvent } from './contracts/core/core.js';
@@ -383,7 +383,7 @@ export class SuigarClient {
 
 	#createPvPCoinflipBetCoin(
 		options: BuildJoinPvPCoinflipTransactionOptions,
-	): (tx: Transaction) => Promise<TransactionResult> {
+	): TransactionArgument {
 		return async (tx: Transaction) => {
 			const { json } = await PvPCoinflipGame.get({
 				client: this.#client,
