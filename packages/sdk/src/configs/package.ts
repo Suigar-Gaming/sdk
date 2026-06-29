@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
-	SuigarCoinMetadataMap,
+	SuigarCoinRegistry,
 	SuigarNetworkRegistry,
 	SuigarPackageIds,
 	SuigarPriceInfoObjectIds,
@@ -23,7 +23,7 @@ export const PACKAGE_IDS: SuigarNetworkRegistry<SuigarPackageIds> = {
 	testnet: { ...TESTNET_PACKAGE_IDS },
 };
 
-export const COINS: SuigarNetworkRegistry<SuigarCoinMetadataMap> = {
+export const COINS: SuigarNetworkRegistry<SuigarCoinRegistry> = {
 	mainnet: { ...MAINNET_COINS },
 	testnet: { ...TESTNET_COINS },
 };

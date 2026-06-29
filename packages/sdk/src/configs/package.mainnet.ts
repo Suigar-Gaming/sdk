@@ -3,7 +3,7 @@
 
 import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';
 import type {
-	SuigarCoinMetadataMap,
+	SuigarCoinRegistry,
 	SuigarPackageIds,
 	SuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
@@ -23,7 +23,7 @@ export const MAINNET_PACKAGE_IDS: SuigarPackageIds = {
 	wheel: '0x6791eac73fe7bf463b7f3b1ea391df265fbc1b96201270664a5a11e2441e9955',
 };
 
-export const MAINNET_COINS: SuigarCoinMetadataMap = {
+export const MAINNET_COINS: SuigarCoinRegistry = {
 	sui: {
 		coinType: SUI_TYPE_ARG,
 		decimals: SUI_DECIMALS,
