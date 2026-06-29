@@ -19,6 +19,8 @@ The package root exports:
 
 - `suigar`
 - `SuigarClient`
+- `SuigarCoin`
+- `SuigarNetwork`
 
 Do not assume individual game builders are exported from `@suigar/sdk`.
 Use the registered extension instance for runtime transaction builders.
@@ -40,7 +42,9 @@ Parser and helper utilities are exported from `@suigar/sdk/utils`:
 
 - `fromMoveI64`
 - `fromMoveFloat`
+- `parseCoinType`
 - `parseGameDetails`
+- `parseGameEvent`
 - `toBigInt`
 - `toU16`
 - `toU8`
@@ -110,10 +114,37 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(
 client.casino;
 ```
 
+If the published SDK defaults lag behind a deployment, or if the app needs to
+provide package, coin, or price object ids from environment/runtime config,
+patch them through the extension config instead of forking package internals:
+
+```ts
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(
+	suigar({
+		config: {
+			packageIds: {
+				coinflip: '0x...',
+			},
+			coins: {
+				sui: {
+					coinType: '0x2::sui::SUI',
+					decimals: 9,
+				},
+			},
+			priceInfoObjectIds: {
+				sui: '0x...',
+			},
+		},
+	}),
+);
+```
+
 ## Required config guardrails
 
 - Standard games rely on the SDK's network-resolved `priceInfoObjectIds` for supported coins.
-- Prefer the SDK's resolved supported coin metadata from `client.suigar.getConfig()` only for debugging or inspection; normal examples can pass the expected coin type directly.
+- `client.suigar.getConfig().coins` returns the supported coin metadata keyed by `SuigarCoin`, with each entry containing `coinType` and `decimals`.
+- Prefer the SDK's resolved supported coin metadata from `client.suigar.getConfig()` only for debugging, inspection, or UI coin selectors; simple examples can pass the expected coin type directly.
+- Use the root-exported `SuigarCoin` and `SuigarNetwork` types when app code needs to type supported coin keys or SDK-supported networks.
 - Do not invent package exports that do not exist or move runtime builders out of `client.suigar.tx`.
 - Keep wallet address ownership explicit and pass the same connected account through the integration.
 - If partner attribution is required, set `suigar({ partner: '<wallet-address>' })` once at extension registration time instead of passing `partner` through transaction `metadata`.

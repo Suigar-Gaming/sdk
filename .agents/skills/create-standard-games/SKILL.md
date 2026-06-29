@@ -34,9 +34,11 @@ Supported game ids:
 - `gasBudget?: number | bigint`
 - `useGasCoin?: boolean`
 
-The SDK builds the bet coin from the owner's balance with Mysten coin intent
-helpers. Do not preselect, split, or pass coin objects from application code for
-standard game bets.
+The SDK builds the bet coin from the owner's balance with Mysten
+`coinWithBalance` transaction arguments. Do not preselect, split, or pass coin
+objects from application code for standard game bets. Set `useGasCoin` only
+when the app needs to control whether the SUI gas coin can be used as the bet
+coin source.
 
 Extension-level option:
 
@@ -195,6 +197,8 @@ Guardrails:
 - Treat `partner` as a wallet address, not a slug, label, or display string.
 - Keep amounts as `bigint` once they leave the UI layer.
 - Ensure the same connected wallet address is used as `owner`.
+- Use `client.suigar.getConfig().coins` when the UI needs supported coin
+  `coinType` and `decimals`; do not duplicate decimal constants in app code.
 
 ## Event decoding
 
