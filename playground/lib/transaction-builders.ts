@@ -20,6 +20,27 @@ type TxApi = SuigarClient['tx'];
 
 export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
+function getBetCountInput(fields: SharedFields) {
+	if (!('betCount' in fields) || typeof fields.betCount !== 'string') {
+		return '';
+	}
+
+	return fields.betCount.trim();
+}
+
+function parseBetCount(value: string) {
+	if (!/^\d+$/.test(value)) {
+		throw new Error('Bet count must be a whole number.');
+	}
+
+	const betCount = BigInt(value);
+	if (betCount < BigInt(1)) {
+		throw new Error('Bet count must be at least 1.');
+	}
+
+	return betCount;
+}
+
 function buildSharedOptions(
 	owner: string,
 	coinType: string,
@@ -32,12 +53,20 @@ function buildSharedOptions(
 		coinType,
 		stake: atomicStake,
 	};
+	const rawBetCount = getBetCountInput(fields);
+
+	if (rawBetCount) {
+		baseOptions.betCount = parseBetCount(rawBetCount);
+	}
 
 	const codeLines = [
 		`owner: '${owner}',`,
 		`coinType: '${coinType}',`,
 		`stake: ${atomicStake.toString()}n,`,
 	];
+	if (rawBetCount) {
+		codeLines.push(`betCount: ${rawBetCount}n,`);
+	}
 
 	return {
 		baseOptions,

@@ -12,6 +12,10 @@ export type SharedFields = {
 	stake: string;
 };
 
+export type StandardSharedFields = SharedFields & {
+	betCount: string;
+};
+
 export type StakeRangeSummary = {
 	min: string;
 	max: string;
@@ -61,27 +65,27 @@ export type PvPGameParametersSummary = {
 	topLevelDetails?: GameSettingsDetail[];
 };
 
-export type CoinflipFormValues = SharedFields & {
+export type CoinflipFormValues = StandardSharedFields & {
 	side: CoinSide;
 };
 
-export type LimboFormValues = SharedFields & {
+export type LimboFormValues = StandardSharedFields & {
 	targetMultiplier: string;
 	scale: string;
 };
 
-export type PlinkoFormValues = SharedFields & {
+export type PlinkoFormValues = StandardSharedFields & {
 	configId: string;
 };
 
-export type RangeFormValues = SharedFields & {
+export type RangeFormValues = StandardSharedFields & {
 	leftPoint: string;
 	rightPoint: string;
 	outOfRange: boolean;
 	scale: string;
 };
 
-export type WheelFormValues = SharedFields & {
+export type WheelFormValues = StandardSharedFields & {
 	configId: string;
 };
 

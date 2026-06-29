@@ -19,29 +19,34 @@ const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',
 };
 
+const DEFAULT_STANDARD_SHARED_FIELDS = {
+	...DEFAULT_SHARED_FIELDS,
+	betCount: '',
+};
+
 export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	coinflip: {
-		...DEFAULT_SHARED_FIELDS,
+		...DEFAULT_STANDARD_SHARED_FIELDS,
 		side: 'heads',
 	},
 	limbo: {
-		...DEFAULT_SHARED_FIELDS,
+		...DEFAULT_STANDARD_SHARED_FIELDS,
 		targetMultiplier: '2.5',
 		scale: '',
 	},
 	plinko: {
-		...DEFAULT_SHARED_FIELDS,
+		...DEFAULT_STANDARD_SHARED_FIELDS,
 		configId: '',
 	},
 	range: {
-		...DEFAULT_SHARED_FIELDS,
+		...DEFAULT_STANDARD_SHARED_FIELDS,
 		leftPoint: '25',
 		rightPoint: '75',
 		outOfRange: false,
 		scale: '',
 	},
 	wheel: {
-		...DEFAULT_SHARED_FIELDS,
+		...DEFAULT_STANDARD_SHARED_FIELDS,
 		configId: '',
 	},
 };
