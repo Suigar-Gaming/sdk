@@ -43,15 +43,17 @@
 	},
 	"scripts": {
 		"build": "pnpm clean && pnpm codegen && tsdown",
-		"build:ci": "rm -rf dist && tsdown",
-		"clean": "rm -rf dist src/contracts",
-		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm lint",
-		"eslint:fix": "eslint . --fix",
-		"format": "pnpm prettier:fix",
-		"lint": "pnpm eslint:fix && pnpm prettier:fix",
-		"prettier:fix": "prettier --write --ignore-unknown .",
+		"build:ci": "pnpm clean && tsdown",
+		"clean": "rm -rf dist",
+		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm lint:fix",
 		"test": "vitest run",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"eslint": "eslint .",
+		"eslint:fix": "eslint . --fix",
+		"prettier": "prettier --check --ignore-unknown .",
+		"prettier:fix": "prettier --write --ignore-unknown .",
+		"lint": "pnpm eslint && pnpm prettier",
+		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix"
 	},
 	"repository": {
 		"type": "git",

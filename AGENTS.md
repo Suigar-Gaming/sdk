@@ -43,11 +43,11 @@ pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with t
 ### Linting and Formatting
 
 ```bash
-# Auto-fix lint and formatting issues
+# Check lint and formatting
 pnpm lint
 
-# Format the repository
-pnpm format
+# Auto-fix lint and formatting issues
+pnpm lint:fix
 ```
 
 ### Package Management
