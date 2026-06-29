@@ -359,6 +359,7 @@ Shared behavior:
 - `partner` configured via `suigar({ partner })` is prepended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
+- bet coin inputs are built from the owner's balance with Mysten coin intent helpers, using `coinType`, `cashStake`, and `useGasCoin`
 - the reward object is transferred back to `owner`
 
 Error behavior:
@@ -449,8 +450,9 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 });
 ```
 
-Join derives the stake from `gameId` and uses the configured price info object
-id for `coinType`.
+PvP coinflip create builds the stake coin from the owner's balance with Mysten
+coin intent helpers. Join derives the stake from `gameId` and uses the
+configured price info object id for `coinType`.
 
 PvP shared options:
 

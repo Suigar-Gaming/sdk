@@ -73,6 +73,8 @@ Guardrails:
 
 - Preserve the creator-selected side.
 - Keep `isPrivate` explicit in product state if the UI exposes it.
+- Let the SDK build the stake coin from `coinType`, `stake`, and `useGasCoin`;
+  do not preselect or split coin objects in application code.
 
 ## Join Game
 
@@ -104,6 +106,8 @@ Guardrails:
 
 - Join derives the stake from `gameId`.
 - Join uses the configured price info object id for `coinType`.
+- Let the SDK fetch the on-chain stake and build the join coin input from the
+  owner's balance.
 - Prefer `client.suigar.getPvPCoinflipGames(options?)` when product logic needs current lobby state before rendering join cards. For one specific live game object, use `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId: gameId })`.
 
 ## Cancel Game

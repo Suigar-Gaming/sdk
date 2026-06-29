@@ -34,6 +34,10 @@ Supported game ids:
 - `gasBudget?: number | bigint`
 - `useGasCoin?: boolean`
 
+The SDK builds the bet coin from the owner's balance with Mysten coin intent
+helpers. Do not preselect, split, or pass coin objects from application code for
+standard game bets.
+
 Extension-level option:
 
 - `suigar({ partner?: string })` prepends the partner wallet address to `partner` metadata automatically across all supported bet flows.
