@@ -686,8 +686,9 @@ describe('shared transaction helpers', () => {
 			},
 		});
 
-		expect(tx.getData().commands).toHaveLength(3);
+		expect(tx.getData().commands).toHaveLength(2);
 		expect(context!).toBeDefined();
+		expect(context!.betCoin).toBeTypeOf('function');
 		expect(context!.owner).toBe(normalizeSuiAddress('0xabc'));
 		expect(context!.coinType).toBe(normalizeStructTag('0x2::sui::SUI'));
 		expect(context!.stake).toBe(1000n);

@@ -4,6 +4,7 @@
 import {
 	coinWithBalance,
 	Transaction,
+	type TransactionArgument,
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -38,7 +39,7 @@ export type BuildSharedBetTransactionContext = Pick<
 	StrictStakeTransactionOptions & {
 		metadata: EncodedBetMetadata;
 		priceInfoObjectId: string;
-		betCoin: TransactionResult;
+		betCoin: TransactionArgument;
 	};
 
 export type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
@@ -95,14 +96,6 @@ export function buildSharedStandardGameBetTransaction({
 		normalizedCoinType,
 	);
 
-	const betCoin = tx.add(
-		coinWithBalance({
-			type: normalizedCoinType,
-			balance: resolvedCashStake,
-			useGasCoin,
-		}),
-	);
-
 	const rewardCoin = tx.add(
 		buildRewardCoin({
 			config,
@@ -113,7 +106,11 @@ export function buildSharedStandardGameBetTransaction({
 			betCount: resolvedBetCount,
 			metadata: encodedMetadata,
 			priceInfoObjectId,
-			betCoin,
+			betCoin: coinWithBalance({
+				type: normalizedCoinType,
+				balance: resolvedCashStake,
+				useGasCoin,
+			}),
 		}),
 	);
 

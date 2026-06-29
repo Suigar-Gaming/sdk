@@ -5,7 +5,6 @@ import type { InferBcsType } from '@mysten/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import {
 	BuildTransactionOptions,
-	coinWithBalance,
 	Transaction,
 	TransactionResult,
 } from '@mysten/sui/transactions';
@@ -391,13 +390,11 @@ export class SuigarClient {
 				objectId: options.gameId,
 			});
 
-			return tx.add(
-				coinWithBalance({
-					type: options.coinType,
-					balance: BigInt(json.stake_per_player),
-					useGasCoin: options.useGasCoin,
-				}),
-			);
+			return tx.coin({
+				type: options.coinType,
+				balance: BigInt(json.stake_per_player),
+				useGasCoin: options.useGasCoin,
+			});
 		};
 	}
 
