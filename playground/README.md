@@ -1,6 +1,6 @@
-# `@suigar/playground`
+# Suigar Playground
 
-Next.js example app for the Suigar SDK. It uses:
+Next.js example app for the Suigar SDK. It runs on Sui testnet and uses:
 
 - `@suigar/sdk`
 - `@suigar/sdk/games`
@@ -34,7 +34,7 @@ The example reflects the current package export split:
 - Oracle price formatting with `fromMoveFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
 - Shared persistent event table across route and game changes
 
-## Run it
+## Development
 
 From the repository root:
 
@@ -45,14 +45,22 @@ pnpm turbo run dev --filter='./playground'
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-The playground resolves the workspace-local `@suigar/sdk` package through `workspace:^`. Use the root Turbo commands when you want the SDK dependency graph built first with `build:ci` before the app command starts.
+The app resolves the workspace-local `@suigar/sdk` package through
+`workspace:^`. Use the root Turbo command when you want the SDK dependency graph
+built first with `build:ci` before the app command starts.
+
+Build the app:
+
+```bash
+pnpm turbo run build --filter='./playground'
+```
 
 Useful local checks:
 
 ```bash
-pnpm --dir playground format
 pnpm --dir playground lint
-pnpm turbo run typecheck --filter='./playground'
+pnpm --dir playground lint:fix
+pnpm --dir playground typecheck
 ```
 
 ## Notes

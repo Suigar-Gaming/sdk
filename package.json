@@ -10,6 +10,9 @@
 	},
 	"scripts": {
 		"prepare": "husky",
+		"build": "turbo build",
+		"test": "turbo test",
+		"typecheck": "turbo typecheck",
 		"changeset": "changeset",
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",

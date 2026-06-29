@@ -2,6 +2,12 @@
 
 TypeScript SDK for building Suigar v2 game transactions on Sui.
 
+## Documentation
+
+For complete SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
+
+For Sui client, transaction, and network APIs, visit the [Sui TypeScript SDK docs](https://sdk.mystenlabs.com/).
+
 ## Installation
 
 ```bash
@@ -612,31 +618,30 @@ Use the matching helper for each PvP coinflip event payload found in `transactio
 
 ## Development
 
+From the repository root:
+
 ```bash
+pnpm install
 pnpm --dir packages/sdk build
 pnpm --dir packages/sdk typecheck
 pnpm --dir packages/sdk test
 ```
 
-## Example App
-
-This repository includes a Next.js integration playground in [playground](../../playground).
-
-It demonstrates:
-
-- standard game transactions through `client.suigar.tx.createBetTransaction(...)`
-- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP coinflip action selector
-- unresolved PvP lobby browsing through `client.suigar.getPvPCoinflipGames(...)`, including public join cards while disconnected, an optional private-lobby join toggle, and connected-wallet filtering for cancel
-- wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
-- supported coin selection from `client.suigar.getConfig()`
-- connected-wallet balance display for each supported coin in the example app
-- privacy badges and copyable PvP game ids in the lobby UI
-- decoding `BetResultEvent` and PvP events into a persistent event log
-- parsing `BetResultEvent.game_details` with `parseGameDetails`
-
-Run it from the repo root with:
+Build without regenerating contract bindings:
 
 ```bash
-pnpm install
-pnpm turbo run dev --filter='./playground'
+pnpm --dir packages/sdk build:ci
+```
+
+Regenerate Move contract bindings only:
+
+```bash
+pnpm --dir packages/sdk codegen
+```
+
+Run linting and formatting checks:
+
+```bash
+pnpm --dir packages/sdk lint
+pnpm --dir packages/sdk lint:fix
 ```
