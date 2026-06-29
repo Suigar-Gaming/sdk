@@ -21,7 +21,7 @@ Runtime requirements for `@suigar/sdk`:
 
 Public package entrypoints:
 
-- `@suigar/sdk` for `suigar()` and `SuigarClient`
+- `@suigar/sdk` for `suigar()`, `SuigarClient`, `SuigarCoin`, and `SuigarNetwork`
 - `@suigar/sdk/games` for game option and action types
 - `@suigar/sdk/utils` for parser helpers, numeric helpers, and reusable constants
 

@@ -21,14 +21,20 @@ This SDK targets Sui TypeScript SDK 2.0+ only. Follow the official [Sui 2.0 migr
 
 The package ships three public entrypoints:
 
-- `@suigar/sdk` for the extension factory and runtime client class
+- `@suigar/sdk` for the extension factory, runtime client class, and core SDK types
 - `@suigar/sdk/games` for game-specific public types
 - `@suigar/sdk/utils` for public parser, constants, and numeric helpers
 
-The package root exposes the extension factory and client class:
+The package root exposes the extension factory, client class, and core SDK
+types:
 
 ```ts
-import { suigar, SuigarClient } from '@suigar/sdk';
+import {
+	suigar,
+	SuigarClient,
+	type SuigarCoin,
+	type SuigarNetwork,
+} from '@suigar/sdk';
 ```
 
 It does not export the individual transaction builders from the package root.

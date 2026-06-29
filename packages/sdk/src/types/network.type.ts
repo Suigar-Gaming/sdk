@@ -3,7 +3,10 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 
-export type SuiNetwork = Extract<SuiClientTypes.Network, 'mainnet' | 'testnet'>;
+export type SuigarNetwork = Extract<
+	SuiClientTypes.Network,
+	'mainnet' | 'testnet'
+>;
 
 export const SUPPORTED_SUI_NETWORKS: SuiClientTypes.Network[] = [
 	'mainnet',

@@ -14,13 +14,13 @@ import type {
 	SuigarCoinMetadata,
 	SuigarConfig,
 	SuigarConfigOverrides,
-	SuiNetwork,
+	SuigarNetwork,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 
 export function resolveSuigarConfig(
-	network: SuiNetwork,
+	network: SuigarNetwork,
 	overrides: SuigarConfigOverrides = {},
 ): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];

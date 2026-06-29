@@ -54,7 +54,7 @@ import {
 	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
-	SuiNetwork,
+	SuigarNetwork,
 	SUPPORTED_SUI_NETWORKS,
 	WithPartner,
 	WithThrowOnError,
@@ -113,7 +113,7 @@ export class SuigarClient {
 				});
 			});
 
-		const network = this.#client.network as SuiNetwork;
+		const network = this.#client.network as SuigarNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
 			throw new RangeError(`Unsupported network: ${network}`);
 		}

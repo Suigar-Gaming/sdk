@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { SuiNetwork } from './network.type.js';
+import { SuigarNetwork } from './network.type.js';
 
 export type SuigarCoinMetadata = {
 	coinType: string;
@@ -60,7 +60,7 @@ export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
 export type SuigarPriceInfoObjectIds = Record<SuigarCoin, string>;
 
-export type SuiNetworkRegistry<TRegistry> = Record<SuiNetwork, TRegistry>;
+export type SuigarNetworkRegistry<TRegistry> = Record<SuigarNetwork, TRegistry>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;

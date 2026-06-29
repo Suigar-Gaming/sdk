@@ -1,13 +1,17 @@
 import { createDAppKit } from '@mysten/dapp-kit-core';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
-import { suigar } from '@suigar/sdk';
+import { suigar, type SuigarNetwork } from '@suigar/sdk';
 
-const GRPC_URLS = {
+type PlaygroundNetwork = Extract<SuigarNetwork, 'testnet'>;
+
+const PLAYGROUND_NETWORKS: [PlaygroundNetwork] = ['testnet'];
+
+const GRPC_URLS: Record<PlaygroundNetwork, string> = {
 	testnet: 'https://fullnode.testnet.sui.io:443',
-} as const;
+};
 
 export const dAppKit = createDAppKit({
-	networks: ['testnet'],
+	networks: PLAYGROUND_NETWORKS,
 	defaultNetwork: 'testnet',
 	autoConnect: true,
 	createClient: (network) =>
