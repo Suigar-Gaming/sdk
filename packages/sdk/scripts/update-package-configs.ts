@@ -26,8 +26,9 @@ type CoinMetadataSource = {
 	coinType: string;
 	decimals: string;
 };
-type CoinMetadataSources = Record<'sui' | 'usdc', CoinMetadataSource>;
-type PriceInfoObjectIds = Record<'sui' | 'usdc', string>;
+type CoinKey = 'sui' | 'usdc';
+type CoinMetadataSources = Record<CoinKey, CoinMetadataSource>;
+type PriceInfoObjectIds = Record<CoinKey, string>;
 
 function extractObjectValue(source: string, objectName: string, key: string) {
 	const blockPattern = new RegExp(
