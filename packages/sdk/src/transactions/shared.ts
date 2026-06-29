@@ -81,7 +81,7 @@ export function buildSharedStandardGameBetTransaction({
 	betCount,
 	metadata,
 	partner,
-	useGasCoin = true,
+	useGasCoin,
 	buildRewardCoin,
 }: BuildSharedBetTransactionOptions): Transaction {
 	const tx = createBaseGameTransaction({ config, game, owner, gasBudget });

@@ -37,8 +37,7 @@ Supported game ids:
 The SDK builds the bet coin from the owner's balance with Mysten
 `coinWithBalance` transaction arguments. Do not preselect, split, or pass coin
 objects from application code for standard game bets. Set `useGasCoin` only
-when the app needs to control whether the SUI gas coin can be used as the bet
-coin source.
+when the app needs to override Mysten's default coin intent behavior.
 
 Extension-level option:
 

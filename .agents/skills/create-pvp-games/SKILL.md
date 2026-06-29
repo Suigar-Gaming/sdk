@@ -55,7 +55,7 @@ Optional fields:
 - `isPrivate`
 - `metadata`
 - `gasBudget`
-- `useGasCoin`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 
@@ -73,9 +73,10 @@ Guardrails:
 
 - Preserve the creator-selected side.
 - Keep `isPrivate` explicit in product state if the UI exposes it.
-- Let the SDK build the stake coin from `coinType`, `stake`, and `useGasCoin`
-  with Mysten `coinWithBalance` transaction arguments; do not preselect or
-  split coin objects in application code.
+- Let the SDK build the stake coin from `coinType` and `stake` with Mysten
+  `coinWithBalance` transaction arguments; do not preselect or split coin
+  objects in application code. Set `useGasCoin` only when the app needs to
+  override Mysten's default coin intent behavior.
 
 ## Join Game
 
@@ -91,7 +92,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `useGasCoin`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 
@@ -127,7 +128,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `useGasCoin`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 

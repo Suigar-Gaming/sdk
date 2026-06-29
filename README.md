@@ -243,7 +243,7 @@ Shared options include `owner`, `coinType`, `stake`, optional `cashStake`, optio
 
 `stake` is the logical wager passed into the Move call. Use `cashStake` only when the withdrawn balance should differ from the logical stake. Pass plain application values to `metadata`; the SDK encodes metadata into on-chain byte arrays.
 
-The SDK builds bet coin inputs from the owner's balance with Mysten coin intent helpers. Applications should pass `coinType`, stake fields, and `useGasCoin` instead of manually splitting or selecting coin objects for standard bets.
+The SDK builds bet coin inputs from the owner's balance with Mysten coin intent helpers. Applications should pass `coinType` and stake fields instead of manually splitting or selecting coin objects for standard bets. Set `useGasCoin` only when the app needs to override Mysten's default coin intent behavior.
 
 ```ts
 const limboTx = client.suigar.tx.createBetTransaction('limbo', {
@@ -289,7 +289,7 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
 });
 ```
 
-PvP coinflip create builds the stake coin from the owner's balance. Join derives the required stake from `gameId` before building the join coin input, so callers only provide the lobby id and shared coin options.
+PvP coinflip create builds the stake coin from the owner's balance. Join derives the required stake from `gameId` before building the join coin input, so callers only provide the lobby id and shared coin options. Omit `useGasCoin` to use Mysten's default coin intent behavior.
 
 Cancel a PvP coinflip lobby:
 

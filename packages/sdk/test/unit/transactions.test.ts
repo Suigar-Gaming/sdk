@@ -704,6 +704,58 @@ describe('shared transaction helpers', () => {
 		});
 	});
 
+	it('does not default useGasCoin in Mysten coin intent options', async () => {
+		const coinWithBalanceMock = vi.fn(({ type }: { type: string }) =>
+			createZeroCoinThunk(type),
+		);
+		vi.doMock('@mysten/sui/transactions', async (importOriginal) => {
+			const actual =
+				await importOriginal<typeof import('@mysten/sui/transactions')>();
+			return {
+				...actual,
+				coinWithBalance: coinWithBalanceMock,
+			};
+		});
+
+		const { buildSharedStandardGameBetTransaction } =
+			await import('../../src/transactions/shared.js');
+
+		buildSharedStandardGameBetTransaction({
+			config: TEST_CONFIG,
+			game: 'coinflip',
+			owner: '0xabc',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			buildRewardCoin: (resolvedContext) => {
+				return createZeroCoinThunk(resolvedContext.coinType);
+			},
+		});
+
+		expect(coinWithBalanceMock).toHaveBeenLastCalledWith({
+			type: normalizeStructTag('0x2::sui::SUI'),
+			balance: 1000n,
+			useGasCoin: undefined,
+		});
+
+		buildSharedStandardGameBetTransaction({
+			config: TEST_CONFIG,
+			game: 'coinflip',
+			owner: '0xabc',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			useGasCoin: false,
+			buildRewardCoin: (resolvedContext) => {
+				return createZeroCoinThunk(resolvedContext.coinType);
+			},
+		});
+
+		expect(coinWithBalanceMock).toHaveBeenLastCalledWith({
+			type: normalizeStructTag('0x2::sui::SUI'),
+			balance: 1000n,
+			useGasCoin: false,
+		});
+	});
+
 	it('warns and skips reserved metadata keys', async () => {
 		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
