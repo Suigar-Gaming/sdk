@@ -1,9 +1,5 @@
 import type { SuigarClient } from '@suigar/sdk';
-import {
-	COIN_DECIMALS,
-	parseOptionalNumber,
-	toAtomicAmount,
-} from '@/lib/suigar-app';
+import { parseOptionalNumber, toAtomicAmount } from '@/lib/suigar-app';
 import type {
 	CoinflipFormValues,
 	LimboFormValues,
@@ -17,7 +13,6 @@ import type {
 	SharedFields,
 	StandardForms,
 	StandardGameId,
-	SupportedCoinKey,
 	WheelFormValues,
 } from '@/lib/suigar-types';
 
@@ -28,10 +23,10 @@ export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 function buildSharedOptions(
 	owner: string,
 	coinType: string,
-	coinKey: SupportedCoinKey,
+	coinDecimals: number,
 	fields: SharedFields,
 ) {
-	const atomicStake = toAtomicAmount(fields.stake, COIN_DECIMALS[coinKey]);
+	const atomicStake = toAtomicAmount(fields.stake, coinDecimals);
 	const baseOptions: Record<string, unknown> = {
 		owner,
 		coinType,
@@ -75,13 +70,13 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	gameId: K,
 	form: StandardForms[K],
 	owner: string,
-	coinKey: SupportedCoinKey,
+	coinDecimals: number,
 	coinType: string,
 ) {
 	const { baseOptions, codeLines } = buildSharedOptions(
 		owner,
 		coinType,
-		coinKey,
+		coinDecimals,
 		form,
 	);
 	const txApi: TxApi = client.suigar.tx;
@@ -150,12 +145,12 @@ export function buildPvPTransaction<K extends PvPAction>(
 	action: K,
 	form: PvPCoinflipForms[K],
 	owner: string,
-	coinKey: SupportedCoinKey,
+	coinDecimals: number,
 	coinType: string,
 ) {
 	const txApi: TxApi = client.suigar.tx;
-	let baseOptions: Record<string, unknown>;
-	let codeLines: string[];
+	let baseOptions: Record<string, unknown> = {};
+	let codeLines: string[] = [];
 
 	switch (action) {
 		case 'create': {
@@ -163,7 +158,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 			({ baseOptions, codeLines } = buildSharedOptions(
 				owner,
 				coinType,
-				coinKey,
+				coinDecimals,
 				typedForm,
 			));
 			baseOptions.side = typedForm.side;

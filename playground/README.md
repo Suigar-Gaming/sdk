@@ -21,7 +21,7 @@ The example reflects the current package export split:
 - Standard game route: `/standard?game=coinflip`
 - PvP route: `/pvp?game=pvp-coinflip&action=create`
 - Query-param game selection
-- Shared supported-coin selector using `client.suigar.getConfig().coinTypes`
+- Shared supported-coin selector using `client.suigar.getConfig().coins`
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - Standard game forms backed by `client.suigar.getGameParameters()` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Wheel config selection

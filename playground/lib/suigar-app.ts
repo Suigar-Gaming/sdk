@@ -3,7 +3,6 @@ import type {
 	PvPCoinflipForms,
 	SharedFields,
 	StandardForms,
-	SupportedCoinKey,
 } from '@/lib/suigar-types';
 
 export const STANDARD_GAMES = [
@@ -15,11 +14,6 @@ export const STANDARD_GAMES = [
 ] as const;
 
 export const PVP_GAMES = ['pvp-coinflip'] as const;
-
-export const COIN_DECIMALS: Record<SupportedCoinKey, number> = {
-	sui: 9,
-	usdc: 6,
-};
 
 const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',
