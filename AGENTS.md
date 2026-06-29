@@ -181,16 +181,23 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - **`patch`**: Bug fixes or internal corrections that do not change the public API shape
 - **`minor`**: New public methods, new supported fields, or additive public type changes
 - **`major`**: Breaking API changes, changed behavior contracts, or removed support
+- Changeset notes must describe only package behavior for the packages listed
+  in the changeset frontmatter. Do not mention root-only, workspace-only,
+  playground-only, or tooling-only changes unless they directly affect that
+  package's published behavior.
+- Do not edit changeset files inherited from `main` or previous work. When a
+  branch needs a release note, create or update only the changeset created for
+  the current branch.
 
 ### Development Workflow
 
 1. Update or add SDK code in `packages/sdk/src/`
 2. If the branch modifies any file under `packages/sdk/src/`, create a `.changeset/*.md` file once for that branch as soon as the first SDK source change is made
-3. Reuse that existing branch changeset for later `packages/sdk/src/` edits on the same branch instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
+3. Reuse only that branch-created changeset for later `packages/sdk/src/` edits instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
 4. Regenerate code with `pnpm --dir packages/sdk codegen` if contract bindings or package sources changed
 5. Run `pnpm --dir packages/sdk test`
 6. Run `pnpm --dir packages/sdk typecheck`
-7. Add or update the existing branch changeset when the user-visible package behavior changes
+7. Add or update the current branch changeset when the user-visible package behavior changes, keeping the note scoped to `@suigar/sdk` package changes only
 
 Documentation is part of the deliverable:
 
