@@ -5,11 +5,13 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
+		"eslint": "eslint .",
 		"eslint:fix": "eslint . --fix",
-		"format": "pnpm prettier:fix",
 		"start": "next start",
-		"lint": "pnpm eslint:fix && pnpm prettier:fix",
+		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
+		"lint": "pnpm eslint && pnpm prettier",
+		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes"
 	},

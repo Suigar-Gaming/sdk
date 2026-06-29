@@ -55,7 +55,7 @@ Optional fields:
 - `isPrivate`
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 
@@ -73,6 +73,10 @@ Guardrails:
 
 - Preserve the creator-selected side.
 - Keep `isPrivate` explicit in product state if the UI exposes it.
+- Let the SDK build the stake coin from `coinType` and `stake` with Mysten
+  `coinWithBalance` transaction arguments; do not preselect or split coin
+  objects in application code. Set `useGasCoin` only when the app needs to
+  override Mysten's default coin intent behavior.
 
 ## Join Game
 
@@ -88,7 +92,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 
@@ -104,6 +108,10 @@ Guardrails:
 
 - Join derives the stake from `gameId`.
 - Join uses the configured price info object id for `coinType`.
+- Let the SDK fetch the on-chain stake and build the join coin input from the
+  owner's balance.
+- Do not pass custom bet coin callbacks or manually call `tx.add()` for join;
+  the SDK resolves the on-chain stake and supplies the transaction argument.
 - Prefer `client.suigar.getPvPCoinflipGames(options?)` when product logic needs current lobby state before rendering join cards. For one specific live game object, use `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId: gameId })`.
 
 ## Cancel Game
@@ -120,7 +128,7 @@ Optional fields:
 
 - `metadata`
 - `gasBudget`
-- `allowGasCoinShortcut`
+- `useGasCoin` only when overriding Mysten's default coin intent behavior
 
 Example:
 
@@ -145,6 +153,9 @@ Guardrails:
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning.
 - If the product needs partner attribution, configure `suigar({ partner: '<wallet-address>' })` on the extension and let the SDK prepend that wallet address automatically.
 - Treat `partner` as a wallet address, not a slug, label, or display string.
+- Use `client.suigar.getConfig().coins` when the UI needs supported coin
+  `coinType` and `decimals`; use the root-exported `SuigarCoin` type for
+  supported coin keys.
 
 ## Event decoding
 

@@ -21,7 +21,6 @@ export function buildRangeTransaction(
 		...options,
 		game: 'range',
 		buildRewardCoin: ({
-			tx,
 			config,
 			coinType,
 			stake,
@@ -45,6 +44,6 @@ export function buildRangeTransaction(
 					metadata.values,
 					priceInfoObjectId,
 				],
-			})(tx),
+			}),
 	});
 }

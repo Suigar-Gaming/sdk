@@ -20,7 +20,6 @@ export function buildLimboTransaction(
 		...options,
 		game: 'limbo',
 		buildRewardCoin: ({
-			tx,
 			config,
 			coinType,
 			stake,
@@ -43,6 +42,6 @@ export function buildLimboTransaction(
 					metadata.values,
 					priceInfoObjectId,
 				],
-			})(tx),
+			}),
 	});
 }

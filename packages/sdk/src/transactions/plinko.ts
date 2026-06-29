@@ -19,7 +19,6 @@ export function buildPlinkoTransaction(
 		...options,
 		game: 'plinko',
 		buildRewardCoin: ({
-			tx,
 			config,
 			coinType,
 			stake,
@@ -41,6 +40,6 @@ export function buildPlinkoTransaction(
 					metadata.values,
 					priceInfoObjectId,
 				],
-			})(tx),
+			}),
 	});
 }

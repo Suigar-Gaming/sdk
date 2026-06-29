@@ -2,7 +2,7 @@
 
 import type * as React from 'react';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '@suigar/sdk/utils';
-import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import {
 	Field,
 	FieldCode,
@@ -76,7 +76,7 @@ export function LimboForm({
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
-			<SharedGameFields
+			<StandardGameFields
 				value={value}
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}

@@ -89,7 +89,6 @@ import {
 } from '@/lib/on-chain-parameters';
 import { withBasePath } from '@/lib/paths';
 import {
-	COIN_DECIMALS,
 	DEFAULT_PVP_FORMS,
 	DEFAULT_STANDARD_FORMS,
 	getRangePointMax,
@@ -586,6 +585,7 @@ function IntegrationControls({
 	isPvPLobbyLoading,
 	pvpForms,
 	coinTypes,
+	coinDecimals,
 	onRefreshPvPLobbies,
 	onSelectPvPLobby,
 	onStandardStakeBlur,
@@ -615,6 +615,7 @@ function IntegrationControls({
 	isPvPLobbyLoading: boolean;
 	pvpForms: PvPCoinflipForms;
 	coinTypes: Record<SupportedCoinKey, string>;
+	coinDecimals: Record<SupportedCoinKey, number>;
 	onRefreshPvPLobbies: () => void;
 	onSelectPvPLobby: (
 		action: 'join' | 'cancel',
@@ -771,7 +772,7 @@ function IntegrationControls({
 												coinTypes,
 											);
 											return matchingCoinKey
-												? COIN_DECIMALS[matchingCoinKey]
+												? coinDecimals[matchingCoinKey]
 												: 9;
 										}}
 										onRefresh={onRefreshPvPLobbies}
@@ -802,7 +803,7 @@ function IntegrationControls({
 												coinTypes,
 											);
 											return matchingCoinKey
-												? COIN_DECIMALS[matchingCoinKey]
+												? coinDecimals[matchingCoinKey]
 												: 9;
 										}}
 										onRefresh={onRefreshPvPLobbies}
@@ -864,7 +865,27 @@ function useIntegrationState({
 		initialPvPParametersState,
 	);
 
-	const coinTypes = currentClient.suigar.getConfig().coinTypes;
+	const coinMetadata = currentClient.suigar.getConfig().coins;
+	const coinTypes = React.useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries(coinMetadata).map(([key, metadata]) => [
+					key,
+					metadata.coinType,
+				]),
+			) as Record<SupportedCoinKey, string>,
+		[coinMetadata],
+	);
+	const coinDecimals = React.useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries(coinMetadata).map(([key, metadata]) => [
+					key,
+					metadata.decimals,
+				]),
+			) as Record<SupportedCoinKey, number>,
+		[coinMetadata],
+	);
 	const coinOptions = React.useMemo(
 		() => Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>,
 		[coinTypes],
@@ -881,6 +902,7 @@ function useIntegrationState({
 		? selectedCoin
 		: (coinOptions[0]?.[0] ?? 'sui');
 	const coinType = coinTypes[effectiveSelectedCoin];
+	const coinDecimal = coinDecimals[effectiveSelectedCoin];
 	const previewOwner = currentAccount?.address ?? PREVIEW_PLAYER_ADDRESS;
 	const visibleStatus = currentAccount ? status : null;
 	const { coinBalances, balanceOwner } = coinBalancesState;
@@ -929,7 +951,7 @@ function useIntegrationState({
 							{
 								balance: formatBalance(
 									BigInt(response.balance.balance),
-									COIN_DECIMALS[coinKey],
+									coinDecimals[coinKey],
 								),
 								isLoading: false,
 								error: null,
@@ -953,7 +975,7 @@ function useIntegrationState({
 			owner: currentAccount.address,
 			results,
 		});
-	}, [coinOptions, currentAccount, currentClient, isRouteReady]);
+	}, [coinDecimals, coinOptions, currentAccount, currentClient, isRouteReady]);
 
 	React.useEffect(() => {
 		void refreshBalances();
@@ -979,7 +1001,7 @@ function useIntegrationState({
 					summary: summarizeStandardGameParameters(
 						standardGame,
 						parameters,
-						COIN_DECIMALS[effectiveSelectedCoin],
+						coinDecimal,
 					),
 				});
 			} catch (parametersError) {
@@ -989,13 +1011,7 @@ function useIntegrationState({
 				});
 			}
 		},
-		[
-			coinType,
-			currentClient,
-			effectiveSelectedCoin,
-			isRouteReady,
-			standardGame,
-		],
+		[coinType, coinDecimal, currentClient, isRouteReady, standardGame],
 	);
 
 	React.useEffect(() => {
@@ -1027,11 +1043,7 @@ function useIntegrationState({
 				dispatchPvPParameters({
 					type: 'loaded',
 					payload: parameters,
-					summary: summarizePvPGameParameters(
-						pvpGame,
-						parameters,
-						COIN_DECIMALS[effectiveSelectedCoin],
-					),
+					summary: summarizePvPGameParameters(pvpGame, parameters, coinDecimal),
 				});
 			} catch (parametersError) {
 				dispatchPvPParameters({
@@ -1040,14 +1052,7 @@ function useIntegrationState({
 				});
 			}
 		},
-		[
-			coinType,
-			currentClient,
-			effectiveSelectedCoin,
-			isRouteReady,
-			mode,
-			pvpGame,
-		],
+		[coinType, coinDecimal, currentClient, isRouteReady, mode, pvpGame],
 	);
 
 	React.useEffect(() => {
@@ -1370,7 +1375,7 @@ function useIntegrationState({
 						standardGame,
 						effectiveStandardForms[standardGame],
 						previewOwner,
-						effectiveSelectedCoin,
+						coinDecimal,
 						coinType,
 					).code
 				: isMissingPvPGameSelection
@@ -1383,7 +1388,7 @@ function useIntegrationState({
 							pvpAction,
 							effectivePvpForms[pvpAction],
 							previewOwner,
-							effectiveSelectedCoin,
+							coinDecimal,
 							coinType,
 						).code;
 	} catch (buildError) {
@@ -1517,7 +1522,7 @@ function useIntegrationState({
 							standardGame,
 							effectiveStandardForms[standardGame],
 							owner,
-							effectiveSelectedCoin,
+							coinDecimal,
 							coinType,
 						)
 					: buildPvPTransaction(
@@ -1525,7 +1530,7 @@ function useIntegrationState({
 							pvpAction,
 							effectivePvpForms[pvpAction],
 							owner,
-							effectiveSelectedCoin,
+							coinDecimal,
 							coinType,
 						);
 
@@ -1682,6 +1687,7 @@ function useIntegrationState({
 		isPvPLobbyLoading,
 		pvpForms,
 		coinTypes,
+		coinDecimals,
 		currentCode,
 		handleExecute,
 		handleStandardStakeBlur,
@@ -1897,6 +1903,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					isPvPLobbyLoading={integration.isPvPLobbyLoading}
 					pvpForms={integration.pvpForms}
 					coinTypes={integration.coinTypes}
+					coinDecimals={integration.coinDecimals}
 					onRefreshPvPLobbies={() => void integration.refreshPvPLobbies()}
 					onSelectPvPLobby={integration.handleSelectPvPLobby}
 					onStandardStakeBlur={integration.handleStandardStakeBlur}

@@ -3,7 +3,7 @@
 
 import { normalizeStructTag } from '@mysten/sui/utils';
 import {
-	COIN_TYPES,
+	COINS,
 	PACKAGE_IDS,
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
@@ -11,28 +11,42 @@ import {
 import type {
 	Game,
 	SuigarCoin,
+	SuigarCoinMetadata,
 	SuigarConfig,
-	SuiNetwork,
+	SuigarConfigOverrides,
+	SuigarNetwork,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 
-export function resolveSuigarConfig(network: SuiNetwork): SuigarConfig {
+export function resolveSuigarConfig(
+	network: SuigarNetwork,
+	overrides: SuigarConfigOverrides = {},
+): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
-	const coinTypes = COIN_TYPES[network];
+	const coins = COINS[network];
 	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 
-	return {
-		packageIds: { ...packageIds },
-		registryIds: { ...registryIds },
-		coinTypes: {
-			sui: normalizeStructTag(coinTypes.sui),
-			usdc: normalizeStructTag(coinTypes.usdc),
+	const resolvedCoins = getSupportedCoins(coins).reduce(
+		(result, supportedCoin) => {
+			result[supportedCoin] = resolveCoinMetadata(
+				supportedCoin,
+				coins[supportedCoin],
+				overrides.coins?.[supportedCoin],
+			);
+			return result;
 		},
+		{} as SuigarConfig['coins'],
+	);
+
+	return {
+		packageIds: { ...packageIds, ...overrides.packageIds },
+		registryIds: { ...registryIds, ...overrides.registryIds },
+		coins: resolvedCoins,
 		priceInfoObjectIds: {
-			sui: priceInfoObjectIds.sui,
-			usdc: priceInfoObjectIds.usdc,
+			...priceInfoObjectIds,
+			...overrides.priceInfoObjectIds,
 		},
 	};
 }
@@ -80,21 +94,45 @@ export function resolvePriceInfoObjectId(
 	return objectId;
 }
 
+function getSupportedCoins(coins: SuigarConfig['coins']): SuigarCoin[] {
+	return Object.keys(coins) as SuigarCoin[];
+}
+
+function resolveCoinMetadata(
+	supportedCoin: SuigarCoin,
+	defaultCoin: SuigarCoinMetadata,
+	override?: Partial<SuigarCoinMetadata>,
+): SuigarCoinMetadata {
+	const coin = { ...defaultCoin, ...override };
+	if (!coin.coinType || coin.decimals === undefined) {
+		throw new Error(
+			`Missing coin metadata configuration for supported coin ${supportedCoin}`,
+		);
+	}
+
+	return {
+		...coin,
+		coinType: normalizeStructTag(coin.coinType),
+	};
+}
+
 function resolveSupportedCoin(
 	config: SuigarConfig,
 	coinType: string,
 ): SuigarCoin {
-	const [supportedCoin] =
-		Object.entries(config.coinTypes).find(([_, value]) => value === coinType) ??
-		[];
+	const supportedCoin = getSupportedCoins(config.coins).find(
+		(coin) => config.coins[coin].coinType === coinType,
+	);
 
 	if (!supportedCoin) {
 		throw new RangeError(
 			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(
-				config.coinTypes,
-			).join(', ')}`,
+				config.coins,
+			)
+				.map(({ coinType }) => coinType)
+				.join(', ')}`,
 		);
 	}
 
-	return supportedCoin as SuigarCoin;
+	return supportedCoin;
 }

@@ -6,7 +6,7 @@ import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import {
 	BuildTransactionOptions,
 	Transaction,
-	TransactionResult,
+	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { BetResultEvent } from './contracts/core/core.js';
@@ -54,7 +54,7 @@ import {
 	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
-	SuiNetwork,
+	SuigarNetwork,
 	SUPPORTED_SUI_NETWORKS,
 	WithPartner,
 	WithThrowOnError,
@@ -63,6 +63,7 @@ import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
+	config,
 	partner,
 	cacheTtl,
 }: SuigarExtensionOptions<Name> = {}) {
@@ -72,6 +73,7 @@ export function suigar<const Name = 'suigar'>({
 			return new SuigarClient({
 				client,
 				name: String(name),
+				config,
 				partner,
 				cacheTtl,
 			});
@@ -91,11 +93,13 @@ export class SuigarClient {
 	constructor({
 		client,
 		name,
+		config,
 		partner,
 		cacheTtl,
 	}: {
 		client: ClientWithCoreApi;
 		name: string;
+		config?: SuigarExtensionOptions['config'];
 		partner?: string;
 		cacheTtl?: number;
 	}) {
@@ -109,19 +113,19 @@ export class SuigarClient {
 				});
 			});
 
-		const network = this.#client.network as SuiNetwork;
+		const network = this.#client.network as SuigarNetwork;
 		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
 			throw new RangeError(`Unsupported network: ${network}`);
 		}
 
-		this.#config = resolveSuigarConfig(network);
+		this.#config = resolveSuigarConfig(network, config);
 	}
 
 	/**
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * registry ids, supported coin types, and price info object ids the SDK
+	 * registry ids, supported coin metadata, and price info object ids the SDK
 	 * resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
@@ -167,7 +171,7 @@ export class SuigarClient {
 		options: GetGameParametersOptions = {},
 	): Promise<GameParameters<TGame>> {
 		const coinType = normalizeStructTag(
-			options.coinType ?? this.#config.coinTypes.sui,
+			options.coinType ?? this.#config.coins.sui.coinType,
 		);
 		return this.#cache.read(
 			['parameters', this.#client.network, game, coinType],
@@ -379,7 +383,7 @@ export class SuigarClient {
 
 	#createPvPCoinflipBetCoin(
 		options: BuildJoinPvPCoinflipTransactionOptions,
-	): (tx: Transaction) => Promise<TransactionResult> {
+	): TransactionArgument {
 		return async (tx: Transaction) => {
 			const { json } = await PvPCoinflipGame.get({
 				client: this.#client,
@@ -389,7 +393,7 @@ export class SuigarClient {
 			return tx.coin({
 				type: options.coinType,
 				balance: BigInt(json.stake_per_player),
-				useGasCoin: options.allowGasCoinShortcut,
+				useGasCoin: options.useGasCoin,
 			});
 		};
 	}

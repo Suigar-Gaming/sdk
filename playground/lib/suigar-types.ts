@@ -1,15 +1,19 @@
 import type { Transaction } from '@mysten/sui/transactions';
-import type { SuigarClient } from '@suigar/sdk';
+import type { SuigarClient, SuigarCoin } from '@suigar/sdk';
 import type { CoinSide, PvPCoinflipAction } from '@suigar/sdk/games';
 import { PVP_GAMES, STANDARD_GAMES } from '@/lib/suigar-app';
 
 export type StandardGameId = (typeof STANDARD_GAMES)[number];
 export type PvPGameId = (typeof PVP_GAMES)[number];
 export type PvPAction = PvPCoinflipAction;
-export type SupportedCoinKey = 'sui' | 'usdc';
+export type SupportedCoinKey = SuigarCoin;
 
 export type SharedFields = {
 	stake: string;
+};
+
+export type StandardSharedFields = SharedFields & {
+	betCount: string;
 };
 
 export type StakeRangeSummary = {
@@ -61,27 +65,27 @@ export type PvPGameParametersSummary = {
 	topLevelDetails?: GameSettingsDetail[];
 };
 
-export type CoinflipFormValues = SharedFields & {
+export type CoinflipFormValues = StandardSharedFields & {
 	side: CoinSide;
 };
 
-export type LimboFormValues = SharedFields & {
+export type LimboFormValues = StandardSharedFields & {
 	targetMultiplier: string;
 	scale: string;
 };
 
-export type PlinkoFormValues = SharedFields & {
+export type PlinkoFormValues = StandardSharedFields & {
 	configId: string;
 };
 
-export type RangeFormValues = SharedFields & {
+export type RangeFormValues = StandardSharedFields & {
 	leftPoint: string;
 	rightPoint: string;
 	outOfRange: boolean;
 	scale: string;
 };
 
-export type WheelFormValues = SharedFields & {
+export type WheelFormValues = StandardSharedFields & {
 	configId: string;
 };
 

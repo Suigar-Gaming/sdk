@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type {
-	SuigarCoinTypes,
+	SuigarCoinMetadataMap,
 	SuigarPackageIds,
 	SuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
@@ -22,9 +22,17 @@ export const TESTNET_PACKAGE_IDS: SuigarPackageIds = {
 	wheel: '0x0997852ded7e13301c42317004bc49704a893aa82997c5706cebee59053a31b7',
 };
 
-export const TESTNET_COIN_TYPES: SuigarCoinTypes = {
-	sui: '0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_sui::TEST_SUI',
-	usdc: '0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+export const TESTNET_COINS: SuigarCoinMetadataMap = {
+	sui: {
+		coinType:
+			'0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_sui::TEST_SUI',
+		decimals: 9,
+	},
+	usdc: {
+		coinType:
+			'0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+		decimals: 6,
+	},
 };
 
 export const TESTNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectIds = {

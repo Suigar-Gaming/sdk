@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { Transaction } from '@mysten/sui/transactions';
+import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag } from '@mysten/sui/utils';
 import {
 	cancelGame,
@@ -44,11 +44,6 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		case 'create': {
 			const createOptions = options as BuildCreatePvPCoinflipTransactionOptions;
 			const stake = toBigInt(createOptions.stake);
-			const betCoin = tx.coin({
-				type: normalizedCoinType,
-				balance: stake,
-				useGasCoin: createOptions.allowGasCoinShortcut,
-			});
 
 			tx.add(
 				createGame({
@@ -56,7 +51,11 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						createOptions.config.packageIds.sweetHouse,
-						betCoin,
+						coinWithBalance({
+							type: normalizedCoinType,
+							balance: stake,
+							useGasCoin: createOptions.useGasCoin,
+						}),
 						createOptions.side === 'tails',
 						Boolean(createOptions.isPrivate),
 						encodedMetadata.keys,
@@ -81,7 +80,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					arguments: [
 						joinOptions.gameId,
 						joinOptions.config.packageIds.sweetHouse,
-						tx.add(joinOptions.betCoin),
+						joinOptions.betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
 						priceInfoObjectId,

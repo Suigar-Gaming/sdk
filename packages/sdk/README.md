@@ -2,6 +2,12 @@
 
 TypeScript SDK for building Suigar v2 game transactions on Sui.
 
+## Documentation
+
+For complete SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
+
+For Sui client, transaction, and network APIs, visit the [Sui TypeScript SDK docs](https://sdk.mystenlabs.com/).
+
 ## Installation
 
 ```bash
@@ -21,14 +27,20 @@ This SDK targets Sui TypeScript SDK 2.0+ only. Follow the official [Sui 2.0 migr
 
 The package ships three public entrypoints:
 
-- `@suigar/sdk` for the extension factory and runtime client class
+- `@suigar/sdk` for the extension factory, runtime client class, and core SDK types
 - `@suigar/sdk/games` for game-specific public types
 - `@suigar/sdk/utils` for public parser, constants, and numeric helpers
 
-The package root exposes the extension factory and client class:
+The package root exposes the extension factory, client class, and core SDK
+types:
 
 ```ts
-import { suigar, SuigarClient } from '@suigar/sdk';
+import {
+	suigar,
+	SuigarClient,
+	type SuigarCoin,
+	type SuigarNetwork,
+} from '@suigar/sdk';
 ```
 
 It does not export the individual transaction builders from the package root.
@@ -165,7 +177,7 @@ client.games.bcs;
 `suigar(options?)` resolves config from:
 
 - internal package ids by network
-- internal supported coin types by network
+- internal supported coin metadata by network
 - internal price info object ids by network
 - the connected client network
 - the extension name
@@ -175,6 +187,32 @@ Supported override areas:
 - `name`
 - `partner`
 - `cacheTtl`
+- `config.packageIds`
+- `config.registryIds`
+- `config.coins`
+- `config.priceInfoObjectIds`
+
+Use `config` when the application needs to patch package ids, supported
+`sui`/`usdc` coin metadata, or price info object ids before a new SDK release is
+published.
+
+```ts
+const client = new SuiGrpcClient({ network, baseUrl }).$extend(
+	suigar({
+		config: {
+			coins: {
+				usdc: {
+					coinType: '0xPACKAGE::usdc::USDC',
+					decimals: 6,
+				},
+			},
+			priceInfoObjectIds: {
+				usdc: '0xPYTH_PRICE_INFO',
+			},
+		},
+	}),
+);
+```
 
 If `partner` is configured, the SDK automatically writes that partner wallet
 address into the on-chain metadata vec-map. Transaction builder options may also
@@ -200,18 +238,19 @@ The registered extension instance exposes the main runtime surface:
 Returns the resolved SDK configuration for the connected network.
 
 This is intended mainly for debugging and inspection, for example to verify the
-resolved package ids or supported coin mappings for the active client network.
+resolved package ids or supported coin metadata for the active client network.
 
 It includes:
 
 - `packageIds`
 - `registryIds`
-- `coinTypes`
+- `coins`
 - `priceInfoObjectIds`
 
 ```ts
 const config = client.suigar.getConfig();
 console.log(config.packageIds);
+console.log(config.coins.sui.coinType);
 ```
 
 ### `getGameParameters(game, options?)`
@@ -321,7 +360,7 @@ Shared option shape:
 - `betCount?: number | bigint`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `allowGasCoinShortcut?: boolean`
+- `useGasCoin?: boolean`
 
 Shared behavior:
 
@@ -332,6 +371,7 @@ Shared behavior:
 - `partner` configured via `suigar({ partner })` is prepended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
 - the SDK resolves the price info object from the configured supported-coin mapping
+- bet coin inputs are built from the owner's balance with Mysten coin intent helpers, using `coinType`, `cashStake`, and optional `useGasCoin`; omit `useGasCoin` to use Mysten's default behavior
 - the reward object is transferred back to `owner`
 
 Error behavior:
@@ -422,8 +462,10 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 });
 ```
 
-Join derives the stake from `gameId` and uses the configured price info object
-id for `coinType`.
+PvP coinflip create builds the stake coin from the owner's balance with Mysten
+coin intent helpers. Join derives the stake from `gameId` and uses the
+configured price info object id for `coinType`. Omit `useGasCoin` to use
+Mysten's default coin intent behavior.
 
 PvP shared options:
 
@@ -431,7 +473,7 @@ PvP shared options:
 - `coinType: string`
 - `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
-- `allowGasCoinShortcut?: boolean`
+- `useGasCoin?: boolean`
 
 Action-specific options:
 
@@ -576,31 +618,30 @@ Use the matching helper for each PvP coinflip event payload found in `transactio
 
 ## Development
 
+From the repository root:
+
 ```bash
+pnpm install
 pnpm --dir packages/sdk build
 pnpm --dir packages/sdk typecheck
 pnpm --dir packages/sdk test
 ```
 
-## Example App
-
-This repository includes a Next.js integration playground in [playground](../../playground).
-
-It demonstrates:
-
-- standard game transactions through `client.suigar.tx.createBetTransaction(...)`
-- PvP coinflip create, join, and cancel flows through `client.suigar.tx.createPvPCoinflipTransaction(...)`, exposed in the example through a PvP coinflip action selector
-- unresolved PvP lobby browsing through `client.suigar.getPvPCoinflipGames(...)`, including public join cards while disconnected, an optional private-lobby join toggle, and connected-wallet filtering for cancel
-- wallet connection and execution with `@mysten/dapp-kit-core` and `@mysten/dapp-kit-react`
-- supported coin selection from `client.suigar.getConfig()`
-- connected-wallet balance display for each supported coin in the example app
-- privacy badges and copyable PvP game ids in the lobby UI
-- decoding `BetResultEvent` and PvP events into a persistent event log
-- parsing `BetResultEvent.game_details` with `parseGameDetails`
-
-Run it from the repo root with:
+Build without regenerating contract bindings:
 
 ```bash
-pnpm install
-pnpm turbo run dev --filter='./playground'
+pnpm --dir packages/sdk build:ci
+```
+
+Regenerate Move contract bindings only:
+
+```bash
+pnpm --dir packages/sdk codegen
+```
+
+Run linting and formatting checks:
+
+```bash
+pnpm --dir packages/sdk lint
+pnpm --dir packages/sdk lint:fix
 ```

@@ -1,7 +1,7 @@
 'use client';
 
 import type * as React from 'react';
-import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
 	Select,
@@ -45,7 +45,7 @@ export function CoinflipForm({
 					</SelectContent>
 				</Select>
 			</Field>
-			<SharedGameFields
+			<StandardGameFields
 				value={value}
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}

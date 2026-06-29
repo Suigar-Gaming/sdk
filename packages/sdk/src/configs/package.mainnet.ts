@@ -1,8 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';
 import type {
-	SuigarCoinTypes,
+	SuigarCoinMetadataMap,
 	SuigarPackageIds,
 	SuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
@@ -22,9 +23,16 @@ export const MAINNET_PACKAGE_IDS: SuigarPackageIds = {
 	wheel: '0x6791eac73fe7bf463b7f3b1ea391df265fbc1b96201270664a5a11e2441e9955',
 };
 
-export const MAINNET_COIN_TYPES: SuigarCoinTypes = {
-	sui: '0x2::sui::SUI',
-	usdc: '0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC',
+export const MAINNET_COINS: SuigarCoinMetadataMap = {
+	sui: {
+		coinType: SUI_TYPE_ARG,
+		decimals: SUI_DECIMALS,
+	},
+	usdc: {
+		coinType:
+			'0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC',
+		decimals: 6,
+	},
 };
 
 export const MAINNET_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectIds = {

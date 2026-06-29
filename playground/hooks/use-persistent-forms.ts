@@ -17,8 +17,7 @@ const persistentFormStores = new Map<
 
 function getPersistentFormsStore<T>(key: string, initialValue: T) {
 	const existingStore = persistentFormStores.get(key) as
-		| UseBoundStore<StoreApi<PersistentFormsStore<T>>>
-		| undefined;
+		UseBoundStore<StoreApi<PersistentFormsStore<T>>> | undefined;
 	if (existingStore) {
 		return existingStore;
 	}

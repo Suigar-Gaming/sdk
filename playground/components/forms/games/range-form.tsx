@@ -2,7 +2,7 @@
 
 import type * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
-import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import {
 	Field,
 	FieldCode,
@@ -113,7 +113,7 @@ export function RangeForm({
 					</Field>
 				</div>
 			</FieldGroup>
-			<SharedGameFields
+			<StandardGameFields
 				value={value}
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}

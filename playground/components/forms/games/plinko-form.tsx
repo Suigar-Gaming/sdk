@@ -1,7 +1,7 @@
 'use client';
 
 import type * as React from 'react';
-import { SharedGameFields } from '@/components/forms/shared-game-fields';
+import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -85,7 +85,7 @@ export function PlinkoForm({
 					)}
 				</FieldDescription>
 			</Field>
-			<SharedGameFields
+			<StandardGameFields
 				value={value}
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
