@@ -26,5 +26,5 @@ export type BuildGameOptions<GameId extends StandardGame> =
 						? WithoutConfig<BuildRangeTransactionOptions>
 						: never;
 
-export type BuildPvPGameOptions<Action extends PvPCoinflipAction> =
+export type BuildPvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
 	WithoutConfig<BuildPvPCoinflipTransactionOptions<Action>>;

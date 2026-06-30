@@ -39,14 +39,11 @@ import {
 	type GetGameParametersOptions,
 } from './types/game-settings.type.js';
 import {
-	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
-	BuildCreatePvPCoinflipTransactionOptions,
 	BuildGameOptions,
-	BuildJoinPvPCoinflipTransactionOptions,
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
-	BuildPvPCoinflipTransactionOptions,
+	BuildPvPCoinflipGameOptions,
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
 	Game,
@@ -351,17 +348,20 @@ export class SuigarClient {
 		 */
 		createPvPCoinflipTransaction: <Action extends PvPCoinflipAction>(
 			action: Action,
-			options: BuildPvPCoinflipTransactionOptions<Action>,
+			options: BuildPvPCoinflipGameOptions<Action>,
 		): Transaction => {
 			switch (action) {
-				case 'create':
+				case 'create': {
+					const createOptions =
+						options as BuildPvPCoinflipGameOptions<'create'>;
 					return buildPvPCoinflipTransaction('create', {
-						...(options as BuildCreatePvPCoinflipTransactionOptions),
+						...createOptions,
 						config: this.#config,
 						partner: this.#partner,
 					});
+				}
 				case 'join': {
-					const joinOptions = options as BuildJoinPvPCoinflipTransactionOptions;
+					const joinOptions = options as BuildPvPCoinflipGameOptions<'join'>;
 					return buildPvPCoinflipTransaction('join', {
 						...joinOptions,
 						betCoin: this.#createPvPCoinflipBetCoin(joinOptions),
@@ -369,12 +369,15 @@ export class SuigarClient {
 						partner: this.#partner,
 					});
 				}
-				case 'cancel':
+				case 'cancel': {
+					const cancelOptions =
+						options as BuildPvPCoinflipGameOptions<'cancel'>;
 					return buildPvPCoinflipTransaction('cancel', {
-						...(options as BuildCancelPvPCoinflipTransactionOptions),
+						...cancelOptions,
 						config: this.#config,
 						partner: this.#partner,
 					});
+				}
 				default:
 					throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
 			}
@@ -382,7 +385,7 @@ export class SuigarClient {
 	};
 
 	#createPvPCoinflipBetCoin(
-		options: BuildJoinPvPCoinflipTransactionOptions,
+		options: BuildPvPCoinflipGameOptions<'join'>,
 	): TransactionArgument {
 		return async (tx: Transaction) => {
 			const { json } = await PvPCoinflipGame.get({
