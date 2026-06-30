@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable package is `@suigar/sdk` under `packages/sdk`, built with TypeScript, `tsdown`, and generated Move contract bindings. The package is ESM-only. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable packages are `@suigar/sdk` under `packages/sdk` and `@suigar/mcp` under `packages/mcp`. Both packages are ESM-only. The main public SDK integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -20,6 +20,9 @@ pnpm --dir packages/sdk build
 # Build without regenerating contract bindings
 pnpm --dir packages/sdk build:ci
 
+# Build the MCP package and bundled MCP App
+pnpm --dir packages/mcp build
+
 # Regenerate Move contract bindings only
 pnpm --dir packages/sdk codegen
 ```
@@ -32,6 +35,7 @@ pnpm --dir packages/sdk test
 
 # Run type checking
 pnpm --dir packages/sdk typecheck
+pnpm --dir packages/mcp typecheck
 
 # Run a specific vitest file
 pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
@@ -77,6 +81,11 @@ pnpm release
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `packages/sdk/test/unit/` - Vitest coverage for config resolution, cache helpers, and transaction builders
+- `packages/mcp/` - `@suigar/mcp` stdio MCP server and MCP App
+  - `src/server.ts` - MCP server, tool registration, and app resource registration
+  - `src/tools.ts` - SDK-backed tool handlers for config, metadata, and unsigned transaction building
+  - `src/app/` - Vite-built single-file MCP App UI
+  - `test/` - Vitest coverage for tools and app resource behavior
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
 - `playground/` - workspace-local Next.js integration playground
@@ -86,6 +95,7 @@ pnpm release
 
 - Uses pnpm workspaces from the private `@suigar/ts-sdks` root package and `pnpm-workspace.yaml`
 - Uses `tsdown` to emit ESM-only outputs into `packages/sdk/dist/`
+- Uses `tsdown` for package outputs and Vite single-file builds for the MCP App under `packages/mcp/dist/`
 - Uses `sui-ts-codegen generate` to regenerate `packages/sdk/src/contracts/`
 - Generated contract bindings are runtime-critical and should stay aligned with the current Suigar packages
 
@@ -98,6 +108,7 @@ pnpm release
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders. Unsupported game ids, PvP actions, and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
+6. **MCP uses public SDK APIs**: `@suigar/mcp` should build transactions through `client.suigar.tx`, inspect config through `client.suigar.getConfig()`, and avoid imports from private Suigar workspace packages.
 
 ### Suigar Client Architecture
 
@@ -169,6 +180,23 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - Treat the extension-level `partner` option as a partner wallet address, not a label or slug.
 - When partner attribution is required, configure `suigar({ partner: '<wallet-address>' })` once during extension setup instead of passing partner data through transaction metadata.
 - Prefer importing public constants and numeric helpers from `@suigar/sdk/utils` instead of duplicating SDK defaults in downstream apps.
+
+### MCP Package Architecture
+
+`packages/mcp` exposes a local stdio MCP server plus a bundled MCP App resource.
+It should stay thin over `@suigar/sdk` and `@mysten/sui`.
+
+- Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and
+  `registerAppTool`.
+- Always return both text `content` and `structuredContent`.
+- Keep tool errors actionable and include the field/config/network detail needed
+  for an agent to retry.
+- The MCP App is an inspector UI only. It must not sign or execute
+  transactions, and it should include restrictive `_meta.ui.csp` metadata.
+- Do not reintroduce explicit coin object sourcing or copied transaction
+  builders unless the SDK adds a public API for that behavior.
+- If a new MCP behavior requires an SDK change, add the SDK change, tests,
+  docs, and an `@suigar/sdk` changeset entry in the same task.
 
 ### Testing Conventions
 

@@ -1,12 +1,20 @@
 # Suigar TypeScript SDKs
 
-A collection of TypeScript SDKs for interacting with the Suigar contracts.
+A collection of TypeScript SDKs and MCP tooling for interacting with the Suigar
+contracts.
 
 ## Documentation
 
 For SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
 
 For Sui TypeScript SDK documentation, visit [sdk.mystenlabs.com](https://sdk.mystenlabs.com/).
+
+## Packages
+
+- `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar v2 Move
+  contracts.
+- `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading
+  Suigar config and building unsigned Suigar transactions through the SDK.
 
 ## Development
 
