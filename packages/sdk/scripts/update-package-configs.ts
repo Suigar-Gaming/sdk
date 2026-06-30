@@ -127,8 +127,8 @@ function renderNetworkFile(
 	const uppercaseNetwork = network.toUpperCase();
 	const isMainnet = network === 'mainnet';
 	const imports = isMainnet
-		? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\nimport type {\n\tSuigarCoinMetadataMap,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';"
-		: "import type {\n\tSuigarCoinMetadataMap,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';";
+		? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\nimport type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';"
+		: "import type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';";
 
 	return `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
@@ -150,7 +150,7 @@ export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackageIds = {
 \twheel: '${packageIds.wheel}',
 };
 
-export const ${uppercaseNetwork}_COINS: SuigarCoinMetadataMap = {
+export const ${uppercaseNetwork}_COINS: SuigarCoinRegistry = {
 \tsui: {
 \t\tcoinType: ${isMainnet ? 'SUI_TYPE_ARG' : coins.sui.coinType},
 \t\tdecimals: ${isMainnet ? 'SUI_DECIMALS' : coins.sui.decimals},

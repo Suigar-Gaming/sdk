@@ -42,7 +42,7 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 
 export type SuigarCoin = 'sui' | 'usdc';
 
-export type SuigarCoinMetadataMap = Record<SuigarCoin, SuigarCoinMetadata>;
+export type SuigarCoinRegistry = Record<SuigarCoin, SuigarCoinMetadata>;
 
 export type SuigarPackage =
 	| 'sweetHouse'
@@ -65,6 +65,6 @@ export type SuigarNetworkRegistry<TRegistry> = Record<SuigarNetwork, TRegistry>;
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
 	registryIds: SuigarRegistryIds;
-	coins: SuigarCoinMetadataMap;
+	coins: SuigarCoinRegistry;
 	priceInfoObjectIds: SuigarPriceInfoObjectIds;
 };

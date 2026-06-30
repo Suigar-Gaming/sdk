@@ -24,8 +24,8 @@ catalogs:
       specifier: ^10.1.8
       version: 10.1.8
     prettier:
-      specifier: ^3.9.0
-      version: 3.9.0
+      specifier: ^3.9.1
+      version: 3.9.1
     tsdown:
       specifier: ^0.22.3
       version: 0.22.3
@@ -56,7 +56,7 @@ importers:
         version: 10.0.1(eslint@10.6.0(jiti@2.7.0))
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.7.1
-        version: 4.7.1(prettier@3.9.0)
+        version: 4.7.1(prettier@3.9.1)
       eslint:
         specifier: ^10.6.0
         version: 10.6.0(jiti@2.7.0)
@@ -71,7 +71,7 @@ importers:
         version: 17.0.8
       prettier:
         specifier: catalog:tooling
-        version: 3.9.0
+        version: 3.9.1
       turbo:
         specifier: ^2.10.0
         version: 2.10.0
@@ -198,7 +198,7 @@ importers:
         version: 10.1.8(eslint@9.39.4(jiti@2.7.0))
       prettier:
         specifier: catalog:tooling
-        version: 3.9.0
+        version: 3.9.1
       react-doctor:
         specifier: ^0.5.8
         version: 0.5.8(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(eslint@9.39.4(jiti@2.7.0))
@@ -3993,8 +3993,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.9.0:
-    resolution: {integrity: sha512-LjIqSIC5VYLzs9WedVmJ2ljNAGnU+DteIClbahu4L/DBeWjZ6iT/k1lAYyu9JUh+1xINxWadaPw/Pl63y/agAw==}
+  prettier@3.9.1:
+    resolution: {integrity: sha512-ppiDo2CSwexck1eyZUwJHg/N3nf1+6IRCv7W/VJ5vaLnVCmB7+3CdRfMwoCHBBX6xTrREDTksZ4OZl5SSf4zXA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -5300,13 +5300,13 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@ianvs/prettier-plugin-sort-imports@4.7.1(prettier@3.9.0)':
+  '@ianvs/prettier-plugin-sort-imports@4.7.1(prettier@3.9.1)':
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
       '@babel/traverse': 7.29.7
       '@babel/types': 7.29.7
-      prettier: 3.9.0
+      prettier: 3.9.1
       semver: 7.8.5
     transitivePeerDependencies:
       - supports-color
@@ -5484,7 +5484,7 @@ snapshots:
       '@stricli/core': 1.2.8
       '@types/node': 25.9.4
       cosmiconfig: 9.0.2(typescript@6.0.3)
-      prettier: 3.9.0
+      prettier: 3.9.1
       toml: 4.1.1
       typescript: 6.0.3
       zod: 4.4.3
@@ -8640,7 +8640,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.9.0: {}
+  prettier@3.9.1: {}
 
   prompts@2.4.2:
     dependencies:
