@@ -65,7 +65,7 @@
 	"bugs": {
 		"url": "https://github.com/Suigar-Gaming/sdk/issues"
 	},
-	"homepage": "https://docs.suigar.com/sdk",
+	"homepage": "https://docs.suigar.com/mcp",
 	"dependencies": {
 		"@modelcontextprotocol/ext-apps": "1.7.4",
 		"@modelcontextprotocol/sdk": "1.29.0",
