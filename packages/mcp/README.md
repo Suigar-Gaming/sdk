@@ -93,6 +93,9 @@ Optional `config` input follows the public SDK extension override shape:
 Partner attribution should be passed as top-level `partner`; the MCP server
 forwards it through `suigar({ partner })`.
 
+Transaction `metadata` values must be JSON-compatible strings, numbers, or
+booleans. Send large integer metadata values as strings.
+
 ## Notes
 
 - Coin object ids and explicit coin sourcing are intentionally not exposed.

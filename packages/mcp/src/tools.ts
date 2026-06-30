@@ -452,7 +452,6 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 		createTransaction: ({ client }) =>
 			client.suigar.tx.createPvPCoinflipTransaction('create', {
 				...commonOptions(input),
-				config: client.suigar.getConfig(),
 				stake: toAmount(input.stake, 'stake'),
 				side: requireString(input.creatorSide, 'creatorSide') as CoinSide,
 				isPrivate: input.isPrivate,
@@ -484,7 +483,6 @@ export const buildPvpCoinflipJoinTransactionTool = async (
 		createTransaction: ({ client }) =>
 			client.suigar.tx.createPvPCoinflipTransaction('join', {
 				...commonOptions(input),
-				config: client.suigar.getConfig(),
 				gameId: requireString(input.gameId, 'gameId'),
 			}),
 	});
@@ -514,7 +512,6 @@ export const buildPvpCoinflipCancelTransactionTool = async (
 		createTransaction: ({ client }) =>
 			client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 				...commonOptions(input),
-				config: client.suigar.getConfig(),
 				gameId: requireString(input.gameId, 'gameId'),
 			}),
 	});
