@@ -36,6 +36,7 @@ types:
 
 ```ts
 import {
+	SUPPORTED_SUI_NETWORKS,
 	suigar,
 	SuigarClient,
 	type SuigarCoin,

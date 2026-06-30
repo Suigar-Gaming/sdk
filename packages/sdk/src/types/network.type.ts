@@ -3,9 +3,9 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 
-export type SuigarNetwork = Extract<
-	SuiClientTypes.Network,
-	'mainnet' | 'testnet'
->;
+export const SUPPORTED_SUI_NETWORKS = [
+	'mainnet',
+	'testnet',
+] as const satisfies readonly SuiClientTypes.Network[];
 
-export const SUPPORTED_SUI_NETWORKS: SuigarNetwork[] = ['mainnet', 'testnet'];
+export type SuigarNetwork = (typeof SUPPORTED_SUI_NETWORKS)[number];

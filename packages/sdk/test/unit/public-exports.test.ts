@@ -50,6 +50,13 @@ import {
 } from '../../src/utils/index.js';
 
 describe('public source subpath modules', () => {
+	it('loads the package root module', async () => {
+		const module = await import('../../src/index.js');
+
+		expect(module).toBeDefined();
+		expect(module.SUPPORTED_SUI_NETWORKS).toEqual(['mainnet', 'testnet']);
+	});
+
 	it('loads the games subpath module', async () => {
 		const module = await import('../../src/games.js');
 
