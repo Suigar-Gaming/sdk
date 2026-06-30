@@ -1,7 +1,14 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-export type { CoinSide } from './types/game.type.js';
+export { GAMES } from './types/game.type.js';
+export type {
+	CoinSide,
+	Game,
+	PvPCoinflipAction,
+	PvPGame,
+	StandardGame,
+} from './types/game.type.js';
 export type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
@@ -11,5 +18,4 @@ export type {
 	BuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
-	PvPCoinflipAction,
 } from './types/transaction-options.type.js';

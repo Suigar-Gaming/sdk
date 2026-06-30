@@ -8,7 +8,4 @@ export type SuigarNetwork = Extract<
 	'mainnet' | 'testnet'
 >;
 
-export const SUPPORTED_SUI_NETWORKS: SuiClientTypes.Network[] = [
-	'mainnet',
-	'testnet',
-];
+export const SUPPORTED_SUI_NETWORKS: SuigarNetwork[] = ['mainnet', 'testnet'];

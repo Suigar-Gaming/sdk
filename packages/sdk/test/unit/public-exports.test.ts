@@ -13,9 +13,18 @@ import type {
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
 	CoinSide,
+	Game,
 	PvPCoinflipAction,
+	PvPGame,
+	StandardGame,
 } from '../../src/games.js';
-import type { CoinSide as InternalCoinSide } from '../../src/types/game.type.js';
+import type {
+	CoinSide as InternalCoinSide,
+	Game as InternalGame,
+	PvPCoinflipAction as InternalPvPCoinflipAction,
+	PvPGame as InternalPvPGame,
+	StandardGame as InternalStandardGame,
+} from '../../src/types/game.type.js';
 import type {
 	BuildCancelPvPCoinflipTransactionOptions as InternalBuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions as InternalBuildCoinflipTransactionOptions,
@@ -25,7 +34,6 @@ import type {
 	BuildPlinkoTransactionOptions as InternalBuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions as InternalBuildRangeTransactionOptions,
 	BuildWheelTransactionOptions as InternalBuildWheelTransactionOptions,
-	PvPCoinflipAction as InternalPvPCoinflipAction,
 } from '../../src/types/transaction-options.type.js';
 import {
 	DEFAULT_GAS_BUDGET_MIST,
@@ -46,7 +54,15 @@ describe('public source subpath modules', () => {
 		const module = await import('../../src/games.js');
 
 		expect(module).toBeDefined();
-		expect(Object.keys(module)).toEqual([]);
+		expect(Object.keys(module)).toEqual(['GAMES']);
+		expect(module.GAMES).toEqual([
+			'coinflip',
+			'limbo',
+			'plinko',
+			'pvp-coinflip',
+			'range',
+			'wheel',
+		]);
 	});
 
 	it('loads the utils subpath module', async () => {
@@ -91,6 +107,9 @@ describe('public source subpath modules', () => {
 
 	it('re-exports the expected public game types', () => {
 		expectTypeOf<CoinSide>().toEqualTypeOf<InternalCoinSide>();
+		expectTypeOf<Game>().toEqualTypeOf<InternalGame>();
+		expectTypeOf<StandardGame>().toEqualTypeOf<InternalStandardGame>();
+		expectTypeOf<PvPGame>().toEqualTypeOf<InternalPvPGame>();
 		expectTypeOf<PvPCoinflipAction>().toEqualTypeOf<InternalPvPCoinflipAction>();
 		expectTypeOf<BuildCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildCoinflipTransactionOptions>();
 		expectTypeOf<BuildLimboTransactionOptions>().toEqualTypeOf<InternalBuildLimboTransactionOptions>();

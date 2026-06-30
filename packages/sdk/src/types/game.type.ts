@@ -23,6 +23,7 @@ export type StandardGame = Exclude<Game, PvPGame>;
 export type PvPGame = Extract<Game, `pvp-${string}`>;
 
 export type CoinSide = 'heads' | 'tails';
+export type PvPCoinflipAction = 'create' | 'join' | 'cancel';
 
 export type GameEvent = (typeof GAME_EVENTS)[number];
 
