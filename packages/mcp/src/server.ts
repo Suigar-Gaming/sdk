@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import {
 	registerAppResource,
@@ -37,6 +38,10 @@ import type { ToolTextResult } from './types.js';
 
 export const SUIGAR_MCP_APP_RESOURCE_URI =
 	'ui://suigar/transaction-inspector.html';
+
+const packageJson = JSON.parse(
+	readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { version: string };
 
 const errorText = (error: unknown) => {
 	if (error instanceof Error) {
@@ -110,7 +115,7 @@ export const createSuigarMcpAppResourceResult = async () => ({
 export const createSuigarMcpServer = () => {
 	const server = new McpServer({
 		name: 'suigar',
-		version: '0.1.0',
+		version: packageJson.version,
 	});
 
 	server.registerTool(
