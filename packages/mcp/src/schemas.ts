@@ -93,7 +93,7 @@ export const readGameMetadataInputSchema = configInputSchema
 
 export const metadataSchema = z.record(
 	z.string(),
-	z.union([z.string(), z.number(), z.boolean(), z.bigint()]),
+	z.union([z.string(), z.number(), z.boolean()]),
 );
 
 export const commonBuildInputSchema = configInputSchema
