@@ -53,15 +53,15 @@ const GAME_TO_PACKAGE_KEY = {
 } as const satisfies Record<Game, keyof ResolvedMcpConfig['sdk']['packageIds']>;
 
 const GAME_TO_TOOLS = {
-	coinflip: ['suigar_build_coinflip_transaction'],
-	limbo: ['suigar_build_limbo_transaction'],
-	plinko: ['suigar_build_plinko_transaction'],
-	range: ['suigar_build_range_transaction'],
-	wheel: ['suigar_build_wheel_transaction'],
+	coinflip: ['build_coinflip_transaction'],
+	limbo: ['build_limbo_transaction'],
+	plinko: ['build_plinko_transaction'],
+	range: ['build_range_transaction'],
+	wheel: ['build_wheel_transaction'],
 	'pvp-coinflip': [
-		'suigar_build_pvp_coinflip_create_transaction',
-		'suigar_build_pvp_coinflip_join_transaction',
-		'suigar_build_pvp_coinflip_cancel_transaction',
+		'build_pvp_coinflip_create_transaction',
+		'build_pvp_coinflip_join_transaction',
+		'build_pvp_coinflip_cancel_transaction',
 	],
 } as const satisfies Record<Game, readonly string[]>;
 

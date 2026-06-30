@@ -119,7 +119,7 @@ export const createSuigarMcpServer = () => {
 	});
 
 	server.registerTool(
-		'suigar_read_config',
+		'read_config',
 		{
 			title: 'Read Suigar Config',
 			description:
@@ -155,7 +155,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_read_game_metadata',
+		'read_game_metadata',
 		{
 			title: 'Read Suigar Game Metadata',
 			description:
@@ -175,7 +175,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_coinflip_transaction',
+		'build_coinflip_transaction',
 		{
 			title: 'Build Coinflip Transaction',
 			description:
@@ -195,7 +195,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_limbo_transaction',
+		'build_limbo_transaction',
 		{
 			title: 'Build Limbo Transaction',
 			description:
@@ -215,7 +215,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_plinko_transaction',
+		'build_plinko_transaction',
 		{
 			title: 'Build Plinko Transaction',
 			description:
@@ -235,7 +235,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_wheel_transaction',
+		'build_wheel_transaction',
 		{
 			title: 'Build Wheel Transaction',
 			description:
@@ -255,7 +255,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_range_transaction',
+		'build_range_transaction',
 		{
 			title: 'Build Range Transaction',
 			description:
@@ -275,7 +275,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_pvp_coinflip_create_transaction',
+		'build_pvp_coinflip_create_transaction',
 		{
 			title: 'Build PvP Coinflip Create',
 			description:
@@ -295,7 +295,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_pvp_coinflip_join_transaction',
+		'build_pvp_coinflip_join_transaction',
 		{
 			title: 'Build PvP Coinflip Join',
 			description:
@@ -315,7 +315,7 @@ export const createSuigarMcpServer = () => {
 
 	registerAppTool(
 		server,
-		'suigar_build_pvp_coinflip_cancel_transaction',
+		'build_pvp_coinflip_cancel_transaction',
 		{
 			title: 'Build PvP Coinflip Cancel',
 			description:

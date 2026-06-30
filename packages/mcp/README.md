@@ -42,16 +42,16 @@ starts the MCP stdio server from `packages/mcp/dist/bin.mjs`.
 
 ## Tools
 
-- `suigar_read_config`
-- `suigar_read_game_metadata`
-- `suigar_build_coinflip_transaction`
-- `suigar_build_limbo_transaction`
-- `suigar_build_plinko_transaction`
-- `suigar_build_wheel_transaction`
-- `suigar_build_range_transaction`
-- `suigar_build_pvp_coinflip_create_transaction`
-- `suigar_build_pvp_coinflip_join_transaction`
-- `suigar_build_pvp_coinflip_cancel_transaction`
+- `read_config`
+- `read_game_metadata`
+- `build_coinflip_transaction`
+- `build_limbo_transaction`
+- `build_plinko_transaction`
+- `build_wheel_transaction`
+- `build_range_transaction`
+- `build_pvp_coinflip_create_transaction`
+- `build_pvp_coinflip_join_transaction`
+- `build_pvp_coinflip_cancel_transaction`
 
 All tools return `content` text plus `structuredContent`. App-capable hosts can
 render the shared Suigar Transaction Inspector UI for game metadata and
