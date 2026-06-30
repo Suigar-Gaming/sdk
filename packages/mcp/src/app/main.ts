@@ -14,13 +14,24 @@ type AnyRecord = Record<string, unknown>;
 const statusElement = document.querySelector<HTMLDivElement>('#status')!;
 const contextElement = document.querySelector<HTMLDListElement>('#context')!;
 const summaryElement = document.querySelector<HTMLDListElement>('#summary')!;
+const gasPanelElement = document.querySelector<HTMLElement>('#gas-panel')!;
+const gasElement = document.querySelector<HTMLDListElement>('#gas')!;
+const dryRunPanelElement =
+	document.querySelector<HTMLElement>('#dry-run-panel')!;
+const dryRunElement = document.querySelector<HTMLDListElement>('#dry-run')!;
 const targetsElement = document.querySelector<HTMLUListElement>('#targets')!;
 const notesPanelElement = document.querySelector<HTMLElement>('#notes-panel')!;
 const notesElement = document.querySelector<HTMLUListElement>('#notes')!;
+const errorsPanelElement =
+	document.querySelector<HTMLElement>('#errors-panel')!;
+const errorsElement = document.querySelector<HTMLUListElement>('#errors')!;
 const resultElement = document.querySelector<HTMLPreElement>('#result')!;
 
 const asRecord = (value: unknown): AnyRecord =>
 	value && typeof value === 'object' ? (value as AnyRecord) : {};
+
+const isRecord = (value: unknown): value is AnyRecord =>
+	value !== null && typeof value === 'object';
 
 const stringify = (value: unknown) =>
 	JSON.stringify(
@@ -50,22 +61,24 @@ const setDefinitionList = (
 	element: HTMLDListElement,
 	entries: Array<[string, unknown]>,
 ) => {
+	const visibleEntries = entries.filter(([, value]) => {
+		const formattedValue = formatValue(value);
+		return formattedValue != null && formattedValue !== '';
+	});
 	element.replaceChildren(
-		...entries.flatMap(([label, value]) => {
+		...visibleEntries.flatMap(([label, value]) => {
 			const term = document.createElement('dt');
 			term.textContent = label;
 			const detail = document.createElement('dd');
 			const formattedValue = formatValue(value);
-			const text =
-				formattedValue == null || formattedValue === ''
-					? 'n/a'
-					: String(formattedValue);
+			const text = String(formattedValue);
 			detail.textContent = text;
-			detail.title = text === 'n/a' ? '' : text;
-			detail.className = text === 'n/a' ? 'is-empty' : 'value';
+			detail.title = text;
+			detail.className = 'value';
 			return [term, detail];
 		}),
 	);
+	return visibleEntries.length > 0;
 };
 
 const renderTargets = (structuredContent: AnyRecord) => {
@@ -107,11 +120,48 @@ const renderNotes = (structuredContent: AnyRecord) => {
 	);
 };
 
+const renderErrors = (structuredContent: AnyRecord) => {
+	const errors = Array.isArray(structuredContent.errors)
+		? structuredContent.errors.filter(
+				(error): error is string => typeof error === 'string' && error !== '',
+			)
+		: [];
+
+	errorsPanelElement.hidden = errors.length === 0;
+	errorsElement.replaceChildren(
+		...errors.map((error) => {
+			const item = document.createElement('li');
+			item.textContent = error;
+			return item;
+		}),
+	);
+};
+
+const amountText = (value: unknown) => {
+	const amount = asRecord(value);
+	if (typeof amount.display === 'string' && typeof amount.raw === 'string') {
+		return `${amount.display} (${amount.raw} base units)`;
+	}
+	return value;
+};
+
+const firstEventFields = (structuredContent: AnyRecord) => {
+	const dryRunSummary = asRecord(structuredContent.dryRunSummary);
+	const events = Array.isArray(dryRunSummary.events)
+		? dryRunSummary.events
+		: [];
+	const event = events.map(asRecord).find((item) => isRecord(item.fields));
+	return event ? asRecord(event.fields) : {};
+};
+
 const renderResult = (structuredContent: unknown) => {
 	const record = asRecord(structuredContent);
 	const config = asRecord(record.config);
 	const sdkConfig = asRecord(config.sdk);
 	const summary = asRecord(record.summary);
+	const dryRunSummary = asRecord(record.dryRunSummary);
+	const gasUsed = asRecord(dryRunSummary.gasUsed);
+	const eventFields = firstEventFields(record);
 	const plan = asRecord(record.plan);
 	const game = asRecord(record.game);
 	const typeArguments = Array.isArray(plan.typeArguments)
@@ -137,7 +187,12 @@ const renderResult = (structuredContent: unknown) => {
 	]);
 	setDefinitionList(summaryElement, [
 		['Sender', summary.sender],
-		['Gas budget', summary.gasBudget],
+		[
+			'Stake',
+			summary.stakeDisplay
+				? `${summary.stakeDisplay} (${summary.stake} base units)`
+				: summary.stake,
+		],
 		['Commands', summary.commandCount ?? (plan.target ? 'planned' : null)],
 		['Inputs', summary.inputs ?? requiredInputs],
 		['Type args', typeArguments],
@@ -147,10 +202,36 @@ const renderResult = (structuredContent: unknown) => {
 				? `${record.transactionBytesBase64.length} chars`
 				: null,
 		],
-		['Dry-run', record.dryRun ? 'included' : null],
+	]);
+	gasPanelElement.hidden = !setDefinitionList(gasElement, [
+		[
+			'Gas budget',
+			summary.gasBudgetDisplay
+				? `${summary.gasBudgetDisplay} (${summary.gasBudget} base units)`
+				: summary.gasBudget,
+		],
+		['Gas computation', amountText(gasUsed.computation)],
+		['Gas storage', amountText(gasUsed.storage)],
+		['Gas rebate', amountText(gasUsed.rebate)],
+		['Net gas delta', amountText(gasUsed.net)],
+	]);
+	dryRunPanelElement.hidden = !setDefinitionList(dryRunElement, [
+		['Dry-run success', dryRunSummary.success],
+		['Player bet', eventFields.player_bet],
+		['Coin outcome', eventFields.coin_outcome],
+		[
+			'Stake amount',
+			eventFields.stake_amount_display ?? eventFields.stake_amount,
+		],
+		[
+			'Outcome amount',
+			eventFields.outcome_amount_display ?? eventFields.outcome_amount,
+		],
+		['Raw payload', record.dryRun ? 'included' : null],
 	]);
 	renderTargets(record);
 	renderNotes(record);
+	renderErrors(record);
 	resultElement.textContent = stringify(structuredContent);
 };
 
@@ -158,12 +239,20 @@ const app = new App({ name: 'suigar-transaction-inspector', version: '0.1.0' });
 
 app.ontoolinput = ({ arguments: args }) => {
 	statusElement.textContent = 'Running tool';
+	renderErrors({});
 	resultElement.textContent = stringify(args ?? {});
 };
 
 app.ontoolresult = (result) => {
 	if (result.isError) {
 		statusElement.textContent = 'Error';
+		const content = result.content as
+			Array<{ type?: string; text?: string }> | undefined;
+		const text = content
+			?.map((item) => (item.type === 'text' ? (item.text ?? '') : ''))
+			.filter(Boolean)
+			.join('\n');
+		renderErrors({ errors: text ? [text] : ['Tool call failed.'] });
 		resultElement.textContent = stringify(result);
 		return;
 	}

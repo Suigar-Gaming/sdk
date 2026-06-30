@@ -64,7 +64,19 @@ transaction tools.
 - `build`: returns unsigned transaction bytes as base64 plus a transaction
   summary.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and
-  returns the dry-run result plus summary.
+  returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed
+  dry-runs include an `errors` array extracted from the failed transaction
+  status.
+
+Dry-run summaries include:
+
+- `success` and `error`
+- gas computation, storage, rebate, non-refundable storage fee, and net gas
+  delta as raw base units plus decimal-formatted display values
+- balance changes as raw base units plus decimal-formatted display values
+- decoded event fields when available, including standard `BetResultEvent`
+  game details such as `player_bet`, `coin_outcome`, `stake_amount`, and
+  `outcome_amount`
 
 ## Inputs
 
@@ -72,6 +84,12 @@ Transaction `owner` inputs accept raw Sui addresses, SuiNS names such as
 `name.sui`, and SuiNS subnames such as `sub.name.sui`. SuiNS owners are resolved
 through the configured network before the unsigned transaction is built or
 dry-run.
+
+Transaction `stake` and `cashStake` inputs are currency amounts in the chosen
+or default configured coin, not base-unit integers. For example, `stake: 1`
+means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server
+uses the configured coin `decimals` value to convert those amounts into base
+units before calling the SDK transaction builders.
 
 ## Config
 

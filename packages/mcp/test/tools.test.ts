@@ -5,6 +5,7 @@ import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
 import { resolveOwnerAddress } from '../src/client.js';
 import type { SuigarClientBundle } from '../src/client.js';
+import { toolOutputSchema } from '../src/schemas.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -186,13 +187,46 @@ describe('build transaction tools', () => {
 			const content = result.structuredContent as {
 				mode: string;
 				transactionBytesBase64?: string;
-				summary: { game?: string };
+				summary: {
+					game?: string;
+					stake?: string;
+					stakeDisplay?: string;
+					coinDecimals?: number;
+				};
 			};
 
 			expect(content.mode).toBe('build');
 			expect(content.transactionBytesBase64).toBe('AQIDBA==');
 			expect(content.summary.game).toBe('coinflip');
+			expect(content.summary.stake).toBe('1000000000000');
+			expect(content.summary.stakeDisplay).toBe('1000');
+			expect(content.summary.coinDecimals).toBe(9);
+			expect(content.summary).not.toHaveProperty('action');
+			expect(() => toolOutputSchema.parse(content)).not.toThrow();
 			expect(buildSpy).toHaveBeenCalledOnce();
+		} finally {
+			buildSpy.mockRestore();
+		}
+	});
+
+	it('treats stake input as the selected coin currency amount', async () => {
+		const buildSpy = vi
+			.spyOn(Transaction.prototype, 'build')
+			.mockResolvedValue(new Uint8Array([1]));
+
+		try {
+			const result = await buildCoinflipTransactionTool({
+				mode: 'build',
+				owner,
+				stake: 1,
+				side: 'heads',
+			});
+			const content = result.structuredContent as {
+				summary: { stake?: string; stakeDisplay?: string };
+			};
+
+			expect(content.summary.stake).toBe('1000000000');
+			expect(content.summary.stakeDisplay).toBe('1');
 		} finally {
 			buildSpy.mockRestore();
 		}
@@ -212,5 +246,26 @@ describe('build transaction tools', () => {
 		await expect(
 			buildCoinflipTransactionTool({ mode: 'build', owner, side: 'heads' }),
 		).rejects.toThrow(/stake/u);
+	});
+});
+
+describe('tool output validation', () => {
+	it('accepts dry-run summaries and errors in tool output validation', () => {
+		expect(() =>
+			toolOutputSchema.parse({
+				mode: 'dry-run',
+				network: 'testnet',
+				summary: {},
+				dryRun: {},
+				dryRunSummary: {
+					success: true,
+					error: null,
+					gasUsed: {},
+					balanceChanges: [],
+					events: [],
+				},
+				errors: ['MoveAbort in coinflip::play'],
+			}),
+		).not.toThrow();
 	});
 });

@@ -11,6 +11,12 @@ const addressDescription =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
 const coinTypeDescription =
 	'Move coin type such as 0x2::sui::SUI. Defaults to the SDK-configured SUI coin type.';
+const currencyAmountDescription =
+	'Currency amount in the chosen coin, converted to base units using the configured coin decimals.';
+const currencyAmountSchema = z.union([
+	z.number().nonnegative(),
+	z.string().regex(/^(?:\d+|\d+\.\d+|\.\d+)$/u),
+]);
 
 const coinMetadataSchema = z
 	.object({
@@ -122,14 +128,12 @@ export const commonBuildInputSchema = configInputSchema
 
 export const stakeBuildInputSchema = commonBuildInputSchema
 	.extend({
-		stake: z
-			.union([z.number().int().nonnegative(), z.string().regex(/^\d+$/u)])
+		stake: currencyAmountSchema
 			.optional()
-			.describe('Logical wager in base units.'),
-		cashStake: z
-			.union([z.number().int().nonnegative(), z.string().regex(/^\d+$/u)])
+			.describe(`Logical wager. ${currencyAmountDescription}`),
+		cashStake: currencyAmountSchema
 			.optional()
-			.describe('Optional withdrawn amount in base units.'),
+			.describe(`Optional withdrawn amount. ${currencyAmountDescription}`),
 		betCount: z
 			.union([z.number().int().positive(), z.string().regex(/^[1-9]\d*$/u)])
 			.optional()
@@ -181,10 +185,9 @@ export const rangeInputSchema = stakeBuildInputSchema
 
 export const pvpCoinflipCreateInputSchema = commonBuildInputSchema
 	.extend({
-		stake: z
-			.union([z.number().int().nonnegative(), z.string().regex(/^\d+$/u)])
+		stake: currencyAmountSchema
 			.optional()
-			.describe('Stake per player in base units.'),
+			.describe(`Stake per player. ${currencyAmountDescription}`),
 		creatorSide: z
 			.enum(['heads', 'tails'])
 			.optional()
@@ -240,6 +243,8 @@ export const toolOutputSchema = z
 		summary: unknownJsonSchema.optional(),
 		transactionBytesBase64: z.string().optional(),
 		dryRun: unknownJsonSchema.optional(),
+		dryRunSummary: unknownJsonSchema.optional(),
+		errors: z.array(z.string()).optional(),
 	})
 	.loose();
 

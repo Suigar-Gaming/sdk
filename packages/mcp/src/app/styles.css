@@ -102,6 +102,10 @@ h2 {
 	padding: 13px;
 }
 
+.panel[hidden] {
+	display: none;
+}
+
 .panel-heading {
 	display: flex;
 	align-items: center;
@@ -176,7 +180,12 @@ dd.is-empty {
 	display: none;
 }
 
-.notes {
+.errors-panel[hidden] {
+	display: none;
+}
+
+.notes,
+.errors {
 	display: grid;
 	gap: 6px;
 	margin: 0;
@@ -184,12 +193,18 @@ dd.is-empty {
 	list-style: none;
 }
 
-.notes li {
+.notes li,
+.errors li {
 	border-left: 2px solid color-mix(in srgb, var(--accent) 48%, transparent);
 	padding-left: 9px;
 	color: var(--mcp-ui-text-secondary-color, var(--muted));
 	font-size: 13px;
 	line-height: 1.45;
+}
+
+.errors li {
+	border-left-color: color-mix(in srgb, #d92d20 72%, transparent);
+	color: color-mix(in srgb, #d92d20 76%, currentColor);
 }
 
 .raw-result {

@@ -14,10 +14,17 @@ import {
 import { suigar } from '@suigar/sdk';
 import type { SuigarClient, SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
+import {
+	extractDryRunErrors,
+	summarizeDryRun,
+	toJsonValue,
+} from './dry-run.js';
+import { formatBaseUnitAmount } from './format.js';
 import type {
 	BuilderMode,
 	BuildTransactionResult,
 	DryRunResult,
+	RawDryRunResult,
 	ResolvedMcpConfig,
 	SuigarConfigOverrides,
 	SuigarMcpConfigInput,
@@ -126,7 +133,7 @@ export const resolveOwnerAddress = async (
 export const dryRunTransaction = async (
 	transaction: Transaction,
 	client: ReturnType<typeof createSuigarClient>['client'],
-): Promise<DryRunResult> =>
+): Promise<RawDryRunResult> =>
 	client.core.simulateTransaction({
 		transaction,
 		include: {
@@ -143,6 +150,8 @@ export const summarizeTransaction = (
 		action?: PvPCoinflipAction;
 		coinType?: string;
 		stake?: bigint | number;
+		stakeDisplay?: string;
+		coinDecimals?: number;
 	} = {},
 ): TransactionSummary => {
 	const data = transaction.getData() as {
@@ -170,13 +179,16 @@ export const summarizeTransaction = (
 				};
 			}
 		).MoveCall;
+		const target =
+			moveCall?.package && moveCall?.module && moveCall?.function
+				? `${moveCall.package}::${moveCall.module}::${moveCall.function}`
+				: undefined;
 		return {
 			kind,
-			target:
-				moveCall?.package && moveCall?.module && moveCall?.function
-					? `${moveCall.package}::${moveCall.module}::${moveCall.function}`
-					: undefined,
-			typeArguments: moveCall?.typeArguments,
+			...(target ? { target } : {}),
+			...(moveCall?.typeArguments
+				? { typeArguments: moveCall.typeArguments }
+				: {}),
 		};
 	});
 
@@ -190,17 +202,25 @@ export const summarizeTransaction = (
 		sender: data.sender ?? null,
 		gasBudget:
 			data.gasData?.budget == null ? null : String(data.gasData.budget),
+		gasBudgetDisplay:
+			data.gasData?.budget == null
+				? null
+				: formatBaseUnitAmount(data.gasData.budget, context.coinDecimals),
 		gasPrice: data.gasData?.price == null ? null : String(data.gasData.price),
 		commandCount: commands.length,
 		commands,
 		inputs: data.inputs?.length ?? 0,
 		objectInputs,
-		game: context.game,
-		action: context.action,
-		coinType: context.coinType
-			? normalizeStructTag(context.coinType)
-			: undefined,
-		stake: context.stake == null ? undefined : String(context.stake),
+		...(context.game ? { game: context.game } : {}),
+		...(context.action ? { action: context.action } : {}),
+		...(context.coinType
+			? { coinType: normalizeStructTag(context.coinType) }
+			: {}),
+		...(context.stake == null ? {} : { stake: String(context.stake) }),
+		...(context.stakeDisplay ? { stakeDisplay: context.stakeDisplay } : {}),
+		...(context.coinDecimals == null
+			? {}
+			: { coinDecimals: context.coinDecimals }),
 	};
 };
 
@@ -219,12 +239,18 @@ export const buildTransactionResult = async ({
 }): Promise<BuildTransactionResult> => {
 	const summary = summarizeTransaction(transaction, context);
 	if (mode === 'dry-run') {
+		const rawDryRun = await dryRunTransaction(transaction, client);
+		const dryRun = toJsonValue(rawDryRun) as DryRunResult;
+		const dryRunSummary = summarizeDryRun(rawDryRun, client, context);
+		const errors = extractDryRunErrors(rawDryRun);
 		return {
 			mode,
 			network: config.network,
 			config,
 			summary,
-			dryRun: await dryRunTransaction(transaction, client),
+			dryRun,
+			dryRunSummary,
+			...(errors.length > 0 ? { errors } : {}),
 		};
 	}
 

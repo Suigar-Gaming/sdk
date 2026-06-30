@@ -26,6 +26,16 @@
 					<h2>Transaction</h2>
 					<dl id="summary"></dl>
 				</div>
+
+				<div id="gas-panel" class="panel" hidden>
+					<h2>Gas</h2>
+					<dl id="gas"></dl>
+				</div>
+
+				<div id="dry-run-panel" class="panel" hidden>
+					<h2>Dry-run</h2>
+					<dl id="dry-run"></dl>
+				</div>
 			</section>
 
 			<section class="panel target-panel">
@@ -40,6 +50,13 @@
 					<h2>Notes</h2>
 				</div>
 				<ul id="notes" class="notes"></ul>
+			</section>
+
+			<section id="errors-panel" class="panel errors-panel" hidden>
+				<div class="panel-heading">
+					<h2>Errors</h2>
+				</div>
+				<ul id="errors" class="errors"></ul>
 			</section>
 
 			<details class="panel raw-result">

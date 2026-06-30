@@ -81,30 +81,73 @@ const asTextResponse = <T extends ToolTextResult['structuredContent']>(
 	structuredContent,
 });
 
-const toAmount = (value: unknown, fieldName: string): number | bigint => {
-	if (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0) {
-		return value;
+const currencyAmountPattern = /^(?:\d+|\d+\.\d+|\.\d+)$/u;
+
+const coinMetadataForAmount = (
+	config: ResolvedMcpConfig,
+	coinType?: string,
+) => {
+	const resolvedCoinType = resolveDefaultCoinType(config, coinType);
+	const coin = Object.values(config.sdk.coins).find(
+		(metadata) =>
+			resolveDefaultCoinType(config, metadata.coinType) === resolvedCoinType,
+	);
+
+	if (!coin) {
+		throw new RangeError(
+			`Unable to resolve decimals for coin type ${resolvedCoinType}. Add the coin to config.coins before using currency-denominated amounts.`,
+		);
 	}
-	if (typeof value === 'bigint' && value >= 0n) {
-		return value;
+
+	return {
+		coinType: resolvedCoinType,
+		decimals: coin.decimals,
+	};
+};
+
+const toCurrencyAmountText = (value: unknown, fieldName: string): string => {
+	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+		return String(value);
 	}
-	if (typeof value === 'string' && /^\d+$/u.test(value)) {
-		return BigInt(value);
+	if (typeof value === 'string' && currencyAmountPattern.test(value.trim())) {
+		return value.trim();
 	}
 	throw new TypeError(
-		`Missing or invalid ${fieldName}. Provide a non-negative integer in base units.`,
+		`Missing or invalid ${fieldName}. Provide a non-negative currency amount such as 1, 2, or 1.5.`,
 	);
 };
 
-const toPositiveAmount = (
+const toBaseUnits = (
+	value: unknown,
+	fieldName: string,
+	decimals: number,
+): bigint => {
+	const amount = toCurrencyAmountText(value, fieldName);
+	const [rawWhole, rawFraction = ''] = amount.split('.');
+	const whole = rawWhole === '' ? '0' : rawWhole;
+	const overflow = rawFraction.slice(decimals);
+	if (/[^0]/u.test(overflow)) {
+		throw new RangeError(
+			`${fieldName} has more fractional digits than the configured coin decimals (${decimals}).`,
+		);
+	}
+	const fraction = rawFraction.slice(0, decimals).padEnd(decimals, '0');
+	return BigInt(whole) * 10n ** BigInt(decimals) + BigInt(fraction || '0');
+};
+
+const toPositiveInteger = (
 	value: unknown,
 	fieldName: string,
 ): number | bigint => {
-	const amount = toAmount(value, fieldName);
-	if (BigInt(amount) <= 0n) {
-		throw new RangeError(`${fieldName} must be greater than zero.`);
+	if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
+		return value;
 	}
-	return amount;
+	if (typeof value === 'string' && /^[1-9]\d*$/u.test(value)) {
+		return BigInt(value);
+	}
+	throw new TypeError(
+		`Missing or invalid ${fieldName}. Provide a positive integer.`,
+	);
 };
 
 const requireString = (value: unknown, fieldName: string): string => {
@@ -221,16 +264,19 @@ const commonOptions = async (
 const stakeOptions = async (
 	input: CoinflipInput | LimboInput | ConfigIdInput | RangeInput,
 	bundle: SuigarClientBundle,
-) => ({
-	...(await commonOptions(input, bundle)),
-	stake: toAmount(input.stake, 'stake'),
-	...(input.cashStake == null
-		? {}
-		: { cashStake: toAmount(input.cashStake, 'cashStake') }),
-	...(input.betCount == null
-		? {}
-		: { betCount: toPositiveAmount(input.betCount, 'betCount') }),
-});
+) => {
+	const { decimals } = coinMetadataForAmount(bundle.config, input.coinType);
+	return {
+		...(await commonOptions(input, bundle)),
+		stake: toBaseUnits(input.stake, 'stake', decimals),
+		...(input.cashStake == null
+			? {}
+			: { cashStake: toBaseUnits(input.cashStake, 'cashStake', decimals) }),
+		...(input.betCount == null
+			? {}
+			: { betCount: toPositiveInteger(input.betCount, 'betCount') }),
+	};
+};
 
 const executeTransactionTool = async ({
 	input,
@@ -238,6 +284,7 @@ const executeTransactionTool = async ({
 	action,
 	createTransaction,
 	stake,
+	stakeDisplay,
 }: {
 	input:
 		| CoinflipInput
@@ -251,6 +298,7 @@ const executeTransactionTool = async ({
 	action?: PvPCoinflipAction;
 	createTransaction: (bundle: SuigarClientBundle) => Promise<Transaction>;
 	stake?: number | bigint;
+	stakeDisplay?: string;
 }) => {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
@@ -260,6 +308,12 @@ const executeTransactionTool = async ({
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
+	const coin = coinMetadataForAmount(bundle.config, input.coinType);
+	const baseStake =
+		stake ??
+		(stakeDisplay == null
+			? undefined
+			: toBaseUnits(stakeDisplay, 'stake', coin.decimals));
 	const transaction = await createTransaction(bundle);
 	return asTextResponse(
 		await buildTransactionResult({
@@ -270,8 +324,10 @@ const executeTransactionTool = async ({
 			context: {
 				game,
 				action,
-				coinType: resolveDefaultCoinType(bundle.config, input.coinType),
-				stake,
+				coinType: coin.coinType,
+				stake: baseStake,
+				stakeDisplay,
+				coinDecimals: coin.decimals,
 			},
 		}),
 	);
@@ -332,7 +388,7 @@ export const buildCoinflipTransactionTool = async (
 	return executeTransactionTool({
 		input,
 		game: 'coinflip',
-		stake: toAmount(input.stake, 'stake'),
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('coinflip', {
 				...(await stakeOptions(input, bundle)),
@@ -358,7 +414,7 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 	return executeTransactionTool({
 		input,
 		game: 'limbo',
-		stake: toAmount(input.stake, 'stake'),
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('limbo', {
 				...(await stakeOptions(input, bundle)),
@@ -388,7 +444,7 @@ const buildConfigIdTransactionTool = async (
 	return executeTransactionTool({
 		input,
 		game,
-		stake: toAmount(input.stake, 'stake'),
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction(game, {
 				...(await stakeOptions(input, bundle)),
@@ -420,7 +476,7 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 	return executeTransactionTool({
 		input,
 		game: 'range',
-		stake: toAmount(input.stake, 'stake'),
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('range', {
 				...(await stakeOptions(input, bundle)),
@@ -452,11 +508,15 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 		input,
 		game: 'pvp-coinflip',
 		action: 'create',
-		stake: toAmount(input.stake, 'stake'),
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createPvPCoinflipTransaction('create', {
 				...(await commonOptions(input, bundle)),
-				stake: toAmount(input.stake, 'stake'),
+				stake: toBaseUnits(
+					input.stake,
+					'stake',
+					coinMetadataForAmount(bundle.config, input.coinType).decimals,
+				),
 				side: requireString(input.creatorSide, 'creatorSide') as CoinSide,
 				isPrivate: input.isPrivate,
 			}),

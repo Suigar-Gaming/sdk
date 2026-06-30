@@ -43,7 +43,7 @@
 	"scripts": {
 		"start:local": "pnpm --filter @suigar/sdk build:ci && pnpm build && node dist/bin.mjs",
 		"build": "pnpm clean && tsdown && vite build",
-		"build:ci": "pnpm clean && tsdown && vite build",
+		"build:ci": "pnpm build",
 		"clean": "rm -rf dist",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",

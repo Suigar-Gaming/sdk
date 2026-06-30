@@ -9,11 +9,16 @@ export type SuigarConfig = ReturnType<SuigarClient['getConfig']>;
 export type SuigarConfigOverrides = NonNullable<
 	Parameters<typeof suigar>[0]
 >['config'];
-export type DryRunResult = SuiClientTypes.SimulateTransactionResult<{
+export type RawDryRunResult = SuiClientTypes.SimulateTransactionResult<{
 	effects: true;
 	events: true;
 	balanceChanges: true;
 }>;
+
+export type JsonValue =
+	string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+export type DryRunResult = { [key: string]: JsonValue };
 
 export type BuilderMode = 'build' | 'dry-run' | 'read-only';
 
@@ -39,6 +44,7 @@ export type TransactionCommandSummary = {
 export type TransactionSummary = {
 	sender: string | null;
 	gasBudget: string | null;
+	gasBudgetDisplay: string | null;
 	gasPrice: string | null;
 	commandCount: number;
 	commands: TransactionCommandSummary[];
@@ -48,6 +54,38 @@ export type TransactionSummary = {
 	action?: PvPCoinflipAction;
 	coinType?: string;
 	stake?: string;
+	stakeDisplay?: string;
+	coinDecimals?: number;
+};
+
+export type FormattedAmount = {
+	raw: string;
+	display: string;
+};
+
+export type DryRunEventSummary = {
+	type: string;
+	game?: Game;
+	eventName?: string;
+	fields: { [key: string]: JsonValue };
+};
+
+export type DryRunSummary = {
+	success: boolean;
+	error: string | null;
+	gasUsed: {
+		computation: FormattedAmount | null;
+		storage: FormattedAmount | null;
+		rebate: FormattedAmount | null;
+		nonRefundableStorageFee: FormattedAmount | null;
+		net: FormattedAmount | null;
+	};
+	balanceChanges: Array<{
+		address: string;
+		coinType: string;
+		amount: FormattedAmount;
+	}>;
+	events: DryRunEventSummary[];
 };
 
 export type ReadOnlyPlan = {
@@ -71,6 +109,8 @@ export type BuildTransactionResult = {
 	summary: TransactionSummary;
 	transactionBytesBase64?: string;
 	dryRun?: DryRunResult;
+	dryRunSummary?: DryRunSummary;
+	errors?: string[];
 };
 
 export type ReadConfigResult = {
