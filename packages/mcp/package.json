@@ -35,12 +35,13 @@
 		}
 	},
 	"bin": {
-		"suigar-mcp": "./dist/bin.mjs"
+		"suigar": "./dist/bin.mjs"
 	},
 	"engines": {
 		"node": "^22.18.0 || >=24.0.0"
 	},
 	"scripts": {
+		"start:local": "pnpm --filter @suigar/sdk build:ci && pnpm build && node dist/bin.mjs",
 		"build": "pnpm clean && tsdown && vite build",
 		"build:ci": "pnpm clean && tsdown && vite build",
 		"clean": "rm -rf dist",

@@ -23,6 +23,9 @@ pnpm --dir packages/sdk build:ci
 # Build the MCP package and bundled MCP App
 pnpm --dir packages/mcp build
 
+# Build and run the local stdio MCP server for manual client testing
+pnpm --dir packages/mcp start:local
+
 # Regenerate Move contract bindings only
 pnpm --dir packages/sdk codegen
 ```

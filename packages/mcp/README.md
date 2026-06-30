@@ -34,9 +34,11 @@ Use the stdio server from an MCP client:
 For local workspace development:
 
 ```bash
-pnpm --dir packages/mcp build
-node packages/mcp/dist/bin.mjs
+pnpm --dir packages/mcp start:local
 ```
+
+This builds the local `@suigar/sdk` workspace package first, then builds and
+starts the MCP stdio server from `packages/mcp/dist/bin.mjs`.
 
 ## Tools
 
