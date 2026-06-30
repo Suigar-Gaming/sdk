@@ -66,6 +66,13 @@ transaction tools.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and
   returns the dry-run result plus summary.
 
+## Inputs
+
+Transaction `owner` inputs accept raw Sui addresses, SuiNS names such as
+`name.sui`, and SuiNS subnames such as `sub.name.sui`. SuiNS owners are resolved
+through the configured network before the unsigned transaction is built or
+dry-run.
+
 ## Config
 
 `network` defaults to `testnet`. Only `mainnet` and `testnet` are supported.

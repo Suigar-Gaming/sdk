@@ -3,6 +3,8 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
+import { resolveOwnerAddress } from '../src/client.js';
+import type { SuigarClientBundle } from '../src/client.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -18,6 +20,58 @@ import {
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const resolvedOwner =
+	'0x0000000000000000000000000000000000000000000000000000000000000002';
+
+const createResolverBundle = (
+	resolveSuiNSName: SuigarClientBundle['resolveSuiNSName'],
+) =>
+	({
+		resolveSuiNSName,
+	}) as SuigarClientBundle;
+
+describe('owner resolution', () => {
+	it('normalizes raw Sui addresses without a SuiNS lookup', async () => {
+		const lookup = vi.fn<SuigarClientBundle['resolveSuiNSName']>();
+
+		await expect(
+			resolveOwnerAddress('0x1', createResolverBundle(lookup)),
+		).resolves.toBe(owner);
+		expect(lookup).not.toHaveBeenCalled();
+	});
+
+	it('resolves SuiNS names and subnames before transaction construction', async () => {
+		const lookup = vi
+			.fn<SuigarClientBundle['resolveSuiNSName']>()
+			.mockResolvedValue(resolvedOwner);
+
+		await expect(
+			resolveOwnerAddress('furbor.sui', createResolverBundle(lookup)),
+		).resolves.toBe(resolvedOwner);
+		expect(lookup).toHaveBeenCalledWith('furbor.sui');
+
+		await expect(
+			resolveOwnerAddress('desk.furbor.sui', createResolverBundle(lookup)),
+		).resolves.toBe(resolvedOwner);
+		expect(lookup).toHaveBeenLastCalledWith('desk.furbor.sui');
+	});
+
+	it('rejects invalid or unresolved SuiNS owners with actionable errors', async () => {
+		await expect(
+			resolveOwnerAddress(
+				'not a name',
+				createResolverBundle(async () => resolvedOwner),
+			),
+		).rejects.toThrow(/Sui address or SuiNS name/u);
+
+		await expect(
+			resolveOwnerAddress(
+				'missing.sui',
+				createResolverBundle(async () => null),
+			),
+		).rejects.toThrow(/did not resolve/u);
+	});
+});
 
 describe('read tools', () => {
 	it('defaults read_config to testnet and returns SDK-shaped config', async () => {

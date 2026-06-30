@@ -13,7 +13,9 @@ import {
 	buildTransactionResult,
 	createSuigarClient,
 	resolveDefaultCoinType,
+	resolveOwnerAddress,
 } from './client.js';
+import type { SuigarClientBundle } from './client.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,
@@ -193,7 +195,7 @@ const readOnlyPlan = ({
 	};
 };
 
-const commonOptions = (
+const commonOptions = async (
 	input:
 		| CoinflipInput
 		| LimboInput
@@ -202,21 +204,25 @@ const commonOptions = (
 		| PvpCoinflipCreateInput
 		| PvpCoinflipJoinInput
 		| PvpCoinflipCancelInput,
+	bundle: SuigarClientBundle,
 ) => {
-	const { config } = createSuigarClient(getConfigInput(input));
 	return {
-		owner: requireString(input.owner, 'owner'),
-		coinType: resolveDefaultCoinType(config, input.coinType),
+		owner: await resolveOwnerAddress(
+			requireString(input.owner, 'owner'),
+			bundle,
+		),
+		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
 		metadata: input.metadata,
 		gasBudget: input.gasBudget,
 		useGasCoin: input.useGasCoin,
 	};
 };
 
-const stakeOptions = (
+const stakeOptions = async (
 	input: CoinflipInput | LimboInput | ConfigIdInput | RangeInput,
+	bundle: SuigarClientBundle,
 ) => ({
-	...commonOptions(input),
+	...(await commonOptions(input, bundle)),
 	stake: toAmount(input.stake, 'stake'),
 	...(input.cashStake == null
 		? {}
@@ -243,9 +249,7 @@ const executeTransactionTool = async ({
 		| PvpCoinflipCancelInput;
 	game: Game;
 	action?: PvPCoinflipAction;
-	createTransaction: (
-		bundle: ReturnType<typeof createSuigarClient>,
-	) => Transaction;
+	createTransaction: (bundle: SuigarClientBundle) => Promise<Transaction>;
 	stake?: number | bigint;
 }) => {
 	const mode = getMode(input.mode);
@@ -256,7 +260,7 @@ const executeTransactionTool = async ({
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
-	const transaction = createTransaction(bundle);
+	const transaction = await createTransaction(bundle);
 	return asTextResponse(
 		await buildTransactionResult({
 			mode,
@@ -329,9 +333,9 @@ export const buildCoinflipTransactionTool = async (
 		input,
 		game: 'coinflip',
 		stake: toAmount(input.stake, 'stake'),
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createBetTransaction('coinflip', {
-				...stakeOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction('coinflip', {
+				...(await stakeOptions(input, bundle)),
 				side: requireString(input.side, 'side') as CoinSide,
 			}),
 	});
@@ -355,9 +359,9 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 		input,
 		game: 'limbo',
 		stake: toAmount(input.stake, 'stake'),
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createBetTransaction('limbo', {
-				...stakeOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction('limbo', {
+				...(await stakeOptions(input, bundle)),
 				targetMultiplier: requireNumber(
 					input.targetMultiplier,
 					'targetMultiplier',
@@ -385,9 +389,9 @@ const buildConfigIdTransactionTool = async (
 		input,
 		game,
 		stake: toAmount(input.stake, 'stake'),
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createBetTransaction(game, {
-				...stakeOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction(game, {
+				...(await stakeOptions(input, bundle)),
 				configId: requireNumber(input.configId, 'configId'),
 			}),
 	});
@@ -417,9 +421,9 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 		input,
 		game: 'range',
 		stake: toAmount(input.stake, 'stake'),
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createBetTransaction('range', {
-				...stakeOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction('range', {
+				...(await stakeOptions(input, bundle)),
 				leftPoint: requireNumber(input.leftPoint, 'leftPoint'),
 				rightPoint: requireNumber(input.rightPoint, 'rightPoint'),
 				outOfRange: Boolean(input.outOfRange),
@@ -449,9 +453,9 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 		game: 'pvp-coinflip',
 		action: 'create',
 		stake: toAmount(input.stake, 'stake'),
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createPvPCoinflipTransaction('create', {
-				...commonOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createPvPCoinflipTransaction('create', {
+				...(await commonOptions(input, bundle)),
 				stake: toAmount(input.stake, 'stake'),
 				side: requireString(input.creatorSide, 'creatorSide') as CoinSide,
 				isPrivate: input.isPrivate,
@@ -480,9 +484,9 @@ export const buildPvpCoinflipJoinTransactionTool = async (
 		input,
 		game: 'pvp-coinflip',
 		action: 'join',
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createPvPCoinflipTransaction('join', {
-				...commonOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createPvPCoinflipTransaction('join', {
+				...(await commonOptions(input, bundle)),
 				gameId: requireString(input.gameId, 'gameId'),
 			}),
 	});
@@ -509,9 +513,9 @@ export const buildPvpCoinflipCancelTransactionTool = async (
 		input,
 		game: 'pvp-coinflip',
 		action: 'cancel',
-		createTransaction: ({ client }) =>
-			client.suigar.tx.createPvPCoinflipTransaction('cancel', {
-				...commonOptions(input),
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createPvPCoinflipTransaction('cancel', {
+				...(await commonOptions(input, bundle)),
 				gameId: requireString(input.gameId, 'gameId'),
 			}),
 	});

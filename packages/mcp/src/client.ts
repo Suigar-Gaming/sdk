@@ -1,11 +1,18 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { ClientWithExtensions } from '@mysten/sui/client';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import type { Transaction } from '@mysten/sui/transactions';
-import { normalizeStructTag } from '@mysten/sui/utils';
+import {
+	isValidSuiAddress,
+	isValidSuiNSName,
+	normalizeStructTag,
+	normalizeSuiAddress,
+	normalizeSuiNSName,
+} from '@mysten/sui/utils';
 import { suigar } from '@suigar/sdk';
-import type { SuigarNetwork } from '@suigar/sdk';
+import type { SuigarClient, SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 import type {
 	BuilderMode,
@@ -40,28 +47,14 @@ export const getProviderUrl = (network: SuigarNetwork, providerUrl?: string) =>
 	providerUrl ?? DEFAULT_PROVIDER_URLS[network];
 
 export type SuigarClientBundle = {
-	client: {
-		core: {
-			simulateTransaction(
-				input: Parameters<SuiGrpcClient['core']['simulateTransaction']>[0],
-			): Promise<DryRunResult>;
-		};
-		suigar: {
-			getConfig(): ResolvedMcpConfig['sdk'];
-			serializeTransactionToBase64(transaction: Transaction): Promise<string>;
-			tx: {
-				createBetTransaction(
-					gameId: string,
-					options: Record<string, unknown>,
-				): Transaction;
-				createPvPCoinflipTransaction(
-					action: string,
-					options: Record<string, unknown>,
-				): Transaction;
-			};
-		};
-	};
+	client: ClientWithExtensions<
+		{
+			suigar: SuigarClient;
+		},
+		SuiGrpcClient
+	>;
 	config: ResolvedMcpConfig;
+	resolveSuiNSName(name: string): Promise<string | null>;
 };
 
 export const createSuigarClient = (
@@ -80,12 +73,18 @@ export const createSuigarClient = (
 	);
 
 	return {
-		client: client as SuigarClientBundle['client'],
+		client,
 		config: {
 			network,
 			providerUrl: getProviderUrl(network, input.providerUrl),
 			sdk: client.suigar.getConfig(),
 		} satisfies ResolvedMcpConfig,
+		resolveSuiNSName: async (name) =>
+			(
+				await baseClient.nameService.lookupName({
+					name,
+				})
+			).response.record?.targetAddress ?? null,
 	};
 };
 
@@ -93,6 +92,36 @@ export const resolveDefaultCoinType = (
 	config: ResolvedMcpConfig,
 	coinType?: string,
 ) => normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
+
+export const resolveOwnerAddress = async (
+	owner: string,
+	bundle: SuigarClientBundle,
+): Promise<string> => {
+	try {
+		const normalizedAddress = normalizeSuiAddress(owner);
+		if (isValidSuiAddress(normalizedAddress)) {
+			return normalizedAddress;
+		}
+	} catch {
+		// Fall through to SuiNS validation.
+	}
+
+	if (!isValidSuiNSName(owner)) {
+		throw new TypeError(
+			'owner must be a valid Sui address or SuiNS name such as name.sui or sub.name.sui.',
+		);
+	}
+
+	const normalizedName = normalizeSuiNSName(owner, 'dot');
+	const resolvedAddress = await bundle.resolveSuiNSName(normalizedName);
+	if (!resolvedAddress) {
+		throw new Error(
+			`SuiNS name ${normalizedName} did not resolve to an address.`,
+		);
+	}
+
+	return normalizeSuiAddress(resolvedAddress);
+};
 
 export const dryRunTransaction = async (
 	transaction: Transaction,

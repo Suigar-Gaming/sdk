@@ -27,6 +27,13 @@ const stringify = (value: unknown) =>
 		2,
 	);
 
+const formatValue = (value: unknown) => {
+	if (Array.isArray(value)) {
+		return value.length > 0 ? value.join(', ') : null;
+	}
+	return value;
+};
+
 const setDefinitionList = (
 	element: HTMLDListElement,
 	entries: Array<[string, unknown]>,
@@ -36,8 +43,14 @@ const setDefinitionList = (
 			const term = document.createElement('dt');
 			term.textContent = label;
 			const detail = document.createElement('dd');
-			detail.textContent =
-				value == null || value === '' ? 'n/a' : String(value);
+			const formattedValue = formatValue(value);
+			const text =
+				formattedValue == null || formattedValue === ''
+					? 'n/a'
+					: String(formattedValue);
+			detail.textContent = text;
+			detail.title = text === 'n/a' ? '' : text;
+			detail.className = text === 'n/a' ? 'is-empty' : 'value';
 			return [term, detail];
 		}),
 	);
@@ -69,20 +82,33 @@ const renderResult = (structuredContent: unknown) => {
 	const config = asRecord(record.config);
 	const sdkConfig = asRecord(config.sdk);
 	const summary = asRecord(record.summary);
+	const plan = asRecord(record.plan);
+	const typeArguments = Array.isArray(plan.typeArguments)
+		? plan.typeArguments
+		: null;
+	const requiredInputs = Array.isArray(plan.requiredInputs)
+		? plan.requiredInputs
+		: null;
 
 	statusElement.textContent = record.mode ? String(record.mode) : 'read';
 	setDefinitionList(contextElement, [
 		['Network', record.network ?? config.network],
 		['Game', record.game ?? summary.game],
 		['Action', record.action ?? summary.action],
-		['Coin type', summary.coinType ?? asRecord(record.game).coinType],
+		[
+			'Coin type',
+			summary.coinType ??
+				asRecord(record.game).coinType ??
+				(typeArguments ? typeArguments[0] : null),
+		],
 		['SweetHouse', asRecord(sdkConfig.packageIds).sweetHouse],
 	]);
 	setDefinitionList(summaryElement, [
 		['Sender', summary.sender],
 		['Gas budget', summary.gasBudget],
-		['Commands', summary.commandCount],
-		['Inputs', summary.inputs],
+		['Commands', summary.commandCount ?? (plan.target ? 'planned' : null)],
+		['Inputs', summary.inputs ?? requiredInputs],
+		['Type args', typeArguments],
 		[
 			'Serialized bytes',
 			typeof record.transactionBytesBase64 === 'string'

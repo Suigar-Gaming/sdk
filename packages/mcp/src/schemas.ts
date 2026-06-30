@@ -8,7 +8,7 @@ import { GAMES } from '@suigar/sdk/games';
 export const builderModes = ['build', 'dry-run', 'read-only'] as const;
 
 const addressDescription =
-	'Sui address such as 0xabc...; required for build and dry-run modes.';
+	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
 const coinTypeDescription =
 	'Move coin type such as 0x2::sui::SUI. Defaults to the SDK-configured SUI coin type.';
 
@@ -234,7 +234,7 @@ export const toolOutputSchema = z
 		mode: z.enum(builderModes).optional(),
 		network: z.enum(SUPPORTED_SUI_NETWORKS).optional(),
 		config: unknownJsonSchema.optional(),
-		game: z.string().optional(),
+		game: unknownJsonSchema.optional(),
 		action: z.string().optional(),
 		plan: unknownJsonSchema.optional(),
 		summary: unknownJsonSchema.optional(),
