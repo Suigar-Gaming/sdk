@@ -15,6 +15,8 @@ const statusElement = document.querySelector<HTMLDivElement>('#status')!;
 const contextElement = document.querySelector<HTMLDListElement>('#context')!;
 const summaryElement = document.querySelector<HTMLDListElement>('#summary')!;
 const targetsElement = document.querySelector<HTMLUListElement>('#targets')!;
+const notesPanelElement = document.querySelector<HTMLElement>('#notes-panel')!;
+const notesElement = document.querySelector<HTMLUListElement>('#notes')!;
 const resultElement = document.querySelector<HTMLPreElement>('#result')!;
 
 const asRecord = (value: unknown): AnyRecord =>
@@ -30,6 +32,16 @@ const stringify = (value: unknown) =>
 const formatValue = (value: unknown) => {
 	if (Array.isArray(value)) {
 		return value.length > 0 ? value.join(', ') : null;
+	}
+	if (value && typeof value === 'object') {
+		const record = asRecord(value);
+		if (typeof record.label === 'string' && typeof record.id === 'string') {
+			return `${record.label} (${record.id})`;
+		}
+		if (typeof record.id === 'string') {
+			return record.id;
+		}
+		return stringify(value);
 	}
 	return value;
 };
@@ -77,12 +89,31 @@ const renderTargets = (structuredContent: AnyRecord) => {
 	);
 };
 
+const renderNotes = (structuredContent: AnyRecord) => {
+	const plan = asRecord(structuredContent.plan);
+	const game = asRecord(structuredContent.game);
+	const notes = [
+		...(Array.isArray(plan.notes) ? plan.notes : []),
+		...(Array.isArray(game.notes) ? game.notes : []),
+	].filter((note): note is string => typeof note === 'string');
+
+	notesPanelElement.hidden = notes.length === 0;
+	notesElement.replaceChildren(
+		...notes.map((note) => {
+			const item = document.createElement('li');
+			item.textContent = note;
+			return item;
+		}),
+	);
+};
+
 const renderResult = (structuredContent: unknown) => {
 	const record = asRecord(structuredContent);
 	const config = asRecord(record.config);
 	const sdkConfig = asRecord(config.sdk);
 	const summary = asRecord(record.summary);
 	const plan = asRecord(record.plan);
+	const game = asRecord(record.game);
 	const typeArguments = Array.isArray(plan.typeArguments)
 		? plan.typeArguments
 		: null;
@@ -93,12 +124,13 @@ const renderResult = (structuredContent: unknown) => {
 	statusElement.textContent = record.mode ? String(record.mode) : 'read';
 	setDefinitionList(contextElement, [
 		['Network', record.network ?? config.network],
-		['Game', record.game ?? summary.game],
+		['Game', game.id ?? summary.game],
+		['Label', game.label],
 		['Action', record.action ?? summary.action],
 		[
 			'Coin type',
 			summary.coinType ??
-				asRecord(record.game).coinType ??
+				game.coinType ??
 				(typeArguments ? typeArguments[0] : null),
 		],
 		['SweetHouse', asRecord(sdkConfig.packageIds).sweetHouse],
@@ -118,6 +150,7 @@ const renderResult = (structuredContent: unknown) => {
 		['Dry-run', record.dryRun ? 'included' : null],
 	]);
 	renderTargets(record);
+	renderNotes(record);
 	resultElement.textContent = stringify(structuredContent);
 };
 

@@ -16,7 +16,7 @@
 				<div id="status" class="status">Waiting for tool result</div>
 			</header>
 
-			<section class="grid">
+			<section class="summary-grid">
 				<div class="panel">
 					<h2>Context</h2>
 					<dl id="context"></dl>
@@ -28,15 +28,24 @@
 				</div>
 			</section>
 
-			<section class="panel">
-				<h2>Targets</h2>
+			<section class="panel target-panel">
+				<div class="panel-heading">
+					<h2>Targets</h2>
+				</div>
 				<ul id="targets" class="targets"></ul>
 			</section>
 
-			<section class="panel">
-				<h2>Result</h2>
-				<pre id="result">{}</pre>
+			<section id="notes-panel" class="panel notes-panel" hidden>
+				<div class="panel-heading">
+					<h2>Notes</h2>
+				</div>
+				<ul id="notes" class="notes"></ul>
 			</section>
+
+			<details class="panel raw-result">
+				<summary>Raw payload</summary>
+				<pre id="result">{}</pre>
+			</details>
 		</main>
 	</body>
 </html>
