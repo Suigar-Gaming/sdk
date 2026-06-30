@@ -19,6 +19,7 @@ The package root exports:
 
 - `suigar`
 - `SuigarClient`
+- `SUPPORTED_SUI_NETWORKS`
 - `SuigarCoin`
 - `SuigarNetwork`
 
@@ -27,6 +28,10 @@ Use the registered extension instance for runtime transaction builders.
 
 Game-specific public types are exported from `@suigar/sdk/games`:
 
+- `GAMES`
+- `Game`
+- `StandardGame`
+- `PvPGame`
 - `CoinSide`
 - `PvPCoinflipAction`
 - `BuildCoinflipTransactionOptions`

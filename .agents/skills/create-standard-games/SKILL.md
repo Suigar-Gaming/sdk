@@ -23,6 +23,11 @@ Supported game ids:
 - `range`
 - `wheel`
 
+When app code needs typed game ids, import `GAMES`, `Game`, or
+`StandardGame` from `@suigar/sdk/games` instead of redefining game unions.
+Use the exported `CoinSide` type for coinflip side values when a named type is
+useful.
+
 ## Shared options
 
 - `owner: string`

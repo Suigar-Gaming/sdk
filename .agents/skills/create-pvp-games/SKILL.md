@@ -39,6 +39,10 @@ PvP coinflip supports these actions:
 - `join`
 - `cancel`
 
+When app code needs typed PvP action values, import `PvPCoinflipAction` from
+`@suigar/sdk/games` instead of redefining the action union. Use `PvPGame` from
+the same subpath when typing supported PvP game ids.
+
 ## Create Game
 
 Use `create` when the first player opens a new PvP coinflip match.
