@@ -1,6 +1,6 @@
 {
 	"name": "@suigar/mcp",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
 	"keywords": [
 		"suigar",
