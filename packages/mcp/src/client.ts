@@ -3,29 +3,30 @@
 
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import type { Transaction } from '@mysten/sui/transactions';
-import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
+import { normalizeStructTag } from '@mysten/sui/utils';
 import { suigar } from '@suigar/sdk';
+import type { SuigarNetwork } from '@suigar/sdk';
+import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 import type {
 	BuilderMode,
 	BuildTransactionResult,
+	DryRunResult,
 	ResolvedMcpConfig,
 	SuigarConfigOverrides,
 	SuigarMcpConfigInput,
-	SuigarMcpNetwork,
-	SupportedGameId,
 	TransactionSummary,
 } from './types.js';
 
 const DEFAULT_PROVIDER_URLS = {
 	mainnet: 'https://fullnode.mainnet.sui.io:443',
 	testnet: 'https://fullnode.testnet.sui.io:443',
-} as const satisfies Record<SuigarMcpNetwork, string>;
+} as const satisfies Record<SuigarNetwork, string>;
 
-export const DEFAULT_NETWORK: SuigarMcpNetwork = 'testnet';
+export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
 export const normalizeNetwork = (
 	network: string | undefined = DEFAULT_NETWORK,
-): SuigarMcpNetwork => {
+): SuigarNetwork => {
 	if (network === 'mainnet' || network === 'testnet') {
 		return network;
 	}
@@ -35,13 +36,16 @@ export const normalizeNetwork = (
 	);
 };
 
-export const getProviderUrl = (
-	network: SuigarMcpNetwork,
-	providerUrl?: string,
-) => providerUrl ?? DEFAULT_PROVIDER_URLS[network];
+export const getProviderUrl = (network: SuigarNetwork, providerUrl?: string) =>
+	providerUrl ?? DEFAULT_PROVIDER_URLS[network];
 
 export type SuigarClientBundle = {
 	client: {
+		core: {
+			simulateTransaction(
+				input: Parameters<SuiGrpcClient['core']['simulateTransaction']>[0],
+			): Promise<DryRunResult>;
+		};
 		suigar: {
 			getConfig(): ResolvedMcpConfig['sdk'];
 			serializeTransactionToBase64(transaction: Transaction): Promise<string>;
@@ -57,7 +61,6 @@ export type SuigarClientBundle = {
 			};
 		};
 	};
-	rawClient: SuiGrpcClient;
 	config: ResolvedMcpConfig;
 };
 
@@ -65,11 +68,11 @@ export const createSuigarClient = (
 	input: SuigarMcpConfigInput = {},
 ): SuigarClientBundle => {
 	const network = normalizeNetwork(input.network);
-	const rawClient = new SuiGrpcClient({
+	const baseClient = new SuiGrpcClient({
 		baseUrl: getProviderUrl(network, input.providerUrl),
 		network,
 	});
-	const client = rawClient.$extend(
+	const client = baseClient.$extend(
 		suigar({
 			config: input.config as SuigarConfigOverrides | undefined,
 			partner: input.partner,
@@ -78,7 +81,6 @@ export const createSuigarClient = (
 
 	return {
 		client: client as SuigarClientBundle['client'],
-		rawClient,
 		config: {
 			network,
 			providerUrl: getProviderUrl(network, input.providerUrl),
@@ -92,15 +94,10 @@ export const resolveDefaultCoinType = (
 	coinType?: string,
 ) => normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
 
-export const serializeTransactionToBase64 = async (
-	transaction: Transaction,
-	client: ReturnType<typeof createSuigarClient>['rawClient'],
-) => toBase64(await transaction.build({ client }));
-
 export const dryRunTransaction = async (
 	transaction: Transaction,
-	client: ReturnType<typeof createSuigarClient>['rawClient'],
-) =>
+	client: ReturnType<typeof createSuigarClient>['client'],
+): Promise<DryRunResult> =>
 	client.core.simulateTransaction({
 		transaction,
 		include: {
@@ -113,8 +110,8 @@ export const dryRunTransaction = async (
 export const summarizeTransaction = (
 	transaction: Transaction,
 	context: {
-		game?: SupportedGameId;
-		action?: 'create' | 'join' | 'cancel';
+		game?: Game;
+		action?: PvPCoinflipAction;
 		coinType?: string;
 		stake?: bigint | number;
 	} = {},
@@ -188,7 +185,7 @@ export const buildTransactionResult = async ({
 	mode: Exclude<BuilderMode, 'read-only'>;
 	transaction: Transaction;
 	config: ResolvedMcpConfig;
-	client: ReturnType<typeof createSuigarClient>['rawClient'];
+	client: ReturnType<typeof createSuigarClient>['client'];
 	context: Parameters<typeof summarizeTransaction>[1];
 }): Promise<BuildTransactionResult> => {
 	const summary = summarizeTransaction(transaction, context);
@@ -207,9 +204,7 @@ export const buildTransactionResult = async ({
 		network: config.network,
 		config,
 		summary,
-		transactionBytesBase64: await serializeTransactionToBase64(
-			transaction,
-			client,
-		),
+		transactionBytesBase64:
+			await client.suigar.serializeTransactionToBase64(transaction),
 	};
 };

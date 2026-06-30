@@ -44,7 +44,6 @@
 		"build": "pnpm clean && tsdown && vite build",
 		"build:ci": "pnpm clean && tsdown && vite build",
 		"clean": "rm -rf dist",
-		"prepack": "pnpm build",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"eslint": "eslint .",
@@ -77,7 +76,7 @@
 		"@types/node": "catalog:typescript",
 		"tsdown": "catalog:tooling",
 		"typescript": "catalog:typescript6",
-		"vite": "7.3.6",
+		"vite": "^8.1.0",
 		"vite-plugin-singlefile": "^2.3.3",
 		"vitest": "catalog:test"
 	}

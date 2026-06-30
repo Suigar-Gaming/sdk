@@ -5,12 +5,10 @@ import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
+	root: 'src/app',
 	build: {
 		emptyOutDir: false,
-		outDir: 'dist/app',
-		rollupOptions: {
-			input: 'src/app/index.html',
-		},
+		outDir: '../../dist/app',
 	},
 	plugins: [viteSingleFile()],
 });

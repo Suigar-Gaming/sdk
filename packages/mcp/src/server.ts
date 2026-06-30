@@ -45,6 +45,14 @@ const errorText = (error: unknown) => {
 	return String(error);
 };
 
+const hasErrorCode = (
+	error: unknown,
+	code: string,
+): error is Error & { code: string } =>
+	error instanceof Error &&
+	'code' in error &&
+	(error as { code: unknown }).code === code;
+
 const withToolErrors =
 	<TInput>(handler: (input: TInput) => Promise<ToolTextResult>) =>
 	async (
@@ -69,20 +77,16 @@ const withToolErrors =
 	};
 
 export const readSuigarMcpAppHtml = async () => {
-	const candidateUrls = [
-		new URL('./app/index.html', import.meta.url),
-		new URL('./app/src/app/index.html', import.meta.url),
-	];
-	for (const url of candidateUrls) {
-		try {
-			return await readFile(url, 'utf8');
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-				throw error;
-			}
+	try {
+		return await readFile(new URL('./app/index.html', import.meta.url), 'utf8');
+	} catch (error) {
+		if (!hasErrorCode(error, 'ENOENT')) {
+			throw error;
 		}
+		throw new Error('Unable to find bundled Suigar MCP App HTML.', {
+			cause: error,
+		});
 	}
-	throw new Error('Unable to find bundled Suigar MCP App HTML.');
 };
 
 export const createSuigarMcpAppResourceResult = async () => ({

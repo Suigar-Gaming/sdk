@@ -1,33 +1,31 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { suigar, SuigarClient } from '@suigar/sdk';
+import type { SuiClientTypes } from '@mysten/sui/client';
+import type { suigar, SuigarClient, SuigarNetwork } from '@suigar/sdk';
+import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 
 export type SuigarConfig = ReturnType<SuigarClient['getConfig']>;
 export type SuigarConfigOverrides = NonNullable<
 	Parameters<typeof suigar>[0]
 >['config'];
-
-export type SuigarMcpNetwork = 'mainnet' | 'testnet';
-
-export type StandardGameId =
-	'coinflip' | 'limbo' | 'plinko' | 'range' | 'wheel';
-
-export type PvpCoinflipAction = 'create' | 'join' | 'cancel';
-
-export type SupportedGameId = StandardGameId | 'pvp-coinflip';
+export type DryRunResult = SuiClientTypes.SimulateTransactionResult<{
+	effects: true;
+	events: true;
+	balanceChanges: true;
+}>;
 
 export type BuilderMode = 'build' | 'dry-run' | 'read-only';
 
 export type SuigarMcpConfigInput = {
-	network?: SuigarMcpNetwork;
+	network?: SuigarNetwork;
 	providerUrl?: string;
 	config?: SuigarConfigOverrides;
 	partner?: string;
 };
 
 export type ResolvedMcpConfig = {
-	network: SuigarMcpNetwork;
+	network: SuigarNetwork;
 	providerUrl: string;
 	sdk: SuigarConfig;
 };
@@ -46,17 +44,17 @@ export type TransactionSummary = {
 	commands: TransactionCommandSummary[];
 	inputs: number;
 	objectInputs: string[];
-	game?: SupportedGameId;
-	action?: PvpCoinflipAction;
+	game?: Game;
+	action?: PvPCoinflipAction;
 	coinType?: string;
 	stake?: string;
 };
 
 export type ReadOnlyPlan = {
 	mode: 'read-only';
-	network: SuigarMcpNetwork;
-	game: SupportedGameId;
-	action?: PvpCoinflipAction;
+	network: SuigarNetwork;
+	game: Game;
+	action?: PvPCoinflipAction;
 	config: ResolvedMcpConfig;
 	plan: {
 		target: string | null;
@@ -68,18 +66,18 @@ export type ReadOnlyPlan = {
 
 export type BuildTransactionResult = {
 	mode: 'build' | 'dry-run';
-	network: SuigarMcpNetwork;
+	network: SuigarNetwork;
 	config: ResolvedMcpConfig;
 	summary: TransactionSummary;
 	transactionBytesBase64?: string;
-	dryRun?: unknown;
+	dryRun?: DryRunResult;
 };
 
 export type ReadConfigResult = {
-	network: SuigarMcpNetwork;
+	network: SuigarNetwork;
 	config: ResolvedMcpConfig;
 	supportedGames: Array<{
-		id: SupportedGameId;
+		id: Game;
 		label: string;
 		tools: string[];
 	}>;
@@ -87,11 +85,11 @@ export type ReadConfigResult = {
 
 export type ReadGameMetadataResult = ReadConfigResult & {
 	game: {
-		id: SupportedGameId;
+		id: Game;
 		label: string;
 		packageId: string;
 		coinType: string;
-		action?: PvpCoinflipAction;
+		action?: PvPCoinflipAction;
 		notes: string[];
 	} | null;
 };

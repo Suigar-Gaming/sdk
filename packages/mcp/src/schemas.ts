@@ -2,16 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
+import { SUPPORTED_SUI_NETWORKS } from '@suigar/sdk';
+import { GAMES } from '@suigar/sdk/games';
 
-export const supportedNetworks = ['mainnet', 'testnet'] as const;
 export const builderModes = ['build', 'dry-run', 'read-only'] as const;
-export const standardGames = [
-	'coinflip',
-	'limbo',
-	'plinko',
-	'range',
-	'wheel',
-] as const;
 
 const addressDescription =
 	'Sui address such as 0xabc...; required for build and dry-run modes.';
@@ -66,7 +60,7 @@ export const configOverridesSchema = z
 export const configInputSchema = z
 	.object({
 		network: z
-			.enum(supportedNetworks)
+			.enum(SUPPORTED_SUI_NETWORKS)
 			.default('testnet')
 			.describe('Sui network. Only mainnet and testnet are supported.'),
 		providerUrl: z
@@ -90,7 +84,7 @@ export const readConfigInputSchema = configInputSchema;
 export const readGameMetadataInputSchema = configInputSchema
 	.extend({
 		game: z
-			.enum([...standardGames, 'pvp-coinflip'])
+			.enum(GAMES)
 			.optional()
 			.describe('Optional Suigar game id to inspect.'),
 		coinType: z.string().min(1).optional().describe(coinTypeDescription),
@@ -238,7 +232,7 @@ const unknownJsonSchema: z.ZodType<unknown> = z.lazy(() =>
 export const toolOutputSchema = z
 	.object({
 		mode: z.enum(builderModes).optional(),
-		network: z.enum(supportedNetworks).optional(),
+		network: z.enum(SUPPORTED_SUI_NETWORKS).optional(),
 		config: unknownJsonSchema.optional(),
 		game: z.string().optional(),
 		action: z.string().optional(),

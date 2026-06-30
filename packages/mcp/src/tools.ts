@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mysten/sui/transactions';
+import { GAMES } from '@suigar/sdk/games';
+import type {
+	CoinSide,
+	Game,
+	PvPCoinflipAction,
+	StandardGame,
+} from '@suigar/sdk/games';
 import {
 	buildTransactionResult,
 	createSuigarClient,
@@ -20,12 +27,10 @@ import type {
 } from './schemas.js';
 import type {
 	BuilderMode,
-	PvpCoinflipAction,
 	ReadConfigResult,
 	ReadGameMetadataResult,
 	ReadOnlyPlan,
 	ResolvedMcpConfig,
-	SupportedGameId,
 	ToolTextResult,
 } from './types.js';
 
@@ -36,7 +41,7 @@ const GAME_LABELS = {
 	range: 'Range',
 	wheel: 'Wheel',
 	'pvp-coinflip': 'PvP Coinflip',
-} as const satisfies Record<SupportedGameId, string>;
+} as const satisfies Record<Game, string>;
 
 const GAME_TO_PACKAGE_KEY = {
 	coinflip: 'coinflip',
@@ -45,10 +50,7 @@ const GAME_TO_PACKAGE_KEY = {
 	range: 'range',
 	wheel: 'wheel',
 	'pvp-coinflip': 'pvpCoinflip',
-} as const satisfies Record<
-	SupportedGameId,
-	keyof ResolvedMcpConfig['sdk']['packageIds']
->;
+} as const satisfies Record<Game, keyof ResolvedMcpConfig['sdk']['packageIds']>;
 
 const GAME_TO_TOOLS = {
 	coinflip: ['suigar_build_coinflip_transaction'],
@@ -61,7 +63,7 @@ const GAME_TO_TOOLS = {
 		'suigar_build_pvp_coinflip_join_transaction',
 		'suigar_build_pvp_coinflip_cancel_transaction',
 	],
-} as const satisfies Record<SupportedGameId, readonly string[]>;
+} as const satisfies Record<Game, readonly string[]>;
 
 const json = (value: unknown) =>
 	JSON.stringify(
@@ -127,19 +129,19 @@ const getConfigInput = (input: ReadConfigInput) => ({
 });
 
 const supportedGames = () =>
-	(Object.keys(GAME_LABELS) as SupportedGameId[]).map((id) => ({
+	GAMES.map((id) => ({
 		id,
 		label: GAME_LABELS[id],
 		tools: [...GAME_TO_TOOLS[id]],
 	}));
 
-const getPackageId = (config: ResolvedMcpConfig, game: SupportedGameId) =>
+const getPackageId = (config: ResolvedMcpConfig, game: Game) =>
 	config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
 
 const getTarget = (
 	config: ResolvedMcpConfig,
-	game: SupportedGameId,
-	action?: PvpCoinflipAction,
+	game: Game,
+	action?: PvPCoinflipAction,
 ) => {
 	const packageId = getPackageId(config, game);
 	if (game === 'pvp-coinflip') {
@@ -169,8 +171,8 @@ const readOnlyPlan = ({
 		| PvpCoinflipCreateInput
 		| PvpCoinflipJoinInput
 		| PvpCoinflipCancelInput;
-	game: SupportedGameId;
-	action?: PvpCoinflipAction;
+	game: Game;
+	action?: PvPCoinflipAction;
 	requiredInputs: string[];
 	notes: string[];
 }): ReadOnlyPlan => {
@@ -239,8 +241,8 @@ const executeTransactionTool = async ({
 		| PvpCoinflipCreateInput
 		| PvpCoinflipJoinInput
 		| PvpCoinflipCancelInput;
-	game: SupportedGameId;
-	action?: PvpCoinflipAction;
+	game: Game;
+	action?: PvPCoinflipAction;
 	createTransaction: (
 		bundle: ReturnType<typeof createSuigarClient>,
 	) => Transaction;
@@ -260,7 +262,7 @@ const executeTransactionTool = async ({
 			mode,
 			transaction,
 			config: bundle.config,
-			client: bundle.rawClient,
+			client: bundle.client,
 			context: {
 				game,
 				action,
@@ -330,7 +332,7 @@ export const buildCoinflipTransactionTool = async (
 		createTransaction: ({ client }) =>
 			client.suigar.tx.createBetTransaction('coinflip', {
 				...stakeOptions(input),
-				side: requireString(input.side, 'side') as 'heads' | 'tails',
+				side: requireString(input.side, 'side') as CoinSide,
 			}),
 	});
 };
@@ -366,7 +368,7 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 
 const buildConfigIdTransactionTool = async (
 	input: ConfigIdInput,
-	game: 'plinko' | 'wheel',
+	game: Extract<StandardGame, 'plinko' | 'wheel'>,
 ) => {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
@@ -452,8 +454,7 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 				...commonOptions(input),
 				config: client.suigar.getConfig(),
 				stake: toAmount(input.stake, 'stake'),
-				side: requireString(input.creatorSide, 'creatorSide') as
-					'heads' | 'tails',
+				side: requireString(input.creatorSide, 'creatorSide') as CoinSide,
 				isPrivate: input.isPrivate,
 			}),
 	});
