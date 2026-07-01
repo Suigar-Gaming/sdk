@@ -7,25 +7,27 @@ contracts.
 
 For SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
 
+For MCP documentation, visit [docs.suigar.com/mcp](https://docs.suigar.com/mcp).
+
 For Sui TypeScript SDK documentation, visit [sdk.mystenlabs.com](https://sdk.mystenlabs.com/).
 
 ## Agent Skills
 
-This repo includes source-controlled Codex-compatible skills in `.agents/skills`.
-The MCP-focused skill teaches agents how to install, configure, and operate
-`@suigar/mcp` for Suigar config reads, game metadata, unsigned transaction
-builders, and dry-runs.
+Suigar agent skills live in the separate `Suigar-Gaming/agent-skills`
+repository. The MCP-focused skill teaches agents how to install, configure, and
+operate `@suigar/mcp` for Suigar config reads, game metadata, unsigned
+transaction builders, and dry-runs.
 
-Install it from a local checkout with:
+Install all Suigar skills with:
 
 ```bash
-npx skills add .agents/skills/suigar-mcp --agent codex --global --yes
+npx skills add Suigar-Gaming/agent-skills --agent codex --global --yes
 ```
 
-The standalone public skill can also be installed from GitHub:
+Install only the MCP skill with:
 
 ```bash
-npx skills add Suigar-Gaming/suigar-skill --agent codex --global --yes
+npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --agent codex --global --yes
 ```
 
 Then configure your MCP client to run the published server:
