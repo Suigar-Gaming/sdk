@@ -21,13 +21,13 @@ transaction builders, and dry-runs.
 Install all Suigar skills with:
 
 ```bash
-npx skills add Suigar-Gaming/agent-skills --agent codex --global --yes
+npx skills add Suigar-Gaming/agent-skills --global --yes
 ```
 
 Install only the MCP skill with:
 
 ```bash
-npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --agent codex --global --yes
+npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 ```
 
 Then configure your MCP client to run the published server:
