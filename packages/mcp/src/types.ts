@@ -56,6 +56,7 @@ export type TransactionSummary = {
 	stake?: string;
 	stakeDisplay?: string;
 	coinDecimals?: number;
+	gameInputs?: { [key: string]: JsonValue };
 };
 
 export type FormattedAmount = {

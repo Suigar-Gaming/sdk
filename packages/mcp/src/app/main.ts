@@ -145,6 +145,25 @@ const amountText = (value: unknown) => {
 	return value;
 };
 
+const labelFor = (key: string) =>
+	key
+		.replace(/([a-z0-9])([A-Z])/gu, '$1 $2')
+		.replace(/_/gu, ' ')
+		.replace(/\b\w/gu, (character) => character.toUpperCase());
+
+const dynamicEntries = (record: AnyRecord) =>
+	Object.entries(record)
+		.filter(([key]) => {
+			if (key.endsWith('_display')) {
+				return false;
+			}
+			return !['game_details', 'metadata'].includes(key);
+		})
+		.map(
+			([key, value]) =>
+				[labelFor(key), record[`${key}_display`] ?? value] as [string, unknown],
+		);
+
 const firstEventFields = (structuredContent: AnyRecord) => {
 	const dryRunSummary = asRecord(structuredContent.dryRunSummary);
 	const events = Array.isArray(dryRunSummary.events)
@@ -159,6 +178,7 @@ const renderResult = (structuredContent: unknown) => {
 	const config = asRecord(record.config);
 	const sdkConfig = asRecord(config.sdk);
 	const summary = asRecord(record.summary);
+	const gameInputs = asRecord(summary.gameInputs);
 	const dryRunSummary = asRecord(record.dryRunSummary);
 	const gasUsed = asRecord(dryRunSummary.gasUsed);
 	const eventFields = firstEventFields(record);
@@ -195,6 +215,7 @@ const renderResult = (structuredContent: unknown) => {
 		],
 		['Commands', summary.commandCount ?? (plan.target ? 'planned' : null)],
 		['Inputs', summary.inputs ?? requiredInputs],
+		...dynamicEntries(gameInputs),
 		['Type args', typeArguments],
 		[
 			'Serialized bytes',
@@ -217,16 +238,7 @@ const renderResult = (structuredContent: unknown) => {
 	]);
 	dryRunPanelElement.hidden = !setDefinitionList(dryRunElement, [
 		['Dry-run success', dryRunSummary.success],
-		['Player bet', eventFields.player_bet],
-		['Coin outcome', eventFields.coin_outcome],
-		[
-			'Stake amount',
-			eventFields.stake_amount_display ?? eventFields.stake_amount,
-		],
-		[
-			'Outcome amount',
-			eventFields.outcome_amount_display ?? eventFields.outcome_amount,
-		],
+		...dynamicEntries(eventFields),
 		['Raw payload', record.dryRun ? 'included' : null],
 	]);
 	renderTargets(record);

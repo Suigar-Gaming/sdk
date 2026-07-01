@@ -24,6 +24,7 @@ import type {
 	BuilderMode,
 	BuildTransactionResult,
 	DryRunResult,
+	JsonValue,
 	RawDryRunResult,
 	ResolvedMcpConfig,
 	SuigarConfigOverrides,
@@ -152,6 +153,7 @@ export const summarizeTransaction = (
 		stake?: bigint | number;
 		stakeDisplay?: string;
 		coinDecimals?: number;
+		gameInputs?: Record<string, JsonValue>;
 	} = {},
 ): TransactionSummary => {
 	const data = transaction.getData() as {
@@ -221,6 +223,7 @@ export const summarizeTransaction = (
 		...(context.coinDecimals == null
 			? {}
 			: { coinDecimals: context.coinDecimals }),
+		...(context.gameInputs ? { gameInputs: context.gameInputs } : {}),
 	};
 };
 

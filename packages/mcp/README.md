@@ -62,7 +62,9 @@ transaction tools.
 - `read-only`: resolves SDK config and returns the intended Move target, type
   arguments, required inputs, and notes.
 - `build`: returns unsigned transaction bytes as base64 plus a transaction
-  summary.
+  summary with resolved shared inputs and game-specific `gameInputs` such as
+  coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and
+  range points.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and
   returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed
   dry-runs include an `errors` array extracted from the failed transaction
@@ -76,7 +78,8 @@ Dry-run summaries include:
 - balance changes as raw base units plus decimal-formatted display values
 - decoded event fields when available, including standard `BetResultEvent`
   game details such as `player_bet`, `coin_outcome`, `stake_amount`, and
-  `outcome_amount`
+  `outcome_amount`; the MCP App renders all parsed result fields it receives,
+  so non-coinflip games expose their own parsed result keys as well
 
 ## Inputs
 

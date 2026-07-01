@@ -29,6 +29,7 @@ import type {
 } from './schemas.js';
 import type {
 	BuilderMode,
+	JsonValue,
 	ReadConfigResult,
 	ReadGameMetadataResult,
 	ReadOnlyPlan,
@@ -285,6 +286,7 @@ const executeTransactionTool = async ({
 	createTransaction,
 	stake,
 	stakeDisplay,
+	gameInputs,
 }: {
 	input:
 		| CoinflipInput
@@ -299,6 +301,7 @@ const executeTransactionTool = async ({
 	createTransaction: (bundle: SuigarClientBundle) => Promise<Transaction>;
 	stake?: number | bigint;
 	stakeDisplay?: string;
+	gameInputs?: Record<string, JsonValue>;
 }) => {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
@@ -328,6 +331,7 @@ const executeTransactionTool = async ({
 				stake: baseStake,
 				stakeDisplay,
 				coinDecimals: coin.decimals,
+				gameInputs,
 			},
 		}),
 	);
@@ -385,14 +389,16 @@ export const buildCoinflipTransactionTool = async (
 		);
 	}
 
+	const side = requireString(input.side, 'side') as CoinSide;
 	return executeTransactionTool({
 		input,
 		game: 'coinflip',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { side },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('coinflip', {
 				...(await stakeOptions(input, bundle)),
-				side: requireString(input.side, 'side') as CoinSide,
+				side,
 			}),
 	});
 };
@@ -411,17 +417,19 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 		);
 	}
 
+	const targetMultiplier = requireNumber(
+		input.targetMultiplier,
+		'targetMultiplier',
+	);
 	return executeTransactionTool({
 		input,
 		game: 'limbo',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { targetMultiplier },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('limbo', {
 				...(await stakeOptions(input, bundle)),
-				targetMultiplier: requireNumber(
-					input.targetMultiplier,
-					'targetMultiplier',
-				),
+				targetMultiplier,
 			}),
 	});
 };
@@ -441,14 +449,16 @@ const buildConfigIdTransactionTool = async (
 		);
 	}
 
+	const configId = requireNumber(input.configId, 'configId');
 	return executeTransactionTool({
 		input,
 		game,
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { configId },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction(game, {
 				...(await stakeOptions(input, bundle)),
-				configId: requireNumber(input.configId, 'configId'),
+				configId,
 			}),
 	});
 };
@@ -473,16 +483,20 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 		);
 	}
 
+	const leftPoint = requireNumber(input.leftPoint, 'leftPoint');
+	const rightPoint = requireNumber(input.rightPoint, 'rightPoint');
+	const outOfRange = Boolean(input.outOfRange);
 	return executeTransactionTool({
 		input,
 		game: 'range',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { leftPoint, rightPoint, outOfRange },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createBetTransaction('range', {
 				...(await stakeOptions(input, bundle)),
-				leftPoint: requireNumber(input.leftPoint, 'leftPoint'),
-				rightPoint: requireNumber(input.rightPoint, 'rightPoint'),
-				outOfRange: Boolean(input.outOfRange),
+				leftPoint,
+				rightPoint,
+				outOfRange,
 			}),
 	});
 };
@@ -504,11 +518,19 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 		);
 	}
 
+	const creatorSide = requireString(
+		input.creatorSide,
+		'creatorSide',
+	) as CoinSide;
 	return executeTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'create',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: {
+			creatorSide,
+			...(input.isPrivate == null ? {} : { isPrivate: input.isPrivate }),
+		},
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createPvPCoinflipTransaction('create', {
 				...(await commonOptions(input, bundle)),
@@ -517,7 +539,7 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 					'stake',
 					coinMetadataForAmount(bundle.config, input.coinType).decimals,
 				),
-				side: requireString(input.creatorSide, 'creatorSide') as CoinSide,
+				side: creatorSide,
 				isPrivate: input.isPrivate,
 			}),
 	});
@@ -540,14 +562,16 @@ export const buildPvpCoinflipJoinTransactionTool = async (
 		);
 	}
 
+	const gameId = requireString(input.gameId, 'gameId');
 	return executeTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'join',
+		gameInputs: { gameId },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createPvPCoinflipTransaction('join', {
 				...(await commonOptions(input, bundle)),
-				gameId: requireString(input.gameId, 'gameId'),
+				gameId,
 			}),
 	});
 };
@@ -569,14 +593,16 @@ export const buildPvpCoinflipCancelTransactionTool = async (
 		);
 	}
 
+	const gameId = requireString(input.gameId, 'gameId');
 	return executeTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'cancel',
+		gameInputs: { gameId },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 				...(await commonOptions(input, bundle)),
-				gameId: requireString(input.gameId, 'gameId'),
+				gameId,
 			}),
 	});
 };

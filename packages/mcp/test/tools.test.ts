@@ -192,6 +192,7 @@ describe('build transaction tools', () => {
 					stake?: string;
 					stakeDisplay?: string;
 					coinDecimals?: number;
+					gameInputs?: Record<string, unknown>;
 				};
 			};
 
@@ -201,6 +202,7 @@ describe('build transaction tools', () => {
 			expect(content.summary.stake).toBe('1000000000000');
 			expect(content.summary.stakeDisplay).toBe('1000');
 			expect(content.summary.coinDecimals).toBe(9);
+			expect(content.summary.gameInputs).toEqual({ side: 'heads' });
 			expect(content.summary).not.toHaveProperty('action');
 			expect(() => toolOutputSchema.parse(content)).not.toThrow();
 			expect(buildSpy).toHaveBeenCalledOnce();
@@ -227,6 +229,62 @@ describe('build transaction tools', () => {
 
 			expect(content.summary.stake).toBe('1000000000');
 			expect(content.summary.stakeDisplay).toBe('1');
+		} finally {
+			buildSpy.mockRestore();
+		}
+	});
+
+	it('includes game-specific inputs in standard transaction summaries', async () => {
+		const buildSpy = vi
+			.spyOn(Transaction.prototype, 'build')
+			.mockResolvedValue(new Uint8Array([1]));
+
+		try {
+			const [limbo, plinko, wheel, range] = await Promise.all([
+				buildLimboTransactionTool({
+					mode: 'build',
+					owner,
+					stake: 1,
+					targetMultiplier: 2.5,
+				}),
+				buildPlinkoTransactionTool({
+					mode: 'build',
+					owner,
+					stake: 1,
+					configId: 3,
+				}),
+				buildWheelTransactionTool({
+					mode: 'build',
+					owner,
+					stake: 1,
+					configId: 4,
+				}),
+				buildRangeTransactionTool({
+					mode: 'build',
+					owner,
+					stake: 1,
+					leftPoint: 25,
+					rightPoint: 75,
+					outOfRange: true,
+				}),
+			]);
+
+			expect(
+				(limbo.structuredContent as { summary: { gameInputs?: unknown } })
+					.summary.gameInputs,
+			).toEqual({ targetMultiplier: 2.5 });
+			expect(
+				(plinko.structuredContent as { summary: { gameInputs?: unknown } })
+					.summary.gameInputs,
+			).toEqual({ configId: 3 });
+			expect(
+				(wheel.structuredContent as { summary: { gameInputs?: unknown } })
+					.summary.gameInputs,
+			).toEqual({ configId: 4 });
+			expect(
+				(range.structuredContent as { summary: { gameInputs?: unknown } })
+					.summary.gameInputs,
+			).toEqual({ leftPoint: 25, rightPoint: 75, outOfRange: true });
 		} finally {
 			buildSpy.mockRestore();
 		}
