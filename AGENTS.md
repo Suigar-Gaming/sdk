@@ -254,6 +254,17 @@ Install a single skill when only one workflow is needed:
 npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp
 ```
 
+For Codex-specific installs, add the Codex agent flag without replacing the
+generic install commands above:
+
+```bash
+npx skills add Suigar-Gaming/agent-skills --agent codex --global --yes
+```
+
+```bash
+npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --agent codex --global --yes
+```
+
 Use these Suigar skills when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
