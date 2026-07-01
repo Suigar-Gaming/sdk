@@ -92,7 +92,6 @@ pnpm release
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
 - `playground/` - workspace-local Next.js integration playground
-- `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System
 
@@ -233,16 +232,29 @@ It should stay thin over `@suigar/sdk` and `@mysten/sui`.
 Documentation is part of the deliverable:
 
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
-- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
-- Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
-- Do not edit `.claude/skills` separately. In this repository, `.claude/skills` is a symlink to `.agents/skills`, so updating `.agents/skills` already updates the Claude-visible path.
+- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant Suigar skills in `Suigar-Gaming/agent-skills`, and any other user-facing markdown that describes the changed behavior.
+- Treat skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
 
 ## AI Skills
 
-Use the repo-local skills in `.agents/skills/` when the task is about building a product on top of this SDK:
+Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository.
+
+Install the skills for an agent with the skills CLI:
+
+```bash
+npx skills add Suigar-Gaming/agent-skills
+```
+
+Install a single skill when only one workflow is needed:
+
+```bash
+npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp
+```
+
+Use these Suigar skills when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
 - `suigar-mcp` for installing, configuring, and operating the `@suigar/mcp` server and MCP App
@@ -252,8 +264,7 @@ Use the repo-local skills in `.agents/skills/` when the task is about building a
 
 Claude Code compatibility:
 
-- `.claude/skills` is a symlink to `.agents/skills`
-- `CLAUDE.md` exists at the repository root for Claude-oriented repository guidance
+- `CLAUDE.md` is a symlink to `AGENTS.md`
 
 ## Pull Requests
 
