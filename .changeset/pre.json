@@ -3,7 +3,8 @@
 	"tag": "beta",
 	"initialVersions": {
 		"@suigar/sdk": "2.0.0-beta.1",
-		"@suigar/playground": "0.1.0"
+		"@suigar/playground": "0.1.0",
+		"@suigar/mcp": "0.1.1"
 	},
 	"changesets": [
 		"all-crews-stop",
@@ -15,18 +16,23 @@
 		"dry-vans-doubt",
 		"fair-bears-repeat",
 		"few-moose-ring",
+		"fresh-mcp-apps",
 		"fresh-mysten-deps",
 		"fresh-pets-tell",
 		"game-parameters-cache",
 		"green-apes-travel",
 		"green-spoons-smoke",
+		"large-walls-smile",
 		"latest-mysten-workspace",
 		"metal-plums-rest",
+		"modern-coins-resolve",
 		"mysten-nodenext-type-tags",
 		"odd-bees-yell",
 		"parser-get-coin-type",
+		"pvp-coinflip-public-options",
 		"quiet-cups-listen",
 		"sdk-catalog-deps",
+		"sdk-public-game-exports",
 		"soft-seas-protect",
 		"solid-animals-dig",
 		"sparkly-phones-thank",

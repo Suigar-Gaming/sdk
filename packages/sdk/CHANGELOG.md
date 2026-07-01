@@ -1,5 +1,28 @@
 # @suigar/sdk
 
+## 2.0.0-beta.22
+
+### Major Changes
+
+- 802e082: Rework SDK coin configuration and transaction bet coin handling.
+
+  - Replace `coinTypes` config with `coins` metadata containing `coinType` and `decimals` for each supported coin.
+  - Add `suigar({ config })` overrides for package ids, registry ids, supported coin metadata, and price info object ids.
+  - Rename `SuiNetwork` to `SuigarNetwork` and export `SuigarCoin` and `SuigarNetwork` from the package root.
+  - Rename `allowGasCoinShortcut` to `useGasCoin`.
+  - Use Mysten `coinWithBalance` transaction arguments for standard game and PvP coinflip bet coin construction.
+  - Leave `useGasCoin` undefined unless the caller explicitly configures it, so Mysten's coin intent helpers apply their default behavior.
+  - Convert the package config updater to TypeScript and run it through `tsx`.
+
+### Minor Changes
+
+- 4923f91: Rename the supported coin metadata registry type to `SuigarCoinRegistry`.
+- d597399: Expose shared game ids, game id types, PvP action types, and supported Sui network constants from public SDK entrypoints for typed integrations such as `@suigar/mcp`.
+
+### Patch Changes
+
+- d597399: Fix the public `createPvPCoinflipTransaction` option type so callers do not need to provide the SDK-internal config object.
+
 ## 2.0.0-beta.21
 
 ### Patch Changes
