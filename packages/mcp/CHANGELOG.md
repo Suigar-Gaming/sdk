@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 0.2.0-beta.1
+
+### Patch Changes
+
+- 4a04248: Update MCP tool schemas for Zod compatibility.
+
 ## 0.2.0-beta.0
 
 ### Minor Changes
