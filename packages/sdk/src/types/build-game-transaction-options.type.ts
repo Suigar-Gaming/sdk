@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { StandardGame } from './game.type.js';
+import type { PvPCoinflipAction, StandardGame } from './game.type.js';
 import type {
 	BuildCoinflipTransactionOptions,
 	BuildLimboTransactionOptions,
@@ -9,7 +9,6 @@ import type {
 	BuildPvPCoinflipTransactionOptions,
 	BuildRangeTransactionOptions,
 	BuildWheelTransactionOptions,
-	PvPCoinflipAction,
 } from './transaction-options.type.js';
 
 type WithoutConfig<T> = Omit<T, 'config'>;
@@ -27,5 +26,5 @@ export type BuildGameOptions<GameId extends StandardGame> =
 						? WithoutConfig<BuildRangeTransactionOptions>
 						: never;
 
-export type BuildPvPGameOptions<Action extends PvPCoinflipAction> =
+export type BuildPvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
 	WithoutConfig<BuildPvPCoinflipTransactionOptions<Action>>;

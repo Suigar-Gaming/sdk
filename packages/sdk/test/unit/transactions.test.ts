@@ -1222,11 +1222,20 @@ describe('SuigarClient', () => {
 
 	it('exposes both standard and pvp transaction factories', () => {
 		const client = createSuigarTestClient();
+		const coinType = client.suigar.getConfig().coins.sui.coinType;
 
 		expect(client.suigar.tx.createBetTransaction).toBeTypeOf('function');
 		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(
 			'function',
 		);
+		expect(
+			client.suigar.tx.createPvPCoinflipTransaction('create', {
+				owner: '0x123',
+				coinType,
+				stake: 1000,
+				side: 'heads',
+			}),
+		).toBeInstanceOf(Transaction);
 	});
 
 	it('loads typed game parameters through the SweetHouse settings object', async () => {

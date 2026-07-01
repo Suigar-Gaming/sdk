@@ -1,10 +1,14 @@
 import type { Transaction } from '@mysten/sui/transactions';
 import type { SuigarClient, SuigarCoin } from '@suigar/sdk';
-import type { CoinSide, PvPCoinflipAction } from '@suigar/sdk/games';
-import { PVP_GAMES, STANDARD_GAMES } from '@/lib/suigar-app';
+import type {
+	CoinSide,
+	PvPCoinflipAction,
+	PvPGame,
+	StandardGame,
+} from '@suigar/sdk/games';
 
-export type StandardGameId = (typeof STANDARD_GAMES)[number];
-export type PvPGameId = (typeof PVP_GAMES)[number];
+export type StandardGameId = StandardGame;
+export type PvPGameId = PvPGame;
 export type PvPAction = PvPCoinflipAction;
 export type SupportedCoinKey = SuigarCoin;
 

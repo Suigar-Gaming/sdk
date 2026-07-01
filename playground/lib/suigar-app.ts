@@ -1,3 +1,4 @@
+import { GAMES, type PvPGame, type StandardGame } from '@suigar/sdk/games';
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
 	PvPCoinflipForms,
@@ -5,15 +6,13 @@ import type {
 	StandardForms,
 } from '@/lib/suigar-types';
 
-export const STANDARD_GAMES = [
-	'coinflip',
-	'limbo',
-	'plinko',
-	'range',
-	'wheel',
-] as const;
+export const STANDARD_GAMES = GAMES.filter(
+	(game): game is StandardGame => !game.startsWith('pvp-'),
+);
 
-export const PVP_GAMES = ['pvp-coinflip'] as const;
+export const PVP_GAMES = GAMES.filter((game): game is PvPGame =>
+	game.startsWith('pvp-'),
+);
 
 const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',

@@ -4,7 +4,7 @@ This file provides guidance to AI agents working with code in this repository.
 
 ## Overview
 
-This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable package is `@suigar/sdk` under `packages/sdk`, built with TypeScript, `tsdown`, and generated Move contract bindings. The package is ESM-only. The main public integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
+This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The current publishable packages are `@suigar/sdk` under `packages/sdk` and `@suigar/mcp` under `packages/mcp`. Both packages are ESM-only. The main public SDK integration surface is the `suigar()` client extension, which is used to build and serialize game transactions on top of `@mysten/sui`.
 
 ## Common Commands
 
@@ -20,6 +20,12 @@ pnpm --dir packages/sdk build
 # Build without regenerating contract bindings
 pnpm --dir packages/sdk build:ci
 
+# Build the MCP package and bundled MCP App
+pnpm --dir packages/mcp build
+
+# Build and run the local stdio MCP server for manual client testing
+pnpm --dir packages/mcp start:local
+
 # Regenerate Move contract bindings only
 pnpm --dir packages/sdk codegen
 ```
@@ -32,6 +38,7 @@ pnpm --dir packages/sdk test
 
 # Run type checking
 pnpm --dir packages/sdk typecheck
+pnpm --dir packages/mcp typecheck
 
 # Run a specific vitest file
 pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
@@ -77,15 +84,20 @@ pnpm release
   - `helpers/` - internal config resolution, metadata encoding, and transaction support helpers
   - `configs/` - network-scoped package ids, supported coin types, and price info object ids
 - `packages/sdk/test/unit/` - Vitest coverage for config resolution, cache helpers, and transaction builders
+- `packages/mcp/` - `@suigar/mcp` stdio MCP server and MCP App
+  - `src/server.ts` - MCP server, tool registration, and app resource registration
+  - `src/tools.ts` - SDK-backed tool handlers for config, metadata, and unsigned transaction building
+  - `src/app/` - Vite-built single-file MCP App UI
+  - `test/` - Vitest coverage for tools and app resource behavior
 - `packages/sdk/dist/` - generated build output
 - `tsconfig.shared.json` - shared TypeScript compiler options for workspace packages
 - `playground/` - workspace-local Next.js integration playground
-- `.agents/skills/` - repo-local skills for Suigar-specific AI workflows
 
 ### Build System
 
 - Uses pnpm workspaces from the private `@suigar/ts-sdks` root package and `pnpm-workspace.yaml`
 - Uses `tsdown` to emit ESM-only outputs into `packages/sdk/dist/`
+- Uses `tsdown` for package outputs and Vite single-file builds for the MCP App under `packages/mcp/dist/`
 - Uses `sui-ts-codegen generate` to regenerate `packages/sdk/src/contracts/`
 - Generated contract bindings are runtime-critical and should stay aligned with the current Suigar packages
 
@@ -93,11 +105,12 @@ pnpm release
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
-   The package root exports `suigar` and `SuigarClient`. Game-related public types should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
+   The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
    Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values, throwing `TypeError` for invalid input shapes and `RangeError` for negatives. `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values. `toU16()` accepts the same input shapes in the `0..65535` range with the same `TypeError` and `RangeError` split. `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders. Unsupported game ids, PvP actions, and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
+6. **MCP uses public SDK APIs**: `@suigar/mcp` should build transactions through `client.suigar.tx`, inspect config through `client.suigar.getConfig()`, and avoid imports from private Suigar workspace packages.
 
 ### Suigar Client Architecture
 
@@ -170,6 +183,23 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - When partner attribution is required, configure `suigar({ partner: '<wallet-address>' })` once during extension setup instead of passing partner data through transaction metadata.
 - Prefer importing public constants and numeric helpers from `@suigar/sdk/utils` instead of duplicating SDK defaults in downstream apps.
 
+### MCP Package Architecture
+
+`packages/mcp` exposes a local stdio MCP server plus a bundled MCP App resource.
+It should stay thin over `@suigar/sdk` and `@mysten/sui`.
+
+- Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and
+  `registerAppTool`.
+- Always return both text `content` and `structuredContent`.
+- Keep tool errors actionable and include the field/config/network detail needed
+  for an agent to retry.
+- The MCP App is an inspector UI only. It must not sign or execute
+  transactions, and it should include restrictive `_meta.ui.csp` metadata.
+- Do not reintroduce explicit coin object sourcing or copied transaction
+  builders unless the SDK adds a public API for that behavior.
+- If a new MCP behavior requires an SDK change, add the SDK change, tests,
+  docs, and an `@suigar/sdk` changeset entry in the same task.
+
 ### Testing Conventions
 
 - `packages/sdk/test/unit/transactions.test.ts` covers transaction composition, normalization, and generated wrapper integration.
@@ -202,26 +232,39 @@ This is a core invariant: standard game transactions must fail clearly when the 
 Documentation is part of the deliverable:
 
 - When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
-- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant repo-local skills under `.agents/skills/`, and any other user-facing markdown that describes the changed behavior.
-- Treat repo-local skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
-- Do not edit `.claude/skills` separately. In this repository, `.claude/skills` is a symlink to `.agents/skills`, so updating `.agents/skills` already updates the Claude-visible path.
+- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant Suigar skills in `Suigar-Gaming/agent-skills`, and any other user-facing markdown that describes the changed behavior.
+- Treat skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
 - If installation or client setup guidance changes, keep examples aligned with the current APIs such as `@mysten/sui/grpc`, explicit `network`, and ESM-only package requirements.
 
 ## AI Skills
 
-Use the repo-local skills in `.agents/skills/` when the task is about building a product on top of this SDK:
+Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository.
+
+Install the skills for an agent with the skills CLI:
+
+```bash
+npx skills add Suigar-Gaming/agent-skills
+```
+
+Install a single skill when only one workflow is needed:
+
+```bash
+npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp
+```
+
+Use these Suigar skills when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
+- `suigar-mcp` for installing, configuring, and operating the `@suigar/mcp` server and MCP App
 - `create-standard-games` for standard game transactions
 - `create-pvp-games` for PvP game flows
 - `find-skills` to discover installable external skills when users ask for capabilities or workflows that may already exist
 
 Claude Code compatibility:
 
-- `.claude/skills` is a symlink to `.agents/skills`
-- `CLAUDE.md` exists at the repository root for Claude-oriented repository guidance
+- `CLAUDE.md` is a symlink to `AGENTS.md`
 
 ## Pull Requests
 

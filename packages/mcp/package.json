@@ -1,0 +1,84 @@
+{
+	"name": "@suigar/mcp",
+	"version": "0.1.1",
+	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
+	"keywords": [
+		"suigar",
+		"sui",
+		"mcp",
+		"mcp-app",
+		"typescript",
+		"move",
+		"web3",
+		"games"
+	],
+	"license": "Apache-2.0",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist",
+		"CHANGELOG.md",
+		"README.md"
+	],
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs",
+			"default": "./dist/index.mjs"
+		},
+		"./server": {
+			"types": "./dist/server.d.mts",
+			"import": "./dist/server.mjs",
+			"default": "./dist/server.mjs"
+		}
+	},
+	"bin": {
+		"suigar": "./dist/bin.mjs"
+	},
+	"engines": {
+		"node": "^22.18.0 || >=24.0.0"
+	},
+	"scripts": {
+		"start:local": "pnpm --filter @suigar/sdk build:ci && pnpm build && node dist/bin.mjs",
+		"build": "pnpm clean && tsdown && vite build",
+		"build:ci": "pnpm build",
+		"clean": "rm -rf dist",
+		"test": "vitest run",
+		"typecheck": "tsc --noEmit",
+		"eslint": "eslint .",
+		"eslint:fix": "eslint . --fix",
+		"prettier": "prettier --check --ignore-unknown .",
+		"prettier:fix": "prettier --write --ignore-unknown .",
+		"lint": "pnpm eslint && pnpm prettier",
+		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Suigar-Gaming/sdk.git",
+		"directory": "packages/mcp"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"bugs": {
+		"url": "https://github.com/Suigar-Gaming/sdk/issues"
+	},
+	"homepage": "https://docs.suigar.com/mcp",
+	"dependencies": {
+		"@modelcontextprotocol/ext-apps": "1.7.4",
+		"@modelcontextprotocol/sdk": "1.29.0",
+		"@mysten/sui": "catalog:mysten",
+		"@suigar/sdk": "workspace:^",
+		"zod": "4.4.3"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:typescript",
+		"tsdown": "catalog:tooling",
+		"typescript": "catalog:typescript6",
+		"vite": "^8.1.0",
+		"vite-plugin-singlefile": "^2.3.3",
+		"vitest": "catalog:test"
+	}
+}

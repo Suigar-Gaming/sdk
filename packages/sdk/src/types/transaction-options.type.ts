@@ -6,7 +6,7 @@ import type {
 	TransactionArgument,
 } from '@mysten/sui/transactions';
 import type { BetMetadataInput } from './bet-metadata.type.js';
-import type { CoinSide } from './game.type.js';
+import type { CoinSide, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
 
 export type WithGasBudget = {
@@ -65,8 +65,6 @@ export type BuildRangeTransactionOptions = SharedBetTransactionOptions & {
 export type BuildWheelTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };
-
-export type PvPCoinflipAction = 'create' | 'join' | 'cancel';
 
 export type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions &
 	CoinTransactionOptions;

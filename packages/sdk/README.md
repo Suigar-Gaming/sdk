@@ -38,6 +38,7 @@ types:
 import {
 	suigar,
 	SuigarClient,
+	SUPPORTED_SUI_NETWORKS,
 	type SuigarCoin,
 	type SuigarNetwork,
 } from '@suigar/sdk';
@@ -90,17 +91,21 @@ Numeric helper behavior:
 Game-specific type exports are available from the dedicated `games` subpath:
 
 ```ts
+import { GAMES } from '@suigar/sdk/games';
 import type {
 	BuildCoinflipTransactionOptions,
 	BuildCreatePvPCoinflipTransactionOptions,
 	CoinSide,
+	Game,
 	PvPCoinflipAction,
+	PvPGame,
+	StandardGame,
 } from '@suigar/sdk/games';
 ```
 
 Current game-type subpath exports:
 
-- `@suigar/sdk/games`: `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
+- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
