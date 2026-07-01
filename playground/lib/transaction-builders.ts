@@ -13,6 +13,7 @@ import type {
 	SharedFields,
 	StandardForms,
 	StandardGameId,
+	StandardSharedFields,
 	WheelFormValues,
 } from '@/lib/suigar-types';
 
@@ -20,11 +21,7 @@ type TxApi = SuigarClient['tx'];
 
 export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
-function getBetCountInput(fields: SharedFields) {
-	if (!('betCount' in fields) || typeof fields.betCount !== 'string') {
-		return '';
-	}
-
+function getBetCountInput(fields: StandardSharedFields) {
 	return fields.betCount.trim();
 }
 
@@ -53,18 +50,34 @@ function buildSharedOptions(
 		coinType,
 		stake: atomicStake,
 	};
-	const rawBetCount = getBetCountInput(fields);
-
-	if (rawBetCount) {
-		baseOptions.betCount = parseBetCount(rawBetCount);
-	}
-
 	const codeLines = [
 		`owner: '${owner}',`,
 		`coinType: '${coinType}',`,
 		`stake: ${atomicStake.toString()}n,`,
 	];
+
+	return {
+		baseOptions,
+		codeLines,
+	};
+}
+
+function buildStandardSharedOptions(
+	owner: string,
+	coinType: string,
+	coinDecimals: number,
+	fields: StandardSharedFields,
+) {
+	const { baseOptions, codeLines } = buildSharedOptions(
+		owner,
+		coinType,
+		coinDecimals,
+		fields,
+	);
+	const rawBetCount = getBetCountInput(fields);
+
 	if (rawBetCount) {
+		baseOptions.betCount = parseBetCount(rawBetCount);
 		codeLines.push(`betCount: ${rawBetCount}n,`);
 	}
 
@@ -102,7 +115,7 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	coinDecimals: number,
 	coinType: string,
 ) {
-	const { baseOptions, codeLines } = buildSharedOptions(
+	const { baseOptions, codeLines } = buildStandardSharedOptions(
 		owner,
 		coinType,
 		coinDecimals,
