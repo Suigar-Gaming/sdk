@@ -232,21 +232,19 @@ const unknownJsonSchema: z.ZodType<unknown> = z.lazy(() =>
 	]),
 );
 
-export const toolOutputSchema = z
-	.object({
-		mode: z.enum(builderModes).optional(),
-		network: z.enum(SUPPORTED_SUI_NETWORKS).optional(),
-		config: unknownJsonSchema.optional(),
-		game: unknownJsonSchema.optional(),
-		action: z.string().optional(),
-		plan: unknownJsonSchema.optional(),
-		summary: unknownJsonSchema.optional(),
-		transactionBytesBase64: z.string().optional(),
-		dryRun: unknownJsonSchema.optional(),
-		dryRunSummary: unknownJsonSchema.optional(),
-		errors: z.array(z.string()).optional(),
-	})
-	.loose();
+export const toolOutputSchema = z.looseObject({
+	mode: z.enum(builderModes).optional(),
+	network: z.enum(SUPPORTED_SUI_NETWORKS).optional(),
+	config: unknownJsonSchema.optional(),
+	game: unknownJsonSchema.optional(),
+	action: z.string().optional(),
+	plan: unknownJsonSchema.optional(),
+	summary: unknownJsonSchema.optional(),
+	transactionBytesBase64: z.string().optional(),
+	dryRun: unknownJsonSchema.optional(),
+	dryRunSummary: unknownJsonSchema.optional(),
+	errors: z.array(z.string()).optional(),
+});
 
 export type ReadConfigInput = z.input<typeof readConfigInputSchema>;
 export type ReadGameMetadataInput = z.input<typeof readGameMetadataInputSchema>;
