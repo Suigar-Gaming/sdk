@@ -13,12 +13,16 @@ type AnyRecord = Record<string, unknown>;
 
 const statusElement = document.querySelector<HTMLDivElement>('#status')!;
 const contextElement = document.querySelector<HTMLDListElement>('#context')!;
+const transactionPanelElement =
+	document.querySelector<HTMLElement>('#transaction-panel')!;
 const summaryElement = document.querySelector<HTMLDListElement>('#summary')!;
 const gasPanelElement = document.querySelector<HTMLElement>('#gas-panel')!;
 const gasElement = document.querySelector<HTMLDListElement>('#gas')!;
 const dryRunPanelElement =
 	document.querySelector<HTMLElement>('#dry-run-panel')!;
 const dryRunElement = document.querySelector<HTMLDListElement>('#dry-run')!;
+const targetPanelElement =
+	document.querySelector<HTMLElement>('#target-panel')!;
 const targetsElement = document.querySelector<HTMLUListElement>('#targets')!;
 const notesPanelElement = document.querySelector<HTMLElement>('#notes-panel')!;
 const notesElement = document.querySelector<HTMLUListElement>('#notes')!;
@@ -91,14 +95,13 @@ const renderTargets = (structuredContent: AnyRecord) => {
 		.filter((target): target is string => typeof target === 'string')
 		.concat(planTarget);
 
+	targetPanelElement.hidden = targets.length === 0;
 	targetsElement.replaceChildren(
-		...(targets.length > 0 ? targets : ['No Move target available yet']).map(
-			(target) => {
-				const item = document.createElement('li');
-				item.textContent = target;
-				return item;
-			},
-		),
+		...targets.map((target) => {
+			const item = document.createElement('li');
+			item.textContent = target;
+			return item;
+		}),
 	);
 };
 
@@ -157,31 +160,49 @@ const dynamicEntries = (record: AnyRecord) =>
 			if (key.endsWith('_display')) {
 				return false;
 			}
-			return !['game_details', 'metadata'].includes(key);
+			return ![
+				'game_details',
+				'metadata',
+				'player',
+				'coin_type',
+				'unsafe_oracle_usd_coin_price',
+				'adjusted_oracle_usd_coin_price',
+			].includes(key);
 		})
 		.map(
 			([key, value]) =>
 				[labelFor(key), record[`${key}_display`] ?? value] as [string, unknown],
 		);
 
-const firstEventFields = (structuredContent: AnyRecord) => {
+const resultEventFields = (structuredContent: AnyRecord) => {
 	const dryRunSummary = asRecord(structuredContent.dryRunSummary);
 	const events = Array.isArray(dryRunSummary.events)
 		? dryRunSummary.events
 		: [];
-	const event = events.map(asRecord).find((item) => isRecord(item.fields));
+	const eventRecords = events.map(asRecord);
+	const event =
+		eventRecords.find((item) => item.eventName === 'BetResultEvent') ??
+		eventRecords.find((item) => {
+			const fields = asRecord(item.fields);
+			return (
+				'player_bet' in fields ||
+				'coin_outcome' in fields ||
+				'outcome_amount' in fields ||
+				'payout_amount' in fields
+			);
+		}) ??
+		eventRecords.find((item) => isRecord(item.fields));
 	return event ? asRecord(event.fields) : {};
 };
 
 const renderResult = (structuredContent: unknown) => {
 	const record = asRecord(structuredContent);
 	const config = asRecord(record.config);
-	const sdkConfig = asRecord(config.sdk);
 	const summary = asRecord(record.summary);
 	const gameInputs = asRecord(summary.gameInputs);
 	const dryRunSummary = asRecord(record.dryRunSummary);
 	const gasUsed = asRecord(dryRunSummary.gasUsed);
-	const eventFields = firstEventFields(record);
+	const eventFields = resultEventFields(record);
 	const plan = asRecord(record.plan);
 	const game = asRecord(record.game);
 	const typeArguments = Array.isArray(plan.typeArguments)
@@ -203,9 +224,9 @@ const renderResult = (structuredContent: unknown) => {
 				game.coinType ??
 				(typeArguments ? typeArguments[0] : null),
 		],
-		['SweetHouse', asRecord(sdkConfig.packageIds).sweetHouse],
+		['Package ID', game.packageId],
 	]);
-	setDefinitionList(summaryElement, [
+	transactionPanelElement.hidden = !setDefinitionList(summaryElement, [
 		['Sender', summary.sender],
 		[
 			'Stake',
@@ -213,9 +234,9 @@ const renderResult = (structuredContent: unknown) => {
 				? `${summary.stakeDisplay} (${summary.stake} base units)`
 				: summary.stake,
 		],
+		...dynamicEntries(gameInputs),
 		['Commands', summary.commandCount ?? (plan.target ? 'planned' : null)],
 		['Inputs', summary.inputs ?? requiredInputs],
-		...dynamicEntries(gameInputs),
 		['Type args', typeArguments],
 		[
 			'Serialized bytes',

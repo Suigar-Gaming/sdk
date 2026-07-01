@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 import { formatAmount } from './format.js';
 import type {
@@ -177,6 +178,48 @@ const eventFields = (
 	return Object.fromEntries(entries);
 };
 
+const parseDryRunEvent = (
+	event: Record<string, unknown>,
+	eventType: string,
+): ReturnType<typeof parseGameEvent> => {
+	const module =
+		typeof event.module === 'string'
+			? event.module
+			: eventType.includes('::core::')
+				? 'core'
+				: eventType.includes('::pvp_coinflip::')
+					? 'pvp_coinflip'
+					: '';
+
+	if (!module) {
+		return null;
+	}
+
+	try {
+		const parsedEvent = parseGameEvent({
+			...event,
+			eventType,
+			module,
+		} as never);
+		if (parsedEvent) {
+			return parsedEvent;
+		}
+	} catch {
+		// Fall back to string matching below for JSON-only simulated events.
+	}
+
+	const standardBetResult = /::BetResultEvent<[^>]+::([^:<>,]+)::Game>/u.exec(
+		eventType,
+	);
+	const gameId = standardBetResult?.[1]?.replaceAll('_', '-');
+	return gameId && GAMES.includes(gameId as Game)
+		? {
+				gameId: gameId as Game,
+				eventName: 'BetResultEvent',
+			}
+		: null;
+};
+
 const summarizeDryRunEvent = (
 	event: unknown,
 	client: DryRunSummaryClient,
@@ -195,9 +238,10 @@ const summarizeDryRunEvent = (
 	const baseSummary = {
 		type: eventType,
 	};
+	let parsedEvent: ReturnType<typeof parseGameEvent> = null;
 
 	try {
-		const parsedEvent = parseGameEvent(event as never);
+		parsedEvent = parseDryRunEvent(event, eventType);
 		if (parsedEvent && event.bcs instanceof Uint8Array) {
 			const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
 			const details = parseGameDetails(
@@ -230,6 +274,12 @@ const summarizeDryRunEvent = (
 	return json
 		? {
 				...baseSummary,
+				...(parsedEvent
+					? {
+							game: parsedEvent.gameId,
+							eventName: parsedEvent.eventName,
+						}
+					: {}),
 				fields: eventFields(json, decimals),
 			}
 		: null;

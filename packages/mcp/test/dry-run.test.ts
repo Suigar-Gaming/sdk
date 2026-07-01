@@ -154,6 +154,63 @@ describe('dry-run summaries', () => {
 		});
 	});
 
+	it('keeps parsed event identity for JSON bet result events after other events', () => {
+		const dryRun = {
+			$kind: 'Transaction',
+			Transaction: {
+				effects: {
+					status: { success: true, error: null },
+				},
+				events: [
+					{
+						eventType: '0x1::core::BetPlacedEvent',
+						json: {
+							amount: '5000000',
+							game_type: '0x2::coinflip::CoinFlip',
+						},
+					},
+					{
+						eventType: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+						json: {
+							player_bet: 'tails',
+							coin_outcome: 'tails',
+							stake_amount: '10000000000',
+							outcome_amount: '20000000000',
+						},
+					},
+				],
+			},
+		};
+
+		const summary = summarizeDryRun(dryRun as never, {} as never, {
+			coinDecimals: 9,
+		});
+
+		expect(summary.events).toMatchObject([
+			{
+				type: '0x1::core::BetPlacedEvent',
+				fields: {
+					amount: '5000000',
+					amount_display: '0.005',
+					game_type: '0x2::coinflip::CoinFlip',
+				},
+			},
+			{
+				type: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+				game: 'coinflip',
+				eventName: 'BetResultEvent',
+				fields: {
+					player_bet: 'tails',
+					coin_outcome: 'tails',
+					stake_amount: '10000000000',
+					stake_amount_display: '10',
+					outcome_amount: '20000000000',
+					outcome_amount_display: '20',
+				},
+			},
+		]);
+	});
+
 	it('summarizes failed dry-runs without gas, balance, or event data', () => {
 		const summary = summarizeDryRun(
 			{
