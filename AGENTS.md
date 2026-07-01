@@ -106,7 +106,12 @@ pnpm release
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
 2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
    The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
-   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values, throwing `TypeError` for invalid input shapes and `RangeError` for negatives. `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values. `toU16()` accepts the same input shapes in the `0..65535` range with the same `TypeError` and `RangeError` split. `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
+   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable.
+   Utility function behavior:
+   - `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values. It throws `TypeError` for invalid input shapes and `RangeError` for negatives.
+   - `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range. It throws `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values.
+   - `toU16()` accepts a finite integer `number` or plain integer `string` in the `0..65535` range. It uses the same `TypeError` and `RangeError` split as `toU8()`.
+   - `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
 3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders. Unsupported game ids, PvP actions, and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
@@ -141,7 +146,11 @@ There are two transaction families and they must not be mixed:
 
 - **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
 - **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
-- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`; this bulk-loads lobby objects with `client.core.getObjects()`, skips per-object fetch or parse failures by default, only rejects when `throwOnError: true` is passed, and returns each parsed game with a derived `coin_type` string from the Move object type.
+- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
+  - Bulk-load lobby objects with `client.core.getObjects()`.
+  - Skip per-object fetch or parse failures by default.
+  - Reject on per-object fetch or parse failures only when `throwOnError: true` is passed.
+  - Return each parsed game with a derived `coin_type` string from the Move object type.
 - **Specific PvP coinflip game object lookups** should use the exported generated helper, `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })`, when a product needs one live game object outside the registry list.
 
 When making changes:
@@ -159,9 +168,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
-
-Unsupported network resolution and unsupported configured coin types should be
-treated as `RangeError` cases when documenting or testing these flows.
+- treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 
 `client.suigar.getGameParameters(game, options?)` first reads the selected
 game's settings object from SweetHouse, then reads that game's
