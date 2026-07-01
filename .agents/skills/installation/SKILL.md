@@ -7,6 +7,9 @@ description: Use when setting up, scaffolding, or fixing the base @suigar/sdk in
 
 Use this skill when the task is about integrating `@suigar/sdk` into an app before game-specific bet logic is added.
 
+If the task is about installing, configuring, or operating the Suigar MCP
+server or MCP App, use the `suigar-mcp` skill instead.
+
 ## Public package surface
 
 The package currently exposes these public entrypoints:

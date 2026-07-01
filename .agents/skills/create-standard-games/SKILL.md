@@ -7,6 +7,11 @@ description: Use when building, scaffolding, or fixing AI-generated standard cas
 
 Use this skill for standard single-player game transactions.
 
+If the user is working through `@suigar/mcp` tools instead of application code
+that imports `@suigar/sdk`, use the `suigar-mcp` skill. MCP `stake` and
+`cashStake` inputs are currency amounts, and the MCP server converts them to
+base units before calling SDK builders.
+
 ## Standard game workflow
 
 Always prefer:

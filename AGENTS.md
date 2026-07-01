@@ -245,6 +245,7 @@ Documentation is part of the deliverable:
 Use the repo-local skills in `.agents/skills/` when the task is about building a product on top of this SDK:
 
 - `installation` for SDK setup, client extension wiring, and config
+- `suigar-mcp` for installing, configuring, and operating the `@suigar/mcp` server and MCP App
 - `create-standard-games` for standard game transactions
 - `create-pvp-games` for PvP game flows
 - `find-skills` to discover installable external skills when users ask for capabilities or workflows that may already exist

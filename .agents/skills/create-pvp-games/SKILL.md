@@ -7,6 +7,10 @@ description: Use when building or fixing AI-generated PvP game flows on top of @
 
 Use this skill for PvP game flows built on the SDK.
 
+If the user is working through `@suigar/mcp` tools instead of application code
+that imports `@suigar/sdk`, use the `suigar-mcp` skill. The MCP PvP create
+tool uses the input name `creatorSide`, which maps to the SDK `side` option.
+
 Today, the concrete PvP runtime surface in this SDK is PvP coinflip, so the
 transaction builders and runtime helpers below are coinflip-specific.
 
