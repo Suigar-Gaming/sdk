@@ -1,10 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { parseStructTag } from '@mysten/sui/utils';
 import { amountText, asRecord, dynamicEntries, isRecord } from './format.js';
 import type { AnyRecord, DefinitionEntry } from './types.js';
 
 export type InspectorViewModel = {
+	coinBadge: string | null;
 	contextEntries: DefinitionEntry[];
 	transactionEntries: DefinitionEntry[];
 	gasEntries: DefinitionEntry[];
@@ -62,6 +64,21 @@ const errorsFor = (structuredContent: AnyRecord) =>
 			)
 		: [];
 
+const fallbackStructName = (coinType: string) =>
+	coinType.match(/::([^:<>,\s]+)(?:<.*>)?$/u)?.[1] ?? null;
+
+const coinBadgeFor = (coinType: unknown) => {
+	if (typeof coinType !== 'string' || coinType === '') {
+		return null;
+	}
+
+	try {
+		return parseStructTag(coinType).name;
+	} catch {
+		return fallbackStructName(coinType);
+	}
+};
+
 export const createInspectorViewModel = (
 	payload: unknown,
 	explicitErrors: string[],
@@ -81,19 +98,19 @@ export const createInspectorViewModel = (
 	const requiredInputs = Array.isArray(plan.requiredInputs)
 		? plan.requiredInputs
 		: null;
+	const coinType =
+		summary.coinType ??
+		game.coinType ??
+		(typeArguments ? typeArguments[0] : null);
 
 	return {
+		coinBadge: coinBadgeFor(coinType),
 		contextEntries: [
 			['Network', record.network ?? config.network],
 			['Game', game.id ?? summary.game],
 			['Label', game.label],
 			['Action', record.action ?? summary.action],
-			[
-				'Coin type',
-				summary.coinType ??
-					game.coinType ??
-					(typeArguments ? typeArguments[0] : null),
-			],
+			['Coin type', coinType],
 			['Package ID', game.packageId],
 		],
 		transactionEntries: [

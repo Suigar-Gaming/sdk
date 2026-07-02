@@ -25,7 +25,13 @@ const listItemClassNames = {
 		'min-w-0 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-lg border border-border/70 bg-background/75 px-3 py-2 font-mono text-xs leading-5 text-foreground',
 } as const;
 
-export function Header({ status }: { status: string }) {
+export function Header({
+	coinBadge,
+	status,
+}: {
+	coinBadge?: string | null;
+	status: string;
+}) {
 	return (
 		<header className="flex min-w-0 flex-col gap-4 rounded-lg border border-border/70 bg-card/88 p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
@@ -36,8 +42,18 @@ export function Header({ status }: { status: string }) {
 					Transaction Inspector
 				</h1>
 			</div>
-			<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-[13px] leading-tight font-extrabold text-primary-foreground sm:shrink-0">
-				{status.toLowerCase()}
+			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+				{coinBadge ? (
+					<div
+						className="w-max max-w-full rounded-full border border-secondary/75 bg-secondary px-3 py-1.5 font-mono text-[13px] leading-tight font-extrabold text-secondary-foreground"
+						title={`Coin ${coinBadge}`}
+					>
+						{coinBadge}
+					</div>
+				) : null}
+				<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-[13px] leading-tight font-extrabold text-primary-foreground">
+					{status.toLowerCase()}
+				</div>
 			</div>
 		</header>
 	);
