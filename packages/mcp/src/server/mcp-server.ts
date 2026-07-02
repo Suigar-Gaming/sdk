@@ -39,10 +39,6 @@ import {
 
 declare const __SUIGAR_MCP_VERSION__: string;
 
-export type CreateSuigarMcpServerOptions = {
-	version?: string;
-};
-
 const errorText = (error: unknown) => {
 	if (error instanceof Error) {
 		return `${error.name}: ${error.message}`;
@@ -73,12 +69,10 @@ const withToolErrors =
 		}
 	};
 
-export const createSuigarMcpServer = ({
-	version = __SUIGAR_MCP_VERSION__,
-}: CreateSuigarMcpServerOptions = {}) => {
+export const createSuigarMcpServer = () => {
 	const server = new McpServer({
 		name: 'suigar',
-		version,
+		version: __SUIGAR_MCP_VERSION__,
 	});
 
 	server.registerTool(
