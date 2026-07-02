@@ -37,7 +37,7 @@ export function Header({ status }: { status: string }) {
 				</h1>
 			</div>
 			<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-[13px] leading-tight font-extrabold text-primary-foreground sm:shrink-0">
-				{status}
+				{status.toLowerCase()}
 			</div>
 		</header>
 	);
