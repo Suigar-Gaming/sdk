@@ -13,7 +13,7 @@ inputs:
   registry-url:
     description: Optional npm registry URL for publish-related jobs.
     required: false
-    default: ''
+    default: 'https://registry.npmjs.org'
 
 runs:
   using: composite
