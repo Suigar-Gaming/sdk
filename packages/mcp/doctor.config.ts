@@ -10,13 +10,6 @@ export default defineConfig({
 				files: ['src/app/**/*'],
 				rules: ['deslop/unused-file'],
 			},
-			{
-				files: ['src/server.ts'],
-				rules: ['react-doctor/mcp-tool-capability-risk'],
-			},
 		],
-	},
-	rules: {
-		'deslop/unused-dependency': 'off',
 	},
 });

@@ -14,8 +14,17 @@ import {
 	createSuigarClient,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
-} from './client.js';
-import type { SuigarClientBundle } from './client.js';
+} from '../runtime/client.js';
+import type { SuigarClientBundle } from '../runtime/client.js';
+import type {
+	BuilderMode,
+	JsonValue,
+	ReadConfigResult,
+	ReadGameMetadataResult,
+	ReadOnlyPlan,
+	ResolvedMcpConfig,
+	ToolTextResult,
+} from '../runtime/types.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,
@@ -27,15 +36,6 @@ import type {
 	ReadConfigInput,
 	ReadGameMetadataInput,
 } from './schemas.js';
-import type {
-	BuilderMode,
-	JsonValue,
-	ReadConfigResult,
-	ReadGameMetadataResult,
-	ReadOnlyPlan,
-	ResolvedMcpConfig,
-	ToolTextResult,
-} from './types.js';
 
 const GAME_LABELS = {
 	coinflip: 'Coinflip',

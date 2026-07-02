@@ -4,11 +4,11 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { describe, expect, it } from 'vitest';
+import { createSuigarMcpServer } from '../src/server.js';
 import {
 	createSuigarMcpAppResourceResult,
-	createSuigarMcpServer,
 	SUIGAR_MCP_APP_RESOURCE_URI,
-} from '../src/server.js';
+} from '../src/server/app-resource.js';
 
 describe('MCP server registration', () => {
 	it('registers all public Suigar MCP tools', () => {

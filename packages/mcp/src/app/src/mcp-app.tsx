@@ -23,10 +23,10 @@ import {
 	ListPanel,
 	Panel,
 	RawPayload,
-} from './components.js';
-import { visibleDefinitionEntries } from './format.js';
-import { createInspectorViewModel } from './inspector.js';
-import type { InspectorState } from './types.js';
+} from './components/inspector-components.js';
+import { visibleDefinitionEntries } from './lib/format.js';
+import { createInspectorViewModel } from './lib/inspector.js';
+import type { InspectorState } from './lib/types.js';
 
 const initialState: InspectorState = {
 	status: 'Waiting for tool result',
@@ -208,7 +208,7 @@ export function SuigarInspectorApp() {
 
 	if (viewState.error) {
 		return (
-			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-transparent p-3.5 text-slate-950 sm:p-4.5 dark:text-slate-100">
+			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
 				<Header status="Error" />
 				<ListPanel
 					className="errors"
@@ -221,7 +221,7 @@ export function SuigarInspectorApp() {
 
 	if (!viewState.hostContext) {
 		return (
-			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-transparent p-3.5 text-slate-950 sm:p-4.5 dark:text-slate-100">
+			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
 				<Header status="Connecting" />
 				<RawPayload payload={viewState.inspector.payload} />
 			</main>
@@ -229,7 +229,7 @@ export function SuigarInspectorApp() {
 	}
 
 	return (
-		<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-transparent p-3.5 text-slate-950 sm:p-4.5 dark:text-slate-100">
+		<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
 			<Header status={viewState.inspector.status} />
 
 			<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
