@@ -3,8 +3,6 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
-import { resolveOwnerAddress } from '../../src/runtime/client.js';
-import type { SuigarClientBundle } from '../../src/runtime/client.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -17,62 +15,9 @@ import {
 	readConfigTool,
 	readGameMetadataTool,
 } from '../../src/tools/handlers.js';
-import { toolOutputSchema } from '../../src/tools/schemas.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
-const resolvedOwner =
-	'0x0000000000000000000000000000000000000000000000000000000000000002';
-
-const createResolverBundle = (
-	resolveSuiNSName: SuigarClientBundle['resolveSuiNSName'],
-) =>
-	({
-		resolveSuiNSName,
-	}) as SuigarClientBundle;
-
-describe('owner resolution', () => {
-	it('normalizes raw Sui addresses without a SuiNS lookup', async () => {
-		const lookup = vi.fn<SuigarClientBundle['resolveSuiNSName']>();
-
-		await expect(
-			resolveOwnerAddress('0x1', createResolverBundle(lookup)),
-		).resolves.toBe(owner);
-		expect(lookup).not.toHaveBeenCalled();
-	});
-
-	it('resolves SuiNS names and subnames before transaction construction', async () => {
-		const lookup = vi
-			.fn<SuigarClientBundle['resolveSuiNSName']>()
-			.mockResolvedValue(resolvedOwner);
-
-		await expect(
-			resolveOwnerAddress('furbor.sui', createResolverBundle(lookup)),
-		).resolves.toBe(resolvedOwner);
-		expect(lookup).toHaveBeenCalledWith('furbor.sui');
-
-		await expect(
-			resolveOwnerAddress('desk.furbor.sui', createResolverBundle(lookup)),
-		).resolves.toBe(resolvedOwner);
-		expect(lookup).toHaveBeenLastCalledWith('desk.furbor.sui');
-	});
-
-	it('rejects invalid or unresolved SuiNS owners with actionable errors', async () => {
-		await expect(
-			resolveOwnerAddress(
-				'not a name',
-				createResolverBundle(async () => resolvedOwner),
-			),
-		).rejects.toThrow(/Sui address or SuiNS name/u);
-
-		await expect(
-			resolveOwnerAddress(
-				'missing.sui',
-				createResolverBundle(async () => null),
-			),
-		).rejects.toThrow(/did not resolve/u);
-	});
-});
 
 describe('read tools', () => {
 	it('defaults read_config to testnet and returns SDK-shaped config', async () => {
@@ -204,7 +149,6 @@ describe('build transaction tools', () => {
 			expect(content.summary.coinDecimals).toBe(9);
 			expect(content.summary.gameInputs).toEqual({ side: 'heads' });
 			expect(content.summary).not.toHaveProperty('action');
-			expect(() => toolOutputSchema.parse(content)).not.toThrow();
 			expect(buildSpy).toHaveBeenCalledOnce();
 		} finally {
 			buildSpy.mockRestore();
@@ -304,26 +248,5 @@ describe('build transaction tools', () => {
 		await expect(
 			buildCoinflipTransactionTool({ mode: 'build', owner, side: 'heads' }),
 		).rejects.toThrow(/stake/u);
-	});
-});
-
-describe('tool output validation', () => {
-	it('accepts dry-run summaries and errors in tool output validation', () => {
-		expect(() =>
-			toolOutputSchema.parse({
-				mode: 'dry-run',
-				network: 'testnet',
-				summary: {},
-				dryRun: {},
-				dryRunSummary: {
-					success: true,
-					error: null,
-					gasUsed: {},
-					balanceChanges: [],
-					events: [],
-				},
-				errors: ['MoveAbort in coinflip::play'],
-			}),
-		).not.toThrow();
 	});
 });

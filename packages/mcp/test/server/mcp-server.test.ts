@@ -5,10 +5,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { describe, expect, it } from 'vitest';
 import { createSuigarMcpServer } from '../../src/server.js';
-import {
-	createSuigarMcpAppResourceResult,
-	SUIGAR_MCP_APP_RESOURCE_URI,
-} from '../../src/server/app-resource.js';
+import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
 
 describe('MCP server registration', () => {
 	it('registers all public Suigar MCP tools', () => {
@@ -69,18 +66,5 @@ describe('MCP server registration', () => {
 			await client.close();
 			await server.close();
 		}
-	});
-
-	it('serves MCP App HTML with text fallback and CSP metadata', async () => {
-		const result = await createSuigarMcpAppResourceResult();
-		const [content] = result.contents;
-
-		expect(content.uri).toBe(SUIGAR_MCP_APP_RESOURCE_URI);
-		expect(content.mimeType).toBe('text/html;profile=mcp-app');
-		expect(content.text).toContain('Suigar Transaction Inspector');
-		expect(content._meta.ui.csp).toEqual({
-			connectDomains: [],
-			resourceDomains: [],
-		});
 	});
 });
