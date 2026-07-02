@@ -78,7 +78,17 @@ const setDefinitionList = (
 			const text = String(formattedValue);
 			detail.textContent = text;
 			detail.title = text;
-			detail.className = 'value';
+			const lowerLabel = label.toLowerCase();
+			const lowerText = text.toLowerCase();
+			const tone =
+				lowerText === 'success'
+					? ' is-success'
+					: value === false ||
+						  lowerLabel.includes('error') ||
+						  lowerText === 'failed'
+						? ' is-error'
+						: '';
+			detail.className = `value${tone}`;
 			return [term, detail];
 		}),
 	);
