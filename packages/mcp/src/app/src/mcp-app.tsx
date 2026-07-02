@@ -47,7 +47,7 @@ type HostContext = NonNullable<ReturnType<App['getHostContext']>>;
 type AppViewState = {
 	error: Error | null;
 	hostContext: HostContext | undefined;
-	inspector: InspectorState;
+	inspector: InspectorState | null;
 };
 
 type AppViewAction =
@@ -129,7 +129,7 @@ export function SuigarInspectorApp() {
 	const [viewState, dispatch] = useReducer(reducer, {
 		error: null,
 		hostContext: undefined,
-		inspector: initialState,
+		inspector: null,
 	});
 	const [app] = useState(
 		() =>
@@ -200,14 +200,11 @@ export function SuigarInspectorApp() {
 			});
 	}, [app]);
 
-	const viewModel = useMemo(
-		() =>
-			createInspectorViewModel(
-				viewState.inspector.payload,
-				viewState.inspector.errors,
-			),
-		[viewState.inspector.errors, viewState.inspector.payload],
-	);
+	const viewModel = useMemo(() => {
+		const inspector = viewState.inspector ?? initialState;
+		return createInspectorViewModel(inspector.payload, inspector.errors);
+	}, [viewState.inspector]);
+	const inspector = viewState.inspector ?? initialState;
 
 	if (viewState.error) {
 		return (
@@ -222,7 +219,7 @@ export function SuigarInspectorApp() {
 		);
 	}
 
-	if (!viewState.hostContext) {
+	if (!viewState.hostContext && !viewState.inspector) {
 		return (
 			<main className={shellClassName}>
 				<Header status="Connecting" />
@@ -237,7 +234,7 @@ export function SuigarInspectorApp() {
 
 	return (
 		<main className={shellClassName}>
-			<Header status={viewState.inspector.status} />
+			<Header coinBadge={viewModel.coinBadge} status={inspector.status} />
 
 			<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
 				<Panel title="Context">
@@ -277,7 +274,7 @@ export function SuigarInspectorApp() {
 			/>
 			<ListPanel className="notes" items={viewModel.notes} title="Notes" />
 			<ListPanel className="errors" items={viewModel.errors} title="Errors" />
-			<RawPayload payload={viewState.inspector.payload} />
+			<RawPayload payload={inspector.payload} />
 		</main>
 	);
 }
