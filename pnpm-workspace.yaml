@@ -5,6 +5,11 @@ packages:
   - '!**/.next/**'
 
 catalogs:
+  frontend:
+    'clsx': ^2.1.1
+    'react': ^19.2.7
+    'react-dom': ^19.2.7
+    'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.0
     '@mysten/codegen': ^0.11.3
@@ -12,12 +17,18 @@ catalogs:
   test:
     'vitest': ^4.1.9
   tooling:
+    '@tailwindcss/postcss': ^4.3.2
+    '@tailwindcss/vite': ^4.3.2
     'eslint-config-prettier': ^10.1.8
     'prettier': ^3.9.4
+    'react-doctor': ^0.5.8
+    'tailwindcss': ^4.3.2
     'tsdown': ^0.22.3
     'tsx': ^4.22.4
   typescript:
     '@types/node': ^24.0.0
+    '@types/react': ^19.2.17
+    '@types/react-dom': ^19.2.3
     'typescript': ^5.9.3
   typescript6:
     'typescript': ^6.0.3
