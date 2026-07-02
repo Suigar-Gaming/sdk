@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { formatAmount, formatBaseUnitAmount } from '../src/format.js';
+import {
+	formatAmount,
+	formatBaseUnitAmount,
+} from '../../src/runtime/format.js';
 
 describe('amount formatting', () => {
 	it.each([

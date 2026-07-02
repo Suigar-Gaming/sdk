@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) Suigar
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *, [data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+	:root {
+		color-scheme: light;
+		--background: #e4faff;
+		--foreground: #072744;
+		--card: #c8f1fb;
+		--card-foreground: #072744;
+		--popover: #d6f4fb;
+		--popover-foreground: #072744;
+		--primary: #ffbf49;
+		--primary-foreground: #321c00;
+		--secondary: #1fa8d8;
+		--secondary-foreground: #03131f;
+		--muted: #d4e6ef;
+		--muted-foreground: #33546b;
+		--accent: #a5e0f0;
+		--accent-foreground: #06263c;
+		--success: #33b98d;
+		--success-foreground: #041f15;
+		--warning: #ffb44d;
+		--warning-foreground: #351f00;
+		--destructive: #de5978;
+		--destructive-foreground: #2c0815;
+		--border: #7eb2c7;
+		--ring: #ffbf49;
+		--font-sans:
+			ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+			sans-serif;
+		--font-mono:
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+			monospace;
+		--tracking-normal: 0.015em;
+		--radius: 1rem;
+	}
+
+	:root[data-theme='dark'],
+	:root.dark,
+	.dark {
+		color-scheme: dark;
+		--background: #030914;
+		--foreground: #edf4ff;
+		--card: #0f1b2f;
+		--card-foreground: #edf4ff;
+		--popover: #10203a;
+		--popover-foreground: #edf4ff;
+		--primary: #ffb547;
+		--primary-foreground: #2d1500;
+		--secondary: #4cc5ff;
+		--secondary-foreground: #030914;
+		--muted: #1a2a44;
+		--muted-foreground: #9db3d6;
+		--accent: #173155;
+		--accent-foreground: #edf4ff;
+		--success: #45c480;
+		--success-foreground: #03150a;
+		--warning: #facc15;
+		--warning-foreground: #1f1200;
+		--destructive: #ff5f74;
+		--destructive-foreground: #130104;
+		--border: #1f2d47;
+		--ring: #ffb547;
+	}
+
+	html {
+		background: var(--background);
+	}
+
+	body {
+		min-height: 100dvh;
+		margin: 0;
+		background: var(--background);
+		color: var(--foreground);
+		font-family: var(--font-sans);
+		letter-spacing: var(--tracking-normal);
+	}
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-success: var(--success);
+	--color-success-foreground: var(--success-foreground);
+	--color-warning: var(--warning);
+	--color-warning-foreground: var(--warning-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-ring: var(--ring);
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-mono);
+	--radius-lg: var(--radius);
+}

@@ -58,7 +58,7 @@ jobs:
             const marker = '<!-- codex:changesets-warning -->';
             const body = [
               marker,
-              'This pull request changes SDK source files or SDK-affecting pnpm catalogs but does not include a changeset file in `.changeset/`.',
+              'This pull request changes package source files or SDK-affecting pnpm catalogs but does not include a changeset file in `.changeset/`.',
               '',
               'Changes under `catalogs.mysten` or `catalogs.typescript` in `pnpm-workspace.yaml` affect `@suigar/sdk` indirectly and require a changeset.',
               '',

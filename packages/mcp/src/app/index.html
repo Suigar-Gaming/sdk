@@ -1,68 +1,18 @@
 <!doctype html>
+<!--
+  Copyright (c) Suigar
+  SPDX-License-Identifier: Apache-2.0
+-->
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="light dark" />
 		<title>Suigar Transaction Inspector</title>
-		<script type="module" src="./main.ts"></script>
+		<link rel="stylesheet" href="/src/global.css" />
 	</head>
 	<body>
-		<main class="shell">
-			<header class="header">
-				<div>
-					<p class="eyebrow">Suigar MCP</p>
-					<h1>Transaction Inspector</h1>
-				</div>
-				<div id="status" class="status">Waiting for tool result</div>
-			</header>
-
-			<section class="summary-grid">
-				<div class="panel">
-					<h2>Context</h2>
-					<dl id="context"></dl>
-				</div>
-
-				<div id="transaction-panel" class="panel">
-					<h2>Transaction</h2>
-					<dl id="summary"></dl>
-				</div>
-
-				<div id="gas-panel" class="panel" hidden>
-					<h2>Gas</h2>
-					<dl id="gas"></dl>
-				</div>
-
-				<div id="dry-run-panel" class="panel" hidden>
-					<h2>Dry-run</h2>
-					<dl id="dry-run"></dl>
-				</div>
-			</section>
-
-			<section id="target-panel" class="panel target-panel">
-				<div class="panel-heading">
-					<h2>Targets</h2>
-				</div>
-				<ul id="targets" class="targets"></ul>
-			</section>
-
-			<section id="notes-panel" class="panel notes-panel" hidden>
-				<div class="panel-heading">
-					<h2>Notes</h2>
-				</div>
-				<ul id="notes" class="notes"></ul>
-			</section>
-
-			<section id="errors-panel" class="panel errors-panel" hidden>
-				<div class="panel-heading">
-					<h2>Errors</h2>
-				</div>
-				<ul id="errors" class="errors"></ul>
-			</section>
-
-			<details class="panel raw-result">
-				<summary>Raw payload</summary>
-				<pre id="result">{}</pre>
-			</details>
-		</main>
+		<div id="root"></div>
+		<script type="module" src="/src/mcp-app.tsx"></script>
 	</body>
 </html>
