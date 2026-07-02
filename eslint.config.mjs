@@ -5,6 +5,7 @@ const tsconfigRootDir = import.meta.dirname;
 
 const handwrittenFiles = [
 	'packages/*/src/**/*.ts',
+	'packages/*/src/**/*.tsx',
 	'packages/*/test/**/*.ts',
 	'packages/*/scripts/**/*.mjs',
 	'packages/*/*.config.{js,mjs,ts}',
