@@ -305,20 +305,37 @@ export const summarizeDryRun = (
 				? statusError.message
 				: null;
 	const balanceChanges = Array.isArray(transactionRecord.balanceChanges)
-		? transactionRecord.balanceChanges.filter(isRecord).map((change) => ({
-				address: String(change.address ?? ''),
-				coinType: String(change.coinType ?? ''),
-				amount:
-					formatAmount(change.amount, context.coinDecimals) ??
-					({ raw: String(change.amount ?? ''), display: '' } as const),
-			}))
+		? transactionRecord.balanceChanges.reduce<DryRunSummary['balanceChanges']>(
+				(changes, change) => {
+					if (isRecord(change)) {
+						changes.push({
+							address: String(change.address ?? ''),
+							coinType: String(change.coinType ?? ''),
+							amount:
+								formatAmount(change.amount, context.coinDecimals) ??
+								({ raw: String(change.amount ?? ''), display: '' } as const),
+						});
+					}
+					return changes;
+				},
+				[],
+			)
 		: [];
 	const events = Array.isArray(transactionRecord.events)
-		? transactionRecord.events
-				.map((event) =>
-					summarizeDryRunEvent(event, client, context.coinDecimals),
-				)
-				.filter((event): event is DryRunEventSummary => event !== null)
+		? transactionRecord.events.reduce<DryRunEventSummary[]>(
+				(summaries, event) => {
+					const summary = summarizeDryRunEvent(
+						event,
+						client,
+						context.coinDecimals,
+					);
+					if (summary) {
+						summaries.push(summary);
+					}
+					return summaries;
+				},
+				[],
+			)
 		: [];
 
 	return {

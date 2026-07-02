@@ -1,12 +1,15 @@
 {
 	"extends": "../../tsconfig.shared.json",
 	"compilerOptions": {
+		"jsx": "react-jsx",
 		"outDir": "dist",
 		"rootDir": "."
 	},
 	"include": [
 		"src/**/*.ts",
+		"src/**/*.tsx",
 		"test/**/*.ts",
+		"doctor.config.ts",
 		"tsdown.config.ts",
 		"vite.config.ts"
 	]

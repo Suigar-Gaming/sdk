@@ -47,6 +47,7 @@
 		"clean": "rm -rf dist",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
+		"doctor": "react-doctor --yes",
 		"eslint": "eslint .",
 		"eslint:fix": "eslint . --fix",
 		"prettier": "prettier --check --ignore-unknown .",
@@ -71,13 +72,23 @@
 		"@modelcontextprotocol/sdk": "1.29.0",
 		"@mysten/sui": "catalog:mysten",
 		"@suigar/sdk": "workspace:^",
+		"clsx": "catalog:frontend",
+		"react": "catalog:frontend",
+		"react-dom": "catalog:frontend",
+		"tailwind-merge": "catalog:frontend",
 		"zod": "4.4.3"
 	},
 	"devDependencies": {
 		"@types/node": "catalog:typescript",
+		"@types/react": "catalog:typescript",
+		"@types/react-dom": "catalog:typescript",
+		"@tailwindcss/vite": "catalog:tooling",
+		"@vitejs/plugin-react": "^6.0.3",
+		"react-doctor": "catalog:tooling",
+		"tailwindcss": "catalog:tooling",
 		"tsdown": "catalog:tooling",
 		"typescript": "catalog:typescript6",
-		"vite": "^8.1.1",
+		"vite": "^8.1.2",
 		"vite-plugin-singlefile": "^2.3.3",
 		"vitest": "catalog:test"
 	}
