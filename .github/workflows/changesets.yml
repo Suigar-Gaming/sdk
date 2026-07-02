@@ -28,13 +28,19 @@ jobs:
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Create release PR or publish
+      - name: Create release PR
+        id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm changeset:version
-          publish: pnpm release
           commit: 'ci: version packages'
           title: 'ci: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish packages
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ''
