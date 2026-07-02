@@ -6,7 +6,7 @@ import packageJson from './package.json' with { type: 'json' };
 
 export default defineConfig({
 	define: {
-		__SUIGAR_MCP_VERSION__: packageJson.version,
+		__SUIGAR_MCP_VERSION__: JSON.stringify(packageJson.version),
 	},
 	test: {
 		environment: 'node',

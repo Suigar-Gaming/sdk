@@ -11,23 +11,23 @@ import type { DefinitionEntry } from '../lib/types.js';
 import { cn } from '../lib/utils.js';
 
 const panelClassName =
-	'grid min-w-0 content-start gap-3 rounded-lg border border-border/70 bg-card/88 p-3.5 text-card-foreground shadow-[0_14px_28px_-24px_color-mix(in_srgb,var(--primary-shadow)_65%,transparent)]';
+	'grid min-w-0 content-start gap-3 rounded-lg border border-border/70 bg-card/88 p-3.5 text-card-foreground';
 
 const valueClassName =
 	'flex min-h-8 min-w-0 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-md border border-border/70 bg-background/75 px-2.5 py-1 font-mono text-[13px] leading-5 text-foreground';
 
 const listItemClassNames = {
 	errors:
-		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-[13px] font-semibold leading-5 text-foreground shadow-[0_10px_24px_-20px_color-mix(in_srgb,var(--destructive-shadow)_70%,transparent)]',
+		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-[13px] font-semibold leading-5 text-foreground',
 	notes:
-		'rounded-lg border border-l-4 border-secondary/65 bg-secondary/12 px-3 py-2 text-[13px] font-semibold leading-5 text-foreground shadow-[0_10px_24px_-20px_color-mix(in_srgb,var(--secondary-shadow)_70%,transparent)]',
+		'rounded-lg border border-l-4 border-secondary/65 bg-secondary/12 px-3 py-2 text-[13px] font-semibold leading-5 text-foreground',
 	targets:
 		'min-w-0 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-lg border border-border/70 bg-background/75 px-3 py-2 font-mono text-xs leading-5 text-foreground',
 } as const;
 
 export function Header({ status }: { status: string }) {
 	return (
-		<header className="flex min-w-0 flex-col gap-4 rounded-lg border border-border/70 bg-card/88 p-4 shadow-[0_16px_34px_-26px_color-mix(in_srgb,var(--primary-shadow)_70%,transparent)] sm:flex-row sm:items-center sm:justify-between">
+		<header className="flex min-w-0 flex-col gap-4 rounded-lg border border-border/70 bg-card/88 p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
 				<p className="mb-1 text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
 					Suigar MCP
@@ -36,7 +36,7 @@ export function Header({ status }: { status: string }) {
 					Transaction Inspector
 				</h1>
 			</div>
-			<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-[13px] leading-tight font-extrabold text-primary-foreground shadow-[0_8px_18px_-12px_color-mix(in_srgb,var(--primary-shadow)_90%,transparent)] sm:shrink-0">
+			<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-[13px] leading-tight font-extrabold text-primary-foreground sm:shrink-0">
 				{status}
 			</div>
 		</header>
@@ -90,9 +90,9 @@ export function DefinitionList({ entries }: { entries: DefinitionEntry[] }) {
 							className={cn(
 								valueClassName,
 								tone === 'success' &&
-									'border-success/70 bg-success/12 text-foreground shadow-[0_8px_18px_-14px_color-mix(in_srgb,var(--success-shadow)_70%,transparent)]',
+									'border-success/70 bg-success/12 text-foreground',
 								tone === 'error' &&
-									'border-destructive/70 bg-destructive/10 text-foreground shadow-[0_8px_18px_-14px_color-mix(in_srgb,var(--destructive-shadow)_70%,transparent)]',
+									'border-destructive/70 bg-destructive/10 text-foreground',
 							)}
 							title={text}
 						>

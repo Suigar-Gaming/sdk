@@ -34,6 +34,9 @@ const initialState: InspectorState = {
 	errors: [],
 };
 
+const shellClassName =
+	'mx-auto grid min-h-dvh max-w-6xl content-start gap-4 bg-background p-3.5 text-foreground sm:p-4.5';
+
 const textErrors = (result: CallToolResult) =>
 	result.content?.flatMap((item) =>
 		item.type === 'text' && item.text ? [item.text] : [],
@@ -208,7 +211,7 @@ export function SuigarInspectorApp() {
 
 	if (viewState.error) {
 		return (
-			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
+			<main className={shellClassName}>
 				<Header status="Error" />
 				<ListPanel
 					className="errors"
@@ -221,15 +224,19 @@ export function SuigarInspectorApp() {
 
 	if (!viewState.hostContext) {
 		return (
-			<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
+			<main className={shellClassName}>
 				<Header status="Connecting" />
-				<RawPayload payload={viewState.inspector.payload} />
+				<Panel title="Connection">
+					<p className="text-[13px] leading-5 font-semibold text-muted-foreground">
+						Waiting for host context.
+					</p>
+				</Panel>
 			</main>
 		);
 	}
 
 	return (
-		<main className="mx-auto grid min-h-dvh max-w-6xl gap-4 bg-background p-3.5 text-foreground sm:p-4.5">
+		<main className={shellClassName}>
 			<Header status={viewState.inspector.status} />
 
 			<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">

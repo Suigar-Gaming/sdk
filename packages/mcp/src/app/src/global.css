@@ -6,39 +6,27 @@
 	:root {
 		color-scheme: light;
 		--background: #e4faff;
-		--background-shadow: #082f4c;
 		--foreground: #072744;
 		--card: #c8f1fb;
-		--card-shadow: #90cada;
 		--card-foreground: #072744;
 		--popover: #d6f4fb;
-		--popover-shadow: #99cede;
 		--popover-foreground: #072744;
 		--primary: #ffbf49;
-		--primary-shadow: #b87b0f;
 		--primary-foreground: #321c00;
 		--secondary: #1fa8d8;
-		--secondary-shadow: #19779c;
 		--secondary-foreground: #03131f;
 		--muted: #d4e6ef;
-		--muted-shadow: #a3bac8;
 		--muted-foreground: #33546b;
 		--accent: #a5e0f0;
-		--accent-shadow: #71b6c9;
 		--accent-foreground: #06263c;
 		--success: #33b98d;
-		--success-shadow: #1f8466;
 		--success-foreground: #041f15;
 		--warning: #ffb44d;
-		--warning-shadow: #bf7b14;
 		--warning-foreground: #351f00;
 		--destructive: #de5978;
-		--destructive-shadow: #a73953;
 		--destructive-foreground: #2c0815;
 		--border: #7eb2c7;
-		--border-shadow: #4d758a;
 		--ring: #ffbf49;
-		--ring-shadow: #b87b0f;
 		--font-sans:
 			ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
 			sans-serif;
@@ -54,39 +42,27 @@
 	.dark {
 		color-scheme: dark;
 		--background: #030914;
-		--background-shadow: #0f172a;
 		--foreground: #edf4ff;
 		--card: #0f1b2f;
-		--card-shadow: #070f1f;
 		--card-foreground: #edf4ff;
 		--popover: #10203a;
-		--popover-shadow: #081220;
 		--popover-foreground: #edf4ff;
 		--primary: #ffb547;
-		--primary-shadow: #c4730d;
 		--primary-foreground: #2d1500;
 		--secondary: #4cc5ff;
-		--secondary-shadow: #1f9ad6;
 		--secondary-foreground: #030914;
 		--muted: #1a2a44;
-		--muted-shadow: #122033;
 		--muted-foreground: #9db3d6;
 		--accent: #173155;
-		--accent-shadow: #0f2139;
 		--accent-foreground: #edf4ff;
 		--success: #45c480;
-		--success-shadow: #2a8c57;
 		--success-foreground: #03150a;
 		--warning: #facc15;
-		--warning-shadow: #c08401;
 		--warning-foreground: #1f1200;
 		--destructive: #ff5f74;
-		--destructive-shadow: #c81d3a;
 		--destructive-foreground: #130104;
 		--border: #1f2d47;
-		--border-shadow: #101a30;
 		--ring: #ffb547;
-		--ring-shadow: #c4730d;
 	}
 
 	html {
@@ -105,39 +81,27 @@
 
 @theme inline {
 	--color-background: var(--background);
-	--color-background-shadow: var(--background-shadow);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
-	--color-card-shadow: var(--card-shadow);
 	--color-card-foreground: var(--card-foreground);
 	--color-popover: var(--popover);
-	--color-popover-shadow: var(--popover-shadow);
 	--color-popover-foreground: var(--popover-foreground);
 	--color-primary: var(--primary);
-	--color-primary-shadow: var(--primary-shadow);
 	--color-primary-foreground: var(--primary-foreground);
 	--color-secondary: var(--secondary);
-	--color-secondary-shadow: var(--secondary-shadow);
 	--color-secondary-foreground: var(--secondary-foreground);
 	--color-muted: var(--muted);
-	--color-muted-shadow: var(--muted-shadow);
 	--color-muted-foreground: var(--muted-foreground);
 	--color-accent: var(--accent);
-	--color-accent-shadow: var(--accent-shadow);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-success: var(--success);
-	--color-success-shadow: var(--success-shadow);
 	--color-success-foreground: var(--success-foreground);
 	--color-warning: var(--warning);
-	--color-warning-shadow: var(--warning-shadow);
 	--color-warning-foreground: var(--warning-foreground);
 	--color-destructive: var(--destructive);
-	--color-destructive-shadow: var(--destructive-shadow);
 	--color-destructive-foreground: var(--destructive-foreground);
 	--color-border: var(--border);
-	--color-border-shadow: var(--border-shadow);
 	--color-ring: var(--ring);
-	--color-ring-shadow: var(--ring-shadow);
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
 	--radius-lg: var(--radius);
