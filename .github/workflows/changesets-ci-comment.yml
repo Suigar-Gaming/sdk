@@ -58,11 +58,11 @@ jobs:
             const marker = '<!-- codex:changesets-warning -->';
             const body = [
               marker,
-              'This pull request changes package source files or SDK-affecting pnpm catalogs but does not include a changeset file in `.changeset/`.',
+              '⚠️ 🦋 **Changesets heads-up:** This PR touches one or more publishable Suigar npm packages, but it does not include a changeset yet.',
               '',
-              'Changes under `catalogs.mysten` or `catalogs.typescript` in `pnpm-workspace.yaml` affect `@suigar/sdk` indirectly and require a changeset.',
+              'Run `pnpm changeset` from the repository root and choose the package(s) whose published behavior changed. If this is only docs, tests, or internal CI cleanup, no release note is needed and you can leave this warning alone.',
               '',
-              'Add a changeset with `pnpm changeset` so this PR can merge.',
+              'The warning disappears automatically after a changeset is added to the pull request.',
             ].join('\n');
 
             const comments = await github.paginate(github.rest.issues.listComments, {
