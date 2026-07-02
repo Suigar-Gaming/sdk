@@ -14,7 +14,7 @@ export default defineConfig({
 		outDir: '../../dist/app',
 	},
 	define: {
-		__SUIGAR_MCP_APP_VERSION__: packageJson.version,
+		__SUIGAR_MCP_APP_VERSION__: JSON.stringify(packageJson.version),
 	},
 	plugins: [react(), tailwindcss(), viteSingleFile()],
 });

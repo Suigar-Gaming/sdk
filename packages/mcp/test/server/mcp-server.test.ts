@@ -9,9 +9,7 @@ import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
 
 describe('MCP server registration', () => {
 	it('registers all public Suigar MCP tools', () => {
-		const server = createSuigarMcpServer({
-			version: '0.0.0-test',
-		}) as unknown as {
+		const server = createSuigarMcpServer() as unknown as {
 			_registeredTools: Record<string, unknown>;
 			_registeredResources: Record<string, unknown>;
 		};
@@ -36,7 +34,7 @@ describe('MCP server registration', () => {
 	});
 
 	it('exposes all public tools through MCP tools/list', async () => {
-		const server = createSuigarMcpServer({ version: '0.0.0-test' });
+		const server = createSuigarMcpServer();
 		const client = new Client({ name: 'suigar-test', version: '0.0.0' });
 		const [clientTransport, serverTransport] =
 			InMemoryTransport.createLinkedPair();
