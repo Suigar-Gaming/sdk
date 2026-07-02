@@ -36,7 +36,12 @@ import {
 	createSuigarMcpAppResourceResult,
 	SUIGAR_MCP_APP_RESOURCE_URI,
 } from './app-resource.js';
-import { packageJson } from './package-info.js';
+
+declare const __SUIGAR_MCP_VERSION__: string;
+
+export type CreateSuigarMcpServerOptions = {
+	version?: string;
+};
 
 const errorText = (error: unknown) => {
 	if (error instanceof Error) {
@@ -68,10 +73,12 @@ const withToolErrors =
 		}
 	};
 
-export const createSuigarMcpServer = () => {
+export const createSuigarMcpServer = ({
+	version = __SUIGAR_MCP_VERSION__,
+}: CreateSuigarMcpServerOptions = {}) => {
 	const server = new McpServer({
 		name: 'suigar',
-		version: packageJson.version,
+		version,
 	});
 
 	server.registerTool(

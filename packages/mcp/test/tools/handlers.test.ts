@@ -3,8 +3,8 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
-import { resolveOwnerAddress } from '../src/runtime/client.js';
-import type { SuigarClientBundle } from '../src/runtime/client.js';
+import { resolveOwnerAddress } from '../../src/runtime/client.js';
+import type { SuigarClientBundle } from '../../src/runtime/client.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -16,8 +16,8 @@ import {
 	buildWheelTransactionTool,
 	readConfigTool,
 	readGameMetadataTool,
-} from '../src/tools/index.js';
-import { toolOutputSchema } from '../src/tools/schemas.js';
+} from '../../src/tools/handlers.js';
+import { toolOutputSchema } from '../../src/tools/schemas.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';

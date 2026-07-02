@@ -6,7 +6,7 @@ import {
 	extractDryRunErrors,
 	summarizeDryRun,
 	toJsonValue,
-} from '../src/runtime/dry-run.js';
+} from '../../src/runtime/dry-run.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';

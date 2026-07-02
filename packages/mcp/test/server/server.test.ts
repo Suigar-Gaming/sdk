@@ -4,15 +4,17 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { describe, expect, it } from 'vitest';
-import { createSuigarMcpServer } from '../src/server.js';
+import { createSuigarMcpServer } from '../../src/server.js';
 import {
 	createSuigarMcpAppResourceResult,
 	SUIGAR_MCP_APP_RESOURCE_URI,
-} from '../src/server/app-resource.js';
+} from '../../src/server/app-resource.js';
 
 describe('MCP server registration', () => {
 	it('registers all public Suigar MCP tools', () => {
-		const server = createSuigarMcpServer() as unknown as {
+		const server = createSuigarMcpServer({
+			version: '0.0.0-test',
+		}) as unknown as {
 			_registeredTools: Record<string, unknown>;
 			_registeredResources: Record<string, unknown>;
 		};
@@ -37,7 +39,7 @@ describe('MCP server registration', () => {
 	});
 
 	it('exposes all public tools through MCP tools/list', async () => {
-		const server = createSuigarMcpServer();
+		const server = createSuigarMcpServer({ version: '0.0.0-test' });
 		const client = new Client({ name: 'suigar-test', version: '0.0.0' });
 		const [clientTransport, serverTransport] =
 			InMemoryTransport.createLinkedPair();
