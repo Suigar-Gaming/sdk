@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - '.github/actions/setup-node-pnpm/action.yml'
-      - '.github/workflows/turborepo.yml'
+      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/workflows/turborepo.yaml'
       - 'playground/**'
       - 'packages/**'
       - 'package.json'
@@ -16,8 +16,8 @@ on:
       - 'turbo.json'
   pull_request:
     paths:
-      - '.github/actions/setup-node-pnpm/action.yml'
-      - '.github/workflows/turborepo.yml'
+      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/workflows/turborepo.yaml'
       - 'playground/**'
       - 'packages/**'
       - 'package.json'
