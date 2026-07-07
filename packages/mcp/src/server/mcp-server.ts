@@ -4,8 +4,11 @@
 import { registerAppResource } from '@modelcontextprotocol/ext-apps/server';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { readConfigTool } from '../tools/handlers.js';
-import { readConfigInputSchema, toolOutputSchema } from '../tools/schemas.js';
+import {
+	readConfigInputSchema,
+	readConfigTool,
+	toolOutputSchema,
+} from '../tools/index.js';
 import {
 	createSuigarMcpAppResourceResult,
 	SUIGAR_MCP_APP_RESOURCE_URI,

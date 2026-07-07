@@ -11,8 +11,7 @@ import {
 	normalizeSuiAddress,
 	normalizeSuiNSName,
 } from '@mysten/sui/utils';
-import { suigar } from '@suigar/sdk';
-import type { SuigarClient, SuigarNetwork } from '@suigar/sdk';
+import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 import {
 	extractDryRunErrors,

@@ -7,8 +7,8 @@ import {
 	normalizeNetwork,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
+	type SuigarClientBundle,
 } from '../../src/runtime/client.js';
-import type { SuigarClientBundle } from '../../src/runtime/client.js';
 import type { ResolvedMcpConfig } from '../../src/runtime/types.js';
 
 const owner =

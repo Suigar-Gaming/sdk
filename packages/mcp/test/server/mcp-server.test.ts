@@ -5,8 +5,8 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { describe, expect, it } from 'vitest';
-import { createSuigarMcpServer } from '../../src/server.js';
 import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
+import { createSuigarMcpServer } from '../../src/server/mcp-server.js';
 
 const publicToolNames = [
 	'build_coinflip_transaction',

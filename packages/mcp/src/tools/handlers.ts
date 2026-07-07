@@ -2,29 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mysten/sui/transactions';
-import { GAMES } from '@suigar/sdk/games';
-import type {
-	CoinSide,
-	Game,
-	PvPCoinflipAction,
-	StandardGame,
+import {
+	GAMES,
+	type CoinSide,
+	type Game,
+	type PvPCoinflipAction,
+	type StandardGame,
 } from '@suigar/sdk/games';
 import {
 	buildTransactionResult,
 	createSuigarClient,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
-} from '../runtime/client.js';
-import type { SuigarClientBundle } from '../runtime/client.js';
-import type {
-	BuilderMode,
-	JsonValue,
-	ReadConfigResult,
-	ReadGameMetadataResult,
-	ReadOnlyPlan,
-	ResolvedMcpConfig,
 	ToolTextResult,
-} from '../runtime/types.js';
+	type BuilderMode,
+	type JsonValue,
+	type ReadConfigResult,
+	type ReadGameMetadataResult,
+	type ReadOnlyPlan,
+	type ResolvedMcpConfig,
+	type SuigarClientBundle,
+} from '../runtime/index.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,

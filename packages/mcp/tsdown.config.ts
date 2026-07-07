@@ -8,7 +8,6 @@ export default defineConfig({
 	entry: {
 		bin: 'src/bin.ts',
 		index: 'src/index.ts',
-		server: 'src/server.ts',
 	},
 	define: {
 		__SUIGAR_MCP_VERSION__: JSON.stringify(packageJson.version),
