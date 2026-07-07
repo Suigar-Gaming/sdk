@@ -10,8 +10,8 @@
 		"start": "next start",
 		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm eslint && pnpm prettier",
-		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix",
+		"lint": "pnpm run eslint && pnpm run prettier",
+		"lint:fix": "pnpm run eslint:fix && pnpm run prettier:fix",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes"
 	},

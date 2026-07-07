@@ -63,7 +63,7 @@ ensure task dependencies are run first.
 
 ```bash
 pnpm install
-pnpm build
+pnpm run build
 ```
 
 Dependency install scripts are disabled by default in `pnpm-workspace.yaml`. If
@@ -74,9 +74,9 @@ blocked from resolving untrusted git or tarball URLs.
 ### Building
 
 ```bash
-pnpm build
+pnpm run build
 # or
-pnpm turbo build
+pnpm turbo run build
 ```
 
 ### Unit Tests
@@ -84,17 +84,17 @@ pnpm turbo build
 For unit tests:
 
 ```bash
-pnpm test
+pnpm run test
 # or
-pnpm turbo test
+pnpm turbo run test
 ```
 
 ### Type Checking
 
 ```bash
-pnpm typecheck
+pnpm run typecheck
 # or
-pnpm turbo typecheck
+pnpm turbo run typecheck
 ```
 
 ### Linting
@@ -102,20 +102,20 @@ pnpm turbo typecheck
 This repo uses ESLint and Prettier for linting.
 
 ```bash
-pnpm lint
+pnpm run lint
 ```
 
 You can automatically fix many lint issues by running:
 
 ```bash
-pnpm lint:fix
+pnpm run lint:fix
 ```
 
 To run ESLint and Prettier individually, use:
 
 ```bash
-pnpm eslint
-pnpm prettier
-pnpm eslint:fix
-pnpm prettier:fix
+pnpm run eslint
+pnpm run prettier
+pnpm run eslint:fix
+pnpm run prettier:fix
 ```

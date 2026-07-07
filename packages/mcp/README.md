@@ -34,7 +34,7 @@ Use the stdio server from an MCP client:
 For local workspace development:
 
 ```bash
-pnpm --dir packages/mcp start:local
+pnpm --dir packages/mcp run start:local
 ```
 
 This builds the local `@suigar/sdk` workspace package first, then builds and

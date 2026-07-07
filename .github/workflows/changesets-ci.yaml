@@ -53,7 +53,7 @@ jobs:
             echo
             echo "Changed package(s): $CHANGED_PACKAGES"
             echo
-            echo "Add a changeset with pnpm changeset so this PR can merge."
+            echo "Add a changeset with `pnpm run changeset` so this PR can merge."
           } > missing-changeset.txt
 
       - name: Upload missing changeset artifact
@@ -68,9 +68,9 @@ jobs:
       - name: Validate versioning
         run: |
           if [ "$(jq -r '.mode // empty' .changeset/pre.json 2>/dev/null)" = "pre" ]; then
-            pnpm changeset:version
+            pnpm run changeset:version
           else
-            pnpm changeset:version --snapshot changesets-ci
+            pnpm run changeset:version --snapshot changesets-ci
           fi
 
       - name: Fail when changeset is missing

@@ -42,28 +42,29 @@
 		"node": "^22.18.0 || >=24.0.0"
 	},
 	"scripts": {
-		"build": "pnpm clean && pnpm codegen && tsdown",
-		"build:ci": "pnpm clean && tsdown",
+		"build": "pnpm run clean && pnpm run codegen && tsdown",
+		"build:ci": "pnpm run clean && tsdown",
 		"clean": "rm -rf dist",
-		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm lint:fix",
+		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"eslint": "eslint .",
 		"eslint:fix": "eslint . --fix",
 		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm eslint && pnpm prettier",
-		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix"
+		"lint": "pnpm run eslint && pnpm run prettier",
+		"lint:fix": "pnpm run eslint:fix && pnpm run prettier:fix"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Suigar-Gaming/sdk.git"
+		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
+		"directory": "packages/sdk"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/sdk/issues"
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
 	},
 	"homepage": "https://docs.suigar.com/sdk",
 	"peerDependencies": {

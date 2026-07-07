@@ -58,9 +58,9 @@ pnpm turbo run build --filter='./playground'
 Useful local checks:
 
 ```bash
-pnpm --dir playground lint
-pnpm --dir playground lint:fix
-pnpm --dir playground typecheck
+pnpm --dir playground run lint
+pnpm --dir playground run lint:fix
+pnpm --dir playground run typecheck
 ```
 
 ## Notes

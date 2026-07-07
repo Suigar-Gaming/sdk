@@ -5,10 +5,11 @@
 			"dependsOn": ["^build:ci"],
 			"outputs": []
 		},
-		"format": {
-			"cache": false
-		},
 		"lint": {
+			"cache": false,
+			"outputs": []
+		},
+		"lint:fix": {
 			"cache": false,
 			"outputs": []
 		},
