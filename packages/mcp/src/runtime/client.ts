@@ -36,7 +36,7 @@ const DEFAULT_PROVIDER_URLS = {
 	testnet: 'https://fullnode.testnet.sui.io:443',
 } as const satisfies Record<SuigarNetwork, string>;
 
-export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
+const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
 export const normalizeNetwork = (
 	network: string | undefined = DEFAULT_NETWORK,
@@ -130,7 +130,7 @@ export const resolveOwnerAddress = async (
 	return normalizeSuiAddress(resolvedAddress);
 };
 
-export const dryRunTransaction = async (
+const dryRunTransaction = async (
 	transaction: Transaction,
 	client: ReturnType<typeof createSuigarClient>['client'],
 ): Promise<RawDryRunResult> =>
@@ -143,7 +143,7 @@ export const dryRunTransaction = async (
 		},
 	});
 
-export const summarizeTransaction = (
+const summarizeTransaction = (
 	transaction: Transaction,
 	context: {
 		game?: Game;

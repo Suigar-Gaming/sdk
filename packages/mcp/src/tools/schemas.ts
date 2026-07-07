@@ -5,7 +5,7 @@ import { z } from 'zod/v4';
 import { SUPPORTED_SUI_NETWORKS } from '@suigar/sdk';
 import { GAMES } from '@suigar/sdk/games';
 
-export const builderModes = ['build', 'dry-run', 'read-only'] as const;
+const builderModes = ['build', 'dry-run', 'read-only'] as const;
 
 const addressDescription =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
@@ -25,7 +25,7 @@ const coinMetadataSchema = z
 	})
 	.strict();
 
-export const configOverridesSchema = z
+const configOverridesSchema = z
 	.object({
 		packageIds: z
 			.object({
@@ -97,12 +97,12 @@ export const readGameMetadataInputSchema = configInputSchema
 	})
 	.strict();
 
-export const metadataSchema = z.record(
+const metadataSchema = z.record(
 	z.string(),
 	z.union([z.string(), z.number(), z.boolean()]),
 );
 
-export const commonBuildInputSchema = configInputSchema
+const commonBuildInputSchema = configInputSchema
 	.extend({
 		mode: z
 			.enum(builderModes)
@@ -126,7 +126,7 @@ export const commonBuildInputSchema = configInputSchema
 	})
 	.strict();
 
-export const stakeBuildInputSchema = commonBuildInputSchema
+const stakeBuildInputSchema = commonBuildInputSchema
 	.extend({
 		stake: currencyAmountSchema
 			.optional()
