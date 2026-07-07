@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- 9d97069: Update package repository and issue tracker metadata to point at the current ts-sdks repository.
+
 ## 2.0.0-beta.22
 
 ### Major Changes
