@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 0.2.0-beta.3
+
+### Patch Changes
+
+- 9cc0a51: Update the MCP App build tooling to use the refreshed Vite dependency set.
+
 ## 0.2.0-beta.2
 
 ### Patch Changes
