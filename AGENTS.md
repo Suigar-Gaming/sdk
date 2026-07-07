@@ -15,30 +15,30 @@ This repository contains the TypeScript SDK workspace for Suigar v2 on Sui. The 
 pnpm install
 
 # Generate bindings and build the package
-pnpm --dir packages/sdk build
+pnpm --dir packages/sdk run build
 
 # Build without regenerating contract bindings
-pnpm --dir packages/sdk build:ci
+pnpm --dir packages/sdk run build:ci
 
 # Build the MCP package and bundled MCP App
-pnpm --dir packages/mcp build
+pnpm --dir packages/mcp run build
 
 # Build and run the local stdio MCP server for manual client testing
-pnpm --dir packages/mcp start:local
+pnpm --dir packages/mcp run start:local
 
 # Regenerate Move contract bindings only
-pnpm --dir packages/sdk codegen
+pnpm --dir packages/sdk run codegen
 ```
 
 ### Testing
 
 ```bash
 # Run the full test suite
-pnpm --dir packages/sdk test
+pnpm --dir packages/sdk run test
 
 # Run type checking
-pnpm --dir packages/sdk typecheck
-pnpm --dir packages/mcp typecheck
+pnpm --dir packages/sdk run typecheck
+pnpm --dir packages/mcp run typecheck
 
 # Run a specific vitest file
 pnpm --dir packages/sdk exec vitest run test/unit/transactions.test.ts
@@ -51,23 +51,23 @@ pnpm --dir packages/sdk exec vitest run -t "builds a coinflip transaction with t
 
 ```bash
 # Check lint and formatting
-pnpm lint
+pnpm run lint
 
 # Auto-fix lint and formatting issues
-pnpm lint:fix
+pnpm run lint:fix
 ```
 
 ### Package Management
 
 ```bash
 # Create a changeset
-pnpm changeset
+pnpm run changeset
 
 # Apply version updates from changesets
-pnpm changeset:version
+pnpm run changeset:version
 
 # Publish release changes
-pnpm release
+pnpm run release
 ```
 
 ## Architecture
@@ -231,9 +231,9 @@ It should stay thin over `@suigar/sdk` and `@mysten/sui`.
 1. Update or add SDK code in `packages/sdk/src/`
 2. If the branch modifies any file under `packages/sdk/src/`, create a `.changeset/*.md` file once for that branch as soon as the first SDK source change is made
 3. Reuse only that branch-created changeset for later `packages/sdk/src/` edits instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
-4. Regenerate code with `pnpm --dir packages/sdk codegen` if contract bindings or package sources changed
-5. Run `pnpm --dir packages/sdk test`
-6. Run `pnpm --dir packages/sdk typecheck`
+4. Regenerate code with `pnpm --dir packages/sdk run codegen` if contract bindings or package sources changed
+5. Run `pnpm --dir packages/sdk run test`
+6. Run `pnpm --dir packages/sdk run typecheck`
 7. Add or update the current branch changeset when the user-visible package behavior changes, keeping the note scoped to `@suigar/sdk` package changes only
 
 Documentation is part of the deliverable:

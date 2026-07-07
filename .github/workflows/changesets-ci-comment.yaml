@@ -60,7 +60,7 @@ jobs:
               marker,
               '⚠️ 🦋 **Changesets heads-up:** This PR touches one or more publishable Suigar npm packages, but it does not include a changeset yet.',
               '',
-              'Run `pnpm changeset` from the repository root and choose the package(s) whose published behavior changed. If this is only docs, tests, or internal CI cleanup, no release note is needed and you can leave this warning alone.',
+              'Run `pnpm run changeset` from the repository root and choose the package(s) whose published behavior changed. If this is only docs, tests, or internal CI cleanup, no release note is needed and you can leave this warning alone.',
               '',
               'The warning disappears automatically after a changeset is added to the pull request.',
             ].join('\n');

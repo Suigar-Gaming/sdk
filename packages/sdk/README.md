@@ -627,26 +627,26 @@ From the repository root:
 
 ```bash
 pnpm install
-pnpm --dir packages/sdk build
-pnpm --dir packages/sdk typecheck
-pnpm --dir packages/sdk test
+pnpm --dir packages/sdk run build
+pnpm --dir packages/sdk run typecheck
+pnpm --dir packages/sdk run test
 ```
 
 Build without regenerating contract bindings:
 
 ```bash
-pnpm --dir packages/sdk build:ci
+pnpm --dir packages/sdk run build:ci
 ```
 
 Regenerate Move contract bindings only:
 
 ```bash
-pnpm --dir packages/sdk codegen
+pnpm --dir packages/sdk run codegen
 ```
 
 Run linting and formatting checks:
 
 ```bash
-pnpm --dir packages/sdk lint
-pnpm --dir packages/sdk lint:fix
+pnpm --dir packages/sdk run lint
+pnpm --dir packages/sdk run lint:fix
 ```
