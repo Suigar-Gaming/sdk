@@ -25,13 +25,9 @@
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",
 		"changeset:version": "changeset version",
-		"release": "pnpm turbo run build:ci --filter='./packages/*' && changeset publish",
-		"eslint": "eslint .",
-		"eslint:fix": "eslint . --fix",
-		"prettier": "prettier --check --ignore-unknown .",
-		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm eslint && pnpm prettier",
-		"lint:fix": "pnpm eslint:fix && pnpm prettier:fix"
+		"release": "turbo build:ci --filter='./packages/*' && changeset publish",
+		"lint": "turbo lint",
+		"lint:fix": "turbo lint:fix"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.0",

@@ -103,19 +103,23 @@ This repo uses ESLint and Prettier for linting.
 
 ```bash
 pnpm lint
+# or
+pnpm turbo lint
 ```
 
 You can automatically fix many lint issues by running:
 
 ```bash
 pnpm lint:fix
+# or
+pnpm turbo lint:fix
 ```
 
 To run ESLint and Prettier individually, use:
 
 ```bash
-pnpm eslint
-pnpm prettier
-pnpm eslint:fix
-pnpm prettier:fix
+pnpm --dir packages/sdk eslint
+pnpm --dir packages/sdk prettier
+pnpm --dir packages/sdk eslint:fix
+pnpm --dir packages/sdk prettier:fix
 ```
