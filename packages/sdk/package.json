@@ -57,7 +57,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git"
+		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
+		"directory": "packages/sdk"
 	},
 	"publishConfig": {
 		"access": "public"
