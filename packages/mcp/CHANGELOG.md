@@ -1,5 +1,13 @@
 # @suigar/mcp
 
+## 0.2.0-beta.4
+
+### Patch Changes
+
+- 9d97069: Update package repository and issue tracker metadata to point at the current ts-sdks repository.
+- Updated dependencies [9d97069]
+  - @suigar/sdk@2.0.0-beta.23
+
 ## 0.2.0-beta.3
 
 ### Patch Changes
