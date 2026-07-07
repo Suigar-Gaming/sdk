@@ -73,6 +73,8 @@ export const createSuigarMcpServer = () => {
 	const server = new McpServer({
 		name: 'suigar',
 		version: __SUIGAR_MCP_VERSION__,
+		description:
+			'Stdio MCP server and MCP App for inspecting Suigar config and building unsigned Suigar transactions on Sui.',
 	});
 
 	server.registerTool(
@@ -98,8 +100,18 @@ export const createSuigarMcpServer = () => {
 		'Suigar Transaction Inspector',
 		SUIGAR_MCP_APP_RESOURCE_URI,
 		{
+			title: 'Suigar Transaction Inspector',
 			description:
 				'Compact MCP App UI for inspecting Suigar config, transaction plans, summaries, dry-runs, and serialized bytes.',
+			_meta: {
+				ui: {
+					csp: {
+						connectDomains: [],
+						resourceDomains: [],
+					},
+					prefersBorder: true,
+				},
+			},
 		},
 		createSuigarMcpAppResourceResult,
 	);

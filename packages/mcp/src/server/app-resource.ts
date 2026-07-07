@@ -43,6 +43,7 @@ export const createSuigarMcpAppResourceResult = async () => ({
 						connectDomains: [],
 						resourceDomains: [],
 					},
+					prefersBorder: true,
 				},
 			},
 		},
