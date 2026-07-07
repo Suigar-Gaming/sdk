@@ -51,13 +51,13 @@ jobs:
       - name: Lint Playground
         run: pnpm turbo run lint --filter='./playground'
 
-      - name: Run package tests
+      - name: Run packages tests
         run: pnpm turbo run test --filter='./packages/*'
 
-      - name: Run package typecheck
+      - name: Run packages typecheck
         run: pnpm turbo run typecheck --filter='./packages/*'
 
-      - name: Run package builds
+      - name: Run packages builds
         run: pnpm turbo run build:ci --filter='./packages/*'
 
       - name: Run Playground typecheck
