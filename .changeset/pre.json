@@ -3,7 +3,7 @@
 	"tag": "beta",
 	"initialVersions": {
 		"@suigar/sdk": "2.0.0-beta.1",
-		"@suigar/playground": "0.1.0",
+		"@suigar/sdk-playground": "0.1.0",
 		"@suigar/mcp": "0.1.1"
 	},
 	"changesets": [

@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - '.github/actions/setup-node-pnpm/action.yml'
-      - '.github/workflows/deploy-playground-pages.yml'
+      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/workflows/deploy-playground-pages.yaml'
       - 'playground/**'
       - 'turbo.json'
   pull_request:
     paths:
-      - '.github/actions/setup-node-pnpm/action.yml'
-      - '.github/workflows/deploy-playground-pages.yml'
+      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/workflows/deploy-playground-pages.yaml'
       - 'playground/**'
       - 'turbo.json'
   workflow_dispatch:
