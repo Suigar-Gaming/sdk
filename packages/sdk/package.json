@@ -57,13 +57,13 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Suigar-Gaming/sdk.git"
+		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/sdk/issues"
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
 	},
 	"homepage": "https://docs.suigar.com/sdk",
 	"peerDependencies": {
