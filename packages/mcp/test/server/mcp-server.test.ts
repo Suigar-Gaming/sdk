@@ -8,26 +8,30 @@ import { describe, expect, it } from 'vitest';
 import { createSuigarMcpServer } from '../../src/server.js';
 import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
 
+const publicToolNames = [
+	'build_coinflip_transaction',
+	'build_limbo_transaction',
+	'build_plinko_transaction',
+	'build_pvp_coinflip_cancel_transaction',
+	'build_pvp_coinflip_create_transaction',
+	'build_pvp_coinflip_join_transaction',
+	'build_range_transaction',
+	'build_wheel_transaction',
+	'read_config',
+	'read_game_metadata',
+];
+
+const sorted = (values: string[]) => [...values].sort();
+
 describe('MCP server registration', () => {
-	it('registers all public Suigar MCP tools', () => {
+	it('wires the root config tool, inspector tools, and app resource', () => {
 		const server = createSuigarMcpServer() as unknown as {
 			_registeredTools: Record<string, unknown>;
 			_registeredResources: Record<string, unknown>;
 		};
 
-		expect(Object.keys(server._registeredTools).sort()).toEqual(
-			[
-				'build_coinflip_transaction',
-				'build_limbo_transaction',
-				'build_plinko_transaction',
-				'build_pvp_coinflip_cancel_transaction',
-				'build_pvp_coinflip_create_transaction',
-				'build_pvp_coinflip_join_transaction',
-				'build_range_transaction',
-				'build_wheel_transaction',
-				'read_config',
-				'read_game_metadata',
-			].sort(),
+		expect(sorted(Object.keys(server._registeredTools))).toEqual(
+			sorted(publicToolNames),
 		);
 		expect(Object.keys(server._registeredResources)).toContain(
 			SUIGAR_MCP_APP_RESOURCE_URI,
@@ -49,19 +53,8 @@ describe('MCP server registration', () => {
 			const serverVersion = client.getServerVersion();
 			const serverCapabilities = client.getServerCapabilities();
 
-			expect(result.tools.map((tool) => tool.name).sort()).toEqual(
-				[
-					'build_coinflip_transaction',
-					'build_limbo_transaction',
-					'build_plinko_transaction',
-					'build_pvp_coinflip_cancel_transaction',
-					'build_pvp_coinflip_create_transaction',
-					'build_pvp_coinflip_join_transaction',
-					'build_range_transaction',
-					'build_wheel_transaction',
-					'read_config',
-					'read_game_metadata',
-				].sort(),
+			expect(sorted(result.tools.map((tool) => tool.name))).toEqual(
+				sorted(publicToolNames),
 			);
 			expect(client.getServerCapabilities()?.tools).toEqual({
 				listChanged: true,

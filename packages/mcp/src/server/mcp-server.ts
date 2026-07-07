@@ -1,73 +1,22 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	registerAppResource,
-	registerAppTool,
-} from '@modelcontextprotocol/ext-apps/server';
+import { registerAppResource } from '@modelcontextprotocol/ext-apps/server';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import type { ToolTextResult } from '../runtime/types.js';
-import {
-	buildCoinflipTransactionTool,
-	buildLimboTransactionTool,
-	buildPlinkoTransactionTool,
-	buildPvpCoinflipCancelTransactionTool,
-	buildPvpCoinflipCreateTransactionTool,
-	buildPvpCoinflipJoinTransactionTool,
-	buildRangeTransactionTool,
-	buildWheelTransactionTool,
-	readConfigTool,
-	readGameMetadataTool,
-} from '../tools/handlers.js';
-import {
-	coinflipInputSchema,
-	configIdInputSchema,
-	limboInputSchema,
-	pvpCoinflipCancelInputSchema,
-	pvpCoinflipCreateInputSchema,
-	pvpCoinflipJoinInputSchema,
-	rangeInputSchema,
-	readConfigInputSchema,
-	readGameMetadataInputSchema,
-	toolOutputSchema,
-} from '../tools/schemas.js';
+import { readConfigTool } from '../tools/handlers.js';
+import { readConfigInputSchema, toolOutputSchema } from '../tools/schemas.js';
 import {
 	createSuigarMcpAppResourceResult,
 	SUIGAR_MCP_APP_RESOURCE_URI,
 } from './app-resource.js';
+import {
+	readOnlyToolAnnotations,
+	registerSuigarInspectorTools,
+	withToolErrors,
+} from './tool-registration.js';
 
 declare const __SUIGAR_MCP_VERSION__: string;
-
-const errorText = (error: unknown) => {
-	if (error instanceof Error) {
-		return `${error.name}: ${error.message}`;
-	}
-	return String(error);
-};
-
-const withToolErrors =
-	<TInput>(handler: (input: TInput) => Promise<ToolTextResult>) =>
-	async (
-		input: TInput,
-	): Promise<
-		| ToolTextResult
-		| { isError: true; content: [{ type: 'text'; text: string }] }
-	> => {
-		try {
-			return await handler(input);
-		} catch (error) {
-			return {
-				isError: true,
-				content: [
-					{
-						type: 'text',
-						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides. The MCP server only builds unsigned transactions and never signs or executes them.`,
-					},
-				],
-			};
-		}
-	};
 
 export const createSuigarMcpServer = () => {
 	const server = new McpServer({
@@ -85,12 +34,7 @@ export const createSuigarMcpServer = () => {
 				'Resolve Suigar SDK config for mainnet or testnet. Defaults to testnet.',
 			inputSchema: readConfigInputSchema,
 			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: true,
-				destructiveHint: false,
-				idempotentHint: true,
-				openWorldHint: false,
-			},
+			annotations: readOnlyToolAnnotations,
 		},
 		withToolErrors(readConfigTool),
 	);
@@ -120,187 +64,9 @@ export const createSuigarMcpServer = () => {
 		ui: {
 			resourceUri: SUIGAR_MCP_APP_RESOURCE_URI,
 		},
-	};
+	} as const;
 
-	registerAppTool(
-		server,
-		'read_game_metadata',
-		{
-			title: 'Read Suigar Game Metadata',
-			description:
-				'Read SDK-backed metadata for a supported Suigar game and coin type.',
-			inputSchema: readGameMetadataInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: true,
-				destructiveHint: false,
-				idempotentHint: true,
-				openWorldHint: false,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(readGameMetadataTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_coinflip_transaction',
-		{
-			title: 'Build Coinflip Transaction',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar coinflip transaction.',
-			inputSchema: coinflipInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildCoinflipTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_limbo_transaction',
-		{
-			title: 'Build Limbo Transaction',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar limbo transaction.',
-			inputSchema: limboInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildLimboTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_plinko_transaction',
-		{
-			title: 'Build Plinko Transaction',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar plinko transaction.',
-			inputSchema: configIdInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildPlinkoTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_wheel_transaction',
-		{
-			title: 'Build Wheel Transaction',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar wheel transaction.',
-			inputSchema: configIdInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildWheelTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_range_transaction',
-		{
-			title: 'Build Range Transaction',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar range transaction.',
-			inputSchema: rangeInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildRangeTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_pvp_coinflip_create_transaction',
-		{
-			title: 'Build PvP Coinflip Create',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar PvP coinflip lobby creation transaction.',
-			inputSchema: pvpCoinflipCreateInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildPvpCoinflipCreateTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_pvp_coinflip_join_transaction',
-		{
-			title: 'Build PvP Coinflip Join',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar PvP coinflip join transaction.',
-			inputSchema: pvpCoinflipJoinInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildPvpCoinflipJoinTransactionTool),
-	);
-
-	registerAppTool(
-		server,
-		'build_pvp_coinflip_cancel_transaction',
-		{
-			title: 'Build PvP Coinflip Cancel',
-			description:
-				'Build, dry-run, or inspect an unsigned Suigar PvP coinflip cancel transaction.',
-			inputSchema: pvpCoinflipCancelInputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: {
-				readOnlyHint: false,
-				destructiveHint: false,
-				idempotentHint: false,
-				openWorldHint: true,
-			},
-			_meta: appToolMeta,
-		},
-		withToolErrors(buildPvpCoinflipCancelTransactionTool),
-	);
+	registerSuigarInspectorTools(server, appToolMeta);
 
 	return server;
 };
