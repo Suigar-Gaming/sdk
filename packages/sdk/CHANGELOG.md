@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.24
+
+### Patch Changes
+
+- f1c285f: Align package compatibility with the latest supported Mysten libraries.
+
 ## 2.0.0-beta.23
 
 ### Patch Changes
