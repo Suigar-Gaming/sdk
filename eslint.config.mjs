@@ -34,8 +34,6 @@ export default tseslint.config(
 			},
 		},
 		rules: {
-			'no-undef': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
@@ -50,6 +48,7 @@ export default tseslint.config(
 		files: ['packages/*/src/contracts/**/*.ts'],
 		rules: {
 			'@typescript-eslint/no-empty-object-type': 'off',
+			'@typescript-eslint/no-explicit-any': 'off',
 		},
 	},
 	{
