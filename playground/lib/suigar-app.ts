@@ -55,8 +55,8 @@ export const DEFAULT_PVP_FORMS: PvPCoinflipForms = {
 	},
 };
 
-export function parseOptionalNumber(value: string) {
-	const trimmed = value.trim().replace(',', '.');
+export function parseOptionalNumber(value?: string) {
+	const trimmed = value?.trim().replace(',', '.') ?? '';
 	return trimmed ? Number(trimmed) : undefined;
 }
 
@@ -66,8 +66,8 @@ export function getRangePointMax(scale?: number) {
 	return RANGE_POINT_LIMIT / effectiveScale;
 }
 
-export function toAtomicAmount(value: string, decimals: number) {
-	const trimmed = value.trim().replace(',', '.');
+export function toAtomicAmount(value: string | undefined, decimals: number) {
+	const trimmed = value?.trim().replace(',', '.') ?? '';
 	if (!trimmed) {
 		throw new Error('Stake is required.');
 	}

@@ -200,11 +200,11 @@ type LobbyAction =
 	| { type: 'loaded'; games: PvPCoinflipLobbyGame[] }
 	| { type: 'error'; error: string };
 type StandardParametersAction =
-	| { type: 'loading' }
+	| { type: 'loading'; preservePrevious?: boolean }
 	| { type: 'loaded'; payload: unknown; summary: StandardGameParametersSummary }
 	| { type: 'error'; error: string };
 type PvPParametersAction =
-	| { type: 'loading' }
+	| { type: 'loading'; preservePrevious?: boolean }
 	| { type: 'loaded'; payload: unknown; summary: PvPGameParametersSummary }
 	| { type: 'error'; error: string }
 	| { type: 'reset' };
@@ -276,6 +276,9 @@ function standardParametersReducer(
 ): StandardParametersState {
 	switch (action.type) {
 		case 'loading':
+			if (action.preservePrevious) {
+				return { ...state, error: null, isLoading: true };
+			}
 			return { ...initialStandardParametersState, isLoading: true };
 		case 'loaded':
 			return {
@@ -295,6 +298,9 @@ function pvpParametersReducer(
 ): PvPParametersState {
 	switch (action.type) {
 		case 'loading':
+			if (action.preservePrevious) {
+				return { ...state, error: null, isLoading: true };
+			}
 			return { ...initialPvPParametersState, isLoading: true };
 		case 'loaded':
 			return {
@@ -987,7 +993,10 @@ function useIntegrationState({
 				return;
 			}
 
-			dispatchStandardParameters({ type: 'loading' });
+			dispatchStandardParameters({
+				type: 'loading',
+				preservePrevious: ignoreCache,
+			});
 
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
@@ -1029,7 +1038,10 @@ function useIntegrationState({
 				return;
 			}
 
-			dispatchPvPParameters({ type: 'loading' });
+			dispatchPvPParameters({
+				type: 'loading',
+				preservePrevious: ignoreCache,
+			});
 
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
@@ -1335,7 +1347,14 @@ function useIntegrationState({
 		return nextForms;
 	}, [standardForms, standardGame, standardGameParameters]);
 
-	const effectivePvpForms = pvpForms;
+	const effectivePvpForms = React.useMemo(
+		() => ({
+			create: { ...DEFAULT_PVP_FORMS.create, ...pvpForms.create },
+			join: { ...DEFAULT_PVP_FORMS.join, ...pvpForms.join },
+			cancel: { ...DEFAULT_PVP_FORMS.cancel, ...pvpForms.cancel },
+		}),
+		[pvpForms],
+	);
 
 	const joinLobbyGames = React.useMemo(
 		() =>
@@ -1364,7 +1383,7 @@ function useIntegrationState({
 	const isMissingPvPGameSelection =
 		mode === 'pvp' &&
 		(pvpAction === 'join' || pvpAction === 'cancel') &&
-		!pvpForms[pvpAction].gameId.trim();
+		!effectivePvpForms[pvpAction].gameId.trim();
 
 	let currentCode = '';
 	try {

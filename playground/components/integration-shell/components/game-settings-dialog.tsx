@@ -39,17 +39,20 @@ function SettingsSummaryCard({
 	title,
 	value,
 	description,
+	isLoading = false,
 }: {
 	title: string;
 	value: React.ReactNode;
 	description: React.ReactNode;
+	isLoading?: boolean;
 }) {
 	return (
 		<Card className="bg-background/40 shadow-none rounded-2xl">
 			<CardContent className="p-4">
-				<p className="text-xs font-medium uppercase text-muted-foreground">
-					{title}
-				</p>
+				<div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
+					<span>{title}</span>
+					{isLoading ? <Spinner data-icon="size-3.5" /> : null}
+				</div>
 				<div className="flex flex-wrap items-center text-lg font-semibold mt-2 gap-2 text-foreground">
 					{value}
 				</div>
@@ -168,6 +171,7 @@ function GameSettingsOverview({
 	playableConfigCount,
 	summarizedTopLevelDetails,
 	stakeTitle,
+	isLoading,
 }: {
 	activeConfigOption: GameConfigOption | null;
 	activeConfigDetails: NonNullable<GameConfigOption['details']>;
@@ -181,11 +185,13 @@ function GameSettingsOverview({
 	playableConfigCount: number;
 	summarizedTopLevelDetails: GameSettingsDetail[];
 	stakeTitle: string;
+	isLoading: boolean;
 }) {
 	return (
 		<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 			<SettingsSummaryCard
 				title={stakeTitle}
+				isLoading={isLoading}
 				value={
 					activeStakeRange ? (
 						<div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
@@ -213,6 +219,7 @@ function GameSettingsOverview({
 			/>
 			<SettingsSummaryCard
 				title="Configs"
+				isLoading={isLoading}
 				value={
 					configOptions?.length ? (
 						<>
@@ -229,6 +236,7 @@ function GameSettingsOverview({
 			/>
 			<SettingsSummaryCard
 				title={hasConfigOptions ? 'Current config' : 'Top-level fields'}
+				isLoading={isLoading}
 				value={
 					activeConfigOption ? (
 						<div className="flex flex-wrap items-center gap-2 text-base">
@@ -285,9 +293,9 @@ function GameSettingsOverview({
 													</FieldCode>
 												</div>
 												<div className="flex flex-wrap gap-1.5">
-													{activeMultiplierValues.map((value) => (
+													{activeMultiplierValues.map((value, index) => (
 														<FieldCode
-															key={`active-config-multiplier-${value}`}
+															key={`active-config-multiplier-${index}-${value}`}
 															className="shrink-0 justify-center"
 														>
 															{value}
@@ -395,7 +403,7 @@ function GameSettingsPanels({
 					Raw payload
 				</AccordionTrigger>
 				<AccordionContent>
-					{isLoading ? (
+					{isLoading && !serializedGameSettings ? (
 						<SettingsStateCard className="inline-flex bg-background/40 text-muted-foreground shadow-none">
 							<div className="flex items-center gap-1">
 								<Spinner />
@@ -462,11 +470,12 @@ export function GameSettingsDialog({
 	const summarizedTopLevelDetails = topLevelDetails?.slice(0, 3) ?? [];
 	const hasConfigOptions = Boolean(configOptions?.length);
 	const isStakeMinimum = activeStakeRange?.kind === 'minimum';
-	const stakeTitle = isLoading
-		? 'Stake'
-		: isStakeMinimum
-			? 'Stake minimum'
-			: 'Stake range';
+	const stakeTitle =
+		isLoading && !activeStakeRange
+			? 'Stake'
+			: isStakeMinimum
+				? 'Stake minimum'
+				: 'Stake range';
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -496,6 +505,7 @@ export function GameSettingsDialog({
 							coinLabel={coinLabel}
 							configOptions={configOptions}
 							hasConfigOptions={hasConfigOptions}
+							isLoading={isLoading}
 							isStakeMinimum={isStakeMinimum}
 							playableConfigCount={playableConfigCount}
 							summarizedTopLevelDetails={summarizedTopLevelDetails}
