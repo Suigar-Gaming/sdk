@@ -11,8 +11,7 @@ import {
 	normalizeSuiAddress,
 	normalizeSuiNSName,
 } from '@mysten/sui/utils';
-import { suigar } from '@suigar/sdk';
-import type { SuigarClient, SuigarNetwork } from '@suigar/sdk';
+import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 import {
 	extractDryRunErrors,
@@ -131,7 +130,7 @@ export const resolveOwnerAddress = async (
 	return normalizeSuiAddress(resolvedAddress);
 };
 
-export const dryRunTransaction = async (
+const dryRunTransaction = async (
 	transaction: Transaction,
 	client: ReturnType<typeof createSuigarClient>['client'],
 ): Promise<RawDryRunResult> =>
@@ -144,7 +143,7 @@ export const dryRunTransaction = async (
 		},
 	});
 
-export const summarizeTransaction = (
+const summarizeTransaction = (
 	transaction: Transaction,
 	context: {
 		game?: Game;

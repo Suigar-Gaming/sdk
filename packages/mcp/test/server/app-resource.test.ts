@@ -19,5 +19,6 @@ describe('MCP App resource', () => {
 			connectDomains: [],
 			resourceDomains: [],
 		});
+		expect(content._meta.ui.prefersBorder).toBe(true);
 	});
 });

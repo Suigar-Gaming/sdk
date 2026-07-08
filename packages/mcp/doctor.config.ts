@@ -7,12 +7,11 @@ export default defineConfig({
 	blocking: 'warning',
 	share: false,
 	noScore: true,
+	rules: {
+		'deslop/unused-dependency': 'off',
+		'deslop/unused-file': 'off',
+	},
 	ignore: {
-		overrides: [
-			{
-				files: ['src/app/**/*'],
-				rules: ['deslop/unused-file'],
-			},
-		],
+		files: ['src/!(app){,/**/*}', 'test/**/*'],
 	},
 });

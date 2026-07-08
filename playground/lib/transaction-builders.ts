@@ -22,7 +22,7 @@ type TxApi = SuigarClient['tx'];
 export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
 function getBetCountInput(fields: StandardSharedFields) {
-	return fields.betCount.trim();
+	return fields.betCount?.trim() ?? '';
 }
 
 function parseBetCount(value: string) {
@@ -211,29 +211,31 @@ export function buildPvPTransaction<K extends PvPAction>(
 		}
 		case 'join': {
 			const typedForm = form as PvPCoinflipJoinFormValues;
+			const gameId = typedForm.gameId?.trim() ?? '';
 			baseOptions = {
 				owner,
 				coinType,
-				gameId: typedForm.gameId.trim(),
+				gameId,
 			};
 			codeLines = [
 				`owner: '${owner}',`,
 				`coinType: '${coinType}',`,
-				`gameId: '${typedForm.gameId.trim()}',`,
+				`gameId: '${gameId}',`,
 			];
 			break;
 		}
 		case 'cancel': {
 			const typedForm = form as PvPCoinflipCancelFormValues;
+			const gameId = typedForm.gameId?.trim() ?? '';
 			baseOptions = {
 				owner,
 				coinType,
-				gameId: typedForm.gameId.trim(),
+				gameId,
 			};
 			codeLines = [
 				`owner: '${owner}',`,
 				`coinType: '${coinType}',`,
-				`gameId: '${typedForm.gameId.trim()}',`,
+				`gameId: '${gameId}',`,
 			];
 			break;
 		}

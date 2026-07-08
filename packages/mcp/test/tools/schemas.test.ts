@@ -30,14 +30,15 @@ describe('config input schema', () => {
 
 describe('build input schemas', () => {
 	it('accepts decimal currency strings and rejects negative stake values', () => {
-		expect(
-			coinflipInputSchema.parse({
-				mode: 'build',
-				owner: '0x1',
-				stake: '1.25',
-				side: 'heads',
-			}).stake,
-		).toBe('1.25');
+		const input = coinflipInputSchema.parse({
+			mode: 'build',
+			owner: '0x1',
+			stake: '1.25',
+			side: 'heads',
+		});
+
+		expect(input.stake).toBe('1.25');
+		expect(input.network).toBe('testnet');
 		expect(() => coinflipInputSchema.parse({ stake: -1 })).toThrow();
 	});
 
