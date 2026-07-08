@@ -12,6 +12,7 @@ import {
 import {
 	buildTransactionResult,
 	createSuigarClient,
+	DEFAULT_NETWORK,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	ToolTextResult,
@@ -166,7 +167,7 @@ const requireNumber = (value: unknown, fieldName: string): number => {
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
 const getConfigInput = (input: ReadConfigInput) => ({
-	network: input.network,
+	network: input.network ?? DEFAULT_NETWORK,
 	providerUrl: input.providerUrl,
 	config: input.config,
 	partner: input.partner,

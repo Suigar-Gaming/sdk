@@ -42,9 +42,11 @@ describe('read tools', () => {
 			coinType: '0x2::sui::SUI',
 		});
 		const content = result.structuredContent as {
+			network: string;
 			game: { id: string; coinType: string; packageId: string } | null;
 		};
 
+		expect(content.network).toBe('testnet');
 		expect(content.game?.id).toBe('coinflip');
 		expect(content.game?.coinType).toMatch(/::sui::SUI$/u);
 		expect(content.game?.packageId).toMatch(/^0x/u);
@@ -107,10 +109,12 @@ describe('read-only transaction tools', () => {
 		const result = await run();
 		const content = result.structuredContent as {
 			mode: string;
+			network: string;
 			plan: { target: string | null };
 		};
 
 		expect(content.mode).toBe('read-only');
+		expect(content.network).toBe('testnet');
 		expect(content.plan.target).toMatch(/^0x.*::/u);
 		expect(result.content[0].text).toContain('"read-only"');
 	});
@@ -131,6 +135,7 @@ describe('build transaction tools', () => {
 			});
 			const content = result.structuredContent as {
 				mode: string;
+				network: string;
 				transactionBytesBase64?: string;
 				summary: {
 					game?: string;
@@ -142,6 +147,7 @@ describe('build transaction tools', () => {
 			};
 
 			expect(content.mode).toBe('build');
+			expect(content.network).toBe('testnet');
 			expect(content.transactionBytesBase64).toBe('AQIDBA==');
 			expect(content.summary.game).toBe('coinflip');
 			expect(content.summary.stake).toBe('1000000000000');

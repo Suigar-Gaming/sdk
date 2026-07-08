@@ -36,7 +36,7 @@ const DEFAULT_PROVIDER_URLS = {
 	testnet: 'https://fullnode.testnet.sui.io:443',
 } as const satisfies Record<SuigarNetwork, string>;
 
-const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
+export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
 export const normalizeNetwork = (
 	network: string | undefined = DEFAULT_NETWORK,
