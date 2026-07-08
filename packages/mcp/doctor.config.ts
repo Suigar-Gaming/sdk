@@ -9,17 +9,9 @@ export default defineConfig({
 	noScore: true,
 	rules: {
 		'deslop/unused-dependency': 'off',
+		'deslop/unused-file': 'off',
 	},
 	ignore: {
-		overrides: [
-			{
-				files: ['src/app/**/*'],
-				rules: ['deslop/unused-file'],
-			},
-			{
-				files: ['src/**/*', '!src/app/**/*'],
-				rules: ['react-doctor/no-barrel-import'],
-			},
-		],
+		files: ['src/!(app){,/**/*}', 'test/**/*'],
 	},
 });

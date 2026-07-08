@@ -224,7 +224,7 @@ export function SuigarInspectorApp() {
 			<main className={shellClassName}>
 				<Header status="Connecting" />
 				<Panel title="Connection">
-					<p className="text-[13px] leading-5 font-semibold text-muted-foreground">
+					<p className="text-xs leading-5 font-semibold text-muted-foreground">
 						Waiting for host context.
 					</p>
 				</Panel>
