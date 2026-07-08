@@ -148,7 +148,7 @@ function FieldCode({ className, ...props }: React.ComponentProps<'code'>) {
 		<code
 			data-slot="field-code"
 			className={cn(
-				'inline-flex items-center font-mono leading-none px-1.5 py-0.5 border-border/70 bg-background/70 text-[0.85em] text-foreground rounded-md border',
+				'inline-flex items-center font-mono leading-none px-1.5 py-0.5 border-border/70 bg-background/70 text-xs text-foreground rounded-md border',
 				className,
 			)}
 			{...props}

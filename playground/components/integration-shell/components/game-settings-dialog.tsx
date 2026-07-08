@@ -198,7 +198,7 @@ function GameSettingsOverview({
 									</FieldCode>
 								</>
 							)}
-							<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+							<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-widest text-muted-foreground">
 								<CoinIcon coinKey={coinKey} className="size-4" />
 								{coinLabel}
 							</span>
@@ -257,7 +257,7 @@ function GameSettingsOverview({
 												<FieldCode className="shrink-0">
 													{activeConfigOption.stakeRange.max}
 												</FieldCode>
-												<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em]">
+												<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-widest">
 													<CoinIcon coinKey={coinKey} className="size-4" />
 													{coinLabel}
 												</span>

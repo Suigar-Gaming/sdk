@@ -91,7 +91,7 @@ export function GameSettingsConfigList({
 								<FieldCode className="shrink-0">
 									{option.stakeRange.max}
 								</FieldCode>
-								<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-[0.12em] gap-1">
+								<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-widest gap-1">
 									<CoinIcon coinKey={coinKey} className="size-4" />
 									{coinKey.toUpperCase()}
 								</span>

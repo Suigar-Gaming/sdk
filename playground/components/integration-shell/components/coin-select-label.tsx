@@ -22,7 +22,7 @@ export function CoinSelectLabel({
 				</span>
 				<span
 					className={cn(
-						'shrink-0 text-[0.68rem] leading-none font-semibold tracking-[0.08em] text-muted-foreground',
+						'shrink-0 text-xs leading-none font-semibold tracking-widest text-muted-foreground',
 						hideTickerOnMobile && 'hidden sm:inline',
 					)}
 				>

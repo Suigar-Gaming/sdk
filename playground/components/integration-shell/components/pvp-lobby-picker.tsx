@@ -126,7 +126,7 @@ export function PvPLobbyPicker({
 												</p>
 												<div className="flex min-w-0 items-center whitespace-nowrap text-sm font-semibold tabular-nums gap-1 text-foreground">
 													<span className="min-w-0 truncate">{amount}</span>
-													<span className="inline-flex shrink-0 items-center font-medium gap-1 text-[0.68rem] text-muted-foreground">
+													<span className="inline-flex shrink-0 items-center font-medium gap-1 text-xs text-muted-foreground">
 														{coinKey ? (
 															<CoinIcon
 																coinKey={coinKey}
