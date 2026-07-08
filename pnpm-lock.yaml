@@ -222,11 +222,11 @@ catalogs:
       specifier: ^2.1.0
       version: 2.1.0
     '@mysten/codegen':
-      specifier: ^0.11.3
-      version: 0.11.3
+      specifier: ^0.11.4
+      version: 0.11.4
     '@mysten/sui':
-      specifier: ^2.20.1
-      version: 2.20.1
+      specifier: ^2.20.2
+      version: 2.20.2
   test:
     vitest:
       specifier: ^4.1.10
@@ -319,7 +319,7 @@ importers:
         version: 1.29.0(zod@4.4.3)
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.20.1(typescript@6.0.3)
+        version: 2.20.2(typescript@6.0.3)
       '@suigar/sdk':
         specifier: workspace:^
         version: link:../sdk
@@ -383,10 +383,10 @@ importers:
         version: 2.1.0
       '@mysten/codegen':
         specifier: catalog:mysten
-        version: 0.11.3
+        version: 0.11.4
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.20.1(typescript@6.0.3)
+        version: 2.20.2(typescript@6.0.3)
       '@types/node':
         specifier: catalog:typescript
         version: 24.13.2
@@ -406,14 +406,14 @@ importers:
   playground:
     dependencies:
       '@mysten/dapp-kit-core':
-        specifier: ^1.6.3
-        version: 1.6.3(@mysten/sui@2.20.1(typescript@5.9.3))(typescript@5.9.3)
+        specifier: ^1.6.4
+        version: 1.6.4(@mysten/sui@2.20.2(typescript@5.9.3))(typescript@5.9.3)
       '@mysten/dapp-kit-react':
-        specifier: ^2.1.5
-        version: 2.1.5(@mysten/sui@2.20.1(typescript@5.9.3))(@types/react@19.2.17)(react@19.2.7)(typescript@5.9.3)
+        specifier: ^2.1.6
+        version: 2.1.6(@mysten/sui@2.20.2(typescript@5.9.3))(@types/react@19.2.17)(react@19.2.7)(typescript@5.9.3)
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.20.1(typescript@5.9.3)
+        version: 2.20.2(typescript@5.9.3)
       '@radix-ui/react-accordion':
         specifier: ^1.2.15
         version: 1.2.15(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -1242,37 +1242,37 @@ packages:
   '@mysten/bcs@2.1.0':
     resolution: {integrity: sha512-rIR/cDAqDfBDxmYEZXppN/on8gmh1OW0dYi/Bk2kMBZcYMTaBaEtEX1VR6g7HicVxuMbFAIP0/SQkdH7J9Y5dQ==}
 
-  '@mysten/codegen@0.11.3':
-    resolution: {integrity: sha512-REEXZqJ+vBo+JfR9CCmyvmZI55ZvcgncJjg18VCjPGHAjlwZYPID6wxiPEKjlQtgBEJZkavtG1+VZYVK2In8CQ==}
+  '@mysten/codegen@0.11.4':
+    resolution: {integrity: sha512-+/hc9cz3Eb0Mm7eyntjlrRM/BMCSy3Mf4llQ6m0ByJtAIkSmR6+xdHhsc2Z561cqJKVG6Z1Y5OKVP4Ahxig0NA==}
     hasBin: true
 
-  '@mysten/dapp-kit-core@1.6.3':
-    resolution: {integrity: sha512-JzchIZNMGIYiWdLNDikVJazh30attEi6Mw0eTu6tIfDDEJ1jrDD/znzqF54yYOEUMQ1UY0iYpnWTtAziCnJblw==}
+  '@mysten/dapp-kit-core@1.6.4':
+    resolution: {integrity: sha512-F/Su4mMKuUknWLxoNJCn7wo9lN0HQR3HGVOc2cEBYvzl9ZuMUvkS4cIMm0WGEgvyZyZIabXqAkPrcDMPrPw+Eg==}
     peerDependencies:
-      '@mysten/sui': ^2.20.1
+      '@mysten/sui': ^2.20.2
 
-  '@mysten/dapp-kit-react@2.1.5':
-    resolution: {integrity: sha512-1mNOmj7yzIHsUzfup9K7Xd8dwH/I4HDX+tyz/b+EhvSYAgW7pFnQJcFHU0fXQzksGDyvnCIdNfW6wQRCCcfwLg==}
+  '@mysten/dapp-kit-react@2.1.6':
+    resolution: {integrity: sha512-eqh2dkTDuEsbs22ppYb4fPf/2BWCdoMen//LvhHvro15wURcaQIfXBX07LmaCiRH+ti+fY7Lgh4BnMvsppeoZw==}
     peerDependencies:
       '@types/react': '>=17.0.0'
       react: '>=17.0.0'
 
-  '@mysten/slush-wallet@1.1.3':
-    resolution: {integrity: sha512-NZteED3JZce0aR5FVRM7HZ996K52Sk72jZjLzwZ25dOeGYaTCBTgBLlsk15tWOi/OtTXKR588d3b9cYVDiilzA==}
+  '@mysten/slush-wallet@1.1.4':
+    resolution: {integrity: sha512-IVnVww7sKgI8Vmj4lHodVzkJAsalgl5lyw3daoocwVd7sSt4sbCOEkBZQLNwLJ3nqAYVna32Ra6B3eoDWsHSPg==}
     peerDependencies:
-      '@mysten/sui': ^2.20.1
+      '@mysten/sui': ^2.20.2
 
-  '@mysten/sui@2.20.1':
-    resolution: {integrity: sha512-gf7p3biAr+456dIFHFZUEvUn52vFhkjdJ6zM8FQoC9Ox75ApfkM8vT6iUiSNBjkNlGWJ54g3+6hHYv75F+ST4A==}
+  '@mysten/sui@2.20.2':
+    resolution: {integrity: sha512-yzvxhcnds6PRZd6jrTtp6AdXXfqtXPHhxR372Dejtu/4JtZYBynhdcJRZkTNGW4Gy7R/7k6VQzt7IBe4HsyHJQ==}
     engines: {node: '>=22'}
 
   '@mysten/utils@0.4.0':
     resolution: {integrity: sha512-nHlXECBl9kE+AHF/aw5a7JVNizae8Kb71A4H18BV/sXd5/l2BaWNGWVatq05fzJo3hF78AWorDxa++1TgcBKWw==}
 
-  '@mysten/wallet-standard@0.21.3':
-    resolution: {integrity: sha512-fjG9N6gNQ8xvL6f2xXK0GnoUXK/xJS9WHQVhnLB3MeT1wy6JK0rhazGj0vSmkO+a3g+Ua5s5JzGzgjKSTuhcDA==}
+  '@mysten/wallet-standard@0.21.4':
+    resolution: {integrity: sha512-GD9kmmLfKhnc57BAdBlyueQRR1W8/Q6fwEmMG2GVSsrsVeCi/zuTGBFZsZfarDHVbAnuBNilzxEi8usvjGOPuA==}
     peerDependencies:
-      '@mysten/sui': ^2.20.1
+      '@mysten/sui': ^2.20.2
 
   '@mysten/window-wallet-core@0.2.0':
     resolution: {integrity: sha512-W5Pm3jWPK7tQ8kiqrD3lRRJIFUDNHW3CCGtu6kv0h+n+UPAcKTeqMEkBH9oXrqfa72+QxjMckZUvc0pYWbj3Rw==}
@@ -6053,10 +6053,10 @@ snapshots:
       '@mysten/utils': 0.4.0
       '@scure/base': 2.2.0
 
-  '@mysten/codegen@0.11.3':
+  '@mysten/codegen@0.11.4':
     dependencies:
       '@mysten/bcs': 2.1.0
-      '@mysten/sui': 2.20.1(typescript@6.0.3)
+      '@mysten/sui': 2.20.2(typescript@6.0.3)
       '@stricli/auto-complete': 1.2.9
       '@stricli/core': 1.2.9
       '@types/node': 25.9.4
@@ -6069,15 +6069,15 @@ snapshots:
       - '@gql.tada/svelte-support'
       - '@gql.tada/vue-support'
 
-  '@mysten/dapp-kit-core@1.6.3(@mysten/sui@2.20.1(typescript@5.9.3))(typescript@5.9.3)':
+  '@mysten/dapp-kit-core@1.6.4(@mysten/sui@2.20.2(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@lit-labs/scoped-registry-mixin': 1.0.4
       '@lit/task': 1.0.3
-      '@mysten/slush-wallet': 1.1.3(@mysten/sui@2.20.1(typescript@5.9.3))(typescript@5.9.3)
-      '@mysten/sui': 2.20.1(typescript@5.9.3)
+      '@mysten/slush-wallet': 1.1.4(@mysten/sui@2.20.2(typescript@5.9.3))(typescript@5.9.3)
+      '@mysten/sui': 2.20.2(typescript@5.9.3)
       '@mysten/utils': 0.4.0
-      '@mysten/wallet-standard': 0.21.3(@mysten/sui@2.20.1(typescript@5.9.3))
+      '@mysten/wallet-standard': 0.21.4(@mysten/sui@2.20.2(typescript@5.9.3))
       '@nanostores/lit': 0.2.3(lit@3.3.3)(nanostores@1.4.0)
       '@wallet-standard/ui': 1.0.3
       '@wallet-standard/ui-registry': 1.1.1
@@ -6087,10 +6087,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@mysten/dapp-kit-react@2.1.5(@mysten/sui@2.20.1(typescript@5.9.3))(@types/react@19.2.17)(react@19.2.7)(typescript@5.9.3)':
+  '@mysten/dapp-kit-react@2.1.6(@mysten/sui@2.20.2(typescript@5.9.3))(@types/react@19.2.17)(react@19.2.7)(typescript@5.9.3)':
     dependencies:
       '@lit/react': 1.0.8(@types/react@19.2.17)
-      '@mysten/dapp-kit-core': 1.6.3(@mysten/sui@2.20.1(typescript@5.9.3))(typescript@5.9.3)
+      '@mysten/dapp-kit-core': 1.6.4(@mysten/sui@2.20.2(typescript@5.9.3))(typescript@5.9.3)
       '@nanostores/react': 1.1.0(nanostores@1.4.0)(react@19.2.7)
       '@types/react': 19.2.17
       nanostores: 1.4.0
@@ -6099,17 +6099,17 @@ snapshots:
       - '@mysten/sui'
       - typescript
 
-  '@mysten/slush-wallet@1.1.3(@mysten/sui@2.20.1(typescript@5.9.3))(typescript@5.9.3)':
+  '@mysten/slush-wallet@1.1.4(@mysten/sui@2.20.2(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
-      '@mysten/sui': 2.20.1(typescript@5.9.3)
+      '@mysten/sui': 2.20.2(typescript@5.9.3)
       '@mysten/utils': 0.4.0
-      '@mysten/wallet-standard': 0.21.3(@mysten/sui@2.20.1(typescript@5.9.3))
+      '@mysten/wallet-standard': 0.21.4(@mysten/sui@2.20.2(typescript@5.9.3))
       '@mysten/window-wallet-core': 0.2.0(typescript@5.9.3)
       valibot: 1.4.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
-  '@mysten/sui@2.20.1(typescript@5.9.3)':
+  '@mysten/sui@2.20.2(typescript@5.9.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.2)
       '@mysten/bcs': 2.1.0
@@ -6131,7 +6131,7 @@ snapshots:
       - '@gql.tada/vue-support'
       - typescript
 
-  '@mysten/sui@2.20.1(typescript@6.0.3)':
+  '@mysten/sui@2.20.2(typescript@6.0.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.2)
       '@mysten/bcs': 2.1.0
@@ -6157,9 +6157,9 @@ snapshots:
     dependencies:
       '@scure/base': 2.2.0
 
-  '@mysten/wallet-standard@0.21.3(@mysten/sui@2.20.1(typescript@5.9.3))':
+  '@mysten/wallet-standard@0.21.4(@mysten/sui@2.20.2(typescript@5.9.3))':
     dependencies:
-      '@mysten/sui': 2.20.1(typescript@5.9.3)
+      '@mysten/sui': 2.20.2(typescript@5.9.3)
       '@wallet-standard/core': 1.1.2
 
   '@mysten/window-wallet-core@0.2.0(typescript@5.9.3)':
