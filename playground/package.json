@@ -16,8 +16,8 @@
 		"doctor": "react-doctor --yes"
 	},
 	"dependencies": {
-		"@mysten/dapp-kit-core": "^1.6.3",
-		"@mysten/dapp-kit-react": "^2.1.5",
+		"@mysten/dapp-kit-core": "^1.6.4",
+		"@mysten/dapp-kit-react": "^2.1.6",
 		"@mysten/sui": "catalog:mysten",
 		"@radix-ui/react-accordion": "^1.2.15",
 		"@radix-ui/react-dialog": "^1.1.18",
