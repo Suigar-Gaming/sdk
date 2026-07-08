@@ -1,5 +1,20 @@
 # @suigar/mcp
 
+## 1.0.0-beta.5
+
+### Major Changes
+
+- 3c342f7: Align MCP server and app resource metadata with the MCP 2025-11-25 specification.
+
+  Narrow the public package exports to the programmatic MCP server API from the package root. Internal runtime clients, schemas, tool handlers, runtime result types, app resource helpers, and the `./server` package subpath are no longer exported as public package APIs.
+
+### Patch Changes
+
+- 3c342f7: Ensure MCP tool handlers default omitted network inputs to testnet unless mainnet is explicitly requested.
+- f1c285f: Align package compatibility with the latest supported Mysten libraries.
+- Updated dependencies [f1c285f]
+  - @suigar/sdk@2.0.0-beta.24
+
 ## 0.2.0-beta.4
 
 ### Patch Changes
