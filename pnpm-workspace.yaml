@@ -12,18 +12,18 @@ catalogs:
     'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.0
-    '@mysten/codegen': ^0.11.4
-    '@mysten/sui': ^2.20.2
+    '@mysten/codegen': ^0.11.5
+    '@mysten/sui': ^2.20.3
   test:
     'vitest': ^4.1.10
   tooling:
     '@tailwindcss/postcss': ^4.3.2
     '@tailwindcss/vite': ^4.3.2
     'eslint-config-prettier': ^10.1.8
-    'prettier': ^3.9.4
-    'react-doctor': ^0.7.1
+    'prettier': ^3.9.5
+    'react-doctor': ^0.7.3
     'tailwindcss': ^4.3.2
-    'tsdown': ^0.22.3
+    'tsdown': ^0.22.4
     'tsx': ^4.23.0
   typescript:
     '@types/node': ^24.0.0
