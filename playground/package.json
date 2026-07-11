@@ -16,8 +16,8 @@
 		"doctor": "react-doctor --yes"
 	},
 	"dependencies": {
-		"@mysten/dapp-kit-core": "^1.6.4",
-		"@mysten/dapp-kit-react": "^2.1.6",
+		"@mysten/dapp-kit-core": "^1.6.5",
+		"@mysten/dapp-kit-react": "^2.1.7",
 		"@mysten/sui": "catalog:mysten",
 		"@radix-ui/react-accordion": "^1.2.16",
 		"@radix-ui/react-dialog": "^1.1.19",
@@ -30,7 +30,7 @@
 		"@suigar/sdk": "workspace:^",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "catalog:frontend",
-		"lucide-react": "^1.23.0",
+		"lucide-react": "^1.24.0",
 		"next": "^16.2.10",
 		"next-themes": "^0.4.6",
 		"react": "catalog:frontend",
