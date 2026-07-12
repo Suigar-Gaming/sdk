@@ -179,9 +179,10 @@ export function summarizeStandardGameParameters(
 						{ label: 'Rows', value: String(entry.value.num_rows) },
 						{ label: 'Slots', value: String(entry.value.multipliers.length) },
 					],
-					multiplierValues: entry.value.multipliers.map((value) =>
-						String(fromMoveFloat(value)),
-					),
+					multiplierValues: entry.value.multipliers.map((value) => ({
+						id: crypto.randomUUID(),
+						value: String(fromMoveFloat(value)),
+					})),
 				}),
 			);
 
@@ -217,9 +218,10 @@ export function summarizeStandardGameParameters(
 							value: String(entry.value.multipliers.length),
 						},
 					],
-					multiplierValues: entry.value.multipliers.map((value) =>
-						String(fromMoveFloat(value)),
-					),
+					multiplierValues: entry.value.multipliers.map((value) => ({
+						id: crypto.randomUUID(),
+						value: String(fromMoveFloat(value)),
+					})),
 				}),
 			);
 
