@@ -42,7 +42,7 @@ const textErrors = (result: CallToolResult) =>
 		item.type === 'text' && item.text ? [item.text] : [],
 	) ?? [];
 
-type HostContext = {
+type McpUiHostContext = {
 	theme?: Parameters<typeof applyDocumentTheme>[0];
 	styles?: {
 		variables?: Parameters<typeof applyHostStyleVariables>[0];
@@ -54,7 +54,7 @@ type HostContext = {
 
 type AppViewState = {
 	error: Error | null;
-	hostContext: HostContext | undefined;
+	hostContext: McpUiHostContext | undefined;
 	inspector: InspectorState | null;
 };
 
@@ -65,7 +65,7 @@ type AppViewAction =
 	  }
 	| {
 			type: 'host-context';
-			context: HostContext | undefined;
+			context: McpUiHostContext | undefined;
 	  }
 	| {
 			type: 'tool-input';
@@ -118,7 +118,7 @@ const reducer = (state: AppViewState, action: AppViewAction): AppViewState => {
 	}
 };
 
-function applyHostContext(context: HostContext | undefined) {
+function applyHostContext(context: McpUiHostContext | undefined) {
 	if (!context) {
 		return;
 	}
