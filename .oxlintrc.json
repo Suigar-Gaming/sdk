@@ -34,7 +34,8 @@
 				"reportUsedIgnorePattern": true,
 				"caughtErrorsIgnorePattern": "^_"
 			}
-		]
+		],
+		"typescript/no-deprecated": "warn"
 	},
 	"overrides": [
 		{
