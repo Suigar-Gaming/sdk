@@ -157,12 +157,14 @@ export function SuigarInspectorApp() {
 		}
 		connectStarted.current = true;
 
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.ontoolinput = ({ arguments: args }) => {
 			dispatch({
 				type: 'tool-input',
 				payload: args ?? {},
 			});
 		};
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.ontoolresult = (result) => {
 			if (result.isError) {
 				const errors = textErrors(result);
@@ -185,6 +187,7 @@ export function SuigarInspectorApp() {
 				payload,
 			});
 		};
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.onhostcontextchanged = ({ context }) => {
 			dispatch({ type: 'host-context', context });
 			applyHostContext(context);
