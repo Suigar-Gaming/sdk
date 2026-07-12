@@ -16,7 +16,7 @@ describe('TtlClientCache', () => {
 
 	it('caches sync reads until the ttl expires', () => {
 		const cache = new TtlClientCache({ ttlMs: 1000 });
-		const load = vi.fn(() => 'value');
+		const load = vi.fn<() => string>(() => 'value');
 
 		expect(cache.readSync(['key'], load)).toBe('value');
 		expect(cache.readSync(['key'], load)).toBe('value');
@@ -30,7 +30,7 @@ describe('TtlClientCache', () => {
 
 	it('supports force refreshing sync reads', () => {
 		const cache = new TtlClientCache({ ttlMs: 1000 });
-		const load = vi.fn(() => 'value');
+		const load = vi.fn<() => string>(() => 'value');
 
 		expect(cache.readSync(['key'], load)).toBe('value');
 		expect(
@@ -44,7 +44,7 @@ describe('TtlClientCache', () => {
 
 	it('shares in-flight async reads and caches the resolved value', async () => {
 		const cache = new TtlClientCache({ ttlMs: 1000 });
-		const load = vi.fn(
+		const load = vi.fn<() => Promise<string>>(
 			() =>
 				new Promise<string>((resolve) => {
 					setTimeout(() => resolve('resolved'), 10);

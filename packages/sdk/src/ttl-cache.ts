@@ -92,7 +92,7 @@ export class TtlClientCache extends ClientCache {
 			entry.value = Promise.resolve(value)
 				.then((resolved) => {
 					super.clear(key);
-					super.read<CacheEntry<T>>(key, () => ({
+					void super.read<CacheEntry<T>>(key, () => ({
 						value: resolved,
 						expiresAt: Date.now() + this.#ttlMs,
 					}));

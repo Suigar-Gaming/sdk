@@ -14,17 +14,19 @@ describe('config input schema', () => {
 		expect(configInputSchema.parse({})).toEqual({ network: 'testnet' });
 		expect(() =>
 			configInputSchema.parse({ network: 'testnet', extra: true }),
-		).toThrow();
+		).toThrow(/Unrecognized key/u);
 	});
 
 	it('accepts only supported networks and valid provider URLs', () => {
 		expect(configInputSchema.parse({ network: 'mainnet' }).network).toBe(
 			'mainnet',
 		);
-		expect(() => configInputSchema.parse({ network: 'devnet' })).toThrow();
-		expect(() =>
-			configInputSchema.parse({ providerUrl: 'not-a-url' }),
-		).toThrow();
+		expect(() => configInputSchema.parse({ network: 'devnet' })).toThrow(
+			/Invalid option/u,
+		);
+		expect(() => configInputSchema.parse({ providerUrl: 'not-a-url' })).toThrow(
+			/Invalid URL/u,
+		);
 	});
 });
 
@@ -39,7 +41,9 @@ describe('build input schemas', () => {
 
 		expect(input.stake).toBe('1.25');
 		expect(input.network).toBe('testnet');
-		expect(() => coinflipInputSchema.parse({ stake: -1 })).toThrow();
+		expect(() => coinflipInputSchema.parse({ stake: -1 })).toThrow(
+			/Too small/u,
+		);
 	});
 
 	it('keeps PvP join game id optional for read-only planning', () => {

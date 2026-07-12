@@ -173,7 +173,7 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	}
 
 	return {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// oxlint-disable-next-line typescript/no-explicit-any
 		transaction: txApi.createBetTransaction(gameId, baseOptions as any),
 		code: toCodeBlock(
 			`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
@@ -242,7 +242,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 	}
 
 	return {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// oxlint-disable-next-line typescript/no-explicit-any
 		transaction: txApi.createPvPCoinflipTransaction(action, baseOptions as any),
 		code: toCodeBlock(
 			`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,

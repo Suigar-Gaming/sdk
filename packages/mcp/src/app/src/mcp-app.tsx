@@ -42,7 +42,15 @@ const textErrors = (result: CallToolResult) =>
 		item.type === 'text' && item.text ? [item.text] : [],
 	) ?? [];
 
-type HostContext = NonNullable<ReturnType<App['getHostContext']>>;
+type HostContext = {
+	theme?: Parameters<typeof applyDocumentTheme>[0];
+	styles?: {
+		variables?: Parameters<typeof applyHostStyleVariables>[0];
+		css?: {
+			fonts?: Parameters<typeof applyHostFonts>[0];
+		};
+	};
+};
 
 type AppViewState = {
 	error: Error | null;
@@ -173,7 +181,7 @@ export function SuigarInspectorApp() {
 					: {};
 			dispatch({
 				type: 'tool-result',
-				status: record.mode ? String(record.mode) : 'read',
+				status: typeof record.mode === 'string' ? record.mode : 'read',
 				payload,
 			});
 		};

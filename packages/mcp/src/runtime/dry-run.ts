@@ -308,12 +308,22 @@ export const summarizeDryRun = (
 		? transactionRecord.balanceChanges.reduce<DryRunSummary['balanceChanges']>(
 				(changes, change) => {
 					if (isRecord(change)) {
+						const rawAmount = toJsonValue(change.amount);
 						changes.push({
-							address: String(change.address ?? ''),
-							coinType: String(change.coinType ?? ''),
+							address: typeof change.address === 'string' ? change.address : '',
+							coinType:
+								typeof change.coinType === 'string' ? change.coinType : '',
 							amount:
 								formatAmount(change.amount, context.coinDecimals) ??
-								({ raw: String(change.amount ?? ''), display: '' } as const),
+								({
+									raw:
+										typeof rawAmount === 'string' ||
+										typeof rawAmount === 'number' ||
+										typeof rawAmount === 'boolean'
+											? String(rawAmount)
+											: '',
+									display: '',
+								} as const),
 						});
 					}
 					return changes;
