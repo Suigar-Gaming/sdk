@@ -17,12 +17,12 @@ import {
 	resolveOwnerAddress,
 	ToolTextResult,
 	type BuilderMode,
-	type JsonValue,
 	type ReadConfigResult,
 	type ReadGameMetadataResult,
 	type ReadOnlyPlan,
 	type ResolvedMcpConfig,
 	type SuigarClientBundle,
+	type TransactionSummaryContext,
 } from '../runtime/index.js';
 import type {
 	CoinflipInput,
@@ -298,10 +298,10 @@ const executeTransactionTool = async ({
 	game: Game;
 	action?: PvPCoinflipAction;
 	createTransaction: (bundle: SuigarClientBundle) => Promise<Transaction>;
-	stake?: number | bigint;
-	stakeDisplay?: string;
-	gameInputs?: Record<string, JsonValue>;
-}) => {
+} & Pick<
+	TransactionSummaryContext,
+	'stake' | 'stakeDisplay' | 'gameInputs'
+>) => {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
 		throw new Error(

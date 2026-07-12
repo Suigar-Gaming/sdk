@@ -12,7 +12,6 @@ import {
 	normalizeSuiNSName,
 } from '@mysten/sui/utils';
 import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
-import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
 import {
 	extractDryRunErrors,
 	summarizeDryRun,
@@ -23,12 +22,12 @@ import type {
 	BuilderMode,
 	BuildTransactionResult,
 	DryRunResult,
-	JsonValue,
 	RawDryRunResult,
 	ResolvedMcpConfig,
 	SuigarConfigOverrides,
 	SuigarMcpConfigInput,
 	TransactionSummary,
+	TransactionSummaryContext,
 } from './types.js';
 
 const DEFAULT_PROVIDER_URLS = {
@@ -132,7 +131,7 @@ export const resolveOwnerAddress = async (
 
 const dryRunTransaction = async (
 	transaction: Transaction,
-	client: ReturnType<typeof createSuigarClient>['client'],
+	client: SuigarClientBundle['client'],
 ): Promise<RawDryRunResult> =>
 	client.core.simulateTransaction({
 		transaction,
@@ -145,15 +144,7 @@ const dryRunTransaction = async (
 
 const summarizeTransaction = (
 	transaction: Transaction,
-	context: {
-		game?: Game;
-		action?: PvPCoinflipAction;
-		coinType?: string;
-		stake?: bigint | number;
-		stakeDisplay?: string;
-		coinDecimals?: number;
-		gameInputs?: Record<string, JsonValue>;
-	} = {},
+	context: TransactionSummaryContext = {},
 ): TransactionSummary => {
 	const data = transaction.getData() as {
 		sender?: string | null;
@@ -236,8 +227,8 @@ export const buildTransactionResult = async ({
 	mode: Exclude<BuilderMode, 'read-only'>;
 	transaction: Transaction;
 	config: ResolvedMcpConfig;
-	client: ReturnType<typeof createSuigarClient>['client'];
-	context: Parameters<typeof summarizeTransaction>[1];
+	client: SuigarClientBundle['client'];
+	context: TransactionSummaryContext;
 }): Promise<BuildTransactionResult> => {
 	const summary = summarizeTransaction(transaction, context);
 	if (mode === 'dry-run') {
