@@ -99,7 +99,7 @@ pnpm turbo run typecheck
 
 ### Linting
 
-This repo uses ESLint and Prettier for linting.
+This repo uses Oxlint and Prettier for linting.
 
 ```bash
 pnpm run lint
@@ -111,11 +111,11 @@ You can automatically fix many lint issues by running:
 pnpm run lint:fix
 ```
 
-To run ESLint and Prettier individually, use:
+To run Oxlint and Prettier individually, use:
 
 ```bash
-pnpm run eslint
+pnpm run oxlint
 pnpm run prettier
-pnpm run eslint:fix
+pnpm run oxlint:fix
 pnpm run prettier:fix
 ```

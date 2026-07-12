@@ -6,7 +6,7 @@ import { bcs } from '@mysten/sui/bcs';
 const textEncoder = new TextEncoder();
 
 export function writeU64(value: bigint): number[] {
-	const bytes = new Array<number>(8).fill(0);
+	const bytes = Array.from({ length: 8 }, () => 0);
 	for (let index = 0; index < 8; index += 1) {
 		bytes[index] = Number((value >> BigInt(8 * index)) & 0xffn);
 	}

@@ -48,12 +48,12 @@
 		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
-		"eslint": "eslint .",
-		"eslint:fix": "eslint . --fix",
+		"oxlint": "oxlint .",
+		"oxlint:fix": "oxlint . --fix",
 		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run eslint && pnpm run prettier",
-		"lint:fix": "pnpm run eslint:fix && pnpm run prettier:fix"
+		"lint": "pnpm run oxlint && pnpm run prettier",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
 	},
 	"repository": {
 		"type": "git",
@@ -78,7 +78,7 @@
 		"@types/node": "catalog:typescript",
 		"tsdown": "catalog:tooling",
 		"tsx": "catalog:tooling",
-		"typescript": "catalog:typescript6",
+		"typescript": "catalog:typescript",
 		"vitest": "catalog:test"
 	}
 }
