@@ -1,18 +1,12 @@
 !/packages
 
 
-.next/
-.source/
-.swc/
-.claude
 .turbo/
 .changeset/*.md
 build/
 coverage/
 dist/
 out/
-generated/
-playground/next-env.d.ts
 CHANGELOG.md
 package.json
 pnpm-lock.yaml
