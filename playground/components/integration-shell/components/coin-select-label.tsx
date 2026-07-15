@@ -22,11 +22,11 @@ export function CoinSelectLabel({
 				</span>
 				<span
 					className={cn(
-						'shrink-0 text-xs leading-none font-semibold tracking-widest text-muted-foreground',
+						'shrink-0 text-xs leading-none font-semibold tracking-widest text-muted-foreground uppercase',
 						hideTickerOnMobile && 'hidden sm:inline',
 					)}
 				>
-					{coinKey.toUpperCase()}
+					{coinKey}
 				</span>
 			</div>
 		</div>

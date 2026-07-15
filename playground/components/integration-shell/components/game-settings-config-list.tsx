@@ -93,7 +93,7 @@ export function GameSettingsConfigList({
 								</FieldCode>
 								<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-widest gap-1">
 									<CoinIcon coinKey={coinKey} className="size-4" />
-									{coinKey.toUpperCase()}
+									{coinKey}
 								</span>
 							</div>
 
