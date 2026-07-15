@@ -34,6 +34,21 @@ function toAccountUrl(address: string) {
 	return `https://testnet.suivision.xyz/account/${address}`;
 }
 
+const eventTimestampFormatter = new Intl.DateTimeFormat('en-US', {
+	day: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+	month: 'short',
+	second: '2-digit',
+	timeZone: 'UTC',
+	timeZoneName: 'short',
+	year: 'numeric',
+});
+
+function formatEventTimestamp(timestamp: string) {
+	return eventTimestampFormatter.format(new Date(timestamp));
+}
+
 function handleCopied(label: string) {
 	const titleCaseLabel = toTitleCase(label);
 
@@ -178,7 +193,7 @@ export function EventsTable() {
 												{row.eventType}
 											</TableCell>
 											<TableCell className="text-muted-foreground">
-												{new Date(row.timestamp).toLocaleString()}
+												{formatEventTimestamp(row.timestamp)}
 											</TableCell>
 											<TableCell className="text-xs">
 												<CopyableValue

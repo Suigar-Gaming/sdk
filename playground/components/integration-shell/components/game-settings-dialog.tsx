@@ -175,7 +175,7 @@ function GameSettingsOverview({
 }: {
 	activeConfigOption: GameConfigOption | null;
 	activeConfigDetails: NonNullable<GameConfigOption['details']>;
-	activeMultiplierValues: string[];
+	activeMultiplierValues: NonNullable<GameConfigOption['multiplierValues']>;
 	activeStakeRange: StakeRangeSummary | null;
 	coinKey: SupportedCoinKey;
 	coinLabel: string;
@@ -293,12 +293,12 @@ function GameSettingsOverview({
 													</FieldCode>
 												</div>
 												<div className="flex flex-wrap gap-1.5">
-													{activeMultiplierValues.map((value, index) => (
+													{activeMultiplierValues.map((multiplier) => (
 														<FieldCode
-															key={`active-config-multiplier-${index}-${value}`}
+															key={multiplier.id}
 															className="shrink-0 justify-center"
 														>
-															{value}
+															{multiplier.value}
 														</FieldCode>
 													))}
 												</div>

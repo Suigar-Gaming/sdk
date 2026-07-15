@@ -69,11 +69,7 @@ export const configInputSchema = z
 			.enum(SUPPORTED_SUI_NETWORKS)
 			.default('testnet')
 			.describe('Sui network. Only mainnet and testnet are supported.'),
-		providerUrl: z
-			.string()
-			.url()
-			.optional()
-			.describe('Optional Sui gRPC endpoint URL.'),
+		providerUrl: z.url().optional().describe('Optional Sui gRPC endpoint URL.'),
 		config: configOverridesSchema
 			.optional()
 			.describe('SDK-style SuigarConfigOverrides.'),

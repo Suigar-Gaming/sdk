@@ -79,6 +79,14 @@ const coinBadgeFor = (coinType: unknown) => {
 	}
 };
 
+const scalarText = (value: unknown) =>
+	typeof value === 'string' ||
+	typeof value === 'number' ||
+	typeof value === 'bigint' ||
+	typeof value === 'boolean'
+		? String(value)
+		: '';
+
 export const createInspectorViewModel = (
 	payload: unknown,
 	explicitErrors: string[],
@@ -118,7 +126,7 @@ export const createInspectorViewModel = (
 			[
 				'Stake',
 				summary.stakeDisplay
-					? `${summary.stakeDisplay} (${summary.stake} base units)`
+					? `${scalarText(summary.stakeDisplay)} (${scalarText(summary.stake)} base units)`
 					: summary.stake,
 			],
 			...dynamicEntries(gameInputs),
@@ -136,7 +144,7 @@ export const createInspectorViewModel = (
 			[
 				'Gas budget',
 				summary.gasBudgetDisplay
-					? `${summary.gasBudgetDisplay} (${summary.gasBudget} base units)`
+					? `${scalarText(summary.gasBudgetDisplay)} (${scalarText(summary.gasBudget)} base units)`
 					: summary.gasBudget,
 			],
 			['Gas computation', amountText(gasUsed.computation)],

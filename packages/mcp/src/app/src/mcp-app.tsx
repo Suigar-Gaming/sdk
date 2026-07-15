@@ -42,11 +42,19 @@ const textErrors = (result: CallToolResult) =>
 		item.type === 'text' && item.text ? [item.text] : [],
 	) ?? [];
 
-type HostContext = NonNullable<ReturnType<App['getHostContext']>>;
+type McpUiHostContext = {
+	theme?: Parameters<typeof applyDocumentTheme>[0];
+	styles?: {
+		variables?: Parameters<typeof applyHostStyleVariables>[0];
+		css?: {
+			fonts?: Parameters<typeof applyHostFonts>[0];
+		};
+	};
+};
 
 type AppViewState = {
 	error: Error | null;
-	hostContext: HostContext | undefined;
+	hostContext: McpUiHostContext | undefined;
 	inspector: InspectorState | null;
 };
 
@@ -57,7 +65,7 @@ type AppViewAction =
 	  }
 	| {
 			type: 'host-context';
-			context: HostContext | undefined;
+			context: McpUiHostContext | undefined;
 	  }
 	| {
 			type: 'tool-input';
@@ -110,7 +118,7 @@ const reducer = (state: AppViewState, action: AppViewAction): AppViewState => {
 	}
 };
 
-function applyHostContext(context: HostContext | undefined) {
+function applyHostContext(context: McpUiHostContext | undefined) {
 	if (!context) {
 		return;
 	}
@@ -149,12 +157,14 @@ export function SuigarInspectorApp() {
 		}
 		connectStarted.current = true;
 
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.ontoolinput = ({ arguments: args }) => {
 			dispatch({
 				type: 'tool-input',
 				payload: args ?? {},
 			});
 		};
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.ontoolresult = (result) => {
 			if (result.isError) {
 				const errors = textErrors(result);
@@ -173,10 +183,11 @@ export function SuigarInspectorApp() {
 					: {};
 			dispatch({
 				type: 'tool-result',
-				status: record.mode ? String(record.mode) : 'read',
+				status: typeof record.mode === 'string' ? record.mode : 'read',
 				payload,
 			});
 		};
+		// oxlint-disable-next-line typescript/no-deprecated
 		app.onhostcontextchanged = ({ context }) => {
 			dispatch({ type: 'host-context', context });
 			applyHostContext(context);

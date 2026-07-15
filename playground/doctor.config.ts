@@ -4,7 +4,4 @@ export default defineConfig({
 	blocking: 'warning',
 	share: false,
 	noScore: true,
-	rules: {
-		'deslop/unused-dependency': 'off',
-	},
 });

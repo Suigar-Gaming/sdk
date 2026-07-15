@@ -18,7 +18,7 @@ export type RawDryRunResult = SuiClientTypes.SimulateTransactionResult<{
 export type JsonValue =
 	string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
-export type DryRunResult = { [key: string]: JsonValue };
+export type DryRunResult = Record<string, JsonValue>;
 
 export type BuilderMode = 'build' | 'dry-run' | 'read-only';
 
@@ -41,6 +41,28 @@ export type TransactionCommandSummary = {
 	typeArguments?: string[];
 };
 
+export type TransactionSummaryDetails = {
+	game?: Game;
+	action?: PvPCoinflipAction;
+	coinType?: string;
+	stake?: string;
+	stakeDisplay?: string;
+	coinDecimals?: number;
+	gameInputs?: Record<string, JsonValue>;
+};
+
+export type TransactionSummaryContext = Omit<
+	TransactionSummaryDetails,
+	'stake'
+> & {
+	stake?: TransactionSummaryDetails['stake'] | bigint | number;
+};
+
+export type TransactionSummaryFormattingContext = Pick<
+	TransactionSummaryDetails,
+	'coinDecimals'
+>;
+
 export type TransactionSummary = {
 	sender: string | null;
 	gasBudget: string | null;
@@ -50,14 +72,7 @@ export type TransactionSummary = {
 	commands: TransactionCommandSummary[];
 	inputs: number;
 	objectInputs: string[];
-	game?: Game;
-	action?: PvPCoinflipAction;
-	coinType?: string;
-	stake?: string;
-	stakeDisplay?: string;
-	coinDecimals?: number;
-	gameInputs?: { [key: string]: JsonValue };
-};
+} & TransactionSummaryDetails;
 
 export type FormattedAmount = {
 	raw: string;
@@ -68,7 +83,7 @@ export type DryRunEventSummary = {
 	type: string;
 	game?: Game;
 	eventName?: string;
-	fields: { [key: string]: JsonValue };
+	fields: Record<string, JsonValue>;
 };
 
 export type DryRunSummary = {

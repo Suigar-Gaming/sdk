@@ -90,6 +90,16 @@ function createZeroCoinThunk(coinType: string) {
 		});
 }
 
+type ContractCallMock = (options: unknown) => (tx: Transaction) => unknown;
+
+function createContractCallMock() {
+	return vi.fn<ContractCallMock>(() => (tx: Transaction) => tx.object('0x777'));
+}
+
+function createUnusedContractCallMock() {
+	return vi.fn<ContractCallMock>();
+}
+
 function createDynamicField(childId: string): SuiClientTypes.DynamicFieldEntry {
 	return {
 		fieldId: `${childId}-field`,
@@ -359,9 +369,7 @@ class TestClient extends CoreClient {
 
 	listOwnedObjects: CoreClient['listOwnedObjects'] = async <
 		Include extends SuiClientTypes.ObjectInclude,
-	>(
-		_options: SuiClientTypes.ListOwnedObjectsOptions<Include>,
-	) => ({
+	>() => ({
 		objects: [] as SuiClientTypes.Object<Include>[],
 		hasNextPage: false,
 		cursor: null,
@@ -660,11 +668,12 @@ describe('shared transaction helpers', () => {
 		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
 
-		let context: Parameters<
-			typeof buildSharedStandardGameBetTransaction
-		>[0]['buildRewardCoin'] extends (ctx: infer T) => unknown
-			? T
-			: never | undefined;
+		type BuildRewardContext = Parameters<
+			Parameters<
+				typeof buildSharedStandardGameBetTransaction
+			>[0]['buildRewardCoin']
+		>[0];
+		let context: BuildRewardContext | undefined;
 
 		const partner = normalizeSuiAddress('0x123');
 		const tx = buildSharedStandardGameBetTransaction({
@@ -705,9 +714,9 @@ describe('shared transaction helpers', () => {
 	});
 
 	it('does not default useGasCoin in Mysten coin intent options', async () => {
-		const coinWithBalanceMock = vi.fn(({ type }: { type: string }) =>
-			createZeroCoinThunk(type),
-		);
+		const coinWithBalanceMock = vi.fn<
+			({ type }: { type: string }) => ReturnType<typeof createZeroCoinThunk>
+		>(({ type }) => createZeroCoinThunk(type));
 		vi.doMock('@mysten/sui/transactions', async (importOriginal) => {
 			const actual =
 				await importOriginal<typeof import('@mysten/sui/transactions')>();
@@ -824,9 +833,7 @@ describe('shared transaction helpers', () => {
 
 describe('coinflip transaction wrapper', () => {
 	it('passes normalized arguments to the generated coinflip contract helper', async () => {
-		const play = vi.fn((_: unknown) => {
-			return (tx: Transaction) => tx.object('0x777');
-		});
+		const play = createContractCallMock();
 
 		const { buildCoinflipTransaction: buildCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
@@ -874,7 +881,7 @@ describe('coinflip transaction wrapper', () => {
 
 describe('limbo transaction wrapper', () => {
 	it('converts target multiplier using the default scale', async () => {
-		const play = vi.fn((_: unknown) => (tx: Transaction) => tx.object('0x777'));
+		const play = createContractCallMock();
 		const { buildLimboTransaction } = await loadTransactionModuleWithMock<{
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
@@ -901,7 +908,7 @@ describe('limbo transaction wrapper', () => {
 	});
 
 	it('respects a custom limbo scale', async () => {
-		const play = vi.fn((_: unknown) => (tx: Transaction) => tx.object('0x777'));
+		const play = createContractCallMock();
 		const { buildLimboTransaction } = await loadTransactionModuleWithMock<{
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
@@ -931,7 +938,7 @@ describe('limbo transaction wrapper', () => {
 
 describe('plinko transaction wrapper', () => {
 	it('passes the validated config id into the generated helper', async () => {
-		const play = vi.fn((_: unknown) => (tx: Transaction) => tx.object('0x777'));
+		const play = createContractCallMock();
 		const { buildPlinkoTransaction } = await loadTransactionModuleWithMock<{
 			buildPlinkoTransaction: (
 				options: Record<string, unknown>,
@@ -974,7 +981,7 @@ describe('plinko transaction wrapper', () => {
 
 describe('range transaction wrapper', () => {
 	it('converts range points and out-of-range flag before calling the generated helper', async () => {
-		const play = vi.fn((_: unknown) => (tx: Transaction) => tx.object('0x777'));
+		const play = createContractCallMock();
 		const { buildRangeTransaction } = await loadTransactionModuleWithMock<{
 			buildRangeTransaction: (
 				options: Record<string, unknown>,
@@ -1006,7 +1013,7 @@ describe('range transaction wrapper', () => {
 
 describe('wheel transaction wrapper', () => {
 	it('passes the validated wheel config id into the generated helper', async () => {
-		const play = vi.fn((_: unknown) => (tx: Transaction) => tx.object('0x777'));
+		const play = createContractCallMock();
 		const { buildWheelTransaction } = await loadTransactionModuleWithMock<{
 			buildWheelTransaction: (
 				options: Record<string, unknown>,
@@ -1049,15 +1056,17 @@ describe('wheel transaction wrapper', () => {
 
 describe('pvp coinflip transaction wrapper', () => {
 	it('passes create action arguments into the generated helper', async () => {
-		const createGame = vi.fn(
-			(_: unknown) => (tx: Transaction) => tx.object('0x777'),
-		);
+		const createGame = createContractCallMock();
 		const { buildPvPCoinflipTransaction: buildPvPCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
-				{ createGame, joinGame: vi.fn(), cancelGame: vi.fn() },
+				{
+					createGame,
+					joinGame: createUnusedContractCallMock(),
+					cancelGame: createUnusedContractCallMock(),
+				},
 				'../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
@@ -1093,15 +1102,17 @@ describe('pvp coinflip transaction wrapper', () => {
 	});
 
 	it('passes join action arguments into the generated helper', async () => {
-		const joinGame = vi.fn(
-			(_: unknown) => (tx: Transaction) => tx.object('0x777'),
-		);
+		const joinGame = createContractCallMock();
 		const { buildPvPCoinflipTransaction: buildPvPCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
-				{ createGame: vi.fn(), joinGame, cancelGame: vi.fn() },
+				{
+					createGame: createUnusedContractCallMock(),
+					joinGame,
+					cancelGame: createUnusedContractCallMock(),
+				},
 				'../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
@@ -1132,15 +1143,17 @@ describe('pvp coinflip transaction wrapper', () => {
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {
-		const cancelGame = vi.fn(
-			(_: unknown) => (tx: Transaction) => tx.object('0x777'),
-		);
+		const cancelGame = createContractCallMock();
 		const { buildPvPCoinflipTransaction: buildPvPCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
-				{ createGame: vi.fn(), joinGame: vi.fn(), cancelGame },
+				{
+					createGame: createUnusedContractCallMock(),
+					joinGame: createUnusedContractCallMock(),
+					cancelGame,
+				},
 				'../../src/transactions/pvp-coinflip.js',
 			);
 
@@ -1166,13 +1179,11 @@ describe('SuigarClient', () => {
 		const client = createSuigarTestClient();
 
 		expect(client.suigar).toBeDefined();
-		expect(client.suigar.serializeTransactionToBase64).toBeTypeOf('function');
+		expect(typeof client.suigar.serializeTransactionToBase64).toBe('function');
 	});
 
 	it('injects the configured partner into standard-game metadata', async () => {
-		const play = vi.fn((_: unknown) => {
-			return (tx: Transaction) => tx.object('0x777');
-		});
+		const play = createContractCallMock();
 
 		vi.resetModules();
 		vi.doMock(

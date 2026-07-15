@@ -48,12 +48,12 @@
 		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
-		"eslint": "eslint .",
-		"eslint:fix": "eslint . --fix",
+		"oxlint": "oxlint .",
+		"oxlint:fix": "oxlint . --fix",
 		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run eslint && pnpm run prettier",
-		"lint:fix": "pnpm run eslint:fix && pnpm run prettier:fix"
+		"lint": "pnpm run oxlint && pnpm run prettier",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
 	},
 	"repository": {
 		"type": "git",
@@ -66,7 +66,7 @@
 	"bugs": {
 		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
 	},
-	"homepage": "https://docs.suigar.com/sdk",
+	"homepage": "https://suigar.com/docs/sdk",
 	"peerDependencies": {
 		"@mysten/bcs": "catalog:mysten",
 		"@mysten/sui": "catalog:mysten"
@@ -78,7 +78,7 @@
 		"@types/node": "catalog:typescript",
 		"tsdown": "catalog:tooling",
 		"tsx": "catalog:tooling",
-		"typescript": "catalog:typescript6",
+		"typescript": "catalog:typescript",
 		"vitest": "catalog:test"
 	}
 }

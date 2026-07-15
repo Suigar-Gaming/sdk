@@ -1,0 +1,49 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"options": {
+		"typeAware": true
+	},
+	"plugins": [
+		"eslint",
+		"typescript",
+		"unicorn",
+		"oxc",
+		"import",
+		"vitest",
+		"node",
+		"promise"
+	],
+	"ignorePatterns": [
+		"node_modules",
+		"dist",
+		"packages/*/dist",
+		"playground",
+		".changeset/*.md"
+	],
+	"rules": {
+		"import/extensions": [
+			"error",
+			"always",
+			{
+				"ignorePackages": true
+			}
+		],
+		"no-unused-vars": [
+			"error",
+			{
+				"reportUsedIgnorePattern": true,
+				"caughtErrorsIgnorePattern": "^_"
+			}
+		],
+		"typescript/no-deprecated": "warn"
+	},
+	"overrides": [
+		{
+			"files": ["packages/*/src/contracts/**/*.ts"],
+			"rules": {
+				"typescript/no-base-to-string": "off",
+				"typescript/restrict-template-expressions": "off"
+			}
+		}
+	]
+}

@@ -41,19 +41,24 @@ export function StakeDescription({
 
 	return (
 		<FieldDescription size="sm">
-			<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
-				<span className="shrink-0">On-chain stake range:</span>
-				<FieldCode className="shrink-0">{stakeRange.min}</FieldCode>
-				<span className="shrink-0">to</span>
-				<FieldCode className="shrink-0">{stakeRange.max}</FieldCode>
-				<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-widest">
-					<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
-					{effectiveSelectedCoin.toUpperCase()}
-				</span>
+			<span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 align-middle">
+				{activeConfigDisabled ? (
+					<span className="text-destructive">
+						The selected config is disabled on-chain.
+					</span>
+				) : (
+					<>
+						<span className="shrink-0">On-chain stake range:</span>
+						<FieldCode className="shrink-0">{stakeRange.min}</FieldCode>
+						<span className="shrink-0">to</span>
+						<FieldCode className="shrink-0">{stakeRange.max}</FieldCode>
+						<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-widest">
+							<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
+							{effectiveSelectedCoin}
+						</span>
+					</>
+				)}
 			</span>
-			{activeConfigDisabled
-				? '. The selected config is disabled on-chain.'
-				: '.'}
 		</FieldDescription>
 	);
 }
@@ -100,15 +105,14 @@ export function PvPStakeDescription({
 
 	return (
 		<FieldDescription size="sm">
-			<span className="inline-flex flex-nowrap items-center gap-2 overflow-x-auto align-middle">
+			<span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 align-middle">
 				<span className="shrink-0">On-chain stake minimum:</span>
 				<FieldCode className="shrink-0">{stakeRange.min}</FieldCode>
 				<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-widest">
 					<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
-					{effectiveSelectedCoin.toUpperCase()}
+					{effectiveSelectedCoin}
 				</span>
 			</span>
-			.
 		</FieldDescription>
 	);
 }

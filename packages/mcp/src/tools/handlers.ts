@@ -17,12 +17,12 @@ import {
 	resolveOwnerAddress,
 	ToolTextResult,
 	type BuilderMode,
-	type JsonValue,
 	type ReadConfigResult,
 	type ReadGameMetadataResult,
 	type ReadOnlyPlan,
 	type ResolvedMcpConfig,
 	type SuigarClientBundle,
+	type TransactionSummaryContext,
 } from '../runtime/index.js';
 import type {
 	CoinflipInput,
@@ -35,6 +35,18 @@ import type {
 	ReadConfigInput,
 	ReadGameMetadataInput,
 } from './schemas.js';
+
+type TransactionToolInput =
+	| CoinflipInput
+	| LimboInput
+	| ConfigIdInput
+	| RangeInput
+	| PvpCoinflipCreateInput
+	| PvpCoinflipJoinInput
+	| PvpCoinflipCancelInput;
+
+type StandardTransactionToolInput =
+	CoinflipInput | LimboInput | ConfigIdInput | RangeInput;
 
 const GAME_LABELS = {
 	coinflip: 'Coinflip',
@@ -208,14 +220,7 @@ const readOnlyPlan = ({
 	requiredInputs,
 	notes,
 }: {
-	input:
-		| CoinflipInput
-		| LimboInput
-		| ConfigIdInput
-		| RangeInput
-		| PvpCoinflipCreateInput
-		| PvpCoinflipJoinInput
-		| PvpCoinflipCancelInput;
+	input: TransactionToolInput;
 	game: Game;
 	action?: PvPCoinflipAction;
 	requiredInputs: string[];
@@ -239,14 +244,7 @@ const readOnlyPlan = ({
 };
 
 const commonOptions = async (
-	input:
-		| CoinflipInput
-		| LimboInput
-		| ConfigIdInput
-		| RangeInput
-		| PvpCoinflipCreateInput
-		| PvpCoinflipJoinInput
-		| PvpCoinflipCancelInput,
+	input: TransactionToolInput,
 	bundle: SuigarClientBundle,
 ) => {
 	return {
@@ -262,7 +260,7 @@ const commonOptions = async (
 };
 
 const stakeOptions = async (
-	input: CoinflipInput | LimboInput | ConfigIdInput | RangeInput,
+	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
 ) => {
 	const { decimals } = coinMetadataForAmount(bundle.config, input.coinType);
@@ -287,21 +285,13 @@ const executeTransactionTool = async ({
 	stakeDisplay,
 	gameInputs,
 }: {
-	input:
-		| CoinflipInput
-		| LimboInput
-		| ConfigIdInput
-		| RangeInput
-		| PvpCoinflipCreateInput
-		| PvpCoinflipJoinInput
-		| PvpCoinflipCancelInput;
-	game: Game;
-	action?: PvPCoinflipAction;
+	input: TransactionToolInput;
 	createTransaction: (bundle: SuigarClientBundle) => Promise<Transaction>;
-	stake?: number | bigint;
-	stakeDisplay?: string;
-	gameInputs?: Record<string, JsonValue>;
-}) => {
+} & Pick<Required<TransactionSummaryContext>, 'game'> &
+	Pick<
+		TransactionSummaryContext,
+		'action' | 'stake' | 'stakeDisplay' | 'gameInputs'
+	>) => {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
 		throw new Error(

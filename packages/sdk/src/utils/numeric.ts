@@ -97,12 +97,12 @@ export function toBigInt(value: unknown): bigint {
 		}
 	} catch {
 		throw new TypeError(
-			`Value must be a bigint, number, integer string, or boolean: ${value}`,
+			`Value must be a bigint, number, integer string, or boolean: ${String(value)}`,
 		);
 	}
 
 	if (result < 0n) {
-		throw new RangeError(`Value must be non-negative: ${value}`);
+		throw new RangeError(`Value must be non-negative: ${String(value)}`);
 	}
 
 	return result;
@@ -139,7 +139,7 @@ function toBoundedInt(value: unknown, max: number, typeName: string): number {
 		num > max
 	) {
 		throw new RangeError(
-			`Value must be a ${typeName} integer (0-${max}): ${value}`,
+			`Value must be a ${typeName} integer (0-${max}): ${String(value)}`,
 		);
 	}
 

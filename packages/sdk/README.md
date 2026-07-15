@@ -4,7 +4,7 @@ TypeScript SDK for building Suigar v2 game transactions on Sui.
 
 ## Documentation
 
-For complete SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
+For complete SDK documentation, visit [suigar.com/docs/sdk](https://suigar.com/docs/sdk).
 
 For Sui client, transaction, and network APIs, visit the [Sui TypeScript SDK docs](https://sdk.mystenlabs.com/).
 

@@ -3,30 +3,15 @@
 
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import type { SuigarClientBundle } from './client.js';
 import { formatAmount } from './format.js';
 import type {
 	DryRunEventSummary,
 	DryRunSummary,
 	JsonValue,
 	RawDryRunResult,
+	TransactionSummaryFormattingContext,
 } from './types.js';
-
-type DryRunSummaryClient = {
-	suigar: {
-		bcs: {
-			BetResultEvent: {
-				parse(value: Uint8Array): Record<string, unknown> & {
-					game_details: {
-						contents: Array<{
-							key: string;
-							value: number[];
-						}>;
-					};
-				};
-			};
-		};
-	};
-};
 
 const amountFieldNames = new Set([
 	'stake_amount',
@@ -222,7 +207,7 @@ const parseDryRunEvent = (
 
 const summarizeDryRunEvent = (
 	event: unknown,
-	client: DryRunSummaryClient,
+	client: SuigarClientBundle['client'],
 	decimals?: number,
 ): DryRunEventSummary | null => {
 	if (!isRecord(event)) {
@@ -238,7 +223,7 @@ const summarizeDryRunEvent = (
 	const baseSummary = {
 		type: eventType,
 	};
-	let parsedEvent: ReturnType<typeof parseGameEvent> = null;
+	let parsedEvent: ReturnType<typeof parseDryRunEvent> = null;
 
 	try {
 		parsedEvent = parseDryRunEvent(event, eventType);
@@ -287,8 +272,8 @@ const summarizeDryRunEvent = (
 
 export const summarizeDryRun = (
 	dryRun: RawDryRunResult,
-	client: DryRunSummaryClient,
-	context: { coinDecimals?: number } = {},
+	client: SuigarClientBundle['client'],
+	context: TransactionSummaryFormattingContext = {},
 ): DryRunSummary => {
 	const transaction = getDryRunTransaction(dryRun);
 	const transactionRecord: Record<string, unknown> = isRecord(transaction)
@@ -308,12 +293,22 @@ export const summarizeDryRun = (
 		? transactionRecord.balanceChanges.reduce<DryRunSummary['balanceChanges']>(
 				(changes, change) => {
 					if (isRecord(change)) {
+						const rawAmount = toJsonValue(change.amount);
 						changes.push({
-							address: String(change.address ?? ''),
-							coinType: String(change.coinType ?? ''),
+							address: typeof change.address === 'string' ? change.address : '',
+							coinType:
+								typeof change.coinType === 'string' ? change.coinType : '',
 							amount:
 								formatAmount(change.amount, context.coinDecimals) ??
-								({ raw: String(change.amount ?? ''), display: '' } as const),
+								({
+									raw:
+										typeof rawAmount === 'string' ||
+										typeof rawAmount === 'number' ||
+										typeof rawAmount === 'boolean'
+											? String(rawAmount)
+											: '',
+									display: '',
+								} as const),
 						});
 					}
 					return changes;

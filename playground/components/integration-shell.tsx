@@ -382,7 +382,7 @@ const floatingActionNode = (
 			className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
 		>
 			<a
-				href="https://docs.suigar.com/sdk"
+				href="https://suigar.com/docs/sdk"
 				target="_blank"
 				rel="noreferrer"
 				aria-label="Open SDK Docs in a new tab"
@@ -838,7 +838,7 @@ function useIntegrationState({
 	setRouteSearch: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	const pathname = usePathname();
-	const { replace } = useRouter();
+	const router = useRouter();
 	const dAppKit = useDAppKit();
 	const currentClient = useCurrentClient();
 	const currentAccount = useCurrentAccount();
@@ -1422,11 +1422,11 @@ function useIntegrationState({
 			}
 			const nextSearch = params.toString();
 			setRouteSearch(nextSearch ? `?${nextSearch}` : '');
-			replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
+			router.replace(`${pathname}${nextSearch ? `?${nextSearch}` : ''}`, {
 				scroll: false,
 			});
 		},
-		[pathname, replace, routeParams, setRouteSearch],
+		[pathname, routeParams, router, setRouteSearch],
 	);
 
 	function updateStandardForm<K extends StandardGameId>(
@@ -1965,10 +1965,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	);
 }
 
-export function StandardIntegrationPage({}: Record<never, never>) {
+export function StandardIntegrationPage() {
 	return <IntegrationContent mode="standard" />;
 }
 
-export function PvPIntegrationPage({}: Record<never, never>) {
+export function PvPIntegrationPage() {
 	return <IntegrationContent mode="pvp" />;
 }

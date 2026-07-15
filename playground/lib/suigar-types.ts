@@ -46,7 +46,10 @@ export type GameConfigOption = {
 		label: string;
 		value: string;
 	}>;
-	multiplierValues?: string[];
+	multiplierValues?: Array<{
+		id: string;
+		value: string;
+	}>;
 	isPlayable: boolean;
 	stakeRange: StakeRangeSummary;
 };
