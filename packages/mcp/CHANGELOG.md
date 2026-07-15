@@ -1,5 +1,15 @@
 # @suigar/mcp
 
+## 1.0.0-beta.6
+
+### Patch Changes
+
+- 444436a: Update package compatibility with the latest supported Mysten libraries.
+- a36cf76: Improve MCP transaction and dry-run summaries so structured values are formatted safely, and align inspector host-context handling with type-aware linting.
+- Updated dependencies [444436a]
+- Updated dependencies [a36cf76]
+  - @suigar/sdk@2.0.0-beta.25
+
 ## 1.0.0-beta.5
 
 ### Major Changes
