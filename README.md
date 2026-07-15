@@ -5,9 +5,9 @@ contracts.
 
 ## Documentation
 
-For SDK documentation, visit [docs.suigar.com/sdk](https://docs.suigar.com/sdk).
+For SDK documentation, visit [suigar.com/docs/sdk](https://suigar.com/docs/sdk).
 
-For MCP documentation, visit [docs.suigar.com/mcp](https://docs.suigar.com/mcp).
+For MCP documentation, visit [suigar.com/docs/mcp](https://suigar.com/docs/mcp).
 
 For Sui TypeScript SDK documentation, visit [sdk.mystenlabs.com](https://sdk.mystenlabs.com/).
 

@@ -66,7 +66,7 @@
 	"bugs": {
 		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
 	},
-	"homepage": "https://docs.suigar.com/sdk",
+	"homepage": "https://suigar.com/docs/sdk",
 	"peerDependencies": {
 		"@mysten/bcs": "catalog:mysten",
 		"@mysten/sui": "catalog:mysten"

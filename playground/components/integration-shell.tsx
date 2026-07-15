@@ -382,7 +382,7 @@ const floatingActionNode = (
 			className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
 		>
 			<a
-				href="https://docs.suigar.com/sdk"
+				href="https://suigar.com/docs/sdk"
 				target="_blank"
 				rel="noreferrer"
 				aria-label="Open SDK Docs in a new tab"
