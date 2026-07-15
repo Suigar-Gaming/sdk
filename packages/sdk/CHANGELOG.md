@@ -1,5 +1,12 @@
 # @suigar/sdk
 
+## 2.0.0-beta.25
+
+### Patch Changes
+
+- 444436a: Update package compatibility with the latest supported Mysten libraries.
+- a36cf76: Harden SDK numeric error formatting for unusual invalid values and keep async TTL cache refresh behavior explicit under type-aware linting.
+
 ## 2.0.0-beta.24
 
 ### Patch Changes
