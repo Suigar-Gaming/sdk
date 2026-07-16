@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.0
         with:
           fetch-depth: 0
 
@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
 
       - name: Create release PR or publish packages
-        uses: changesets/action@v1
+        uses: changesets/action@v1.9.0
         with:
           version: pnpm run changeset:version
           publish: pnpm run release
