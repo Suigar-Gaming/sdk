@@ -35,6 +35,7 @@
 		"modern-mcp-upgrade",
 		"mysten-libs-sdk-mcp",
 		"mysten-nodenext-type-tags",
+		"mysten-sui-minor-upgrade",
 		"odd-bees-yell",
 		"parser-get-coin-type",
 		"pvp-coinflip-public-options",

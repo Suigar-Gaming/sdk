@@ -1,5 +1,16 @@
 # @suigar/mcp
 
+## 1.0.0-beta.7
+
+### Minor Changes
+
+- 5085660: Upgrade the SDK and MCP package compatibility to the latest minor `@mysten/sui` release used by the workspace catalog.
+
+### Patch Changes
+
+- Updated dependencies [5085660]
+  - @suigar/sdk@2.0.0-beta.26
+
 ## 1.0.0-beta.6
 
 ### Patch Changes
