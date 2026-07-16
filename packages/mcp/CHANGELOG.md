@@ -1,5 +1,13 @@
 # @suigar/mcp
 
+## 1.0.0-beta.8
+
+### Patch Changes
+
+- ba75a50: Clean up MCP runtime summary typing and scope React Doctor checks to the bundled MCP App.
+- Updated dependencies [ba75a50]
+  - @suigar/sdk@2.0.0-beta.27
+
 ## 1.0.0-beta.7
 
 ### Minor Changes

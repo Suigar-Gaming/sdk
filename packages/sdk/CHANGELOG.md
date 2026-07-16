@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.27
+
+### Patch Changes
+
+- ba75a50: Tighten transaction builder validation around typed transaction data.
+
 ## 2.0.0-beta.26
 
 ### Minor Changes
