@@ -64,7 +64,7 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
 
       - name: Manypkg Check
-        run: pnpm exec manypkg check
+        run: pnpm manypkg check
 
       - name: Lint packages
         run: pnpm turbo run lint --filter='./packages/*'

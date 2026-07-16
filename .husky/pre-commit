@@ -1,2 +1,2 @@
 pnpm --recursive --if-present run doctor --staged
-pnpm exec lint-staged
+pnpm lint-staged
