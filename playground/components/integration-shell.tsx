@@ -61,7 +61,6 @@ import {
 	PVP_GAME_OPTIONS,
 	STANDARD_GAME_OPTIONS,
 } from '@/components/integration-shell/options';
-import { useEventLog } from '@/components/providers/event-log-provider';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import {
@@ -79,6 +78,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
+import { useEventLog } from '@/hooks/use-event-log';
 import { usePersistentForms } from '@/hooks/use-persistent-forms';
 import { parseSuigarEvents } from '@/lib/event-parsing';
 import {

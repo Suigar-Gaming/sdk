@@ -4,17 +4,13 @@ import * as React from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+import {
+	EventLogContext,
+	type EventLogContextValue,
+} from '@/components/providers/event-log-context';
 import type { EventLogRow } from '@/lib/suigar-types';
 
-type EventLogContextValue = {
-	rows: EventLogRow[];
-	addRows: (rows: EventLogRow[]) => void;
-	clearRows: () => void;
-};
-
 const STORAGE_KEY = 'suigar-playground:event:logs';
-
-const EventLogContext = React.createContext<EventLogContextValue | null>(null);
 
 type EventLogStore = {
 	rows: EventLogRow[];
@@ -67,14 +63,4 @@ export function EventLogProvider({ children }: { children: React.ReactNode }) {
 			{children}
 		</EventLogContext.Provider>
 	);
-}
-
-export function useEventLog() {
-	const context = React.use(EventLogContext);
-
-	if (!context) {
-		throw new Error('useEventLog must be used inside EventLogProvider');
-	}
-
-	return context;
 }

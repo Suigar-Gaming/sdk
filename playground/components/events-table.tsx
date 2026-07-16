@@ -2,7 +2,6 @@
 
 import { Copy, ExternalLink, ListTree, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useEventLog } from '@/components/providers/event-log-provider';
 import { Button } from '@/components/ui/button';
 import {
 	Card,
@@ -20,6 +19,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
+import { useEventLog } from '@/hooks/use-event-log';
 import { compactAddress } from '@/lib/suigar-app';
 
 function toTitleCase(value: string) {
