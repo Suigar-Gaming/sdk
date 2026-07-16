@@ -36,7 +36,6 @@
 		"node": "^22.18.0 || >=24.0.0"
 	},
 	"scripts": {
-		"start:local": "pnpm --filter @suigar/sdk run build:ci && pnpm run build && node dist/bin.mjs",
 		"build": "pnpm run clean && tsdown && vite build",
 		"build:ci": "pnpm run build",
 		"clean": "rm -rf dist",

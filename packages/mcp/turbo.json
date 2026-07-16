@@ -1,0 +1,11 @@
+{
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["@suigar/sdk#build"]
+		},
+		"build:ci": {
+			"dependsOn": ["@suigar/sdk#build:ci"]
+		}
+	}
+}
