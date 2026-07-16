@@ -24,7 +24,6 @@ import type {
 	DryRunResult,
 	RawDryRunResult,
 	ResolvedMcpConfig,
-	SuigarConfigOverrides,
 	SuigarMcpConfigInput,
 	TransactionSummary,
 	TransactionSummaryContext,
@@ -73,7 +72,7 @@ export const createSuigarClient = (
 	});
 	const client = baseClient.$extend(
 		suigar({
-			config: input.config as SuigarConfigOverrides | undefined,
+			config: input.config,
 			partner: input.partner,
 		}),
 	);
