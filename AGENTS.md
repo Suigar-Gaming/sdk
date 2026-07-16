@@ -21,10 +21,11 @@ pnpm --dir packages/sdk run build
 pnpm --dir packages/sdk run build:ci
 
 # Build the MCP package and bundled MCP App
-pnpm --dir packages/mcp run build
+pnpm turbo run build --filter=@suigar/mcp
 
 # Build and run the local stdio MCP server for manual client testing
-pnpm --dir packages/mcp run start:local
+pnpm turbo run build --filter=@suigar/mcp
+node packages/mcp/dist/bin.mjs
 
 # Regenerate Move contract bindings only
 pnpm --dir packages/sdk run codegen
