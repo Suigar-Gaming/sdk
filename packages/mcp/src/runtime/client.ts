@@ -146,31 +146,11 @@ const summarizeTransaction = (
 	transaction: Transaction,
 	context: TransactionSummaryContext = {},
 ): TransactionSummary => {
-	const data = transaction.getData() as {
-		sender?: string | null;
-		gasData?: {
-			budget?: string | number | bigint | null;
-			price?: string | number | bigint | null;
-		};
-		commands?: Array<Record<string, unknown> & { $kind?: string }>;
-		inputs?: Array<{
-			$kind?: string;
-			UnresolvedObject?: { objectId?: string } | null;
-		}>;
-	};
+	const data = transaction.getData();
 
 	const commands = (data.commands ?? []).map((command) => {
 		const kind = String(command.$kind ?? Object.keys(command)[0] ?? 'Unknown');
-		const moveCall = (
-			command as {
-				MoveCall?: {
-					package?: string;
-					module?: string;
-					function?: string;
-					typeArguments?: string[];
-				};
-			}
-		).MoveCall;
+		const moveCall = command.MoveCall;
 		const target =
 			moveCall?.package && moveCall?.module && moveCall?.function
 				? `${moveCall.package}::${moveCall.module}::${moveCall.function}`

@@ -4,6 +4,11 @@
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
 import {
+	BuildTransactionResult,
+	ReadGameMetadataResult,
+	ReadOnlyPlan,
+} from '../../src/runtime/types.js';
+import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
 	buildPlinkoTransactionTool,
@@ -41,10 +46,7 @@ describe('read tools', () => {
 			game: 'coinflip',
 			coinType: '0x2::sui::SUI',
 		});
-		const content = result.structuredContent as {
-			network: string;
-			game: { id: string; coinType: string; packageId: string } | null;
-		};
+		const content = result.structuredContent as ReadGameMetadataResult;
 
 		expect(content.network).toBe('testnet');
 		expect(content.game?.id).toBe('coinflip');
@@ -107,11 +109,7 @@ describe('read-only transaction tools', () => {
 		],
 	])('returns a read-only plan for %s', async (_name, run) => {
 		const result = await run();
-		const content = result.structuredContent as {
-			mode: string;
-			network: string;
-			plan: { target: string | null };
-		};
+		const content = result.structuredContent as ReadOnlyPlan;
 
 		expect(content.mode).toBe('read-only');
 		expect(content.network).toBe('testnet');
@@ -133,18 +131,7 @@ describe('build transaction tools', () => {
 				stake: 1_000,
 				side: 'heads',
 			});
-			const content = result.structuredContent as {
-				mode: string;
-				network: string;
-				transactionBytesBase64?: string;
-				summary: {
-					game?: string;
-					stake?: string;
-					stakeDisplay?: string;
-					coinDecimals?: number;
-					gameInputs?: Record<string, unknown>;
-				};
-			};
+			const content = result.structuredContent as BuildTransactionResult;
 
 			expect(content.mode).toBe('build');
 			expect(content.network).toBe('testnet');
@@ -173,9 +160,7 @@ describe('build transaction tools', () => {
 				stake: 1,
 				side: 'heads',
 			});
-			const content = result.structuredContent as {
-				summary: { stake?: string; stakeDisplay?: string };
-			};
+			const content = result.structuredContent as BuildTransactionResult;
 
 			expect(content.summary.stake).toBe('1000000000');
 			expect(content.summary.stakeDisplay).toBe('1');
@@ -220,20 +205,16 @@ describe('build transaction tools', () => {
 			]);
 
 			expect(
-				(limbo.structuredContent as { summary: { gameInputs?: unknown } })
-					.summary.gameInputs,
+				(limbo.structuredContent as BuildTransactionResult).summary.gameInputs,
 			).toEqual({ targetMultiplier: 2.5 });
 			expect(
-				(plinko.structuredContent as { summary: { gameInputs?: unknown } })
-					.summary.gameInputs,
+				(plinko.structuredContent as BuildTransactionResult).summary.gameInputs,
 			).toEqual({ configId: 3 });
 			expect(
-				(wheel.structuredContent as { summary: { gameInputs?: unknown } })
-					.summary.gameInputs,
+				(wheel.structuredContent as BuildTransactionResult).summary.gameInputs,
 			).toEqual({ configId: 4 });
 			expect(
-				(range.structuredContent as { summary: { gameInputs?: unknown } })
-					.summary.gameInputs,
+				(range.structuredContent as BuildTransactionResult).summary.gameInputs,
 			).toEqual({ leftPoint: 25, rightPoint: 75, outOfRange: true });
 		} finally {
 			buildSpy.mockRestore();
