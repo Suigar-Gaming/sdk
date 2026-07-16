@@ -74,10 +74,10 @@
 		"zod": "4.4.3"
 	},
 	"devDependencies": {
+		"@tailwindcss/vite": "catalog:tooling",
 		"@types/node": "catalog:typescript",
 		"@types/react": "catalog:typescript",
 		"@types/react-dom": "catalog:typescript",
-		"@tailwindcss/vite": "catalog:tooling",
 		"@vitejs/plugin-react": "^6.0.3",
 		"react-doctor": "catalog:tooling",
 		"tailwindcss": "catalog:tooling",

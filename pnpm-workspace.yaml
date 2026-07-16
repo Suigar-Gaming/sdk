@@ -45,6 +45,10 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@mysten/*'
 
+auditConfig:
+  ignoreGhsas:
+    - GHSA-qx2v-qp2m-jg93
+
 peerDependencyRules:
   ignoreMissing:
     - eslint
