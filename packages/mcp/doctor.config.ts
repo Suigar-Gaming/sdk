@@ -8,8 +8,10 @@ export default defineConfig({
 	share: false,
 	noScore: true,
 	rules: {
-		'deslop/unused-dependency': 'off',
 		'deslop/unused-file': 'off',
+		// The MCP package uses NodeNext ESM source imports with emitted `.js`
+		// specifiers, which React Doctor's wrapper reports as missing extensions.
+		'import/extensions': 'off',
 	},
 	ignore: {
 		files: ['src/!(app){,/**/*}', 'test/**/*'],
