@@ -40,6 +40,8 @@
 		"parser-get-coin-type",
 		"pvp-coinflip-public-options",
 		"quiet-cups-listen",
+		"remove-useless-casts-mcp",
+		"remove-useless-casts-sdk",
 		"sdk-catalog-deps",
 		"sdk-public-game-exports",
 		"soft-seas-protect",
