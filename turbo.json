@@ -1,39 +1,50 @@
 {
 	"$schema": "https://turbo.build/schema.json",
+	"globalDependencies": [
+		".prettierignore",
+		".prettierrc.json",
+		"pnpm-workspace.yaml",
+		"tsconfig.shared.json"
+	],
 	"tasks": {
 		"test": {
 			"dependsOn": ["^build:ci"],
+			"inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"],
 			"outputs": []
 		},
 		"lint": {
-			"cache": false,
+			"inputs": ["$TURBO_DEFAULT$"],
 			"outputs": []
 		},
 		"lint:fix": {
 			"cache": false,
+			"inputs": ["$TURBO_DEFAULT$"],
 			"outputs": []
 		},
 		"typecheck": {
 			"dependsOn": ["^build:ci"],
+			"inputs": ["$TURBO_DEFAULT$", "!README.md", "!CHANGELOG.md"],
 			"outputs": []
 		},
 		"build": {
-			"dependsOn": ["^build:ci"],
-			"outputs": ["dist/**", "out/**", ".next/**"]
-		},
-		"build:ci": {
-			"dependsOn": ["^build:ci"],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"!test/**",
+				"!tests/**",
+				"!README.md",
+				"!CHANGELOG.md"
+			],
 			"outputs": ["dist/**"]
 		},
-		"dev": {
-			"dependsOn": ["^build:ci"],
-			"cache": false,
-			"persistent": true
-		},
-		"start": {
-			"dependsOn": ["^build:ci"],
-			"cache": false,
-			"persistent": true
+		"build:ci": {
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				"!test/**",
+				"!tests/**",
+				"!README.md",
+				"!CHANGELOG.md"
+			],
+			"outputs": ["dist/**"]
 		}
 	}
 }

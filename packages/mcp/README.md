@@ -12,12 +12,7 @@ It provides:
 
 The package never signs or executes transactions.
 
-The server targets the MCP
-[`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25)
-specification and registers tools/resources through the modern MCP server and
-MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for
-retryable validation or config failures rather than signing or executing
-transactions.
+The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
 ## Install
 
@@ -41,11 +36,11 @@ Use the stdio server from an MCP client:
 For local workspace development:
 
 ```bash
-pnpm --dir packages/mcp run start:local
+pnpm turbo run build --filter=@suigar/mcp
+node packages/mcp/dist/bin.mjs
 ```
 
-This builds the local `@suigar/sdk` workspace package first, then builds and
-starts the MCP stdio server from `packages/mcp/dist/bin.mjs`.
+This builds the local workspace dependencies, MCP server, and bundled MCP App. Run the generated stdio entrypoint from the repository root for manual client testing.
 
 ## Tools
 

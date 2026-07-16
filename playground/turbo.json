@@ -1,0 +1,20 @@
+{
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build:ci"],
+			"env": ["BASE_PATH"],
+			"outputs": [".next/**", "!.next/cache/**", "out/**"]
+		},
+		"dev": {
+			"dependsOn": ["^build:ci"],
+			"cache": false,
+			"persistent": true
+		},
+		"start": {
+			"dependsOn": ["^build:ci"],
+			"cache": false,
+			"persistent": true
+		}
+	}
+}

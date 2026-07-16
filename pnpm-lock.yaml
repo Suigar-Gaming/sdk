@@ -242,8 +242,8 @@ catalogs:
       specifier: ^3.9.5
       version: 3.9.5
     react-doctor:
-      specifier: ^0.7.7
-      version: 0.7.7
+      specifier: ^0.7.8
+      version: 0.7.8
     tailwindcss:
       specifier: ^4.3.2
       version: 4.3.2
@@ -346,7 +346,7 @@ importers:
         version: 6.0.3(vite@8.1.4(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
       react-doctor:
         specifier: catalog:tooling
-        version: 0.7.7(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0)
+        version: 0.7.8(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0)
       tailwindcss:
         specifier: catalog:tooling
         version: 4.3.2
@@ -479,7 +479,7 @@ importers:
         version: 3.9.5
       react-doctor:
         specifier: catalog:tooling
-        version: 0.7.7(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0)
+        version: 0.7.8(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0)
       tailwindcss:
         specifier: catalog:tooling
         version: 4.3.2
@@ -2957,8 +2957,8 @@ packages:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
 
-  deslop-js@0.7.7:
-    resolution: {integrity: sha512-mUr2B3FZM+vJZK4w6ZRwuHm6cXVWM5kS4xGRjRLC0yyen/zD+/ZI7QtH/UqUN0LaEIQZL2+P8PMcsDOIB5xgPQ==}
+  deslop-js@0.7.8:
+    resolution: {integrity: sha512-QMmb3Z/ARvYZmZneudb8cnY/4mVvZTdhUyA9TC2skwOcm7KvY9zyOdn0TApQc4rL0VM2TffFkmo3ky/lJZX7qw==}
 
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
@@ -3648,8 +3648,8 @@ packages:
   oxc-resolver@11.24.2:
     resolution: {integrity: sha512-FY91FiDBj7ls5MsFS9jN3tjz2o0/zsdSsymlakySaBwVJZorHhkWyICLZMKxlu1R9vYo+sd3z1jwb4J8x7bNDw==}
 
-  oxlint-plugin-react-doctor@0.7.7:
-    resolution: {integrity: sha512-OMl/8k3rcxTSyMJWUL/pdq/ZZKFtv1F4kyM+AWYsj/YYaL/nftL/idrJOxyd2CuFa5Nrbz2DlK3QFRej1uwQ/Q==}
+  oxlint-plugin-react-doctor@0.7.8:
+    resolution: {integrity: sha512-3f9/jFLIC/KRLPYqxiXSk20cq47luGy9Oz5Ru7nK7w0EI9B9zuMvAU92bK9jFiwFE7Lc9PA8ER6Y+naYaGFQGw==}
     engines: {node: ^20.19.0 || >=22.13.0}
 
   oxlint-tsgolint@0.24.0:
@@ -3821,8 +3821,8 @@ packages:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
 
-  react-doctor@0.7.7:
-    resolution: {integrity: sha512-kHlzPDZNRKlQbXsXgnFh1I4mL0ybt0xJca3/uRMZafaXR4AG5zf7iFMqtdRUiFWHeefE4vGf4YQmkYkXzE1rlg==}
+  react-doctor@0.7.8:
+    resolution: {integrity: sha512-G3spmtZJE/gWWPRJ3rpgUWTPRDJpEmdRja7iNZ7RAXlfpEO+NWVzPTca/cPI9hLwPo2Aq5/BZggo5JDBrwGrlA==}
     engines: {node: ^20.19.0 || >=22.13.0}
     hasBin: true
 
@@ -6597,7 +6597,7 @@ snapshots:
 
   depd@2.0.0: {}
 
-  deslop-js@0.7.7:
+  deslop-js@0.7.8:
     dependencies:
       '@oxc-project/types': 0.138.0
       fast-glob: 3.3.3
@@ -7288,7 +7288,7 @@ snapshots:
       '@oxc-resolver/binding-win32-arm64-msvc': 11.24.2
       '@oxc-resolver/binding-win32-x64-msvc': 11.24.2
 
-  oxlint-plugin-react-doctor@0.7.7:
+  oxlint-plugin-react-doctor@0.7.8:
     dependencies:
       '@typescript-eslint/types': 8.64.0
       eslint-scope: 9.1.2
@@ -7473,19 +7473,19 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-doctor@0.7.7(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0):
+  react-doctor@0.7.8(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(oxlint-tsgolint@0.24.0):
     dependencies:
       '@babel/code-frame': 7.29.7
       '@sentry/node': 10.65.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))
       agent-install: 0.0.5
       conf: 15.1.0
       confbox: 0.2.4
-      deslop-js: 0.7.7
+      deslop-js: 0.7.8
       eslint-plugin-react-hooks: 7.1.1
       jiti: 2.7.0
       magicast: 0.5.3
       oxlint: 1.66.0(oxlint-tsgolint@0.24.0)
-      oxlint-plugin-react-doctor: 0.7.7
+      oxlint-plugin-react-doctor: 0.7.8
       prompts: 2.4.2
       typescript: 5.9.3
       vscode-languageserver: 9.0.1

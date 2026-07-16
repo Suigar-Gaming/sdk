@@ -590,18 +590,14 @@ describe('transaction builders', () => {
 			side: 'heads',
 			config: TEST_CONFIG,
 		});
-		const data = tx.getData() as {
-			sender: string | null;
-			commands: Array<Record<string, unknown> & { $kind: string }>;
-		};
+		const data = tx.getData();
 
 		expect(data.sender).toBe(normalizeSuiAddress('0x123'));
 		expect(data.commands[0].$kind).toBe('$Intent');
 		expect(data.commands[1].$kind).toBe('MoveCall');
-		expect(
-			(data.commands[1] as unknown as { MoveCall: { package: string } })
-				.MoveCall.package,
-		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.coinflip));
+		expect(data.commands[1].MoveCall!.package).toBe(
+			normalizeSuiAddress(TEST_CONFIG.packageIds.coinflip),
+		);
 	});
 
 	it('builds pvp coinflip create and cancel transactions with the configured package id', () => {
@@ -620,27 +616,19 @@ describe('transaction builders', () => {
 			config: TEST_CONFIG,
 		});
 
-		const createData = createTx.getData() as {
-			sender: string | null;
-			commands: Array<Record<string, unknown> & { $kind: string }>;
-		};
-		const cancelData = cancelTx.getData() as {
-			sender: string | null;
-			commands: Array<Record<string, unknown> & { $kind: string }>;
-		};
+		const createData = createTx.getData();
+		const cancelData = cancelTx.getData();
 
 		expect(createData.sender).toBe(normalizeSuiAddress('0x123'));
 		expect(cancelData.sender).toBe(normalizeSuiAddress('0x123'));
 		expect(createData.commands[1].$kind).toBe('MoveCall');
 		expect(cancelData.commands[0].$kind).toBe('MoveCall');
-		expect(
-			(createData.commands[1] as unknown as { MoveCall: { package: string } })
-				.MoveCall.package,
-		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip));
-		expect(
-			(cancelData.commands[0] as unknown as { MoveCall: { package: string } })
-				.MoveCall.package,
-		).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip));
+		expect(createData.commands[1].MoveCall!.package).toBe(
+			normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip),
+		);
+		expect(cancelData.commands[0].MoveCall!.package).toBe(
+			normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip),
+		);
 	});
 });
 
@@ -655,10 +643,7 @@ describe('shared transaction helpers', () => {
 			owner: '0xabc',
 			gasBudget: 999,
 		});
-		const data = tx.getData() as {
-			sender: string | null;
-			gasData?: { budget?: string | number | bigint | null };
-		};
+		const data = tx.getData();
 
 		expect(data.sender).toBe(normalizeSuiAddress('0xabc'));
 		expect(data.gasData?.budget).toBe('999');
