@@ -1,3 +1,6 @@
+// Copyright (c) Suigar
+// SPDX-License-Identifier: Apache-2.0
+
 import path from 'node:path';
 import type { NextConfig } from 'next';
 import { basePath } from './lib/paths';
