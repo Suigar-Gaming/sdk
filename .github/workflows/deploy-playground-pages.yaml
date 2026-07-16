@@ -7,13 +7,23 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yaml'
       - '.github/workflows/deploy-playground-pages.yaml'
+      - 'package.json'
+      - 'packages/sdk/**'
       - 'playground/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.shared.json'
       - 'turbo.json'
   pull_request:
     paths:
       - '.github/actions/setup-node-pnpm/action.yaml'
       - '.github/workflows/deploy-playground-pages.yaml'
+      - 'package.json'
+      - 'packages/sdk/**'
       - 'playground/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig.shared.json'
       - 'turbo.json'
   workflow_dispatch:
 

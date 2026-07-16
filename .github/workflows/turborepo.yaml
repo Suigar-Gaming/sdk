@@ -8,21 +8,29 @@ on:
     paths:
       - '.github/actions/setup-node-pnpm/action.yaml'
       - '.github/workflows/turborepo.yaml'
+      - '.oxlintrc.json'
+      - '.prettierignore'
+      - '.prettierrc.json'
       - 'playground/**'
       - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
+      - 'tsconfig.shared.json'
       - 'turbo.json'
   pull_request:
     paths:
       - '.github/actions/setup-node-pnpm/action.yaml'
       - '.github/workflows/turborepo.yaml'
+      - '.oxlintrc.json'
+      - '.prettierignore'
+      - '.prettierrc.json'
       - 'playground/**'
       - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
+      - 'tsconfig.shared.json'
       - 'turbo.json'
 
 permissions:
