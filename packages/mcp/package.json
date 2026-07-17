@@ -2,6 +2,7 @@
 	"name": "@suigar/mcp",
 	"version": "1.0.0-beta.8",
 	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
+	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
 		"suigar",
 		"sui",
@@ -13,7 +14,6 @@
 		"games"
 	],
 	"license": "Apache-2.0",
-	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"type": "module",
 	"sideEffects": false,
 	"files": [

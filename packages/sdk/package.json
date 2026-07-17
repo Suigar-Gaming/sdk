@@ -2,6 +2,7 @@
 	"name": "@suigar/sdk",
 	"version": "2.0.0-beta.27",
 	"description": "TypeScript SDK for Suigar v2 Move contracts on Sui.",
+	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
 		"suigar",
 		"sui",
@@ -45,7 +46,7 @@
 		"build": "pnpm run clean && pnpm run codegen && tsdown",
 		"build:ci": "pnpm run clean && tsdown",
 		"clean": "rm -rf dist",
-		"codegen": "tsx ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
+		"codegen": "node ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"oxlint": "oxlint .",
@@ -64,7 +65,7 @@
 		"access": "public"
 	},
 	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
 	},
 	"homepage": "https://suigar.com/docs/sdk",
 	"peerDependencies": {
@@ -77,7 +78,6 @@
 		"@mysten/sui": "catalog:mysten",
 		"@types/node": "catalog:typescript",
 		"tsdown": "catalog:tooling",
-		"tsx": "catalog:tooling",
 		"typescript": "catalog:typescript",
 		"vitest": "catalog:test"
 	}
