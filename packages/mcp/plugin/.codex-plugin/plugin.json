@@ -1,0 +1,30 @@
+{
+	"name": "suigar",
+	"version": "1.0.0-beta.8",
+	"description": "Suigar MCP tools for reading game config and building unsigned Sui game transactions.",
+	"author": {
+		"name": "Suigar",
+		"email": "contact.suigar@gmail.com",
+		"url": "https://github.com/Suigar-Gaming"
+	},
+	"homepage": "https://suigar.com/docs/mcp",
+	"repository": "https://github.com/Suigar-Gaming/ts-sdks",
+	"license": "Apache-2.0",
+	"keywords": ["suigar", "sui", "mcp", "games", "transactions"],
+	"mcpServers": "./.codex-mcp.json",
+	"interface": {
+		"displayName": "Suigar",
+		"shortDescription": "Build unsigned Suigar game transactions on Sui",
+		"longDescription": "Suigar adds MCP tools for reading Suigar network config, inspecting game metadata, and building or dry-running unsigned Sui transactions for coinflip, limbo, plinko, range, wheel, and PvP coinflip.",
+		"developerName": "Suigar",
+		"category": "Developer Tools",
+		"capabilities": ["Read", "Generate"],
+		"websiteURL": "https://suigar.com/docs/mcp",
+		"defaultPrompt": [
+			"Show Suigar testnet game metadata",
+			"Build a Suigar coinflip transaction",
+			"Dry-run a Suigar PvP coinflip transaction"
+		],
+		"brandColor": "#E03B8B"
+	}
+}

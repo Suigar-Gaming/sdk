@@ -13,10 +13,12 @@
 		"games"
 	],
 	"license": "Apache-2.0",
+	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"type": "module",
 	"sideEffects": false,
 	"files": [
 		"dist",
+		"plugin",
 		"CHANGELOG.md",
 		"README.md"
 	],
@@ -39,6 +41,7 @@
 		"build": "pnpm run clean && tsdown && vite build",
 		"build:ci": "pnpm run build",
 		"clean": "rm -rf dist",
+		"sync-plugin-version": "node ./scripts/sync-plugin-version.ts",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes",
@@ -58,7 +61,7 @@
 		"access": "public"
 	},
 	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues"
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
 	},
 	"homepage": "https://suigar.com/docs/mcp",
 	"dependencies": {

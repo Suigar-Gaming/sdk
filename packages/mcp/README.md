@@ -33,6 +33,15 @@ Use the stdio server from an MCP client:
 }
 ```
 
+The package also ships `plugin/` manifests for plugin-capable hosts:
+
+- `plugin/.codex-plugin/plugin.json` for Codex
+- `plugin/.claude-plugin/plugin.json` for Claude Code
+- `plugin/.cursor-plugin/plugin.json` for Cursor
+- `plugin/plugin.json` for Antigravity-style plugin discovery
+
+Each plugin manifest registers the same `npx -y @suigar/mcp` stdio server through the bundled `.mcp.json` client config files. Plugin manifest versions are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
+
 For local workspace development:
 
 ```bash
