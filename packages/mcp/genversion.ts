@@ -7,10 +7,6 @@ interface PackageJson {
 	version: string;
 }
 
-interface PluginManifest {
-	version: string;
-}
-
 const packageJsonPath = new URL('./package.json', import.meta.url);
 const pluginManifestPaths = [
 	new URL('./plugin/plugin.json', import.meta.url),
@@ -22,11 +18,23 @@ const pluginManifestPaths = [
 const packageJson = JSON.parse(
 	await readFile(packageJsonPath, 'utf8'),
 ) as PackageJson;
+const versionPattern = /^(\s*"version"\s*:\s*")[^"]+(")/m;
 
 for (const manifestPath of pluginManifestPaths) {
-	const manifest = JSON.parse(
-		await readFile(manifestPath, 'utf8'),
-	) as PluginManifest;
-	manifest.version = packageJson.version;
-	await writeFile(manifestPath, `${JSON.stringify(manifest, null, '\t')}\n`);
+	const manifestSource = await readFile(manifestPath, 'utf8');
+	const nextManifestSource = manifestSource.replace(
+		versionPattern,
+		`$1${packageJson.version}$2`,
+	);
+
+	if (
+		nextManifestSource === manifestSource &&
+		!versionPattern.test(manifestSource)
+	) {
+		throw new Error(`Missing version field in ${manifestPath.pathname}`);
+	}
+
+	if (nextManifestSource !== manifestSource) {
+		await writeFile(manifestPath, nextManifestSource);
+	}
 }

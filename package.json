@@ -24,7 +24,7 @@
 		"changeset": "changeset",
 		"changeset:beta:enter": "changeset pre enter beta",
 		"changeset:beta:exit": "changeset pre exit",
-		"changeset:version": "changeset version && pnpm --filter '@suigar/*' codegen:version && pnpm --filter '@suigar/*' prettier:fix",
+		"changeset:version": "changeset version && pnpm --filter '@suigar/*' codegen:version",
 		"release": "turbo run build:ci --filter='./packages/*' && changeset publish",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
