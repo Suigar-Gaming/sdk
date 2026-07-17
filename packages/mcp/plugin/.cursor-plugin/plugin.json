@@ -10,5 +10,6 @@
 	"repository": "https://github.com/Suigar-Gaming/ts-sdks",
 	"license": "Apache-2.0",
 	"keywords": ["suigar", "sui", "mcp", "games", "transactions"],
+	"logo": "./assets/logo.svg",
 	"mcpServers": "./.mcp.json"
 }

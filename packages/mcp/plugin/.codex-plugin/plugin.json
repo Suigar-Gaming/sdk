@@ -25,6 +25,8 @@
 			"Build a Suigar coinflip transaction",
 			"Dry-run a Suigar PvP coinflip transaction"
 		],
-		"brandColor": "#E03B8B"
+		"brandColor": "#2AC2FF",
+		"composerIcon": "./assets/logo.png",
+		"logo": "./assets/logo.png"
 	}
 }

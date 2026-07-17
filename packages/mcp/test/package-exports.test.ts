@@ -39,11 +39,18 @@ describe('package exports', () => {
 			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
 			expect(manifest.name).toBe('suigar');
 			expect(manifest.version).toBe(packageJson.version);
+			expect(manifest.license).toBe('Apache-2.0');
 		}
 
 		const mcpConfig = JSON.parse(
 			await readFile(new URL('../plugin/.mcp.json', import.meta.url), 'utf8'),
 		);
+		await expect(
+			readFile(new URL('../plugin/assets/logo.svg', import.meta.url), 'utf8'),
+		).resolves.toContain('<svg');
+		await expect(
+			readFile(new URL('../plugin/assets/logo.png', import.meta.url)),
+		).resolves.toBeInstanceOf(Buffer);
 		expect(mcpConfig).toEqual({
 			mcpServers: {
 				suigar: {
@@ -60,6 +67,8 @@ describe('package exports', () => {
 			),
 		);
 		expect(codexManifest.mcpServers).toBe('./.mcp.json');
+		expect(codexManifest.interface.composerIcon).toBe('./assets/logo.png');
+		expect(codexManifest.interface.logo).toBe('./assets/logo.png');
 
 		const cursorManifest = JSON.parse(
 			await readFile(
@@ -68,5 +77,6 @@ describe('package exports', () => {
 			),
 		);
 		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
+		expect(cursorManifest.logo).toBe('./assets/logo.svg');
 	});
 });
