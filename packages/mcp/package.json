@@ -41,7 +41,7 @@
 		"build": "pnpm run clean && tsdown && vite build",
 		"build:ci": "pnpm run build",
 		"clean": "rm -rf dist",
-		"sync-plugin-version": "node ./scripts/sync-plugin-version.ts",
+		"codegen:version": "node genversion.ts",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes",

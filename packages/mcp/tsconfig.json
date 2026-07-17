@@ -9,8 +9,8 @@
 		"src/**/*.tsx",
 		"test/**/*.ts",
 		"doctor.config.ts",
+		"genversion.ts",
 		"package.json",
-		"scripts/**/*.ts",
 		"tsdown.config.ts",
 		"vite.config.ts"
 	]
