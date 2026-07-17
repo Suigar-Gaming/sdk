@@ -25,4 +25,37 @@ describe('package exports', () => {
 		expect(source).not.toContain("export * from './runtime/");
 		expect(source).not.toContain("export type * from './runtime/");
 	});
+
+	it('ships synchronized plugin manifests and MCP server config', async () => {
+		expect(packageJson.files).toContain('plugin');
+
+		const manifestUrls = [
+			new URL('../plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.claude-plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
+		];
+		const mcpConfigUrls = [
+			new URL('../plugin/.mcp.json', import.meta.url),
+			new URL('../plugin/.codex-mcp.json', import.meta.url),
+		];
+
+		for (const manifestUrl of manifestUrls) {
+			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
+			expect(manifest.name).toBe('suigar');
+			expect(manifest.version).toBe(packageJson.version);
+		}
+
+		for (const mcpConfigUrl of mcpConfigUrls) {
+			const mcpConfig = JSON.parse(await readFile(mcpConfigUrl, 'utf8'));
+			expect(mcpConfig).toEqual({
+				mcpServers: {
+					suigar: {
+						command: 'npx',
+						args: ['-y', '@suigar/mcp'],
+					},
+				},
+			});
+		}
+	});
 });
