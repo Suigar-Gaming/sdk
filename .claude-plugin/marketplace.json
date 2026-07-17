@@ -1,0 +1,16 @@
+{
+	"name": "suigar",
+	"owner": {
+		"name": "Suigar",
+		"email": "contact.suigar@gmail.com"
+	},
+	"description": "Suigar plugin catalog for Claude Code.",
+	"plugins": [
+		{
+			"name": "suigar",
+			"source": "./packages/mcp/plugin",
+			"description": "Suigar MCP tools for reading game config and building unsigned Sui game transactions.",
+			"category": "Developer Tools"
+		}
+	]
+}

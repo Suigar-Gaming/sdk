@@ -42,6 +42,27 @@ The package also ships `plugin/` manifests for plugin-capable hosts:
 
 The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp` stdio server. Plugin manifest versions are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
 
+Repo-level marketplace catalogs are included for local plugin testing:
+
+- `.agents/plugins/marketplace.json` for ChatGPT desktop and Codex
+- `.claude-plugin/marketplace.json` for Claude Code
+- `.cursor-plugin/marketplace.json` for Cursor multi-plugin repository discovery
+
+For ChatGPT desktop or Codex local testing, open the repository in ChatGPT desktop, restart the app, open the Plugins directory in Work mode or Codex, then install `suigar` from the `Suigar` source. The same marketplace can be registered from the Codex CLI with:
+
+```bash
+codex plugin marketplace add .
+```
+
+For Claude Code local testing, add this repository as a marketplace from the repository root and install the plugin:
+
+```text
+/plugin marketplace add .
+/plugin install suigar@suigar
+```
+
+For Cursor, the repository includes both the plugin manifest and a root `.cursor-plugin/marketplace.json` for multi-plugin repository flows. During local development, you can also copy or symlink `packages/mcp/plugin` into Cursor's local plugin directory and reload Cursor. If you only need MCP tools, direct MCP configuration with `npx -y @suigar/mcp` is simpler and does not require the plugin wrapper.
+
 For local workspace development:
 
 ```bash

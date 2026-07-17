@@ -21,9 +21,9 @@
 		"capabilities": ["Read", "Generate"],
 		"websiteURL": "https://suigar.com/docs/mcp",
 		"defaultPrompt": [
-			"Show Suigar testnet game metadata",
-			"Build a Suigar coinflip transaction",
-			"Dry-run a Suigar PvP coinflip transaction"
+			"Show testnet game metadata",
+			"Build a coinflip transaction",
+			"Dry-run a PvP coinflip transaction"
 		],
 		"brandColor": "#2AC2FF",
 		"composerIcon": "./assets/logo.png",

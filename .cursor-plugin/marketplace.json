@@ -1,0 +1,18 @@
+{
+	"name": "suigar",
+	"owner": {
+		"name": "Suigar",
+		"email": "contact.suigar@gmail.com"
+	},
+	"metadata": {
+		"description": "Suigar plugin catalog for Cursor."
+	},
+	"plugins": [
+		{
+			"name": "suigar",
+			"source": "packages/mcp/plugin",
+			"description": "Suigar MCP tools for reading game config and building unsigned Sui game transactions.",
+			"category": "Developer Tools"
+		}
+	]
+}
