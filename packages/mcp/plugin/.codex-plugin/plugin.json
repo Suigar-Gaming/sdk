@@ -11,7 +11,7 @@
 	"repository": "https://github.com/Suigar-Gaming/ts-sdks",
 	"license": "Apache-2.0",
 	"keywords": ["suigar", "sui", "mcp", "games", "transactions"],
-	"mcpServers": "./.codex-mcp.json",
+	"mcpServers": "./.mcp.json",
 	"interface": {
 		"displayName": "Suigar",
 		"shortDescription": "Build unsigned Suigar game transactions on Sui",

@@ -35,27 +35,38 @@ describe('package exports', () => {
 			new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
 			new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
 		];
-		const mcpConfigUrls = [
-			new URL('../plugin/.mcp.json', import.meta.url),
-			new URL('../plugin/.codex-mcp.json', import.meta.url),
-		];
-
 		for (const manifestUrl of manifestUrls) {
 			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
 			expect(manifest.name).toBe('suigar');
 			expect(manifest.version).toBe(packageJson.version);
 		}
 
-		for (const mcpConfigUrl of mcpConfigUrls) {
-			const mcpConfig = JSON.parse(await readFile(mcpConfigUrl, 'utf8'));
-			expect(mcpConfig).toEqual({
-				mcpServers: {
-					suigar: {
-						command: 'npx',
-						args: ['-y', '@suigar/mcp'],
-					},
+		const mcpConfig = JSON.parse(
+			await readFile(new URL('../plugin/.mcp.json', import.meta.url), 'utf8'),
+		);
+		expect(mcpConfig).toEqual({
+			mcpServers: {
+				suigar: {
+					command: 'npx',
+					args: ['-y', '@suigar/mcp'],
 				},
-			});
-		}
+			},
+		});
+
+		const codexManifest = JSON.parse(
+			await readFile(
+				new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
+				'utf8',
+			),
+		);
+		expect(codexManifest.mcpServers).toBe('./.mcp.json');
+
+		const cursorManifest = JSON.parse(
+			await readFile(
+				new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
+				'utf8',
+			),
+		);
+		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
 	});
 });
