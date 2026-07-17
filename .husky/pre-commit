@@ -1,2 +1,2 @@
-pnpm --filter '@suigar/*' doctor --staged
+pnpm --filter '@suigar/*' run doctor --staged
 pnpm lint-staged
