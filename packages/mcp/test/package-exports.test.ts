@@ -55,7 +55,7 @@ describe('package exports', () => {
 			mcpServers: {
 				suigar: {
 					command: 'npx',
-					args: ['-y', '@suigar/mcp'],
+					args: ['-y', `@suigar/mcp@${packageJson.version}`],
 				},
 			},
 		});
