@@ -67,6 +67,9 @@ describe('MCP server registration', () => {
 			const readConfigTool = result.tools.find(
 				(tool) => tool.name === 'read_config',
 			);
+			const readGameMetadataTool = result.tools.find(
+				(tool) => tool.name === 'read_game_metadata',
+			);
 			expect(readConfigTool).toMatchObject({
 				title: 'Read Suigar Config',
 				execution: { taskSupport: 'forbidden' },
@@ -78,6 +81,11 @@ describe('MCP server registration', () => {
 			expect(readConfigTool?.outputSchema).toMatchObject({
 				type: 'object',
 			});
+			expect(readGameMetadataTool).toMatchObject({
+				title: 'Read Suigar Game Metadata',
+				execution: { taskSupport: 'forbidden' },
+			});
+			expect(readGameMetadataTool?._meta).toBeUndefined();
 		} finally {
 			await client.close();
 			await server.close();

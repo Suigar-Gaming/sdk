@@ -7,7 +7,7 @@ import type { ToolTextResult } from '../../src/runtime/types.js';
 import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
 import {
 	readOnlyToolAnnotations,
-	registerSuigarInspectorTools,
+	registerSuigarTools,
 	withToolErrors,
 } from '../../src/server/tool-registration.js';
 
@@ -17,7 +17,9 @@ const appToolMeta = {
 	},
 } as const;
 
-const inspectorToolNames = [
+const registeredToolNames = [
+	'read_config',
+	'read_game_metadata',
 	'build_coinflip_transaction',
 	'build_limbo_transaction',
 	'build_plinko_transaction',
@@ -26,7 +28,6 @@ const inspectorToolNames = [
 	'build_pvp_coinflip_join_transaction',
 	'build_range_transaction',
 	'build_wheel_transaction',
-	'read_game_metadata',
 ];
 
 const transactionToolAnnotations = {
@@ -36,11 +37,11 @@ const transactionToolAnnotations = {
 	openWorldHint: true,
 };
 
-describe('MCP inspector tool registration', () => {
-	it('registers the app-backed Suigar inspector tools with shared metadata', () => {
+describe('MCP tool registration', () => {
+	it('registers all Suigar tools with shared definitions', () => {
 		const server = new McpServer({ name: 'suigar-test', version: '0.0.0' });
 
-		registerSuigarInspectorTools(server, appToolMeta);
+		registerSuigarTools(server, appToolMeta);
 
 		const registeredTools = (
 			server as unknown as {
@@ -58,13 +59,18 @@ describe('MCP inspector tool registration', () => {
 		)._registeredTools;
 
 		expect(Object.keys(registeredTools).sort()).toEqual(
-			inspectorToolNames.sort(),
+			registeredToolNames.sort(),
 		);
+		expect(registeredTools.read_config).toMatchObject({
+			title: 'Read Suigar Config',
+			annotations: readOnlyToolAnnotations,
+		});
+		expect(registeredTools.read_config._meta).toBeUndefined();
 		expect(registeredTools.read_game_metadata).toMatchObject({
 			title: 'Read Suigar Game Metadata',
 			annotations: readOnlyToolAnnotations,
-			_meta: appToolMeta,
 		});
+		expect(registeredTools.read_game_metadata._meta).toBeUndefined();
 		expect(registeredTools.build_coinflip_transaction).toMatchObject({
 			title: 'Build Coinflip Transaction',
 			annotations: transactionToolAnnotations,

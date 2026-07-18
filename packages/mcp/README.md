@@ -4,7 +4,7 @@ MCP server and MCP App for Suigar transaction workflows on Sui.
 
 It provides:
 
-- SDK-backed tools for reading Suigar config and game metadata
+- SDK-backed tools for reading Suigar config and live game metadata
 - unsigned transaction builders for standard Suigar games and PvP coinflip
 - `build`, `dry-run`, and `read-only` modes
 - a compact MCP App UI resource for compatible hosts
@@ -85,7 +85,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_pvp_coinflip_join_transaction`
 - `build_pvp_coinflip_cancel_transaction`
 
-All tools return `content` text plus `structuredContent`. App-capable hosts can render the shared Suigar Transaction Inspector UI for game metadata and transaction tools.
+All tools return `content` text plus `structuredContent`. App-capable hosts can render the shared Suigar Transaction Inspector UI for transaction tools. Use `read_game_metadata` for live on-chain parameters for one selected game, and `read_config` for broad network config and supported-game discovery.
 
 ## Modes
 

@@ -15,13 +15,13 @@
 	"interface": {
 		"displayName": "Suigar",
 		"shortDescription": "Build unsigned Suigar game transactions on Sui",
-		"longDescription": "Suigar adds MCP tools for reading Suigar network config, inspecting game metadata, and building or dry-running unsigned Sui transactions for coinflip, limbo, plinko, range, wheel, and PvP coinflip.",
+		"longDescription": "Suigar adds MCP tools for reading Suigar network config, inspecting live game parameters, and building or dry-running unsigned Sui transactions for coinflip, limbo, plinko, range, wheel, and PvP coinflip.",
 		"developerName": "Suigar",
 		"category": "Developer Tools",
 		"capabilities": ["Read", "Generate"],
 		"websiteURL": "https://suigar.com/docs/mcp",
 		"defaultPrompt": [
-			"Read testnet coinflip game metadata",
+			"Read testnet config",
 			"Build a coinflip transaction",
 			"Dry-run a PvP coinflip transaction"
 		],

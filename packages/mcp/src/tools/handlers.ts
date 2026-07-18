@@ -9,12 +9,14 @@ import {
 	type PvPCoinflipAction,
 	type StandardGame,
 } from '@suigar/sdk/games';
+import { formatBaseUnitAmount } from '../runtime/format.js';
 import {
 	buildTransactionResult,
 	createSuigarClient,
 	DEFAULT_NETWORK,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
+	toJsonValue,
 	ToolTextResult,
 	type BuilderMode,
 	type ReadConfigResult,
@@ -186,6 +188,42 @@ const requireGame = (value: unknown): Game => {
 	);
 };
 
+const isAmountParameter = (key: string) =>
+	key === 'min_stake' || key === 'max_stake' || key === 'max_payout';
+
+const formatGameParameterValue = (
+	key: string,
+	value: unknown,
+	decimals: number,
+): unknown => {
+	if (Array.isArray(value)) {
+		return value.map((item) => formatGameParameterValue(key, item, decimals));
+	}
+	if (value && typeof value === 'object') {
+		return formatGameParameters(value as Record<string, unknown>, decimals);
+	}
+	return isAmountParameter(key) &&
+		(typeof value === 'string' ||
+			typeof value === 'number' ||
+			typeof value === 'bigint')
+		? {
+				raw: String(value),
+				display: formatBaseUnitAmount(value, decimals),
+			}
+		: value;
+};
+
+const formatGameParameters = (
+	parameters: Record<string, unknown>,
+	decimals: number,
+) =>
+	Object.fromEntries(
+		Object.entries(parameters).map(([key, value]) => [
+			key,
+			formatGameParameterValue(key, value, decimals),
+		]),
+	);
+
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
 const getConfigInput = (input: ReadConfigInput) => ({
@@ -344,8 +382,14 @@ export const readGameMetadataTool = async (
 	input: Partial<ReadGameMetadataInput> = {},
 ) => {
 	const game = requireGame(input.game);
-	const { config } = createSuigarClient(getConfigInput(input));
-	const coinType = resolveDefaultCoinType(config, input.coinType);
+	const { client, config } = createSuigarClient(getConfigInput(input));
+	const coin = coinMetadataForAmount(config, input.coinType);
+	const ignoreCache = input.ignoreCache ?? true;
+	const parameters = await client.suigar.getGameParameters(game, {
+		coinType: coin.coinType,
+		ignoreCache,
+	});
+
 	return asTextResponse({
 		network: config.network,
 		config,
@@ -354,12 +398,15 @@ export const readGameMetadataTool = async (
 			id: game,
 			label: GAME_LABELS[game],
 			packageId: getPackageId(config, game),
-			coinType,
+			coinType: coin.coinType,
+			parameters:
+				toJsonValue(formatGameParameters(parameters, coin.decimals)) ?? null,
+			ignoreCache,
 			notes: [
-				game === 'pvp-coinflip'
-					? 'PvP coinflip uses dedicated create, join, and cancel transaction builders.'
-					: 'Standard games use client.suigar.tx.createBetTransaction().',
-				'Transactions are unsigned and are never executed by the MCP server.',
+				'Parameters are loaded from the on-chain game settings objects through client.suigar.getGameParameters().',
+				ignoreCache
+					? 'SDK parameter cache was ignored for this read.'
+					: 'SDK parameter cache was allowed for this read.',
 			],
 		},
 	} satisfies ReadGameMetadataResult);

@@ -85,8 +85,18 @@ export const readConfigInputSchema = configInputSchema;
 
 export const readGameMetadataInputSchema = configInputSchema
 	.extend({
-		game: z.enum(GAMES).describe('Suigar game id to inspect.'),
+		game: z
+			.enum(GAMES)
+			.describe(
+				'Required single Suigar game id whose live on-chain parameters should be read.',
+			),
 		coinType: z.string().min(1).optional().describe(coinTypeDescription),
+		ignoreCache: z
+			.boolean()
+			.optional()
+			.describe(
+				'Refresh on-chain game parameters instead of reading SDK cache.',
+			),
 	})
 	.strict();
 
