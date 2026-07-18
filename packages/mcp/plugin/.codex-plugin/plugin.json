@@ -21,8 +21,6 @@
 		"capabilities": ["Read", "Generate"],
 		"websiteURL": "https://suigar.com/docs/mcp",
 		"defaultPrompt": [
-			"Read testnet configuration",
-			"Read mainnet configuration",
 			"Read testnet coinflip game metadata",
 			"Build a coinflip transaction",
 			"Dry-run a PvP coinflip transaction"
