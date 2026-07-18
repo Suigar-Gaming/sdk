@@ -1,5 +1,15 @@
 # @suigar/mcp
 
+## 1.0.0-beta.9
+
+### Patch Changes
+
+- 373d636: Require an explicit game id when reading game metadata through the MCP tool and make the Codex plugin default prompts more explicit for reading config and game metadata.
+- 09b6525: Ship a multi-client plugin bundle for installing the Suigar MCP server in Codex, Claude Code, Cursor, and Antigravity-style plugin hosts.
+- 615cea7: Pin the bundled MCP server config of plugin to the package version from `package.json`.
+- Updated dependencies [09b6525]
+  - @suigar/sdk@2.0.0-beta.28
+
 ## 1.0.0-beta.8
 
 ### Patch Changes
