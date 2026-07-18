@@ -3,6 +3,7 @@ import { fromBase64 } from '@mysten/sui/utils';
 import type { SuigarClient } from '@suigar/sdk';
 import {
 	fromMoveFloat,
+	isMoveFloat,
 	parseGameDetails,
 	parseGameEvent,
 } from '@suigar/sdk/utils';
@@ -74,11 +75,11 @@ function formatParsedMap(value: Record<string, unknown>) {
 }
 
 function formatOraclePrice(value: unknown) {
-	if (typeof value !== 'object' || value === null) {
+	if (!isMoveFloat(value)) {
 		return 'N/A';
 	}
 
-	const parsed = fromMoveFloat(value as Parameters<typeof fromMoveFloat>[0]);
+	const parsed = fromMoveFloat(value);
 	if (!Number.isFinite(parsed)) {
 		return 'N/A';
 	}
