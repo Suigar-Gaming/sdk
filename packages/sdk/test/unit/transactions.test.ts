@@ -59,7 +59,7 @@ const COINFLIP_SETTINGS_FIELD_BCS = CoinFlipSettingsKey.serialize({
 	dummy_field: false,
 }).toBytes();
 const SUI_TYPE_NAME_FIELD_BCS = TypeName.serialize({
-	name: '0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+	name: normalizeStructTag(COINS.testnet.sui.coinType).slice(2),
 }).toBytes();
 
 afterEach(() => {
@@ -1266,6 +1266,13 @@ describe('SuigarClient', () => {
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
 		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(client.getDynamicObjectFieldCalls[0]?.name).toEqual({
+			type: TypeName.name,
+			bcs: SUI_TYPE_NAME_FIELD_BCS,
+		});
+		expect(
+			TypeName.parse(client.getDynamicObjectFieldCalls[0]!.name.bcs).name,
+		).toBe(normalizeStructTag(COINS.testnet.sui.coinType).slice(2));
 		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);

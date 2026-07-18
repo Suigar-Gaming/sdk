@@ -19,7 +19,6 @@ import {
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
-	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
@@ -426,7 +425,7 @@ export class SuigarClient {
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({
-					name: resolveCoinTypeNameForTypeNameKey(coinType),
+					name: coinType.slice(2),
 				}).toBytes(),
 			},
 			include: {

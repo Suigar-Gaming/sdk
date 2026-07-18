@@ -19,7 +19,6 @@ import {
 	PlinkoSettingsKey,
 } from '../../src/contracts/plinko/plinko.js';
 import {
-	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
@@ -138,19 +137,6 @@ describe('resolveSuigarConfig', () => {
 
 	it('builds generated TypeName tags independently from TypeName key values', () => {
 		expect(TypeName.typeTag()).toBe(normalizeStructTag(TypeName.name));
-	});
-
-	it('formats coin types for Move TypeName dynamic field key payloads', () => {
-		expect(resolveCoinTypeNameForTypeNameKey('0x2::sui::SUI')).toBe(
-			'0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
-		);
-		expect(
-			resolveCoinTypeNameForTypeNameKey(
-				'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
-			),
-		).toBe(
-			'47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
-		);
 	});
 
 	it('throws when no price info object id is configured for the requested coin type', () => {

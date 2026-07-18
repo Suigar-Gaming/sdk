@@ -3,4 +3,3 @@
 
 export * from './config.js';
 export * from './metadata.js';
-export * from './type-name.js';
