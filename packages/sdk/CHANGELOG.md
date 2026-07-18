@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.28
+
+### Patch Changes
+
+- 09b6525: Add package author metadata to the SDK package manifest.
+
 ## 2.0.0-beta.27
 
 ### Patch Changes
@@ -71,8 +77,7 @@
 
 ### Minor Changes
 
-- 10f49e2: Bump the SDK's `@mysten/sui` dependency to the latest shared workspace minor
-  release and align the package metadata and lockfile with that update.
+- 10f49e2: Bump the SDK's `@mysten/sui` dependency to the latest shared workspace minor release and align the package metadata and lockfile with that update.
 
 ## 2.0.0-beta.18
 
@@ -121,10 +126,7 @@
 
 ### Patch Changes
 
-- 85ae057: Refine public validation failures to use `RangeError` and `TypeError` instead
-  of generic `Error` for unsupported networks, unsupported game or PvP action
-  inputs, unsupported configured coin types, bounded integer helpers, and
-  `parseCoinType()` parsing failures.
+- 85ae057: Refine public validation failures to use `RangeError` and `TypeError` instead of generic `Error` for unsupported networks, unsupported game or PvP action inputs, unsupported configured coin types, bounded integer helpers, and `parseCoinType()` parsing failures.
 
 ## 2.0.0-beta.11
 
@@ -151,18 +153,14 @@
 ### Patch Changes
 
 - eaf8b3a: Fix metadata encoding so partner metadata is only added when configured and hex metadata values are encoded consistently as bytes. Improve supported-coin and price-info resolution error handling for transaction configuration.
-- 9929e05: Refine Move parser helpers by simplifying BCS type usage, normalizing missing
-  `i64` and float mantissa values to `0`, and documenting the numeric conversion
-  behavior in `fromMoveI64` and `fromMoveFloat`.
+- 9929e05: Refine Move parser helpers by simplifying BCS type usage, normalizing missing `i64` and float mantissa values to `0`, and documenting the numeric conversion behavior in `fromMoveI64` and `fromMoveFloat`.
 
 ## 2.0.0-beta.8
 
 ### Patch Changes
 
 - 0292edb: Rename transaction builder option `owner` to `playerAddress` and remove the separate `sender` option so all game transactions use a single explicit player address.
-- 20311be: Improve the public JSDoc for `parseGameDetails`, `toBigInt`, and `toU8` so the
-  generated API surface explains their coercion, validation, and decoding
-  behavior more clearly.
+- 20311be: Improve the public JSDoc for `parseGameDetails`, `toBigInt`, and `toU8` so the generated API surface explains their coercion, validation, and decoding behavior more clearly.
 - a2aa324: Update PvP coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
   - Make `getPvPCoinflipGames()` parse bulk `client.core.getObjects()` results instead of resolving each game individually.
   - Skip per-object fetch or parse failures by default and continue supporting strict rejection with `throwOnError: true`.
@@ -185,12 +183,9 @@
 
 ### Patch Changes
 
-- bf98e0a: Update PvP coinflip registry lookups so `getPvPCoinflipGames()` can skip
-  individual game resolution failures by default while still supporting
-  `rejectOnError: true` for strict rejection.
+- bf98e0a: Update PvP coinflip registry lookups so `getPvPCoinflipGames()` can skip individual game resolution failures by default while still supporting `rejectOnError: true` for strict rejection.
   - Document the `rejectOnError` behavior in the public JSDoc and README examples.
-  - Clarify repo guidance and skill documentation to distinguish general PvP game
-    guidance from the current PvP coinflip-specific runtime surface.
+  - Clarify repo guidance and skill documentation to distinguish general PvP game guidance from the current PvP coinflip-specific runtime surface.
 
 ## 2.0.0-beta.4
 
@@ -209,9 +204,7 @@
 - b89d0b4: Add a public `@suigar/sdk/games` export subpath for shared game option types, and export `SuigarClient` from the package root.
 - bf1f71b: Add `registryIds` to `SuigarConfig` and resolve them from the network config registry map.
 
-  Document the PvP coinflip runtime helpers more clearly by describing
-  registry-backed unresolved game discovery through `getPvPCoinflipGames()` and
-  the normalized live-game lookup behavior of `resolvePvPCoinflipGame()`.
+  Document the PvP coinflip runtime helpers more clearly by describing registry-backed unresolved game discovery through `getPvPCoinflipGames()` and the normalized live-game lookup behavior of `resolvePvPCoinflipGame()`.
 
 - 4861f55: Add public utility exports for shared scaling constants in `@suigar/sdk/utils`, including `RANGE_POINT_LIMIT` and `DEFAULT_RANGE_SCALE`. Update the SDK example app and documentation to use the exported constants and document limbo/range scaling behavior more clearly.
 
