@@ -10,7 +10,7 @@ import {
 	normalizeSuiAddress,
 	SUI_ADDRESS_LENGTH,
 } from '@mysten/sui/utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { suigar, type SuigarClient } from '../../src/client.js';
 import { COINS, PACKAGE_IDS } from '../../src/configs/index.js';
 import {
@@ -18,6 +18,10 @@ import {
 	Parameters as GeneratedCoinflipParameters,
 } from '../../src/contracts/coinflip/coinflip.js';
 import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import {
+	Parameters as GeneratedLimboParameters,
+	LimboSettingsKey,
+} from '../../src/contracts/limbo/limbo.js';
 import { Game as GeneratedPvPCoinflipGame } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	buildCoinflipTransaction,
@@ -56,6 +60,9 @@ const TEST_CONFIG = {
 } as const;
 
 const COINFLIP_SETTINGS_FIELD_BCS = CoinFlipSettingsKey.serialize({
+	dummy_field: false,
+}).toBytes();
+const LIMBO_SETTINGS_FIELD_BCS = LimboSettingsKey.serialize({
 	dummy_field: false,
 }).toBytes();
 const SUI_TYPE_NAME_FIELD_BCS = TypeName.serialize({
@@ -172,6 +179,44 @@ function createCoinflipParametersObject({
 			house_edge: 100n,
 			min_stake: BigInt(minStake),
 			max_stake: 10_000n,
+		}).toBytes(),
+		previousTransaction: undefined,
+		objectBcs: undefined,
+		json: undefined,
+		display: undefined,
+	};
+}
+
+function createLimboParametersObject(
+	objectId: string,
+): SuiClientTypes.Object<{ content: true }> {
+	return {
+		objectId,
+		version: '1',
+		digest: `${objectId}-digest`,
+		owner: {
+			$kind: 'AddressOwner',
+			AddressOwner: '0xowner',
+		},
+		type: `${TEST_CONFIG.packageIds.limbo}::limbo::Parameters<0x2::sui::SUI>`,
+		content: GeneratedLimboParameters.serialize({
+			id: objectId,
+			min_stake: 25n,
+			max_stake: 10_000n,
+			max_payout: 100_000n,
+			min_target_multiplier: {
+				mant: 1n,
+				exp: { bits: 52n },
+				is_negative: false,
+			},
+			max_target_multiplier: {
+				mant: 2n,
+				exp: { bits: 52n },
+				is_negative: false,
+			},
+			max_number_of_games: 10n,
+			min_rtp: { mant: 95n, exp: { bits: 52n }, is_negative: false },
+			max_rtp: { mant: 99n, exp: { bits: 52n }, is_negative: false },
 		}).toBytes(),
 		previousTransaction: undefined,
 		objectBcs: undefined,
@@ -1276,6 +1321,35 @@ describe('SuigarClient', () => {
 		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
+	});
+
+	it('decodes generated Move floats in game parameters into numbers', async () => {
+		const client = createSuigarTestClient({
+			objects: [createLimboParametersObject('0x111')],
+			dynamicFieldLookups: [
+				{
+					nameBcs: LIMBO_SETTINGS_FIELD_BCS,
+					parentId: PACKAGE_IDS.testnet.sweetHouse,
+					nameType: `${PACKAGE_IDS.testnet.limbo}::limbo::LimboSettingsKey`,
+					childId: '0x222',
+				},
+				{
+					nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+					parentId: '0x222',
+					nameType: TypeName.name,
+					childId: '0x111',
+				},
+			],
+		});
+
+		const parameters = await client.suigar.getGameParameters('limbo');
+
+		expectTypeOf(parameters.min_target_multiplier).toEqualTypeOf<number>();
+		expectTypeOf(parameters.max_target_multiplier).toEqualTypeOf<number>();
+		expect(parameters.min_target_multiplier).toBe(1);
+		expect(parameters.max_target_multiplier).toBe(2);
+		expect(parameters.min_rtp).toBe(95);
+		expect(parameters.max_rtp).toBe(99);
 	});
 
 	it('throws the game and coin type when parameters content is missing', async () => {

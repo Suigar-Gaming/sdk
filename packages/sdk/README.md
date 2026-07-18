@@ -54,6 +54,8 @@ import {
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
+	isMoveFloat,
+	isMoveI64,
 	parseCoinType,
 	parseGameDetails,
 	RANGE_POINT_LIMIT,
@@ -69,7 +71,9 @@ Numeric helper behavior:
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript `number`
-- `fromMoveFloat(value)` converts a generated Move float struct into a JavaScript `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a JavaScript `number`; `getGameParameters()` already applies this conversion to all float fields, including nested game configs
+- `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
+- `isMoveFloat(value)` checks whether an unknown value has the generated Move float shape
 - `parseCoinType(type)` extracts the normalized first generic coin type from a Move object type string and throws `TypeError` when no coin type can be parsed
 - `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
 
@@ -238,7 +242,7 @@ Returns the on-chain `Parameters<T>` object for any supported game and coin type
 
 The SDK first reads the selected game's settings object from the configured SweetHouse object, then reads that game's coin-specific `Parameters<T>` object. This is useful for displaying or validating current limits such as min/max stake, house edge, or game-specific config bounds. The parsed result is cached using the extension `cacheTtl`.
 
-When a parameter field is a generated Move float struct, such as `min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use `fromMoveFloat()` before treating it as a normal JavaScript number.
+Float parameter fields such as `min_target_multiplier`, `max_target_multiplier`, `min_rtp`, and `max_rtp` are returned as normal JavaScript numbers. This also applies to float multipliers nested in Plinko and Wheel configs.
 
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {

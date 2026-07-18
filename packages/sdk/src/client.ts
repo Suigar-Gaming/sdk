@@ -19,6 +19,7 @@ import {
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
+	normalizeGameParameterValues,
 	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
@@ -35,6 +36,7 @@ import {
 	GAME_SETTINGS,
 	type GameParameters,
 	type GetGameParametersOptions,
+	type OnChainGameParameters,
 } from './types/game-settings.type.js';
 import {
 	BuildCoinflipTransactionOptions,
@@ -155,7 +157,8 @@ export class SuigarClient {
 	 * then reads that game's coin-specific `Parameters<T>` object. Results are
 	 * cached according to the extension `cacheTtl` option. Pass
 	 * `ignoreCache: true` to refresh the on-chain read and replace the cached
-	 * value.
+	 * value. Generated Move float fields are decoded into JavaScript numbers,
+	 * including floats nested in game configs.
 	 *
 	 * @param game Game whose parameters should be loaded.
 	 * @param options Optional coin type, cache override, and abort signal.
@@ -440,8 +443,10 @@ export class SuigarClient {
 			);
 		}
 
-		return gameDefinition.parameters.parse(
-			object.content,
-		) as GameParameters<TGame>;
+		return normalizeGameParameterValues(
+			gameDefinition.parameters.parse(
+				object.content,
+			) as OnChainGameParameters<TGame>,
+		);
 	}
 }

@@ -28,6 +28,7 @@ import {
 	WheelSettingsKey,
 } from '../contracts/wheel/wheel.js';
 import type { Game } from './game.type.js';
+import type { MoveFloat } from './move-float.type.js';
 
 export const GAME_SETTINGS = {
 	coinflip: {
@@ -56,11 +57,25 @@ export const GAME_SETTINGS = {
 	},
 } as const;
 
-type GameParametersMap = {
+type OnChainGameParametersMap = {
 	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;
 };
 
-export type GameParameters<TGame extends Game> = GameParametersMap[TGame];
+export type GameParameterValue<TValue> = TValue extends MoveFloat
+	? number
+	: TValue extends Array<infer TItem>
+		? Array<GameParameterValue<TItem>>
+		: TValue extends object
+			? { [TKey in keyof TValue]: GameParameterValue<TValue[TKey]> }
+			: TValue;
+
+export type OnChainGameParameters<TGame extends Game> =
+	OnChainGameParametersMap[TGame];
+
+/** Consumer-ready parameters with generated Move float values decoded to numbers. */
+export type GameParameters<TGame extends Game> = GameParameterValue<
+	OnChainGameParameters<TGame>
+>;
 
 export type GetGameParametersOptions =
 	SuiClientTypes.CoreClientMethodOptions & {

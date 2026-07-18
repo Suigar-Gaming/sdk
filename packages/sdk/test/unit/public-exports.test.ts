@@ -41,6 +41,8 @@ import {
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
+	isMoveFloat,
+	isMoveI64,
 	parseCoinType,
 	parseGameEvent,
 	RANGE_POINT_LIMIT,
@@ -82,9 +84,17 @@ describe('public source subpath modules', () => {
 		expect(DEFAULT_RANGE_SCALE).toBe(1_000_000);
 		expect(DEFAULT_LIMBO_MULTIPLIER_SCALE).toBe(100);
 		expect(fromMoveI64({ bits: '0' })).toBe(0);
+		expect(isMoveI64({ bits: '0' })).toBe(true);
+		expect(isMoveI64({ bits: 0 })).toBe(false);
 		expect(
 			fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
 		).toBe(0);
+		expect(
+			isMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
+		).toBe(true);
+		expect(
+			isMoveFloat({ mant: '0', exp: { bits: 0 }, is_negative: false }),
+		).toBe(false);
 		expect(parseGameEvent).toBeTypeOf('function');
 		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
