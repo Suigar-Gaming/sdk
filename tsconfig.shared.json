@@ -5,6 +5,7 @@
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"lib": ["DOM", "ESNext"],
+		"types": ["node"],
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,

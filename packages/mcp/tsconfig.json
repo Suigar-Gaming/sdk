@@ -1,7 +1,6 @@
 {
 	"extends": "../../tsconfig.shared.json",
 	"compilerOptions": {
-		"jsx": "react-jsx",
 		"outDir": "dist",
 		"rootDir": "."
 	},
@@ -10,6 +9,7 @@
 		"src/**/*.tsx",
 		"test/**/*.ts",
 		"doctor.config.ts",
+		"genversion.ts",
 		"package.json",
 		"tsdown.config.ts",
 		"vite.config.ts"

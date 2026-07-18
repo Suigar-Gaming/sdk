@@ -1,2 +1,2 @@
-pnpm --recursive --if-present run doctor --staged
+pnpm --filter '@suigar/*' run doctor --staged
 pnpm lint-staged

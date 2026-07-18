@@ -25,4 +25,58 @@ describe('package exports', () => {
 		expect(source).not.toContain("export * from './runtime/");
 		expect(source).not.toContain("export type * from './runtime/");
 	});
+
+	it('ships synchronized plugin manifests and MCP server config', async () => {
+		expect(packageJson.files).toContain('plugin');
+
+		const manifestUrls = [
+			new URL('../plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.claude-plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
+			new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
+		];
+		for (const manifestUrl of manifestUrls) {
+			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
+			expect(manifest.name).toBe('suigar');
+			expect(manifest.version).toBe(packageJson.version);
+			expect(manifest.license).toBe('Apache-2.0');
+		}
+
+		const mcpConfig = JSON.parse(
+			await readFile(new URL('../plugin/.mcp.json', import.meta.url), 'utf8'),
+		);
+		await expect(
+			readFile(new URL('../plugin/assets/logo.svg', import.meta.url), 'utf8'),
+		).resolves.toContain('<svg');
+		await expect(
+			readFile(new URL('../plugin/assets/logo.png', import.meta.url)),
+		).resolves.toBeInstanceOf(Buffer);
+		expect(mcpConfig).toEqual({
+			mcpServers: {
+				suigar: {
+					command: 'npx',
+					args: ['-y', '@suigar/mcp'],
+				},
+			},
+		});
+
+		const codexManifest = JSON.parse(
+			await readFile(
+				new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
+				'utf8',
+			),
+		);
+		expect(codexManifest.mcpServers).toBe('./.mcp.json');
+		expect(codexManifest.interface.composerIcon).toBe('./assets/logo.png');
+		expect(codexManifest.interface.logo).toBe('./assets/logo.svg');
+
+		const cursorManifest = JSON.parse(
+			await readFile(
+				new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
+				'utf8',
+			),
+		);
+		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
+		expect(cursorManifest.logo).toBe('./assets/logo.svg');
+	});
 });
