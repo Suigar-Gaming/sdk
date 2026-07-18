@@ -22,12 +22,16 @@ export function normalizeGameParameterValues<TGameParameters>(
 	}
 
 	if (typeof value === 'object' && value !== null) {
-		return Object.fromEntries(
-			Object.entries(value).map(([key, item]) => [
-				key,
-				normalizeGameParameterValues(item),
-			]),
-		) as GameParameterValue<TGameParameters>;
+		const normalized: Record<
+			string,
+			GameParameterValue<TGameParameters[keyof TGameParameters]>
+		> = {};
+		for (const key of Object.keys(value)) {
+			normalized[key] = normalizeGameParameterValues(
+				value[key as keyof TGameParameters],
+			);
+		}
+		return normalized as GameParameterValue<TGameParameters>;
 	}
 
 	return value as GameParameterValue<TGameParameters>;

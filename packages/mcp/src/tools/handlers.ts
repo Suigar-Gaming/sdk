@@ -216,13 +216,16 @@ const formatGameParameterValue = (
 const formatGameParameters = (
 	parameters: Record<string, unknown>,
 	decimals: number,
-) =>
-	Object.fromEntries(
-		Object.entries(parameters).map(([key, value]) => [
-			key,
-			formatGameParameterValue(key, value, decimals),
-		]),
-	);
+) => {
+	const formatted: Record<
+		string,
+		ReturnType<typeof formatGameParameterValue>
+	> = {};
+	for (const key of Object.keys(parameters)) {
+		formatted[key] = formatGameParameterValue(key, parameters[key], decimals);
+	}
+	return formatted;
+};
 
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
