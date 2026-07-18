@@ -22,7 +22,7 @@ catalogs:
     'prettier': ^3.9.5
     'react-doctor': ^0.7.8
     'tailwindcss': ^4.3.3
-    'tsdown': ^0.22.8
+    'tsdown': ^0.22.9
   typescript:
     '@types/node': ^24.0.0
     '@types/react': ^19.2.17
