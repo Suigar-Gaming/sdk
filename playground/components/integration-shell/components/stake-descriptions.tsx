@@ -29,7 +29,7 @@ export function StakeDescription({
 
 	if (error) {
 		return (
-			<FieldDescription size="sm">
+			<FieldDescription size="sm" className="text-destructive">
 				Unable to load on-chain stake limits: {error}
 			</FieldDescription>
 		);
