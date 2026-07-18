@@ -212,13 +212,8 @@ const getTarget = (
 ) => {
 	const packageId = getPackageId(config, game);
 	if (game === 'pvp-coinflip') {
-		const functionName =
-			action === 'join'
-				? 'join_game'
-				: action === 'cancel'
-					? 'cancel_game'
-					: 'create_game';
-		return `${packageId}::pvp_coinflip::${functionName}`;
+		const functionName = `${action?.toLowerCase() ?? 'create'}_game`;
+		return `${packageId}::${game}::${functionName}`;
 	}
 	return `${packageId}::${game}::play`;
 };
