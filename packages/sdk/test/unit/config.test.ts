@@ -13,11 +13,14 @@ import {
 	PRICE_INFO_OBJECT_IDS,
 	REGISTRY_IDS,
 } from '../../src/configs/index.js';
-import { PlinkoSettingsKey } from '../../src/contracts/plinko/plinko.js';
+import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import {
+	Parameters as PlinkoParameters,
+	PlinkoSettingsKey,
+} from '../../src/contracts/plinko/plinko.js';
 import {
 	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
-	resolveGameSettingsKeyType,
 	resolvePriceInfoObjectId,
 	resolveSuigarConfig,
 } from '../../src/helpers/index.js';
@@ -118,22 +121,23 @@ describe('resolveSuigarConfig', () => {
 		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
 	});
 
-	it('builds the SweetHouse settings key type with the configured game package id', () => {
+	it('builds the SweetHouse settings key type with the generated typeTag helper', () => {
 		expect(
-			resolveGameSettingsKeyType(
-				PlinkoSettingsKey.name,
-				PACKAGE_IDS.mainnet.plinko,
-			),
+			PlinkoSettingsKey.typeTag({ package: PACKAGE_IDS.mainnet.plinko }),
 		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
 	});
 
-	it('keeps settings key module and struct names when replacing the package id', () => {
+	it('supports generated type tags with positional type arguments', () => {
 		expect(
-			resolveGameSettingsKeyType(
-				'0x123::custom_game::CustomSettingsKey',
-				'0x456',
-			),
-		).toBe('0x456::custom_game::CustomSettingsKey');
+			PlinkoParameters.typeTag({
+				package: '0x456',
+				typeArguments: [SUI_TYPE_ARG],
+			}),
+		).toBe(`0x456::plinko::Parameters<${normalizeStructTag(SUI_TYPE_ARG)}>`);
+	});
+
+	it('builds generated TypeName tags independently from TypeName key values', () => {
+		expect(TypeName.typeTag()).toBe(normalizeStructTag(TypeName.name));
 	});
 
 	it('formats coin types for Move TypeName dynamic field key payloads', () => {

@@ -21,7 +21,6 @@ import {
 	DEFAULT_CACHE_TTL_MS,
 	resolveCoinTypeNameForTypeNameKey,
 	resolveGamePackageId,
-	resolveGameSettingsKeyType,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -412,10 +411,9 @@ export class SuigarClient {
 			await this.#client.core.getDynamicObjectField({
 				parentId: this.#config.packageIds.sweetHouse,
 				name: {
-					type: resolveGameSettingsKeyType(
-						gameDefinition.settingsKey.name,
-						resolveGamePackageId(this.#config, game),
-					),
+					type: gameDefinition.settingsKey.typeTag({
+						package: resolveGamePackageId(this.#config, game),
+					}),
 					bcs: gameDefinition.settingsKey
 						.serialize({ dummy_field: false })
 						.toBytes(),
