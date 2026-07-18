@@ -427,7 +427,7 @@ export class SuigarClient {
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({
-					name: coinType.slice(2),
+					name: coinType.replace(/^0x/u, ''),
 				}).toBytes(),
 			},
 			include: {

@@ -66,7 +66,7 @@ const LIMBO_SETTINGS_FIELD_BCS = LimboSettingsKey.serialize({
 	dummy_field: false,
 }).toBytes();
 const SUI_TYPE_NAME_FIELD_BCS = TypeName.serialize({
-	name: normalizeStructTag(COINS.testnet.sui.coinType).slice(2),
+	name: normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''),
 }).toBytes();
 
 afterEach(() => {
@@ -1317,7 +1317,7 @@ describe('SuigarClient', () => {
 		});
 		expect(
 			TypeName.parse(client.getDynamicObjectFieldCalls[0]!.name.bcs).name,
-		).toBe(normalizeStructTag(COINS.testnet.sui.coinType).slice(2));
+		).toBe(normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''));
 		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
