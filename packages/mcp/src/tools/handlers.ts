@@ -176,6 +176,16 @@ const requireNumber = (value: unknown, fieldName: string): number => {
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
 };
 
+const requireGame = (value: unknown): Game => {
+	const game = requireString(value, 'game');
+	if (GAMES.includes(game as Game)) {
+		return game as Game;
+	}
+	throw new RangeError(
+		`Unsupported game: ${game}. Use one of: ${GAMES.join(', ')}.`,
+	);
+};
+
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
 const getConfigInput = (input: ReadConfigInput) => ({
@@ -336,29 +346,27 @@ export const readConfigTool = async (input: ReadConfigInput = {}) => {
 };
 
 export const readGameMetadataTool = async (
-	input: ReadGameMetadataInput = {},
+	input: Partial<ReadGameMetadataInput> = {},
 ) => {
+	const game = requireGame(input.game);
 	const { config } = createSuigarClient(getConfigInput(input));
-	const game = input.game ?? null;
 	const coinType = resolveDefaultCoinType(config, input.coinType);
 	return asTextResponse({
 		network: config.network,
 		config,
 		supportedGames: supportedGames(),
-		game: game
-			? {
-					id: game,
-					label: GAME_LABELS[game],
-					packageId: getPackageId(config, game),
-					coinType,
-					notes: [
-						game === 'pvp-coinflip'
-							? 'PvP coinflip uses dedicated create, join, and cancel transaction builders.'
-							: 'Standard games use client.suigar.tx.createBetTransaction().',
-						'Transactions are unsigned and are never executed by the MCP server.',
-					],
-				}
-			: null,
+		game: {
+			id: game,
+			label: GAME_LABELS[game],
+			packageId: getPackageId(config, game),
+			coinType,
+			notes: [
+				game === 'pvp-coinflip'
+					? 'PvP coinflip uses dedicated create, join, and cancel transaction builders.'
+					: 'Standard games use client.suigar.tx.createBetTransaction().',
+				'Transactions are unsigned and are never executed by the MCP server.',
+			],
+		},
 	} satisfies ReadGameMetadataResult);
 };
 

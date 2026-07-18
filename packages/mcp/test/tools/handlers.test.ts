@@ -53,6 +53,12 @@ describe('read tools', () => {
 		expect(content.game?.coinType).toMatch(/::sui::SUI$/u);
 		expect(content.game?.packageId).toMatch(/^0x/u);
 	});
+
+	it('requires a game when reading game metadata', async () => {
+		await expect(readGameMetadataTool({})).rejects.toThrow(
+			'Missing required field: game.',
+		);
+	});
 });
 
 describe('read-only transaction tools', () => {
