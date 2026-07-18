@@ -40,7 +40,7 @@ The package also ships `plugin/` manifests for plugin-capable hosts:
 - `plugin/.cursor-plugin/plugin.json` for Cursor
 - `plugin/plugin.json` for Antigravity-style plugin discovery
 
-The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp` stdio server. Plugin manifest versions are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
+The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp@<package-version>` stdio server. Plugin manifest versions and the MCP config package specifier are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
 
 Repo-level marketplace catalogs are included for local plugin testing:
 
