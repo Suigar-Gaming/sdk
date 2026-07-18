@@ -6,9 +6,8 @@ import { BetResultEvent } from '../contracts/core/core.js';
 import { Float } from '../contracts/core/float.js';
 import type { Game } from './game.type.js';
 
-export type BetResultGameDetails = ReturnType<
-	(typeof BetResultEvent)['parse']
->['game_details'];
+export type BetResultGameDetails =
+	(typeof BetResultEvent.$inferType)['game_details'];
 
 export type GameDetailValueType = 'u8' | 'u64' | 'bool' | 'float' | 'string';
 export type GameDetailsSchema = Record<string, GameDetailValueType>;
@@ -16,7 +15,7 @@ export type GameDetailsSchema = Record<string, GameDetailValueType>;
 export type GameDetail<TValueType extends GameDetailValueType> =
 	TValueType extends 'float' | 'u64'
 		? number
-		: ReturnType<(typeof GAME_DETAIL_BCS)[TValueType]['parse']>;
+		: (typeof GAME_DETAIL_BCS)[TValueType]['$inferType'];
 
 export type GameDetails<TGame extends Game> = {
 	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<

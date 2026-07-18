@@ -3,4 +3,4 @@
 
 import { Float } from '../contracts/core/float.js';
 
-export type MoveFloat = ReturnType<(typeof Float)['parse']>;
+export type MoveFloat = typeof Float.$inferType;

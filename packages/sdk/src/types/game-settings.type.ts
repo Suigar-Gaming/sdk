@@ -56,9 +56,7 @@ export const GAME_SETTINGS = {
 } as const;
 
 type GameParametersMap = {
-	[TGame in Game]: ReturnType<
-		(typeof GAME_SETTINGS)[TGame]['parameters']['parse']
-	>;
+	[TGame in Game]: (typeof GAME_SETTINGS)[TGame]['parameters']['$inferInput'];
 };
 
 export type GameParameters<TGame extends Game> = GameParametersMap[TGame];
