@@ -105,10 +105,7 @@ pnpm run release
 ### Key Patterns
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
-2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`.
-   The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`.
-   Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable.
-   Utility function behavior:
+2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`. The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`. Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. Utility function behavior:
    - `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values. It throws `TypeError` for invalid input shapes and `RangeError` for negatives.
    - `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range. It throws `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values.
    - `toU16()` accepts a finite integer `number` or plain integer `string` in the `0..65535` range. It uses the same `TypeError` and `RangeError` split as `toU8()`.
@@ -171,13 +168,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - providing the price info object id used by PvP coinflip join
 - treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 
-`client.suigar.getGameParameters(game, options?)` first reads the selected
-game's settings object from SweetHouse, then reads that game's
-coin-specific `Parameters<T>` object, parses it with the generated type, and
-caches the parsed result for `cacheTtl`. When returned parameter fields are
-generated Move float structs, such as `min_target_multiplier`,
-`max_target_multiplier`, `min_rtp`, or `max_rtp`, convert them with
-`fromMoveFloat()` before using them as normal JavaScript numbers.
+`client.suigar.getGameParameters(game, options?)` first reads the selected game's settings object from SweetHouse, then reads that game's coin-specific `Parameters<T>` object, parses it with the generated type, and caches the parsed result for `cacheTtl`. When returned parameter fields are generated Move float structs, such as `min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, convert them with `fromMoveFloat()` before using them as normal JavaScript numbers.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
@@ -193,20 +184,14 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 ### MCP Package Architecture
 
-`packages/mcp` exposes a local stdio MCP server plus a bundled MCP App resource.
-It should stay thin over `@suigar/sdk` and `@mysten/sui`.
+`packages/mcp` exposes a local stdio MCP server plus a bundled MCP App resource. It should stay thin over `@suigar/sdk` and `@mysten/sui`.
 
-- Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and
-  `registerAppTool`.
+- Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and `registerAppTool`.
 - Always return both text `content` and `structuredContent`.
-- Keep tool errors actionable and include the field/config/network detail needed
-  for an agent to retry.
-- The MCP App is an inspector UI only. It must not sign or execute
-  transactions, and it should include restrictive `_meta.ui.csp` metadata.
-- Do not reintroduce explicit coin object sourcing or copied transaction
-  builders unless the SDK adds a public API for that behavior.
-- If a new MCP behavior requires an SDK change, add the SDK change, tests,
-  docs, and an `@suigar/sdk` changeset entry in the same task.
+- Keep tool errors actionable and include the field/config/network detail needed for an agent to retry.
+- The MCP App is an inspector UI only. It must not sign or execute transactions, and it should include restrictive `_meta.ui.csp` metadata.
+- Do not reintroduce explicit coin object sourcing or copied transaction builders unless the SDK adds a public API for that behavior.
+- If a new MCP behavior requires an SDK change, add the SDK change, tests, docs, and an `@suigar/sdk` changeset entry in the same task.
 
 ### Testing Conventions
 
@@ -219,13 +204,8 @@ It should stay thin over `@suigar/sdk` and `@mysten/sui`.
 - **`patch`**: Bug fixes or internal corrections that do not change the public API shape
 - **`minor`**: New public methods, new supported fields, or additive public type changes
 - **`major`**: Breaking API changes, changed behavior contracts, or removed support
-- Changeset notes must describe only package behavior for the packages listed
-  in the changeset frontmatter. Do not mention root-only, workspace-only,
-  playground-only, or tooling-only changes unless they directly affect that
-  package's published behavior.
-- Do not edit changeset files inherited from `main` or previous work. When a
-  branch needs a release note, create or update only the changeset created for
-  the current branch.
+- Changeset notes must describe only package behavior for the packages listed in the changeset frontmatter. Do not mention root-only, workspace-only, playground-only, or tooling-only changes unless they directly affect that package's published behavior.
+- Do not edit changeset files inherited from `main` or previous work. When a branch needs a release note, create or update only the changeset created for the current branch.
 
 ### Development Workflow
 
@@ -262,8 +242,7 @@ Install a single skill when only one workflow is needed:
 npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp
 ```
 
-For Codex-specific installs, add the Codex agent flag without replacing the
-generic install commands above:
+For Codex-specific installs, add the Codex agent flag without replacing the generic install commands above:
 
 ```bash
 npx skills add Suigar-Gaming/agent-skills --agent codex --global --yes

@@ -147,7 +147,7 @@ export type ReadGameMetadataResult = ReadConfigResult & {
 		coinType: string;
 		action?: PvPCoinflipAction;
 		notes: string[];
-	} | null;
+	};
 };
 
 export type ToolStructuredResult =

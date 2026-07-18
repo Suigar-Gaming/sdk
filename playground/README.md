@@ -45,9 +45,7 @@ pnpm turbo run dev --filter='./playground'
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-The app resolves the workspace-local `@suigar/sdk` package through
-`workspace:^`. Use the root Turbo command when you want the SDK dependency graph
-built first with `build:ci` before the app command starts.
+The app resolves the workspace-local `@suigar/sdk` package through `workspace:^`. Use the root Turbo command when you want the SDK dependency graph built first with `build:ci` before the app command starts.
 
 Build the app:
 

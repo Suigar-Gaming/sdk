@@ -31,8 +31,7 @@ The package ships three public entrypoints:
 - `@suigar/sdk/games` for game-specific public types
 - `@suigar/sdk/utils` for public parser, constants, and numeric helpers
 
-The package root exposes the extension factory, client class, and core SDK
-types:
+The package root exposes the extension factory, client class, and core SDK types:
 
 ```ts
 import {
@@ -44,8 +43,7 @@ import {
 } from '@suigar/sdk';
 ```
 
-It does not export the individual transaction builders from the package root.
-Those stay on the registered extension instance under `client.suigar.tx`.
+It does not export the individual transaction builders from the package root. Those stay on the registered extension instance under `client.suigar.tx`.
 
 Utility exports are available from the utils subpath:
 
@@ -67,26 +65,13 @@ import {
 
 Numeric helper behavior:
 
-- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer
-  `string`, and `boolean` inputs and returns a normalized non-negative `bigint`
-  while throwing `TypeError` for invalid input shapes and `RangeError` for
-  negative values
-- `toU8(value)` accepts a finite integer `number` or plain integer `string` in
-  the inclusive `0..255` range, throwing `TypeError` for non-numeric input and
-  `RangeError` for booleans, fractional values, or out-of-range integers
-- `toU16(value)` accepts a finite integer `number` or plain integer `string`
-  in the inclusive `0..65535` range, throwing `TypeError` for non-numeric
-  input and `RangeError` for booleans, fractional values, or out-of-range
-  integers
-- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a
-  JavaScript `number`
-- `fromMoveFloat(value)` converts a generated Move float struct into a
-  JavaScript `number`
-- `parseCoinType(type)` extracts the normalized first generic coin type from a
-  Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details`
-  byte arrays into the expected string, number, and boolean values while
-  preserving the original on-chain keys
+- `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` inputs and returns a normalized non-negative `bigint` while throwing `TypeError` for invalid input shapes and `RangeError` for negative values
+- `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
+- `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
+- `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript `number`
+- `fromMoveFloat(value)` converts a generated Move float struct into a JavaScript `number`
+- `parseCoinType(type)` extracts the normalized first generic coin type from a Move object type string and throws `TypeError` when no coin type can be parsed
+- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -146,14 +131,11 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 
 Creates a named Sui client extension. By default, it registers under `client.suigar`.
 
-The extension constructor throws `RangeError` when the connected client network
-is not one of the SDK's supported Sui networks.
+The extension constructor throws `RangeError` when the connected client network is not one of the SDK's supported Sui networks.
 
 ### Partner Setup
 
-> **Important:** `partner` is the partner wallet address. Configure it once
-> when you register the extension so the SDK can prepend that wallet address to
-> supported bet metadata automatically.
+> **Important:** `partner` is the partner wallet address. Configure it once when you register the extension so the SDK can prepend that wallet address to supported bet metadata automatically.
 
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(
@@ -163,8 +145,7 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(
 client.suigar;
 ```
 
-Do not pass a partner slug, label, or display name here. Use the wallet
-address that should receive partner attribution on-chain.
+Do not pass a partner slug, label, or display name here. Use the wallet address that should receive partner attribution on-chain.
 
 You can rename the extension:
 
@@ -197,9 +178,7 @@ Supported override areas:
 - `config.coins`
 - `config.priceInfoObjectIds`
 
-Use `config` when the application needs to patch package ids, supported
-`sui`/`usdc` coin metadata, or price info object ids before a new SDK release is
-published.
+Use `config` when the application needs to patch package ids, supported `sui`/`usdc` coin metadata, or price info object ids before a new SDK release is published.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(
@@ -219,13 +198,9 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 );
 ```
 
-If `partner` is configured, the SDK automatically writes that partner wallet
-address into the on-chain metadata vec-map. Transaction builder options may also
-include `metadata`, but reserved keys such as `partner` and `referrer` are
-ignored with a warning when provided manually.
+If `partner` is configured, the SDK automatically writes that partner wallet address into the on-chain metadata vec-map. Transaction builder options may also include `metadata`, but reserved keys such as `partner` and `referrer` are ignored with a warning when provided manually.
 
-`cacheTtl` controls the SDK cache for on-chain reads such as parsed game
-parameters. It is expressed in milliseconds and defaults to 30 minutes.
+`cacheTtl` controls the SDK cache for on-chain reads such as parsed game parameters. It is expressed in milliseconds and defaults to 30 minutes.
 
 ## Runtime Surface
 
@@ -242,8 +217,7 @@ The registered extension instance exposes the main runtime surface:
 
 Returns the resolved SDK configuration for the connected network.
 
-This is intended mainly for debugging and inspection, for example to verify the
-resolved package ids or supported coin metadata for the active client network.
+This is intended mainly for debugging and inspection, for example to verify the resolved package ids or supported coin metadata for the active client network.
 
 It includes:
 
@@ -260,18 +234,11 @@ console.log(config.coins.sui.coinType);
 
 ### `getGameParameters(game, options?)`
 
-Returns the on-chain `Parameters<T>` object for any supported game and coin type.
-The return type is inferred from `game`.
+Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`.
 
-The SDK first reads the selected game's settings object from the configured
-SweetHouse object, then reads that game's coin-specific `Parameters<T>` object.
-This is useful for displaying or validating current limits such as min/max
-stake, house edge, or game-specific config bounds. The parsed result is cached
-using the extension `cacheTtl`.
+The SDK first reads the selected game's settings object from the configured SweetHouse object, then reads that game's coin-specific `Parameters<T>` object. This is useful for displaying or validating current limits such as min/max stake, house edge, or game-specific config bounds. The parsed result is cached using the extension `cacheTtl`.
 
-When a parameter field is a generated Move float struct, such as
-`min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use
-`fromMoveFloat()` before treating it as a normal JavaScript number.
+When a parameter field is a generated Move float struct, such as `min_target_multiplier`, `max_target_multiplier`, `min_rtp`, or `max_rtp`, use `fromMoveFloat()` before treating it as a normal JavaScript number.
 
 ```ts
 const parameters = await client.suigar.getGameParameters('coinflip', {
@@ -281,8 +248,7 @@ const parameters = await client.suigar.getGameParameters('coinflip', {
 console.log(parameters.min_stake);
 ```
 
-Pass `ignoreCache: true` to refresh the on-chain read and replace the cached
-value.
+Pass `ignoreCache: true` to refresh the on-chain read and replace the cached value.
 
 ### `serializeTransactionToBase64(transaction, options?)`
 
@@ -298,24 +264,15 @@ const base64 = await client.suigar.serializeTransactionToBase64(tx);
 
 Lists unresolved PvP coinflip games from the configured PvP registry.
 
-This reads the registry dynamic fields for the active network and resolves each
-entry into parsed game state through a bulk `client.core.getObjects()` lookup.
-Registry membership is the unresolved-state signal: once a match is joined and
-resolved, the Move flow removes it from the registry and deletes the live
-`Game` object.
+This reads the registry dynamic fields for the active network and resolves each entry into parsed game state through a bulk `client.core.getObjects()` lookup. Registry membership is the unresolved-state signal: once a match is joined and resolved, the Move flow removes it from the registry and deletes the live `Game` object.
 
-Use this when a product needs the current set of open PvP coinflip matches for
-browsing or lobby views.
+Use this when a product needs the current set of open PvP coinflip matches for browsing or lobby views.
 
-By default, per-object fetch or parse failures are skipped so one broken or
-already-deleted registry entry does not reject the full lookup. Pass
-`throwOnError: true` if you want the call to reject instead.
+By default, per-object fetch or parse failures are skipped so one broken or already-deleted registry entry does not reject the full lookup. Pass `throwOnError: true` if you want the call to reject instead.
 
-Each returned entry includes the parsed game fields plus a derived
-`coin_type` string from the underlying Move object type.
+Each returned entry includes the parsed game fields plus a derived `coin_type` string from the underlying Move object type.
 
-Any supported `listDynamicFields()` options such as `limit`, `cursor`, or
-`signal` can be passed through `options`.
+Any supported `listDynamicFields()` options such as `limit`, `cursor`, or `signal` can be passed through `options`.
 
 ```ts
 const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
@@ -467,10 +424,7 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
 });
 ```
 
-PvP coinflip create builds the stake coin from the owner's balance with Mysten
-coin intent helpers. Join derives the stake from `gameId` and uses the
-configured price info object id for `coinType`. Omit `useGasCoin` to use
-Mysten's default coin intent behavior.
+PvP coinflip create builds the stake coin from the owner's balance with Mysten coin intent helpers. Join derives the stake from `gameId` and uses the configured price info object id for `coinType`. Omit `useGasCoin` to use Mysten's default coin intent behavior.
 
 PvP shared options:
 
@@ -508,8 +462,7 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `PvPCoinflipGame` parses a PvP coinflip game object's `content`
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
-- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>`
-  and throws `TypeError` when the type string does not include a first generic coin type
+- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
 - `parseGameDetails(gameId, game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
@@ -597,8 +550,7 @@ const gameDetails = parseGameDetails(gameId, decoded.game_details);
 - `{ gameId: 'pvp-coinflip', eventName: 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 
-When the extension is configured with `partner`, decoded event `metadata` will
-contain that partner wallet address under the `partner` entry.
+When the extension is configured with `partner`, decoded event `metadata` will contain that partner wallet address under the `partner` entry.
 
 > **Important:**
 >

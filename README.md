@@ -1,7 +1,6 @@
 # Suigar TypeScript SDKs
 
-A collection of TypeScript SDKs and MCP tooling for interacting with the Suigar
-contracts.
+A collection of TypeScript SDKs and MCP tooling for interacting with the Suigar contracts.
 
 ## Documentation
 

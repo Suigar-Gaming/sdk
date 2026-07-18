@@ -85,10 +85,7 @@ export const readConfigInputSchema = configInputSchema;
 
 export const readGameMetadataInputSchema = configInputSchema
 	.extend({
-		game: z
-			.enum(GAMES)
-			.optional()
-			.describe('Optional Suigar game id to inspect.'),
+		game: z.enum(GAMES).describe('Suigar game id to inspect.'),
 		coinType: z.string().min(1).optional().describe(coinTypeDescription),
 	})
 	.strict();
