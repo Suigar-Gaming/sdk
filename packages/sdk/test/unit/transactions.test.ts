@@ -1265,8 +1265,8 @@ describe('SuigarClient', () => {
 
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
-		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
@@ -1327,8 +1327,8 @@ describe('SuigarClient', () => {
 		await client.suigar.getGameParameters('coinflip');
 		await client.suigar.getGameParameters('coinflip');
 
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
-		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 
@@ -1341,8 +1341,8 @@ describe('SuigarClient', () => {
 		});
 
 		expect(refreshed.min_stake).toBe('50');
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(4);
-		expect(client.getDynamicFieldCalls).toHaveLength(0);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
+		expect(client.getDynamicFieldCalls).toHaveLength(2);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
@@ -1386,8 +1386,8 @@ describe('SuigarClient', () => {
 		await first.shared.getGameParameters('coinflip');
 		await second.shared.getGameParameters('coinflip');
 
-		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
-		expect(baseClient.getDynamicFieldCalls).toHaveLength(0);
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(baseClient.getDynamicFieldCalls).toHaveLength(1);
 		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);
 		expect(baseClient.getObjectsCalls).toHaveLength(0);
 	});
