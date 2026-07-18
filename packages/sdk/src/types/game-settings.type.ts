@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { InferBcsType } from '@mysten/bcs';
 import { SuiClientTypes } from '@mysten/sui/client';
 import {
 	Parameters as CoinflipParameters,
@@ -56,7 +57,7 @@ export const GAME_SETTINGS = {
 } as const;
 
 type GameParametersMap = {
-	[TGame in Game]: (typeof GAME_SETTINGS)[TGame]['parameters']['$inferInput'];
+	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;
 };
 
 export type GameParameters<TGame extends Game> = GameParametersMap[TGame];
