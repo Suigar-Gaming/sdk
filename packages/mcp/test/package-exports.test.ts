@@ -68,7 +68,7 @@ describe('package exports', () => {
 		);
 		expect(codexManifest.mcpServers).toBe('./.mcp.json');
 		expect(codexManifest.interface.composerIcon).toBe('./assets/logo.png');
-		expect(codexManifest.interface.logo).toBe('./assets/logo.png');
+		expect(codexManifest.interface.logo).toBe('./assets/logo.svg');
 
 		const cursorManifest = JSON.parse(
 			await readFile(
