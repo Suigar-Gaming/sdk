@@ -1003,7 +1003,10 @@ function useIntegrationState({
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
 					standardGame,
-					{ coinType, ignoreCache },
+					{
+						coinType,
+						ignoreCache,
+					},
 				);
 
 				dispatchStandardParameters({

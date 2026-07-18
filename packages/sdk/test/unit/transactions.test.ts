@@ -513,7 +513,10 @@ class TestClient extends CoreClient {
 		const lookup = this.mockDynamicFieldLookups.find(
 			(entry) =>
 				entry.parentId === options.parentId &&
-				entry.nameType === options.name.type,
+				[
+					entry.nameType,
+					`0x2::dynamic_object_field::Wrapper<${entry.nameType}>`,
+				].includes(options.name.type),
 		);
 
 		if (!lookup) {

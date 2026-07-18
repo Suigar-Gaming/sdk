@@ -173,7 +173,7 @@ export class SuigarClient {
 		);
 		return this.#cache.read(
 			['parameters', this.#client.network, game, coinType],
-			() => this.#fetchGameParameters(game, coinType, options.signal),
+			() => this.#fetchGameParameters(game, coinType, options),
 			{ ignoreCache: options.ignoreCache },
 		) as Promise<GameParameters<TGame>>;
 	}
@@ -405,16 +405,19 @@ export class SuigarClient {
 	async #fetchGameParameters<TGame extends Game>(
 		game: TGame,
 		coinType: string,
-		signal?: AbortSignal,
+		options: Omit<GetGameParametersOptions, 'coinType' | 'ignoreCache'>,
 	): Promise<GameParameters<TGame>> {
 		const gameDefinition = GAME_SETTINGS[game];
+		const { signal } = options;
 
 		const { dynamicField } = await this.#client.core.getDynamicField({
 			parentId: this.#config.packageIds.sweetHouse,
 			name: {
-				type: gameDefinition.settingsKey.typeTag({
-					package: resolveGamePackageId(this.#config, game),
-				}),
+				type: `0x2::dynamic_object_field::Wrapper<${gameDefinition.settingsKey.typeTag(
+					{
+						package: resolveGamePackageId(this.#config, game),
+					},
+				)}>`,
 				bcs: gameDefinition.settingsKey
 					.serialize({ dummy_field: false })
 					.toBytes(),
@@ -430,9 +433,7 @@ export class SuigarClient {
 					name: coinType.replace(/^0x/u, ''),
 				}).toBytes(),
 			},
-			include: {
-				content: true,
-			},
+			include: { content: true },
 			signal,
 		});
 
