@@ -141,7 +141,7 @@ function renderNetworkFile(
 
 ${imports}
 
-// \`sweetHouse\`, \`legacyNft\`, and \`legacyNftFactory\` are preserved manually because they are not currently resolved from MVR.
+// \`sweetHouse\`, \`legacyNft\`, and \`legacyNftFactory\` are preserved manually because they are not resolved from MVR.
 export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackageIds = {
 \tsweetHouse:
 \t\t'${packageIds.sweetHouse}',

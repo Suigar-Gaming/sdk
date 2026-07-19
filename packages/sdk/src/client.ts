@@ -269,11 +269,11 @@ export class SuigarClient {
 	bcs = {
 		// Objects
 		/**
-		 * BCS schema for the shared factory containing legacy Suigar NFT specifications.
+		 * Shared factory containing legacy Suigar NFT specifications.
 		 */
 		LegacyNftFactory,
 		/**
-		 * BCS schema for a minted legacy Suigar NFT owned directly by an address.
+		 * Minted legacy Suigar NFT owned directly by an address.
 		 */
 		LegacyNft,
 		/**

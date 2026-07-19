@@ -7,7 +7,7 @@ import type {
 	SuigarPriceInfoObjectIds,
 } from '../types/suigar-config.type.js';
 
-// `sweetHouse`, `legacyNft`, and `legacyNftFactory` are preserved manually because they are not currently resolved from MVR.
+// `sweetHouse`, `legacyNft`, and `legacyNftFactory` are preserved manually because they are not resolved from MVR.
 export const TESTNET_PACKAGE_IDS: SuigarPackageIds = {
 	sweetHouse:
 		'0xb7f64e5a273aba1ede00caa0a6f8027cc7490c279d17eab12e7100ed20660603',
