@@ -22,7 +22,10 @@ const REGISTRY_PACKAGE_NAMES = {
 } as const;
 
 type PackageIds = Record<
-	keyof typeof REGISTRY_PACKAGE_NAMES | 'sweetHouse',
+	| keyof typeof REGISTRY_PACKAGE_NAMES
+	| 'sweetHouse'
+	| 'legacyNft'
+	| 'legacyNftFactory',
 	string
 >;
 type CoinMetadataSource = {
@@ -138,10 +141,14 @@ function renderNetworkFile(
 
 ${imports}
 
-// \`sweetHouse\` is preserved manually because it is not currently resolved from MVR.
+// \`sweetHouse\`, \`legacyNft\`, and \`legacyNftFactory\` are preserved manually because they are not resolved from MVR.
 export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackageIds = {
 \tsweetHouse:
 \t\t'${packageIds.sweetHouse}',
+\tlegacyNft:
+\t\t'${packageIds.legacyNft}',
+\tlegacyNftFactory:
+\t\t'${packageIds.legacyNftFactory}',
 \tcore: '${packageIds.core}',
 \tcoinflip:
 \t\t'${packageIds.coinflip}',
@@ -185,6 +192,16 @@ async function updateNetworkConfig(network: Network) {
 			currentSource,
 			currentPackageObjectName,
 			'sweetHouse',
+		),
+		legacyNft: extractObjectValue(
+			currentSource,
+			currentPackageObjectName,
+			'legacyNft',
+		),
+		legacyNftFactory: extractObjectValue(
+			currentSource,
+			currentPackageObjectName,
+			'legacyNftFactory',
 		),
 		core: '',
 		coinflip: '',

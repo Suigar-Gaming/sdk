@@ -166,6 +166,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
+- exposing `packageIds.legacyNft` and `packageIds.legacyNftFactory` for applications that need legacy NFT lookups without adding an NFT client surface to this SDK; derive `${client.suigar.getConfig().packageIds.legacyNft}::nft::Nft`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.LegacyNft.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.LegacyNftFactory.parse(object.content)`, while leaving legacy NFT minting outside this SDK
 - treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 
 `client.suigar.getGameParameters(game, options?)` first reads the selected game's settings object from SweetHouse, then reads that game's coin-specific `Parameters<T>` object, parses it with the generated type, decodes Move float fields into JavaScript numbers (including nested Plinko and Wheel config multipliers), and caches the parsed result for `cacheTtl`.

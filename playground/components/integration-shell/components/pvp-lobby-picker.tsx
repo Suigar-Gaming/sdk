@@ -120,7 +120,7 @@ export function PvPLobbyPicker({
 									/>
 									<div className="pointer-events-none relative z-10 flex flex-col gap-2">
 										<div className="flex items-start justify-between gap-3">
-											<div className="space-y-1">
+											<div className="min-w-0 space-y-1">
 												<p className="text-sm uppercase text-muted-foreground">
 													Amount
 												</p>
@@ -139,7 +139,7 @@ export function PvPLobbyPicker({
 											</div>
 											<Badge
 												variant={game.is_private ? 'destructive' : 'success'}
-												className="uppercase"
+												className="mr-1 uppercase"
 											>
 												{game.is_private ? 'Private' : 'Public'}
 											</Badge>
