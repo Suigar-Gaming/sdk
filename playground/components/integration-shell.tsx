@@ -6,12 +6,11 @@ import {
 	useDAppKit,
 } from '@mysten/dapp-kit-react';
 import { BookOpenText, Cog, Gamepad2, Swords } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
+import { AppHeader } from '@/components/app-header';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/forms/games/coinflip-form';
 import { LimboForm } from '@/components/forms/games/limbo-form';
@@ -25,7 +24,6 @@ import {
 	CodeSample,
 	CodeSampleSkeleton,
 } from '@/components/integration-shell/components/code-sample';
-import { CoinSelectLabel } from '@/components/integration-shell/components/coin-select-label';
 import { ExecuteTransactionCard } from '@/components/integration-shell/components/execute-transaction-card';
 import { GameSettingsDialog } from '@/components/integration-shell/components/game-settings-dialog';
 import { IntegrationShellLayout } from '@/components/integration-shell/components/integration-shell-layout';
@@ -37,7 +35,6 @@ import {
 } from '@/components/integration-shell/components/stake-descriptions';
 import {
 	formatBalance,
-	getCoinDisplayAmount,
 	resolveCoinKeyForType,
 	type CoinBalanceState,
 } from '@/components/integration-shell/helpers/coin';
@@ -61,7 +58,6 @@ import {
 	PVP_GAME_OPTIONS,
 	STANDARD_GAME_OPTIONS,
 } from '@/components/integration-shell/options';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import {
 	FieldCode,
@@ -87,7 +83,6 @@ import {
 	summarizePvPGameParameters,
 	summarizeStandardGameParameters,
 } from '@/lib/on-chain-parameters';
-import { withBasePath } from '@/lib/paths';
 import {
 	DEFAULT_PVP_FORMS,
 	DEFAULT_STANDARD_FORMS,
@@ -361,19 +356,6 @@ function resolvePlayableConfigId(
 
 	return nextConfig?.id ?? currentConfigId;
 }
-
-const ConnectButton = dynamic(
-	() =>
-		import('@mysten/dapp-kit-react/ui').then((mod) => ({
-			default: mod.ConnectButton,
-		})),
-	{
-		ssr: false,
-		loading: () => (
-			<Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
-		),
-	},
-);
 
 const floatingActionNode = (
 	<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
@@ -1605,88 +1587,16 @@ function useIntegrationState({
 	}
 	const navNode = React.useMemo(
 		() => (
-			<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
-				<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full p-1">
-					<Link
-						href="/standard?game=coinflip"
-						scroll={false}
-						prefetch={false}
-						className="inline-flex min-w-0 items-center gap-2"
-					>
-						<Image
-							src={withBasePath('/logo/icon.svg')}
-							alt="Suigar"
-							width={36}
-							height={36}
-							className="size-8 md:hidden"
-							priority
-						/>
-						<Image
-							src={withBasePath('/logo/suigar-logo-full.svg')}
-							alt="Suigar"
-							width={132}
-							height={36}
-							className="hidden w-auto md:block md:h-10"
-							priority
-						/>
-					</Link>
-				</div>
-
-				<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
-					<ThemeToggle className="size-9 shrink-0 sm:size-10" />
-					{currentAccount ? (
-						<div className="min-w-0 shrink">
-							<Select
-								value={selectedCoin}
-								onValueChange={(value: SupportedCoinKey) =>
-									dispatchUi({ type: 'set-selected-coin', value })
-								}
-							>
-								<SelectTrigger
-									aria-label="Select active coin"
-									className="h-10 w-full min-w-0 max-w-[10.5rem] rounded-full border-border/70 bg-background/55 px-3 sm:w-auto sm:min-w-[8.75rem] sm:max-w-none"
-								>
-									<CoinSelectLabel
-										coinKey={effectiveSelectedCoin}
-										amount={getCoinDisplayAmount({
-											currentAccountAddress: currentAccount?.address,
-											balanceOwner,
-											balanceState: coinBalances[effectiveSelectedCoin],
-										})}
-										hideTickerOnMobile
-									/>
-								</SelectTrigger>
-								<SelectContent>
-									{coinOptions.map(([key]) => (
-										<SelectItem key={key} value={key}>
-											<CoinSelectLabel
-												coinKey={key}
-												amount={getCoinDisplayAmount({
-													currentAccountAddress: currentAccount?.address,
-													balanceOwner,
-													balanceState: coinBalances[key],
-												})}
-											/>
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-					) : null}
-					<div className="min-w-0 shrink-0">
-						<ConnectButton className="wallet-connect" />
-					</div>
-				</div>
-			</nav>
+			<AppHeader
+				selectedCoin={effectiveSelectedCoin}
+				onSelectedCoinChange={(value) =>
+					dispatchUi({ type: 'set-selected-coin', value })
+				}
+				coinBalances={coinBalances}
+				balanceOwner={balanceOwner}
+			/>
 		),
-		[
-			balanceOwner,
-			coinBalances,
-			coinOptions,
-			currentAccount,
-			effectiveSelectedCoin,
-			selectedCoin,
-		],
+		[balanceOwner, coinBalances, effectiveSelectedCoin],
 	);
 
 	return {
@@ -1754,32 +1664,7 @@ function useIntegrationState({
 	};
 }
 
-const loadingNavNode = (
-	<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
-		<div className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full p-1">
-			<Image
-				src={withBasePath('/logo/icon.svg')}
-				alt="Suigar"
-				width={36}
-				height={36}
-				className="size-8 md:hidden"
-				priority
-			/>
-			<Image
-				src={withBasePath('/logo/suigar-logo-full.svg')}
-				alt="Suigar"
-				width={132}
-				height={36}
-				className="hidden w-auto md:block md:h-10"
-				priority
-			/>
-		</div>
-		<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
-			<Skeleton className="size-9 shrink-0 rounded-full sm:size-10" />
-			<Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
-		</div>
-	</nav>
-);
+const loadingNavNode = <AppHeader />;
 
 const loadingHeroNode = (
 	<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
