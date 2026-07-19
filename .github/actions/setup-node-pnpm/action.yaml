@@ -10,6 +10,10 @@ inputs:
     description: Install workspace dependencies from the repository root.
     required: false
     default: 'true'
+  doctor:
+    description: Run pnpm diagnostics after pnpm setup.
+    required: false
+    default: 'true'
   cache:
     description: Enable pnpm dependency caching.
     required: false
@@ -36,9 +40,17 @@ runs:
         package_json_file: package.json
         run_install: false
 
-    - name: Doctor pnpm
+    - name: pnpm doctor
+      if: inputs.doctor == 'true'
       shell: bash
-      run: pnpm doctor
+      run: |
+        pnpm_version="$(pnpm --version)"
+        if [[ "$pnpm_version" == "11.14.0" ]] || [[ "$(printf '%s\n%s\n' '11.14.0' "$pnpm_version" | sort -V | head -n 1)" != "11.14.0" ]]; then
+          echo "Skipping pnpm doctor: pnpm must be newer than 11.14.0; found $pnpm_version."
+          exit 0
+        fi
+
+        pnpm doctor
 
     - name: Install dependencies
       if: inputs.install == 'true'
