@@ -3,4 +3,4 @@
 
 export * from './config.js';
 export * from './metadata.js';
-export * from './parameters.js';
+export * from './game-parameters.js';
