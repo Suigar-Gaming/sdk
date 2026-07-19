@@ -11,6 +11,10 @@ import type {
 export const TESTNET_PACKAGE_IDS: SuigarPackageIds = {
 	sweetHouse:
 		'0xb7f64e5a273aba1ede00caa0a6f8027cc7490c279d17eab12e7100ed20660603',
+	legacyNft:
+		'0x196047539fdc2f1585d28dad9f4f2ccd50d23b21799ad0c88fa4e717d13b91a4',
+	legacyNftFactory:
+		'0x1a3e1753a906ba344e47ffa5166325739fd815563a3828a4cf72a4db7cee9915',
 	core: '0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc',
 	coinflip:
 		'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea',

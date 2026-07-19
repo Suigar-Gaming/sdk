@@ -46,6 +46,8 @@ export type SuigarCoinRegistry = Record<SuigarCoin, SuigarCoinMetadata>;
 
 export type SuigarPackage =
 	| 'sweetHouse'
+	| 'legacyNft'
+	| 'legacyNftFactory'
 	| 'core'
 	| 'coinflip'
 	| 'limbo'
