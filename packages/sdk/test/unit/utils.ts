@@ -2,8 +2,42 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { bcs } from '@mysten/sui/bcs';
+import type { Transaction } from '@mysten/sui/transactions';
+import { normalizeStructTag } from '@mysten/sui/utils';
+import { vi } from 'vitest';
 
+type ContractCallMock = (options: unknown) => (tx: Transaction) => unknown;
 const textEncoder = new TextEncoder();
+
+export const TEST_CONFIG = {
+	packageIds: {
+		sweetHouse: '0x456',
+		core: '0xcore',
+		coinflip: '0xabc',
+		limbo: '0x1',
+		plinko: '0x2',
+		pvpCoinflip: '0x3',
+		range: '0x4',
+		wheel: '0x5',
+	},
+	registryIds: {
+		pvpCoinflip: '0xregistry',
+	},
+	coins: {
+		sui: {
+			coinType: normalizeStructTag('0x2::sui::SUI'),
+			decimals: 9,
+		},
+		usdc: {
+			coinType: normalizeStructTag('0xusdc::coin::USDC'),
+			decimals: 6,
+		},
+	},
+	priceInfoObjectIds: {
+		sui: '0x789',
+		usdc: '0x987',
+	},
+} as const;
 
 export function writeU64(value: bigint): number[] {
 	const bytes = Array.from({ length: 8 }, () => 0);
@@ -36,4 +70,12 @@ export function encodeString(value: string): number[] {
 
 export function encodeUtf8(value: string): number[] {
 	return Array.from(textEncoder.encode(value));
+}
+
+export function createContractCallMock() {
+	return vi.fn<ContractCallMock>(() => (tx: Transaction) => tx.object('0x777'));
+}
+
+export function getFirstMockArg<T>(mock: { mock: { calls: unknown[][] } }): T {
+	return mock.mock.calls[0]?.[0] as T;
 }
