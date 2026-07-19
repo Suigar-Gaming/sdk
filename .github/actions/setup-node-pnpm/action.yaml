@@ -13,7 +13,7 @@ inputs:
   doctor:
     description: Run pnpm diagnostics after pnpm setup.
     required: false
-    default: 'false'
+    default: 'true'
   cache:
     description: Enable pnpm dependency caching.
     required: false
@@ -26,6 +26,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v6.0.9
+      with:
+        package_json_file: package.json
+        run_install: false
+
     - name: Setup Node.js
       uses: actions/setup-node@v7.0.0
       with:
@@ -33,12 +39,6 @@ runs:
         registry-url: ${{ inputs.registry-url }}
         cache: ${{ inputs.cache == 'true' && 'pnpm' || '' }}
         cache-dependency-path: pnpm-lock.yaml
-
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v6.0.9
-      with:
-        package_json_file: package.json
-        run_install: false
 
     - name: pnpm doctor
       if: inputs.doctor == 'true'
