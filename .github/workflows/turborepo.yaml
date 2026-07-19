@@ -57,6 +57,7 @@ jobs:
           cache: 'false'
 
       - name: Run audit
+        shell: bash
         run: pnpm audit --prod --audit-level high
 
   validate:
@@ -72,25 +73,33 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
 
       - name: Manypkg Check
+        shell: bash
         run: pnpm manypkg check
 
       - name: Lint packages
+        shell: bash
         run: pnpm turbo run lint --filter='./packages/*'
 
       - name: Lint Playground
+        shell: bash
         run: pnpm turbo run lint --filter='./playground'
 
       - name: Run packages tests
+        shell: bash
         run: pnpm turbo run test --filter='./packages/*'
 
       - name: Run packages typecheck
+        shell: bash
         run: pnpm turbo run typecheck --filter='./packages/*'
 
       - name: Run packages builds
+        shell: bash
         run: pnpm turbo run build:ci --filter='./packages/*'
 
       - name: Run Playground typecheck
+        shell: bash
         run: pnpm turbo run typecheck --filter='./playground'
 
       - name: Run Playground build
+        shell: bash
         run: pnpm turbo run build --filter='./playground'

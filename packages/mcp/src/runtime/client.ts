@@ -163,11 +163,15 @@ const summarizeTransaction = (
 		};
 	});
 
-	const objectInputs = (data.inputs ?? []).flatMap((input) =>
-		input.$kind === 'UnresolvedObject' && input.UnresolvedObject?.objectId
-			? [input.UnresolvedObject.objectId]
-			: [],
-	);
+	const objectInputs: string[] = [];
+	for (const input of data.inputs ?? []) {
+		if (
+			input.$kind === 'UnresolvedObject' &&
+			input.UnresolvedObject?.objectId
+		) {
+			objectInputs.push(input.UnresolvedObject.objectId);
+		}
+	}
 
 	return {
 		sender: data.sender ?? null,

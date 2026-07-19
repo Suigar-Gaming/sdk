@@ -1,7 +1,7 @@
 'use client';
 
 import type { SuigarClient } from '@suigar/sdk';
-import { fromMoveFloat, toBigInt } from '@suigar/sdk/utils';
+import { toBigInt } from '@suigar/sdk/utils';
 import type {
 	GameConfigOption,
 	PvPGameId,
@@ -19,8 +19,6 @@ type StakeParameters = {
 	min_stake: bigint | string | number;
 	max_stake: bigint | string | number;
 };
-
-type MoveFloatLike = Parameters<typeof fromMoveFloat>[0];
 
 type ConfigEntry = {
 	key: number;
@@ -112,8 +110,8 @@ export function summarizeStandardGameParameters(
 		}
 		case 'limbo': {
 			const limboParameters = parameters as StakeParameters & {
-				min_target_multiplier: MoveFloatLike;
-				max_target_multiplier: MoveFloatLike;
+				min_target_multiplier: number;
+				max_target_multiplier: number;
 			};
 			const stakeRange = toStakeRange(
 				toBigInt(limboParameters.min_stake),
@@ -124,8 +122,8 @@ export function summarizeStandardGameParameters(
 			return {
 				stakeRange,
 				targetMultiplierRange: {
-					min: fromMoveFloat(limboParameters.min_target_multiplier),
-					max: fromMoveFloat(limboParameters.max_target_multiplier),
+					min: limboParameters.min_target_multiplier,
+					max: limboParameters.max_target_multiplier,
 				},
 			};
 		}
@@ -133,8 +131,8 @@ export function summarizeStandardGameParameters(
 			const rangeParameters = parameters as StakeParameters & {
 				min_zone_size: bigint | string | number;
 				max_zone_size: bigint | string | number;
-				min_rtp: MoveFloatLike;
-				max_rtp: MoveFloatLike;
+				min_rtp: number;
+				max_rtp: number;
 			};
 			const stakeRange = toStakeRange(
 				toBigInt(rangeParameters.min_stake),
@@ -147,8 +145,8 @@ export function summarizeStandardGameParameters(
 				rangeBounds: {
 					minZoneSize: Number(rangeParameters.min_zone_size),
 					maxZoneSize: Number(rangeParameters.max_zone_size),
-					minRtp: fromMoveFloat(rangeParameters.min_rtp),
-					maxRtp: fromMoveFloat(rangeParameters.max_rtp),
+					minRtp: rangeParameters.min_rtp,
+					maxRtp: rangeParameters.max_rtp,
 				},
 			};
 		}
@@ -159,7 +157,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_rows: number;
-								multipliers: MoveFloatLike[];
+								multipliers: number[];
 							};
 						}
 					>;
@@ -181,7 +179,7 @@ export function summarizeStandardGameParameters(
 					],
 					multiplierValues: entry.value.multipliers.map((value) => ({
 						id: crypto.randomUUID(),
-						value: String(fromMoveFloat(value)),
+						value: String(value),
 					})),
 				}),
 			);
@@ -195,7 +193,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_cases: number;
-								multipliers: MoveFloatLike[];
+								multipliers: number[];
 							};
 						}
 					>;
@@ -220,7 +218,7 @@ export function summarizeStandardGameParameters(
 					],
 					multiplierValues: entry.value.multipliers.map((value) => ({
 						id: crypto.randomUUID(),
-						value: String(fromMoveFloat(value)),
+						value: String(value),
 					})),
 				}),
 			);

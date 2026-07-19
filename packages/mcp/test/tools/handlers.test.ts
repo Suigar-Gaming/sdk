@@ -5,7 +5,6 @@ import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
 import {
 	BuildTransactionResult,
-	ReadGameMetadataResult,
 	ReadOnlyPlan,
 } from '../../src/runtime/types.js';
 import {
@@ -41,23 +40,13 @@ describe('read tools', () => {
 		);
 	});
 
-	it('reads game metadata for a selected game and coin type', async () => {
-		const result = await readGameMetadataTool({
-			game: 'coinflip',
-			coinType: '0x2::sui::SUI',
-		});
-		const content = result.structuredContent as ReadGameMetadataResult;
-
-		expect(content.network).toBe('testnet');
-		expect(content.game?.id).toBe('coinflip');
-		expect(content.game?.coinType).toMatch(/::sui::SUI$/u);
-		expect(content.game?.packageId).toMatch(/^0x/u);
-	});
-
-	it('requires a game when reading game metadata', async () => {
+	it('requires one supported game when reading live game metadata', async () => {
 		await expect(readGameMetadataTool({})).rejects.toThrow(
 			'Missing required field: game.',
 		);
+		await expect(
+			readGameMetadataTool({ game: 'slots' as never }),
+		).rejects.toThrow(/Unsupported game/u);
 	});
 });
 

@@ -145,7 +145,8 @@ export type ReadGameMetadataResult = ReadConfigResult & {
 		label: string;
 		packageId: string;
 		coinType: string;
-		action?: PvPCoinflipAction;
+		parameters: JsonValue;
+		ignoreCache: boolean;
 		notes: string[];
 	};
 };

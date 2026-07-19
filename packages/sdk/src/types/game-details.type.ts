@@ -1,13 +1,14 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { InferBcsType } from '@mysten/bcs';
 import { bcs } from '@mysten/sui/bcs';
 import { BetResultEvent } from '../contracts/core/core.js';
 import { Float } from '../contracts/core/float.js';
 import type { Game } from './game.type.js';
 
-export type BetResultGameDetails = ReturnType<
-	(typeof BetResultEvent)['parse']
+export type BetResultGameDetails = InferBcsType<
+	typeof BetResultEvent
 >['game_details'];
 
 export type GameDetailValueType = 'u8' | 'u64' | 'bool' | 'float' | 'string';
@@ -16,7 +17,7 @@ export type GameDetailsSchema = Record<string, GameDetailValueType>;
 export type GameDetail<TValueType extends GameDetailValueType> =
 	TValueType extends 'float' | 'u64'
 		? number
-		: ReturnType<(typeof GAME_DETAIL_BCS)[TValueType]['parse']>;
+		: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
 
 export type GameDetails<TGame extends Game> = {
 	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<

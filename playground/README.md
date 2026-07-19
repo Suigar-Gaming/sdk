@@ -68,7 +68,7 @@ pnpm --dir playground run typecheck
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation where the selected action requires a stake.
 - Standard game stake fields show the current on-chain min and max range for the selected coin, and the form clamps stake back into the allowed range when live parameters load or change.
 - Standard games expose optional bet count; leave it empty to use the SDK default of `1`.
-- Limbo also clamps `targetMultiplier` to the on-chain `min_target_multiplier` and `max_target_multiplier` bounds. Those fields are generated Move float structs, so the playground parses them with `fromMoveFloat()` before using them as JavaScript numbers.
+- Limbo clamps `targetMultiplier` to the on-chain `min_target_multiplier` and `max_target_multiplier` bounds. `getGameParameters()` returns those fields as JavaScript numbers.
 - Range also clamps the current inputs to the on-chain zone-size bounds for the active scale and surfaces the current RTP bounds in the field description.
 - Plinko and Wheel switch to live config options when those on-chain parameters are available. The form only offers playable configs in the selector and automatically moves away from missing or disabled selections.
 - The settings dialog is available from the top-right of both the standard and PvP controls cards and is useful for inspecting the live parsed parameter object without leaving the playground.

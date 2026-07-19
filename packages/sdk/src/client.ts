@@ -19,9 +19,8 @@ import {
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
-	resolveCoinTypeNameForTypeNameKey,
+	normalizeGameParameterValues,
 	resolveGamePackageId,
-	resolveGameSettingsKeyType,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -37,6 +36,7 @@ import {
 	GAME_SETTINGS,
 	type GameParameters,
 	type GetGameParametersOptions,
+	type OnChainGameParameters,
 } from './types/game-settings.type.js';
 import {
 	BuildCoinflipTransactionOptions,
@@ -157,7 +157,8 @@ export class SuigarClient {
 	 * then reads that game's coin-specific `Parameters<T>` object. Results are
 	 * cached according to the extension `cacheTtl` option. Pass
 	 * `ignoreCache: true` to refresh the on-chain read and replace the cached
-	 * value.
+	 * value. Generated Move float fields are decoded into JavaScript numbers,
+	 * including floats nested in game configs.
 	 *
 	 * @param game Game whose parameters should be loaded.
 	 * @param options Optional coin type, cache override, and abort signal.
@@ -172,7 +173,7 @@ export class SuigarClient {
 		);
 		return this.#cache.read(
 			['parameters', this.#client.network, game, coinType],
-			() => this.#fetchGameParameters(game, coinType, options.signal),
+			() => this.#fetchGameParameters(game, coinType, options),
 			{ ignoreCache: options.ignoreCache },
 		) as Promise<GameParameters<TGame>>;
 	}
@@ -404,36 +405,35 @@ export class SuigarClient {
 	async #fetchGameParameters<TGame extends Game>(
 		game: TGame,
 		coinType: string,
-		signal?: AbortSignal,
+		options: Omit<GetGameParametersOptions, 'coinType' | 'ignoreCache'>,
 	): Promise<GameParameters<TGame>> {
 		const gameDefinition = GAME_SETTINGS[game];
+		const { signal } = options;
 
-		const { object: settingsObject } =
-			await this.#client.core.getDynamicObjectField({
-				parentId: this.#config.packageIds.sweetHouse,
-				name: {
-					type: resolveGameSettingsKeyType(
-						gameDefinition.settingsKey.name,
-						resolveGamePackageId(this.#config, game),
-					),
-					bcs: gameDefinition.settingsKey
-						.serialize({ dummy_field: false })
-						.toBytes(),
-				},
-				signal,
-			});
+		const { dynamicField } = await this.#client.core.getDynamicField({
+			parentId: this.#config.packageIds.sweetHouse,
+			name: {
+				type: `0x2::dynamic_object_field::Wrapper<${gameDefinition.settingsKey.typeTag(
+					{
+						package: resolveGamePackageId(this.#config, game),
+					},
+				)}>`,
+				bcs: gameDefinition.settingsKey
+					.serialize({ dummy_field: false })
+					.toBytes(),
+			},
+			signal,
+		});
 
 		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: settingsObject.objectId,
+			parentId: dynamicField.childId!,
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({
-					name: resolveCoinTypeNameForTypeNameKey(coinType),
+					name: coinType.replace(/^0x/u, ''),
 				}).toBytes(),
 			},
-			include: {
-				content: true,
-			},
+			include: { content: true },
 			signal,
 		});
 
@@ -443,8 +443,10 @@ export class SuigarClient {
 			);
 		}
 
-		return gameDefinition.parameters.parse(
-			object.content,
-		) as GameParameters<TGame>;
+		return normalizeGameParameterValues(
+			gameDefinition.parameters.parse(
+				object.content,
+			) as OnChainGameParameters<TGame>,
+		);
 	}
 }

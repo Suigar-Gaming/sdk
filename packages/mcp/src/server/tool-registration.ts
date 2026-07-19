@@ -24,6 +24,8 @@ import {
 	pvpCoinflipCreateInputSchema,
 	pvpCoinflipJoinInputSchema,
 	rangeInputSchema,
+	readConfigInputSchema,
+	readConfigTool,
 	readGameMetadataInputSchema,
 	readGameMetadataTool,
 	toolOutputSchema,
@@ -75,7 +77,7 @@ const transactionToolAnnotations = {
 
 type ToolHandler<TInput = never> = Parameters<typeof withToolErrors<TInput>>[0];
 
-type InspectorToolDefinition = {
+type ToolDefinition = {
 	name: string;
 	title: string;
 	description: string;
@@ -90,16 +92,28 @@ type AppToolMeta = {
 	};
 };
 
-const appTools = [
+const readTools = [
+	{
+		name: 'read_config',
+		title: 'Read Suigar Config',
+		description:
+			'Resolve Suigar SDK config for mainnet or testnet. Defaults to testnet.',
+		inputSchema: readConfigInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: readConfigTool,
+	},
 	{
 		name: 'read_game_metadata',
 		title: 'Read Suigar Game Metadata',
 		description:
-			'Read SDK-backed metadata for a supported Suigar game and coin type.',
+			'Read live on-chain parameters for one selected Suigar game and coin type without opening the MCP App.',
 		inputSchema: readGameMetadataInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: readGameMetadataTool,
 	},
+] satisfies ToolDefinition[];
+
+const appTools = [
 	{
 		name: 'build_coinflip_transaction',
 		title: 'Build Coinflip Transaction',
@@ -172,36 +186,51 @@ const appTools = [
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,
 	},
-] satisfies InspectorToolDefinition[];
+] satisfies ToolDefinition[];
 
-const registerInspectorTool = <TInput>(
+const registerTool = <TInput>(
+	server: McpServer,
+	tool: ToolDefinition & { handler: ToolHandler<TInput> },
+) =>
+	server.registerTool(
+		tool.name,
+		{
+			title: tool.title,
+			description: tool.description,
+			inputSchema: tool.inputSchema,
+			outputSchema: toolOutputSchema,
+			annotations: tool.annotations,
+		},
+		withToolErrors(tool.handler),
+	);
+
+const registerAppToolDefinition = <TInput>(
 	server: McpServer,
 	appToolMeta: AppToolMeta,
-	name: string,
-	config: {
-		title: string;
-		description: string;
-		inputSchema: NonNullable<ToolConfig['inputSchema']>;
-		annotations: ToolAnnotations;
-	},
-	handler: ToolHandler<TInput>,
+	tool: ToolDefinition & { handler: ToolHandler<TInput> },
 ) =>
 	registerAppTool(
 		server,
-		name,
+		tool.name,
 		{
-			...config,
+			title: tool.title,
+			description: tool.description,
+			inputSchema: tool.inputSchema,
+			annotations: tool.annotations,
 			outputSchema: toolOutputSchema,
 			_meta: appToolMeta,
 		},
-		withToolErrors(handler),
+		withToolErrors(tool.handler),
 	);
 
-export const registerSuigarInspectorTools = (
+export const registerSuigarTools = (
 	server: McpServer,
 	appToolMeta: AppToolMeta,
 ) => {
+	for (const tool of readTools) {
+		registerTool(server, tool);
+	}
 	for (const tool of appTools) {
-		registerInspectorTool(server, appToolMeta, tool.name, tool, tool.handler);
+		registerAppToolDefinition(server, appToolMeta, tool);
 	}
 };

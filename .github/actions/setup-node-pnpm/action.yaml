@@ -10,6 +10,10 @@ inputs:
     description: Install workspace dependencies from the repository root.
     required: false
     default: 'true'
+  doctor:
+    description: Run pnpm diagnostics after pnpm setup.
+    required: false
+    default: 'true'
   cache:
     description: Enable pnpm dependency caching.
     required: false
@@ -35,6 +39,11 @@ runs:
         registry-url: ${{ inputs.registry-url }}
         cache: ${{ inputs.cache == 'true' && 'pnpm' || '' }}
         cache-dependency-path: pnpm-lock.yaml
+
+    - name: pnpm doctor
+      if: inputs.doctor == 'true'
+      shell: bash
+      run: pnpm doctor
 
     - name: Install dependencies
       if: inputs.install == 'true'

@@ -48,18 +48,26 @@ export const toJsonValue = (value: unknown): JsonValue | undefined => {
 		return Array.from(value);
 	}
 	if (Array.isArray(value)) {
-		return value
-			.map((item) => toJsonValue(item))
-			.filter((item): item is JsonValue => item !== undefined);
+		const jsonValues: JsonValue[] = [];
+		for (const item of value) {
+			const jsonValue = toJsonValue(item);
+			if (jsonValue !== undefined) {
+				jsonValues.push(jsonValue);
+			}
+		}
+		return jsonValues;
 	}
 	if (isRecord(value)) {
-		const entries = Object.entries(value)
-			.map(([key, item]) => [key, toJsonValue(item)] as const)
-			.filter(
-				(entry): entry is readonly [string, JsonValue] =>
-					entry[1] !== undefined,
-			);
-		return Object.fromEntries(entries);
+		const jsonRecord: Record<string, JsonValue> = {};
+		for (const key in value) {
+			if (Object.hasOwn(value, key)) {
+				const jsonValue = toJsonValue(value[key]);
+				if (jsonValue !== undefined) {
+					jsonRecord[key] = jsonValue;
+				}
+			}
+		}
+		return jsonRecord;
 	}
 	return undefined;
 };
@@ -145,22 +153,27 @@ const eventFields = (
 	fields: Record<string, unknown>,
 	decimals?: number,
 ): Record<string, JsonValue> => {
-	const entries = Object.entries(fields).flatMap(([key, value]) => {
+	const formattedFields: Record<string, JsonValue> = {};
+	for (const key in fields) {
+		if (!Object.hasOwn(fields, key)) {
+			continue;
+		}
+
+		const value = fields[key];
 		const jsonValue = toJsonValue(value);
 		if (jsonValue === undefined) {
-			return [];
+			continue;
 		}
-		const displayValue = amountFieldNames.has(key)
-			? formatAmount(value, decimals)
-			: null;
-		return displayValue
-			? [
-					[key, jsonValue] as const,
-					[`${key}_display`, displayValue.display] as const,
-				]
-			: [[key, jsonValue] as const];
-	});
-	return Object.fromEntries(entries);
+
+		formattedFields[key] = jsonValue;
+		if (amountFieldNames.has(key)) {
+			const displayValue = formatAmount(value, decimals);
+			if (displayValue) {
+				formattedFields[`${key}_display`] = displayValue.display;
+			}
+		}
+	}
+	return formattedFields;
 };
 
 const parseDryRunEvent = (

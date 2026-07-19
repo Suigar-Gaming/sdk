@@ -4,6 +4,45 @@
 import { MoveFloat } from '../types/index.js';
 
 /**
+ * Checks whether a value is a generated Move `i64` wrapper.
+ *
+ * Generated bindings represent signed 64-bit integers as an object containing
+ * a raw two's-complement `bits` string.
+ *
+ * @param value Value to inspect.
+ * @returns Whether `value` has the generated Move `i64` shape.
+ */
+export function isMoveI64(value: unknown): value is MoveFloat['exp'] {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		'bits' in value &&
+		typeof value.bits === 'string'
+	);
+}
+
+/**
+ * Checks whether a value is a generated Move `Float` struct.
+ *
+ * @param value Value to inspect.
+ * @returns Whether `value` has the generated Move float shape.
+ */
+export function isMoveFloat(value: unknown): value is MoveFloat {
+	if (typeof value !== 'object' || value === null) {
+		return false;
+	}
+
+	return (
+		'mant' in value &&
+		'exp' in value &&
+		'is_negative' in value &&
+		typeof value.mant === 'string' &&
+		isMoveI64(value.exp) &&
+		typeof value.is_negative === 'boolean'
+	);
+}
+
+/**
  * Converts a generated Move `i64` wrapper into a JavaScript number.
  *
  * The generated bindings expose signed 64-bit integers through a `{ bits }`

@@ -2,9 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SuiClientTypes } from '@mysten/sui/client';
-import { describe, expect, it } from 'vitest';
-import { GAME_EVENTS } from '../../src/types/index.js';
-import { parseCoinType, parseGameEvent } from '../../src/utils/index.js';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import { BetResultGameDetails, GAME_EVENTS } from '../../src/types/index.js';
+import {
+	parseCoinType,
+	parseGameDetails,
+	parseGameEvent,
+} from '../../src/utils/index.js';
+import { encodeFloat, encodeString, writeU64 } from './utils.js';
+
+function gameDetails(
+	contents: Array<{ key: string; value: number[] }>,
+): BetResultGameDetails {
+	return { contents };
+}
 
 function createEvent(options: {
 	eventType: string;
@@ -142,9 +153,83 @@ describe('parseGameEvent', () => {
 });
 
 describe('parseCoinType', () => {
-	it('extracts the first generic type argument as the coin type', () => {
+	it('extracts and normalizes the first generic coin type', () => {
 		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
+		expect(
+			parseCoinType(
+				'0x1::pvp_coinflip::Game<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
+			),
+		).toBe(
+			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+		);
+	});
+
+	it('throws when the object type does not include a generic coin type', () => {
+		expect(() => parseCoinType('0x1::pvp_coinflip::Game')).toThrow(
+			'Unable to parse coin type',
+		);
+	});
+});
+
+describe('parseGameDetails', () => {
+	it('parses known detail types and preserves unknown event keys', () => {
+		expect(
+			parseGameDetails(
+				'coinflip',
+				gameDetails([
+					{ key: 'player_bet', value: encodeString('heads') },
+					{ key: 'coin_outcome', value: encodeString('tails') },
+					{ key: 'custom_label', value: encodeString('vip') },
+				]),
+			),
+		).toEqual({
+			player_bet: 'heads',
+			coin_outcome: 'tails',
+			custom_label: 'vip',
+		});
+	});
+
+	it('decodes numeric, boolean, float, and raw UTF-8 values', () => {
+		const rangeDetails = parseGameDetails(
+			'range',
+			gameDetails([
+				{ key: 'roll_value', value: writeU64(42n) },
+				{ key: 'win', value: [1] },
+				{ key: 'range_mode', value: [2] },
+				{ key: 'payout_multiplier', value: encodeFloat(2.5) },
+				{ key: 'actual_rtp', value: encodeFloat(0.97) },
+			]),
+		);
+
+		expect(rangeDetails).toMatchObject({
+			roll_value: 42,
+			win: true,
+			range_mode: 2,
+			payout_multiplier: 2.5,
+		});
+		expect(Number(rangeDetails.actual_rtp)).toBeCloseTo(0.97);
+		expect(
+			parseGameDetails(
+				'pvp-coinflip',
+				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
+			),
+		).toEqual({ pvp_result: 'loss' });
+	});
+
+	it('narrows parsed detail keys and value types by game id', () => {
+		const details = parseGameDetails(
+			'coinflip',
+			gameDetails([
+				{ key: 'player_bet', value: encodeString('heads') },
+				{ key: 'coin_outcome', value: encodeString('tails') },
+			]),
+		);
+
+		expectTypeOf(details).toEqualTypeOf<{
+			player_bet: string;
+			coin_outcome: string;
+		}>();
 	});
 });

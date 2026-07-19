@@ -826,6 +826,24 @@ function IntegrationControls({
 	);
 }
 
+const projectCoinMetadata = <TCoin extends string>(
+	coinMetadata: Record<TCoin, { coinType: string; decimals: number }>,
+) => {
+	const coinTypes: Record<TCoin, string> = {} as Record<TCoin, string>;
+	const coinDecimals: Record<TCoin, number> = {} as Record<TCoin, number>;
+
+	for (const key in coinMetadata) {
+		if (Object.hasOwn(coinMetadata, key)) {
+			const coinKey = key as TCoin;
+			const metadata = coinMetadata[coinKey];
+			coinTypes[coinKey] = metadata.coinType;
+			coinDecimals[coinKey] = metadata.decimals;
+		}
+	}
+
+	return { coinTypes, coinDecimals };
+};
+
 function useIntegrationState({
 	mode,
 	routeParams,
@@ -872,24 +890,8 @@ function useIntegrationState({
 	);
 
 	const coinMetadata = currentClient.suigar.getConfig().coins;
-	const coinTypes = React.useMemo(
-		() =>
-			Object.fromEntries(
-				Object.entries(coinMetadata).map(([key, metadata]) => [
-					key,
-					metadata.coinType,
-				]),
-			) as Record<SupportedCoinKey, string>,
-		[coinMetadata],
-	);
-	const coinDecimals = React.useMemo(
-		() =>
-			Object.fromEntries(
-				Object.entries(coinMetadata).map(([key, metadata]) => [
-					key,
-					metadata.decimals,
-				]),
-			) as Record<SupportedCoinKey, number>,
+	const { coinTypes, coinDecimals } = React.useMemo(
+		() => projectCoinMetadata(coinMetadata),
 		[coinMetadata],
 	);
 	const coinOptions = React.useMemo(
@@ -1001,7 +1003,10 @@ function useIntegrationState({
 			try {
 				const parameters = await currentClient.suigar.getGameParameters(
 					standardGame,
-					{ coinType, ignoreCache },
+					{
+						coinType,
+						ignoreCache,
+					},
 				);
 
 				dispatchStandardParameters({
