@@ -905,9 +905,34 @@ describe('SuigarClient', () => {
 		expect(games.map((game) => game.id)).toEqual(['0xopen', '0xpending']);
 	});
 
-	it('exposes the generated BCS helpers under their current event keys', async () => {
+	it('exposes BCS schemas under their current event keys', async () => {
 		const client = createSuigarTestClient();
 
+		expect(client.suigar.bcs.LegacyNftFactory).toBeDefined();
+		expect(client.suigar.bcs.LegacyNft).toBeDefined();
+		expect(
+			client.suigar.bcs.LegacyNftFactory.parse(
+				client.suigar.bcs.LegacyNftFactory.serialize({
+					id: '0x1',
+					specs: {
+						contents: [
+							{
+								key: '0x2',
+								value: {
+									id: '0x2',
+									name: 'Suigar Cane',
+									description: 'A legacy Suigar NFT',
+									url: { url: 'https://suigar.com/cane.png' },
+									supply: 500n,
+									available: 494n,
+									price: 15n,
+								},
+							},
+						],
+					},
+				}).toBytes(),
+			).specs.contents[0]?.value.url.url,
+		).toBe('https://suigar.com/cane.png');
 		expect(client.suigar.bcs.PvPCoinflipGame).toBeDefined();
 		expect(client.suigar.bcs.BetResultEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameCreatedEvent).toBeDefined();

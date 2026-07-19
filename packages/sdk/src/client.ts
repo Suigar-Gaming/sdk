@@ -9,6 +9,7 @@ import {
 	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
+import { LegacyNft, LegacyNftFactory } from './bcs/nft.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
@@ -267,6 +268,14 @@ export class SuigarClient {
 	 */
 	bcs = {
 		// Objects
+		/**
+		 * BCS schema for the shared factory containing legacy Suigar NFT specifications.
+		 */
+		LegacyNftFactory,
+		/**
+		 * BCS schema for a minted legacy Suigar NFT owned directly by an address.
+		 */
+		LegacyNft,
 		/**
 		 * Object representing the state of a PvP coinflip game, as stored on-chain.
 		 */
