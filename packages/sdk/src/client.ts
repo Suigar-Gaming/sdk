@@ -9,7 +9,7 @@ import {
 	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
-import { LegacyNft, LegacyNftFactory } from './bcs/nft.js';
+import { LegacyNft, LegacyNftFactory } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
