@@ -152,7 +152,9 @@ describe('shared transaction helpers', () => {
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
 		expect(context!.betCount).toBe(3n);
-		expect(context!.priceInfoObjectId).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
+		expect(context!.priceInfoObjectId).toBe(
+			TEST_CONFIG.coins.sui.priceInfoObjectId,
+		);
 		expect(context!.metadata).toEqual({
 			keys: ['partner', 'label'],
 			values: [
@@ -324,7 +326,7 @@ describe('coinflip transaction wrapper', () => {
 			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
-		expect(options.arguments[7]).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
+		expect(options.arguments[7]).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
 	});
 });
 
@@ -588,7 +590,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			Array.from(Buffer.from(partner.slice(2), 'hex')),
 			encodeUtf8('vip'),
 		]);
-		expect(options.arguments[5]).toBe(TEST_CONFIG.priceInfoObjectIds.sui);
+		expect(options.arguments[5]).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {

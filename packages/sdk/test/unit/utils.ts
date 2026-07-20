@@ -29,15 +29,13 @@ export const TEST_CONFIG = {
 		sui: {
 			coinType: normalizeStructTag('0x2::sui::SUI'),
 			decimals: 9,
+			priceInfoObjectId: '0x789',
 		},
 		usdc: {
 			coinType: normalizeStructTag('0xusdc::coin::USDC'),
 			decimals: 6,
+			priceInfoObjectId: '0x987',
 		},
-	},
-	priceInfoObjectIds: {
-		sui: '0x789',
-		usdc: '0x987',
 	},
 } as const;
 

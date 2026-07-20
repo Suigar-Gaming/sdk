@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { normalizeStructTag } from '@mysten/sui/utils';
-import {
-	COINS,
-	PACKAGE_IDS,
-	PRICE_INFO_OBJECT_IDS,
-	REGISTRY_IDS,
-} from '../configs/index.js';
+import { COINS, PACKAGE_IDS, REGISTRY_IDS } from '../configs/index.js';
 import type {
 	Game,
 	SuigarCoin,
@@ -26,7 +21,6 @@ export function resolveSuigarConfig(
 	const packageIds = PACKAGE_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
 	const coins = COINS[network];
-	const priceInfoObjectIds = PRICE_INFO_OBJECT_IDS[network];
 
 	const resolvedCoins = getSupportedCoins(coins).reduce(
 		(result, supportedCoin) => {
@@ -44,10 +38,6 @@ export function resolveSuigarConfig(
 		packageIds: { ...packageIds, ...overrides.packageIds },
 		registryIds: { ...registryIds, ...overrides.registryIds },
 		coins: resolvedCoins,
-		priceInfoObjectIds: {
-			...priceInfoObjectIds,
-			...overrides.priceInfoObjectIds,
-		},
 	};
 }
 
@@ -83,7 +73,7 @@ export function resolvePriceInfoObjectId(
 ): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
-	const objectId = config.priceInfoObjectIds[supportedCoin];
+	const objectId = config.coins[supportedCoin].priceInfoObjectId;
 
 	if (!objectId) {
 		throw new Error(
@@ -104,7 +94,11 @@ function resolveCoinMetadata(
 	override?: Partial<SuigarCoinMetadata>,
 ): SuigarCoinMetadata {
 	const coin = { ...defaultCoin, ...override };
-	if (!coin.coinType || coin.decimals === undefined) {
+	if (
+		!coin.coinType ||
+		coin.decimals === undefined ||
+		!coin.priceInfoObjectId
+	) {
 		throw new Error(
 			`Missing coin metadata configuration for supported coin ${supportedCoin}`,
 		);
