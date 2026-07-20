@@ -82,7 +82,7 @@ function extractCoinMetadata(
 	return {
 		coinType: entryMatch[1].trim(),
 		decimals: entryMatch[2].trim(),
-		priceInfoObjectId: entryMatch[3],
+		priceInfoObjectId: entryMatch[3].trim(),
 	};
 }
 
