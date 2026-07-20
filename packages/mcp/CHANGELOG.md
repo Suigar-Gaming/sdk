@@ -1,5 +1,18 @@
 # @suigar/mcp
 
+## 1.0.0-beta.10
+
+### Minor Changes
+
+- e3239d1: Add dedicated MCP App views for configuration, game metadata, transactions, and NFT browsing. Introduce the read-only `list_nfts` tool for the Suigar NFT catalog and a wallet's matching owned NFTs, including NFT images and display-friendly identifiers, and improve transaction gas formatting.
+
+### Patch Changes
+
+- e664f02: Expose `read_config` and `read_game_metadata` as standalone read-only MCP tools. `read_game_metadata` now requires one supported game and returns its live, cache-controllable on-chain parameters through `client.suigar.getGameParameters()`, including SDK-normalized float values and formatted atomic amount limits. MCP App support remains focused on transaction tools.
+- Updated dependencies [e664f02]
+- Updated dependencies [be697d7]
+  - @suigar/sdk@2.0.0-beta.29
+
 ## 1.0.0-beta.9
 
 ### Patch Changes
