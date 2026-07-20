@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 
@@ -35,6 +36,43 @@ function NftTable({
 	);
 }
 
+const isHttpUrl = (value: string) => {
+	try {
+		const url = new URL(value);
+		return url.protocol === 'https:';
+	} catch {
+		return false;
+	}
+};
+
+function NftImage({ name, url }: { name: string; url: unknown }) {
+	const imageUrl = typeof url === 'string' ? url : '';
+	const [failed, setFailed] = useState(!isHttpUrl(imageUrl));
+
+	if (failed) {
+		return (
+			<span
+				className="block max-w-48 truncate font-mono text-muted-foreground"
+				title={imageUrl}
+			>
+				{imageUrl || 'No image URL'}
+			</span>
+		);
+	}
+
+	return (
+		<img
+			alt={`${name} NFT`}
+			className="size-14 rounded-md border border-border/70 bg-background object-cover"
+			height={56}
+			loading="lazy"
+			onError={() => setFailed(true)}
+			src={imageUrl}
+			width={56}
+		/>
+	);
+}
+
 export function NftView({ payload }: { payload: unknown }) {
 	const result = asRecord(payload);
 	const catalog = Array.isArray(result.nftCatalog) ? result.nftCatalog : [];
@@ -56,7 +94,7 @@ export function NftView({ payload }: { payload: unknown }) {
 				hidden={catalog.length === 0}
 				title="NFT catalog"
 			>
-				<NftTable headers={['NFT', 'Available', 'Supply', 'Price (MIST)']}>
+				<NftTable headers={['NFT', 'Available', 'Supply', 'Price (SUI)']}>
 					{catalog.map((item) => {
 						const nft = asRecord(item);
 						return (
@@ -72,7 +110,12 @@ export function NftView({ payload }: { payload: unknown }) {
 								</td>
 								<td className="px-3 py-2 font-mono">{String(nft.available)}</td>
 								<td className="px-3 py-2 font-mono">{String(nft.supply)}</td>
-								<td className="px-3 py-2 font-mono">{String(nft.price)}</td>
+								<td
+									className="px-3 py-2 font-mono"
+									title={`${String(nft.price)} MIST`}
+								>
+									{String(nft.priceDisplay ?? nft.price)}
+								</td>
 							</tr>
 						);
 					})}
@@ -84,11 +127,14 @@ export function NftView({ payload }: { payload: unknown }) {
 						This address does not own any legacy Suigar NFTs.
 					</p>
 				) : (
-					<NftTable headers={['NFT', 'Object ID', 'Spec ID', 'Image URL']}>
+					<NftTable headers={['Image', 'NFT', 'Object ID', 'Spec ID']}>
 						{ownedNfts.map((item) => {
 							const nft = asRecord(item);
 							return (
 								<tr className="bg-card/45" key={String(nft.id)}>
+									<td className="px-3 py-2">
+										<NftImage name={String(nft.name)} url={nft.imageUrl} />
+									</td>
 									<td className="px-3 py-2 font-bold">{String(nft.name)}</td>
 									<td className="px-3 py-2 font-mono" title={String(nft.id)}>
 										{shortId(nft.id)}
@@ -98,12 +144,6 @@ export function NftView({ payload }: { payload: unknown }) {
 										title={String(nft.specId)}
 									>
 										{shortId(nft.specId)}
-									</td>
-									<td
-										className="max-w-72 truncate px-3 py-2 font-mono"
-										title={String(nft.imageUrl)}
-									>
-										{String(nft.imageUrl)}
 									</td>
 								</tr>
 							);

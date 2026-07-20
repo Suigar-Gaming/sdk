@@ -159,6 +159,7 @@ export type LegacyNftSpec = {
 	supply: string;
 	available: string;
 	price: string;
+	priceDisplay: string;
 };
 
 export type LegacyNft = {

@@ -473,6 +473,7 @@ export const listLegacyNftsTool = async (
 			supply: value.supply.toString(),
 			available: value.available.toString(),
 			price: value.price.toString(),
+			priceDisplay: formatBaseUnitAmount(value.price),
 		})),
 		ownedNfts,
 	} satisfies ListLegacyNftsResult);

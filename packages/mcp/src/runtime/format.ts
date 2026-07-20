@@ -1,14 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUI_DECIMALS } from '@mysten/sui/utils';
 import type { FormattedAmount } from './types.js';
-
-/** Gas is always paid in MIST, the 9-decimal base unit of SUI. */
-export const MIST_DECIMALS = 9;
 
 export const formatBaseUnitAmount = (
 	value: string | number | bigint,
-	decimals = MIST_DECIMALS,
+	decimals = SUI_DECIMALS,
 ): string => {
 	const raw = String(value);
 	const negative = raw.startsWith('-');

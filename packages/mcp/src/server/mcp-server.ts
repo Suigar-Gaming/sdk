@@ -6,6 +6,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
 	createSuigarMcpAppResourceResult,
+	NFT_IMAGE_RESOURCE_DOMAINS,
 	SUIGAR_MCP_APP_RESOURCE_URI,
 } from './app-resource.js';
 import { registerSuigarTools } from './tool-registration.js';
@@ -32,7 +33,7 @@ export const createSuigarMcpServer = () => {
 				ui: {
 					csp: {
 						connectDomains: [],
-						resourceDomains: [],
+						resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
 					},
 					prefersBorder: true,
 				},
