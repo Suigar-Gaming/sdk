@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 1.0.0-beta.12
+
+### Patch Changes
+
+- 7f256b1: Keep the MCP server manifest's npm package version synchronized with the package version.
+
 ## 1.0.0-beta.11
 
 ### Patch Changes
