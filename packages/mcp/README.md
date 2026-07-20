@@ -155,10 +155,9 @@ Optional `config` input follows the public SDK extension override shape:
 	};
 	registryIds?: { pvpCoinflip?: string };
 	coins?: {
-		sui?: { coinType?: string; decimals?: number };
-		usdc?: { coinType?: string; decimals?: number };
+		sui?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
+		usdc?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
 	};
-	priceInfoObjectIds?: { sui?: string; usdc?: string };
 }
 ```
 
