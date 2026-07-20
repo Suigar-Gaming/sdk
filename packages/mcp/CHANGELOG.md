@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 1.0.0-beta.11
+
+### Patch Changes
+
+- 04c9a54: Add MCP Registry metadata for package verification and discovery.
+
 ## 1.0.0-beta.10
 
 ### Minor Changes
