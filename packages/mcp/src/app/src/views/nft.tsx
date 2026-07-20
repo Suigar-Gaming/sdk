@@ -4,12 +4,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
-import { asRecord } from '../lib/format.js';
-
-const shortId = (value: unknown) => {
-	const id = String(value ?? '');
-	return id.length > 18 ? `${id.slice(0, 10)}...${id.slice(-6)}` : id;
-};
+import { asRecord, shortId } from '../lib/format.js';
 
 function NftTable({
 	children,

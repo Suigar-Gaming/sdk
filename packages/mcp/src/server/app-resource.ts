@@ -8,13 +8,7 @@ export const SUIGAR_MCP_APP_RESOURCE_URI =
 	'ui://suigar/transaction-inspector.html';
 
 export const NFT_IMAGE_RESOURCE_DOMAINS = [
-	'https://suigar.com',
-	'https://*.suigar.com',
-	'https://ipfs.io',
-	'https://*.ipfs.dweb.link',
-	'https://gateway.pinata.cloud',
-	'https://*.pinata.cloud',
-	'https://arweave.net',
+	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
 ] as const;
 
 const hasErrorCode = (
