@@ -190,6 +190,7 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and `registerAppTool`.
 - Always return both text `content` and `structuredContent`.
 - Keep tool errors actionable and include the field/config/network detail needed for an agent to retry.
+- Keep SDK-style MCP config documentation aligned with `SuigarConfigOverrides`: both `coins.sui` and `coins.usdc` accept optional `coinType` and `decimals` metadata.
 - The MCP App is an inspector UI only. It must not sign or execute transactions, and it should include restrictive `_meta.ui.csp` metadata.
 - Do not reintroduce explicit coin object sourcing or copied transaction builders unless the SDK adds a public API for that behavior.
 - If a new MCP behavior requires an SDK change, add the SDK change, tests, docs, and an `@suigar/sdk` changeset entry in the same task.

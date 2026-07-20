@@ -86,15 +86,17 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_pvp_coinflip_join_transaction`
 - `build_pvp_coinflip_cancel_transaction`
 
-All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, or transaction inspection. Use `list_nfts` with an `owner` address or SuiNS name to read the NFT catalog and all matching NFTs held by that owner. The tool is read-only and never signs or executes a transaction.
+All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, or transaction inspection.
 
-### NFT lookup
+### Read tools
 
-`list_nfts` accepts the same network, provider, and SDK config overrides as the other read tools, plus a required `owner`. It returns the resolved owner and NFT type, the factory `nftCatalog`, and `ownedNfts` held by that address. Catalog entries include available supply and a MIST-formatted price; owned entries include the NFT and its catalog specification ids.
+`read_config`, `read_game_metadata`, and `list_nfts` are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; `list_nfts` additionally requires an `owner` address or SuiNS name.
 
-In an App-capable host, the NFT view presents the catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text.
+In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text.
 
-## Modes
+### Transaction tools
+
+All transaction tools accept the shared config inputs and support these `mode` values:
 
 - `read-only`: resolves SDK config and returns the intended Move target, type arguments, required inputs, and notes.
 - `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
@@ -107,11 +109,15 @@ Dry-run summaries include:
 - balance changes as raw base units plus decimal-formatted display values
 - decoded event fields when available, including standard `BetResultEvent` game details such as `player_bet`, `coin_outcome`, `stake_amount`, and `outcome_amount`; the MCP App renders all parsed result fields it receives, so non-coinflip games expose their own parsed result keys as well
 
-## Inputs
+### Shared transaction inputs
 
-Transaction `owner` inputs accept raw Sui addresses, SuiNS names such as `name.sui`, and SuiNS subnames such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run.
+For `build` and `dry-run`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. `read-only` can be used to inspect a tool's requirements before providing an owner.
 
-Transaction `stake` and `cashStake` inputs are currency amounts in the chosen or default configured coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
+`coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
+
+Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `useGasCoin` for native SUI bets. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings.
+
+Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`.
 
 ## Config
 
@@ -134,7 +140,10 @@ Optional `config` input follows the public SDK extension override shape:
 		wheel?: string;
 	};
 	registryIds?: { pvpCoinflip?: string };
-	coins?: { sui?: { coinType?: string; decimals?: number } };
+	coins?: {
+		sui?: { coinType?: string; decimals?: number };
+		usdc?: { coinType?: string; decimals?: number };
+	};
 	priceInfoObjectIds?: { sui?: string; usdc?: string };
 }
 ```
