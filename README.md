@@ -10,6 +10,29 @@ For MCP documentation, visit [suigar.com/docs/mcp](https://suigar.com/docs/mcp).
 
 For Sui TypeScript SDK documentation, visit [sdk.mystenlabs.com](https://sdk.mystenlabs.com/).
 
+## Install the MCP server
+
+Install Suigar MCP for all detected coding agents with [add-mcp](https://www.npmjs.com/package/add-mcp):
+
+```bash
+npx add-mcp @suigar/mcp@latest
+```
+
+Add `-y` to skip the installer prompts. Restart or reload your MCP client after installation.
+
+To configure an MCP client manually, use:
+
+```json
+{
+	"mcpServers": {
+		"suigar": {
+			"command": "npx",
+			"args": ["-y", "@suigar/mcp@latest"]
+		}
+	}
+}
+```
+
 ## Agent Skills
 
 Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository. The MCP-focused skill teaches agents how to install, configure, and operate `@suigar/mcp` for Suigar config reads, game metadata, NFT lookups, unsigned transaction builders, and dry-runs.
@@ -25,21 +48,6 @@ Install only the MCP skill with:
 ```bash
 npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 ```
-
-Then configure your MCP client to run the published server:
-
-```json
-{
-	"mcpServers": {
-		"suigar": {
-			"command": "npx",
-			"args": ["-y", "@suigar/mcp"]
-		}
-	}
-}
-```
-
-Restart or reload the MCP client after changing its config.
 
 ## Packages
 
