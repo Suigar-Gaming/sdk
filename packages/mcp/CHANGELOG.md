@@ -1,5 +1,16 @@
 # @suigar/mcp
 
+## 1.0.0-beta.13
+
+### Minor Changes
+
+- eb9f060: Move each supported coin's price-info object ID into its coin metadata and remove the redundant `priceInfoObjectIds` configuration map.
+
+### Patch Changes
+
+- Updated dependencies [eb9f060]
+  - @suigar/sdk@2.0.0-beta.30
+
 ## 1.0.0-beta.12
 
 ### Patch Changes

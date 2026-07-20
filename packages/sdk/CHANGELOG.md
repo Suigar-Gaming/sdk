@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.30
+
+### Minor Changes
+
+- eb9f060: Move each supported coin's price-info object ID into its coin metadata and remove the redundant `priceInfoObjectIds` configuration map.
+
 ## 2.0.0-beta.29
 
 ### Minor Changes
