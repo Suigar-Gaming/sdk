@@ -171,6 +171,31 @@ describe('build transaction tools', () => {
 		}
 	});
 
+	it('formats the gas budget as MIST even when the wager coin has six decimals', async () => {
+		const buildSpy = vi
+			.spyOn(Transaction.prototype, 'build')
+			.mockResolvedValue(new Uint8Array([1]));
+
+		try {
+			const result = await buildCoinflipTransactionTool({
+				mode: 'build',
+				owner,
+				stake: 1,
+				side: 'heads',
+				coinType:
+					'0x47c67b9594069c32caa7a6e875ddf31d7fa52602dd22ccb9ebd8d3482aed76dc::test_usdc::TEST_USDC',
+				gasBudget: 50_000_000,
+			});
+			const content = result.structuredContent as BuildTransactionResult;
+
+			expect(content.summary.coinDecimals).toBe(6);
+			expect(content.summary.gasBudget).toBe('50000000');
+			expect(content.summary.gasBudgetDisplay).toBe('0.05');
+		} finally {
+			buildSpy.mockRestore();
+		}
+	});
+
 	it('includes game-specific inputs in standard transaction summaries', async () => {
 		const buildSpy = vi
 			.spyOn(Transaction.prototype, 'build')

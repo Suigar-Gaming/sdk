@@ -17,7 +17,7 @@ import {
 	summarizeDryRun,
 	toJsonValue,
 } from './dry-run.js';
-import { formatBaseUnitAmount } from './format.js';
+import { formatBaseUnitAmount, MIST_DECIMALS } from './format.js';
 import type {
 	BuilderMode,
 	BuildTransactionResult,
@@ -180,7 +180,7 @@ const summarizeTransaction = (
 		gasBudgetDisplay:
 			data.gasData?.budget == null
 				? null
-				: formatBaseUnitAmount(data.gasData.budget, context.coinDecimals),
+				: formatBaseUnitAmount(data.gasData.budget, MIST_DECIMALS),
 		gasPrice: data.gasData?.price == null ? null : String(data.gasData.price),
 		commandCount: commands.length,
 		commands,

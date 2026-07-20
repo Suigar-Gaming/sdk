@@ -4,7 +4,7 @@
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 import type { SuigarClientBundle } from './client.js';
-import { formatAmount } from './format.js';
+import { formatAmount, MIST_DECIMALS } from './format.js';
 import type {
 	DryRunEventSummary,
 	DryRunSummary,
@@ -349,7 +349,7 @@ export const summarizeDryRun = (
 	return {
 		success,
 		error,
-		gasUsed: gasUsedSummary(effects, context.coinDecimals),
+		gasUsed: gasUsedSummary(effects, MIST_DECIMALS),
 		balanceChanges,
 		events,
 	};

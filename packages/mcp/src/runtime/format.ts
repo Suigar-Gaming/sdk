@@ -3,9 +3,12 @@
 
 import type { FormattedAmount } from './types.js';
 
+/** Gas is always paid in MIST, the 9-decimal base unit of SUI. */
+export const MIST_DECIMALS = 9;
+
 export const formatBaseUnitAmount = (
 	value: string | number | bigint,
-	decimals = 9,
+	decimals = MIST_DECIMALS,
 ): string => {
 	const raw = String(value);
 	const negative = raw.startsWith('-');
