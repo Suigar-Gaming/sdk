@@ -3,6 +3,7 @@
 
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord, dynamicEntries } from '../lib/format.js';
+import type { DefinitionEntry } from '../lib/types.js';
 
 export function ConfigView({ payload }: { payload: unknown }) {
 	const result = asRecord(payload);
@@ -20,12 +21,17 @@ export function ConfigView({ payload }: { payload: unknown }) {
 			<Panel title="SDK configuration">
 				<DefinitionList entries={dynamicEntries(sdk)} />
 			</Panel>
-			<Panel hidden={supportedGames.length === 0} title="Supported games">
+			<Panel title="Available tools">
 				<DefinitionList
-					entries={supportedGames.map((game) => [
-						String(game.label ?? game.id),
-						Array.isArray(game.tools) ? game.tools.join(', ') : null,
-					])}
+					entries={[
+						['Configuration', 'read_config'],
+						['Game metadata', 'read_game_metadata'],
+						['Legacy NFTs', 'list_legacy_nfts'],
+						...supportedGames.map((game): DefinitionEntry => [
+							String(game.label ?? game.id),
+							Array.isArray(game.tools) ? game.tools.join(', ') : null,
+						]),
+					]}
 				/>
 			</Panel>
 		</section>

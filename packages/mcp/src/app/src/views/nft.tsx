@@ -1,12 +1,42 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ReactNode } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
-import { asRecord, dynamicEntries } from '../lib/format.js';
+import { asRecord } from '../lib/format.js';
+
+const shortId = (value: unknown) => {
+	const id = String(value ?? '');
+	return id.length > 18 ? `${id.slice(0, 10)}...${id.slice(-6)}` : id;
+};
+
+function NftTable({
+	children,
+	headers,
+}: {
+	children: ReactNode;
+	headers: string[];
+}) {
+	return (
+		<div className="overflow-x-auto rounded-md border border-border/70">
+			<table className="min-w-full border-collapse text-left text-xs leading-5">
+				<thead className="bg-background/75 text-muted-foreground">
+					<tr>
+						{headers.map((header) => (
+							<th className="px-3 py-2 font-extrabold" key={header} scope="col">
+								{header}
+							</th>
+						))}
+					</tr>
+				</thead>
+				<tbody className="divide-y divide-border/70">{children}</tbody>
+			</table>
+		</div>
+	);
+}
 
 export function NftView({ payload }: { payload: unknown }) {
 	const result = asRecord(payload);
-	const config = asRecord(result.config);
 	const catalog = Array.isArray(result.nftCatalog) ? result.nftCatalog : [];
 	const ownedNfts = Array.isArray(result.ownedNfts) ? result.ownedNfts : [];
 
@@ -21,32 +51,65 @@ export function NftView({ payload }: { payload: unknown }) {
 					]}
 				/>
 			</Panel>
-			<Panel title="SDK configuration">
-				<DefinitionList entries={dynamicEntries(asRecord(config.sdk))} />
-			</Panel>
-			<Panel hidden={catalog.length === 0} title="NFT catalog">
-				<DefinitionList
-					entries={catalog.flatMap((item) => {
+			<Panel
+				className="md:col-span-2"
+				hidden={catalog.length === 0}
+				title="NFT catalog"
+			>
+				<NftTable headers={['NFT', 'Available', 'Supply', 'Price (MIST)']}>
+					{catalog.map((item) => {
 						const nft = asRecord(item);
-						const label = `${String(nft.name)} (${String(nft.id)})`;
-						return [
-							[label, `${nft.available}/${nft.supply} available`],
-							[`${label} price`, nft.price],
-						];
+						return (
+							<tr className="bg-card/45" key={String(nft.id)}>
+								<td className="px-3 py-2 font-bold">
+									<div>{String(nft.name)}</div>
+									<div
+										className="font-mono text-muted-foreground"
+										title={String(nft.id)}
+									>
+										{shortId(nft.id)}
+									</div>
+								</td>
+								<td className="px-3 py-2 font-mono">{String(nft.available)}</td>
+								<td className="px-3 py-2 font-mono">{String(nft.supply)}</td>
+								<td className="px-3 py-2 font-mono">{String(nft.price)}</td>
+							</tr>
+						);
 					})}
-				/>
+				</NftTable>
 			</Panel>
-			<Panel hidden={ownedNfts.length === 0} title="Owned NFTs">
-				<DefinitionList
-					entries={ownedNfts.flatMap((item) => {
-						const nft = asRecord(item);
-						const label = `${String(nft.name)} (${String(nft.id)})`;
-						return [
-							[label, nft.id],
-							[`${label} image`, nft.imageUrl],
-						];
-					})}
-				/>
+			<Panel className="md:col-span-2" title="Owned NFTs">
+				{ownedNfts.length === 0 ? (
+					<p className="text-xs font-semibold text-muted-foreground">
+						This address does not own any legacy Suigar NFTs.
+					</p>
+				) : (
+					<NftTable headers={['NFT', 'Object ID', 'Spec ID', 'Image URL']}>
+						{ownedNfts.map((item) => {
+							const nft = asRecord(item);
+							return (
+								<tr className="bg-card/45" key={String(nft.id)}>
+									<td className="px-3 py-2 font-bold">{String(nft.name)}</td>
+									<td className="px-3 py-2 font-mono" title={String(nft.id)}>
+										{shortId(nft.id)}
+									</td>
+									<td
+										className="px-3 py-2 font-mono"
+										title={String(nft.specId)}
+									>
+										{shortId(nft.specId)}
+									</td>
+									<td
+										className="max-w-72 truncate px-3 py-2 font-mono"
+										title={String(nft.imageUrl)}
+									>
+										{String(nft.imageUrl)}
+									</td>
+								</tr>
+							);
+						})}
+					</NftTable>
+				)}
 			</Panel>
 		</section>
 	);
