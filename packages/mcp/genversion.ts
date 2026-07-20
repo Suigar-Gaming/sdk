@@ -22,6 +22,8 @@ const packageJson = JSON.parse(
 ) as PackageJson;
 const versionPattern = /^(\s*"version"\s*:\s*")[^"]+(")/m;
 const mcpPackagePattern = /("@suigar\/mcp)(?:@[^"]+)?(")/;
+const serverPackageVersionPattern =
+	/("identifier"\s*:\s*"@suigar\/mcp"\s*,\s*"version"\s*:\s*")[^"]+(")/;
 
 async function replaceInFile(
 	filePath: URL,
@@ -62,4 +64,11 @@ await replaceInFile(
 	versionPattern,
 	`$1${packageJson.version}$2`,
 	'Missing version field',
+);
+
+await replaceInFile(
+	serverManifestPath,
+	serverPackageVersionPattern,
+	`$1${packageJson.version}$2`,
+	'Missing @suigar/mcp package version',
 );
