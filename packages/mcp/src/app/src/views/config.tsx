@@ -26,7 +26,7 @@ export function ConfigView({ payload }: { payload: unknown }) {
 					entries={[
 						['Configuration', 'read_config'],
 						['Game metadata', 'read_game_metadata'],
-						['Legacy NFTs', 'list_legacy_nfts'],
+						['NFTs', 'list_nfts'],
 						...supportedGames.map((game): DefinitionEntry => [
 							String(game.label ?? game.id),
 							Array.isArray(game.tools) ? game.tools.join(', ') : null,

@@ -24,7 +24,7 @@ export const resolveAppView = (payload: unknown): ResolvedAppView => {
 	const result = asRecord(payload);
 	const coinBadge = createInspectorViewModel(payload, []).coinBadge;
 	if (Array.isArray(result.ownedNfts)) {
-		return { coinBadge, title: 'Legacy NFT Collection', View: NftView };
+		return { coinBadge, title: 'NFT Collection', View: NftView };
 	}
 	if (result.game && !result.summary) {
 		return { coinBadge, title: 'Game Metadata', View: GameMetadataView };

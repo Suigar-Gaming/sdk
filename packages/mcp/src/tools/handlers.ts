@@ -20,7 +20,7 @@ import {
 	toJsonValue,
 	ToolTextResult,
 	type BuilderMode,
-	type ListLegacyNftsResult,
+	type ListNftsResult,
 	type ReadConfigResult,
 	type ReadGameMetadataResult,
 	type ReadOnlyPlan,
@@ -32,7 +32,7 @@ import type {
 	CoinflipInput,
 	ConfigIdInput,
 	LimboInput,
-	ListLegacyNftsInput,
+	ListNftsInput,
 	PvpCoinflipCancelInput,
 	PvpCoinflipCreateInput,
 	PvpCoinflipJoinInput,
@@ -418,9 +418,7 @@ export const readGameMetadataTool = async (
 	} satisfies ReadGameMetadataResult);
 };
 
-export const listLegacyNftsTool = async (
-	input: Partial<ListLegacyNftsInput> = {},
-) => {
+export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveOwnerAddress(
 		requireString(input.owner, 'owner'),
@@ -435,7 +433,7 @@ export const listLegacyNftsTool = async (
 	const catalog = client.suigar.bcs.LegacyNftFactory.parse(
 		factory.object.content,
 	);
-	const ownedNfts = [] as ListLegacyNftsResult['ownedNfts'];
+	const ownedNfts = [] as ListNftsResult['ownedNfts'];
 	let cursor: string | null = null;
 
 	do {
@@ -476,7 +474,7 @@ export const listLegacyNftsTool = async (
 			priceDisplay: formatBaseUnitAmount(value.price),
 		})),
 		ownedNfts,
-	} satisfies ListLegacyNftsResult);
+	} satisfies ListNftsResult);
 };
 
 export const buildCoinflipTransactionTool = async (

@@ -124,7 +124,7 @@ export function NftView({ payload }: { payload: unknown }) {
 			<Panel className="md:col-span-2" title="Owned NFTs">
 				{ownedNfts.length === 0 ? (
 					<p className="text-xs font-semibold text-muted-foreground">
-						This address does not own any legacy Suigar NFTs.
+						This address does not own any Suigar NFTs.
 					</p>
 				) : (
 					<NftTable headers={['Image', 'NFT', 'Object ID', 'Spec ID']}>

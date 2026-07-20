@@ -20,7 +20,7 @@ const appToolMeta = {
 const registeredToolNames = [
 	'read_config',
 	'read_game_metadata',
-	'list_legacy_nfts',
+	'list_nfts',
 	'build_coinflip_transaction',
 	'build_limbo_transaction',
 	'build_plinko_transaction',
@@ -72,8 +72,8 @@ describe('MCP tool registration', () => {
 			annotations: readOnlyToolAnnotations,
 		});
 		expect(registeredTools.read_game_metadata._meta).toMatchObject(appToolMeta);
-		expect(registeredTools.list_legacy_nfts).toMatchObject({
-			title: 'List Legacy Suigar NFTs',
+		expect(registeredTools.list_nfts).toMatchObject({
+			title: 'List Suigar NFTs',
 			annotations: readOnlyToolAnnotations,
 			_meta: appToolMeta,
 		});

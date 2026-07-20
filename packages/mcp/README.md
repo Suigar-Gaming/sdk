@@ -76,6 +76,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 
 - `read_config`
 - `read_game_metadata`
+- `list_nfts`
 - `build_coinflip_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
@@ -85,7 +86,13 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_pvp_coinflip_join_transaction`
 - `build_pvp_coinflip_cancel_transaction`
 
-All tools return `content` text plus `structuredContent`. App-capable hosts can render the shared Suigar Transaction Inspector UI for transaction tools. Use `read_game_metadata` for live on-chain parameters for one selected game, and `read_config` for broad network config and supported-game discovery.
+All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, or transaction inspection. Use `list_nfts` with an `owner` address or SuiNS name to read the NFT catalog and all matching NFTs held by that owner. The tool is read-only and never signs or executes a transaction.
+
+### NFT lookup
+
+`list_nfts` accepts the same network, provider, and SDK config overrides as the other read tools, plus a required `owner`. It returns the resolved owner and NFT type, the factory `nftCatalog`, and `ownedNfts` held by that address. Catalog entries include available supply and a MIST-formatted price; owned entries include the NFT and its catalog specification ids.
+
+In an App-capable host, the NFT view presents the catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text.
 
 ## Modes
 
@@ -116,6 +123,8 @@ Optional `config` input follows the public SDK extension override shape:
 {
 	packageIds?: {
 		sweetHouse?: string;
+		legacyNft?: string;
+		legacyNftFactory?: string;
 		core?: string;
 		coinflip?: string;
 		limbo?: string;

@@ -77,7 +77,7 @@ export function NftPage() {
 
 	React.useEffect(() => {
 		let cancelled = false;
-		const { legacyNft, legacyNftFactory } =
+		const { legacyNft: nftPackageId, legacyNftFactory: nftFactoryId } =
 			client.suigar.getConfig().packageIds;
 
 		async function load() {
@@ -85,12 +85,12 @@ export function NftPage() {
 			setError(null);
 			try {
 				const { object } = await client.core.getObject({
-					objectId: legacyNftFactory,
+					objectId: nftFactoryId,
 					include: { content: true },
 				});
 				if (object instanceof Error) throw object;
 				if (!object.content) {
-					throw new Error('The legacy NFT factory did not return BCS content.');
+					throw new Error('The NFT factory did not return BCS content.');
 				}
 				const factory = client.suigar.bcs.LegacyNftFactory.parse(
 					object.content,
@@ -104,15 +104,13 @@ export function NftPage() {
 					supply: value.supply.toString(),
 				}));
 				if (nextSpecs.length === 0) {
-					throw new Error(
-						'The legacy NFT factory did not return any readable specs.',
-					);
+					throw new Error('The NFT factory did not return any readable specs.');
 				}
 				const nextOwnedNftsBySpec = accountAddress
 					? await getOwnedNftsBySpec(
 							client,
 							accountAddress,
-							`${legacyNft}::nft::Nft`,
+							`${nftPackageId}::nft::Nft`,
 						)
 					: new Map<string, OwnedNftDisplay>();
 				if (!cancelled) {
@@ -150,9 +148,7 @@ export function NftPage() {
 						<div>
 							<div className="mb-2 flex items-center gap-2 text-secondary">
 								<Gem className="size-5" />
-								<span className="text-sm font-semibold">
-									Legacy NFT collection
-								</span>
+								<span className="text-sm font-semibold">NFT collection</span>
 							</div>
 							<h1 className="text-3xl leading-none md:text-5xl">
 								Your Suigar NFTs

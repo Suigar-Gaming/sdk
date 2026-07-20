@@ -151,7 +151,7 @@ export type ReadGameMetadataResult = ReadConfigResult & {
 	};
 };
 
-export type LegacyNftSpec = {
+export type NftSpec = {
 	id: string;
 	name: string;
 	description: string;
@@ -162,7 +162,7 @@ export type LegacyNftSpec = {
 	priceDisplay: string;
 };
 
-export type LegacyNft = {
+export type Nft = {
 	id: string;
 	specId: string;
 	name: string;
@@ -171,19 +171,19 @@ export type LegacyNft = {
 	imageUrl: string;
 };
 
-export type ListLegacyNftsResult = {
+export type ListNftsResult = {
 	network: SuigarNetwork;
 	config: ResolvedMcpConfig;
 	owner: string;
 	nftType: string;
-	nftCatalog: LegacyNftSpec[];
-	ownedNfts: LegacyNft[];
+	nftCatalog: NftSpec[];
+	ownedNfts: Nft[];
 };
 
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
-	| ListLegacyNftsResult
+	| ListNftsResult
 	| ReadOnlyPlan
 	| BuildTransactionResult;
 

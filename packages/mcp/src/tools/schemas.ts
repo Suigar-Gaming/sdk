@@ -102,13 +102,13 @@ export const readGameMetadataInputSchema = configInputSchema
 	})
 	.strict();
 
-export const listLegacyNftsInputSchema = configInputSchema
+export const listNftsInputSchema = configInputSchema
 	.extend({
 		owner: z
 			.string()
 			.min(1)
 			.describe(
-				'Sui address or SuiNS name whose legacy Suigar NFTs should be listed.',
+				'Sui address or SuiNS name whose Suigar NFTs should be listed.',
 			),
 	})
 	.strict();
@@ -266,7 +266,7 @@ export const toolOutputSchema = z.looseObject({
 
 export type ReadConfigInput = z.input<typeof readConfigInputSchema>;
 export type ReadGameMetadataInput = z.input<typeof readGameMetadataInputSchema>;
-export type ListLegacyNftsInput = z.input<typeof listLegacyNftsInputSchema>;
+export type ListNftsInput = z.input<typeof listNftsInputSchema>;
 export type CommonBuildInput = z.input<typeof commonBuildInputSchema>;
 export type CoinflipInput = z.input<typeof coinflipInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;

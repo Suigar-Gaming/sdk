@@ -22,7 +22,7 @@ const publicToolNames = [
 	'build_wheel_transaction',
 	'read_config',
 	'read_game_metadata',
-	'list_legacy_nfts',
+	'list_nfts',
 ];
 
 const sorted = (values: string[]) => [...values].sort();
@@ -92,11 +92,11 @@ describe('MCP server registration', () => {
 			expect(readGameMetadataTool?._meta).toMatchObject({
 				ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI },
 			});
-			const listLegacyNftsTool = result.tools.find(
-				(tool) => tool.name === 'list_legacy_nfts',
+			const listNftsTool = result.tools.find(
+				(tool) => tool.name === 'list_nfts',
 			);
-			expect(listLegacyNftsTool).toMatchObject({
-				title: 'List Legacy Suigar NFTs',
+			expect(listNftsTool).toMatchObject({
+				title: 'List Suigar NFTs',
 				execution: { taskSupport: 'forbidden' },
 				_meta: { ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI } },
 			});
