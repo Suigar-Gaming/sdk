@@ -20,6 +20,7 @@ const appToolMeta = {
 const registeredToolNames = [
 	'read_config',
 	'read_game_metadata',
+	'list_nfts',
 	'build_coinflip_transaction',
 	'build_limbo_transaction',
 	'build_plinko_transaction',
@@ -65,12 +66,17 @@ describe('MCP tool registration', () => {
 			title: 'Read Suigar Config',
 			annotations: readOnlyToolAnnotations,
 		});
-		expect(registeredTools.read_config._meta).toBeUndefined();
+		expect(registeredTools.read_config._meta).toMatchObject(appToolMeta);
 		expect(registeredTools.read_game_metadata).toMatchObject({
 			title: 'Read Suigar Game Metadata',
 			annotations: readOnlyToolAnnotations,
 		});
-		expect(registeredTools.read_game_metadata._meta).toBeUndefined();
+		expect(registeredTools.read_game_metadata._meta).toMatchObject(appToolMeta);
+		expect(registeredTools.list_nfts).toMatchObject({
+			title: 'List Suigar NFTs',
+			annotations: readOnlyToolAnnotations,
+			_meta: appToolMeta,
+		});
 		expect(registeredTools.build_coinflip_transaction).toMatchObject({
 			title: 'Build Coinflip Transaction',
 			annotations: transactionToolAnnotations,

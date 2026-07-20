@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUI_DECIMALS } from '@mysten/sui/utils';
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 import type { SuigarClientBundle } from './client.js';
@@ -349,7 +350,7 @@ export const summarizeDryRun = (
 	return {
 		success,
 		error,
-		gasUsed: gasUsedSummary(effects, context.coinDecimals),
+		gasUsed: gasUsedSummary(effects, SUI_DECIMALS),
 		balanceChanges,
 		events,
 	};

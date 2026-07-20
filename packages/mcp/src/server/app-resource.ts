@@ -7,6 +7,10 @@ import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 export const SUIGAR_MCP_APP_RESOURCE_URI =
 	'ui://suigar/transaction-inspector.html';
 
+export const NFT_IMAGE_RESOURCE_DOMAINS = [
+	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
+] as const;
+
 const hasErrorCode = (
 	error: unknown,
 	code: string,
@@ -41,7 +45,7 @@ export const createSuigarMcpAppResourceResult = async () => ({
 				ui: {
 					csp: {
 						connectDomains: [],
-						resourceDomains: [],
+						resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
 					},
 					prefersBorder: true,
 				},

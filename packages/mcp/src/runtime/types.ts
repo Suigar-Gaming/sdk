@@ -151,9 +151,39 @@ export type ReadGameMetadataResult = ReadConfigResult & {
 	};
 };
 
+export type NftSpec = {
+	id: string;
+	name: string;
+	description: string;
+	url: string;
+	supply: string;
+	available: string;
+	price: string;
+	priceDisplay: string;
+};
+
+export type Nft = {
+	id: string;
+	specId: string;
+	name: string;
+	description: string;
+	url: string;
+	imageUrl: string;
+};
+
+export type ListNftsResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	owner: string;
+	nftType: string;
+	nftCatalog: NftSpec[];
+	ownedNfts: Nft[];
+};
+
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
+	| ListNftsResult
 	| ReadOnlyPlan
 	| BuildTransactionResult;
 

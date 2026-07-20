@@ -8,25 +8,16 @@ import {
 	applyHostStyleVariables,
 } from '@modelcontextprotocol/ext-apps';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import {
-	StrictMode,
-	useEffect,
-	useMemo,
-	useReducer,
-	useRef,
-	useState,
-} from 'react';
+import { StrictMode, useEffect, useReducer, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-	DefinitionList,
 	Header,
 	ListPanel,
 	Panel,
 	RawPayload,
 } from './components/inspector-components.js';
-import { visibleDefinitionEntries } from './lib/format.js';
-import { createInspectorViewModel } from './lib/inspector.js';
 import type { InspectorState } from './lib/types.js';
+import { resolveAppView } from './views/index.js';
 
 const initialState: InspectorState = {
 	status: 'Waiting for tool result',
@@ -211,16 +202,13 @@ export function SuigarInspectorApp() {
 			});
 	}, [app]);
 
-	const viewModel = useMemo(() => {
-		const inspector = viewState.inspector ?? initialState;
-		return createInspectorViewModel(inspector.payload, inspector.errors);
-	}, [viewState.inspector]);
 	const inspector = viewState.inspector ?? initialState;
+	const { coinBadge, title, View } = resolveAppView(inspector.payload);
 
 	if (viewState.error) {
 		return (
 			<main className={shellClassName}>
-				<Header status="Error" />
+				<Header status="Error" title={title} />
 				<ListPanel
 					className="errors"
 					items={[viewState.error.message]}
@@ -233,7 +221,7 @@ export function SuigarInspectorApp() {
 	if (!viewState.hostContext && !viewState.inspector) {
 		return (
 			<main className={shellClassName}>
-				<Header status="Connecting" />
+				<Header status="Connecting" title="Suigar MCP" />
 				<Panel title="Connection">
 					<p className="text-xs leading-5 font-semibold text-muted-foreground">
 						Waiting for host context.
@@ -245,46 +233,8 @@ export function SuigarInspectorApp() {
 
 	return (
 		<main className={shellClassName}>
-			<Header coinBadge={viewModel.coinBadge} status={inspector.status} />
-
-			<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
-				<Panel title="Context">
-					<DefinitionList entries={viewModel.contextEntries} />
-				</Panel>
-
-				<Panel
-					hidden={
-						visibleDefinitionEntries(viewModel.transactionEntries).length === 0
-					}
-					title="Transaction"
-				>
-					<DefinitionList entries={viewModel.transactionEntries} />
-				</Panel>
-
-				<Panel
-					hidden={visibleDefinitionEntries(viewModel.gasEntries).length === 0}
-					title="Gas"
-				>
-					<DefinitionList entries={viewModel.gasEntries} />
-				</Panel>
-
-				<Panel
-					hidden={
-						visibleDefinitionEntries(viewModel.dryRunEntries).length === 0
-					}
-					title="Dry-run"
-				>
-					<DefinitionList entries={viewModel.dryRunEntries} />
-				</Panel>
-			</section>
-
-			<ListPanel
-				className="targets"
-				items={viewModel.targets}
-				title="Targets"
-			/>
-			<ListPanel className="notes" items={viewModel.notes} title="Notes" />
-			<ListPanel className="errors" items={viewModel.errors} title="Errors" />
+			<Header coinBadge={coinBadge} status={inspector.status} title={title} />
+			<View payload={inspector.payload} errors={inspector.errors} />
 			<RawPayload payload={inspector.payload} />
 		</main>
 	);

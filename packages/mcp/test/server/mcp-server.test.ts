@@ -5,7 +5,10 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { describe, expect, it } from 'vitest';
-import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
+import {
+	NFT_IMAGE_RESOURCE_DOMAINS,
+	SUIGAR_MCP_APP_RESOURCE_URI,
+} from '../../src/server/app-resource.js';
 import { createSuigarMcpServer } from '../../src/server/mcp-server.js';
 
 const publicToolNames = [
@@ -19,6 +22,7 @@ const publicToolNames = [
 	'build_wheel_transaction',
 	'read_config',
 	'read_game_metadata',
+	'list_nfts',
 ];
 
 const sorted = (values: string[]) => [...values].sort();
@@ -85,7 +89,17 @@ describe('MCP server registration', () => {
 				title: 'Read Suigar Game Metadata',
 				execution: { taskSupport: 'forbidden' },
 			});
-			expect(readGameMetadataTool?._meta).toBeUndefined();
+			expect(readGameMetadataTool?._meta).toMatchObject({
+				ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI },
+			});
+			const listNftsTool = result.tools.find(
+				(tool) => tool.name === 'list_nfts',
+			);
+			expect(listNftsTool).toMatchObject({
+				title: 'List Suigar NFTs',
+				execution: { taskSupport: 'forbidden' },
+				_meta: { ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI } },
+			});
 		} finally {
 			await client.close();
 			await server.close();
@@ -119,7 +133,7 @@ describe('MCP server registration', () => {
 					ui: {
 						csp: {
 							connectDomains: [],
-							resourceDomains: [],
+							resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
 						},
 						prefersBorder: true,
 					},

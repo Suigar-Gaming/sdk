@@ -184,6 +184,15 @@ Supported override areas:
 
 Use `config` when the application needs to patch package ids, supported `sui`/`usdc` coin metadata, or price info object ids before a new SDK release is published.
 
+Both supported coin keys accept the same partial metadata shape:
+
+```ts
+coins?: {
+	sui?: { coinType?: string; decimals?: number };
+	usdc?: { coinType?: string; decimals?: number };
+};
+```
+
 `packageIds.legacyNft` exposes the network-specific legacy NFT package id, so applications can derive the `::nft::Nft` type for their own lookup. The `packageIds.legacyNftFactory` object id is available for applications that need to read the legacy NFT catalog. Request `content: true`, then use `client.suigar.bcs.LegacyNftFactory.parse(object.content)` to decode the factory and `client.suigar.bcs.LegacyNft.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or legacy NFT mint transaction builder.
 
 ```ts

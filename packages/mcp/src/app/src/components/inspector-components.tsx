@@ -28,9 +28,11 @@ const listItemClassNames = {
 export function Header({
 	coinBadge,
 	status,
+	title = 'Transaction Inspector',
 }: {
 	coinBadge?: string | null;
 	status: string;
+	title?: string;
 }) {
 	return (
 		<header className="flex min-w-0 flex-col gap-4 rounded-lg border border-border/70 bg-card/88 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -39,7 +41,7 @@ export function Header({
 					Suigar MCP
 				</p>
 				<h1 className="text-2xl leading-tight font-extrabold text-foreground">
-					Transaction Inspector
+					{title}
 				</h1>
 			</div>
 			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">

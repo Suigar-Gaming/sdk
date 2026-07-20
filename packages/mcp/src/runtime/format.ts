@@ -1,11 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { SUI_DECIMALS } from '@mysten/sui/utils';
 import type { FormattedAmount } from './types.js';
 
 export const formatBaseUnitAmount = (
 	value: string | number | bigint,
-	decimals = 9,
+	decimals = SUI_DECIMALS,
 ): string => {
 	const raw = String(value);
 	const negative = raw.startsWith('-');

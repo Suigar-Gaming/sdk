@@ -30,6 +30,8 @@ const configOverridesSchema = z
 		packageIds: z
 			.object({
 				sweetHouse: z.string().min(1).optional(),
+				legacyNft: z.string().min(1).optional(),
+				legacyNftFactory: z.string().min(1).optional(),
 				core: z.string().min(1).optional(),
 				coinflip: z.string().min(1).optional(),
 				limbo: z.string().min(1).optional(),
@@ -96,6 +98,17 @@ export const readGameMetadataInputSchema = configInputSchema
 			.optional()
 			.describe(
 				'Refresh on-chain game parameters instead of reading SDK cache.',
+			),
+	})
+	.strict();
+
+export const listNftsInputSchema = configInputSchema
+	.extend({
+		owner: z
+			.string()
+			.min(1)
+			.describe(
+				'Sui address or SuiNS name whose Suigar NFTs should be listed.',
 			),
 	})
 	.strict();
@@ -246,11 +259,14 @@ export const toolOutputSchema = z.looseObject({
 	transactionBytesBase64: z.string().optional(),
 	dryRun: unknownJsonSchema.optional(),
 	dryRunSummary: unknownJsonSchema.optional(),
+	nftCatalog: unknownJsonSchema.optional(),
+	ownedNfts: unknownJsonSchema.optional(),
 	errors: z.array(z.string()).optional(),
 });
 
 export type ReadConfigInput = z.input<typeof readConfigInputSchema>;
 export type ReadGameMetadataInput = z.input<typeof readGameMetadataInputSchema>;
+export type ListNftsInput = z.input<typeof listNftsInputSchema>;
 export type CommonBuildInput = z.input<typeof commonBuildInputSchema>;
 export type CoinflipInput = z.input<typeof coinflipInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;
