@@ -31,10 +31,10 @@ type PackageIds = Record<
 type CoinMetadataSource = {
 	coinType: string;
 	decimals: string;
+	priceInfoObjectId: string;
 };
 type CoinKey = 'sui' | 'usdc';
 type CoinMetadataSources = Record<CoinKey, CoinMetadataSource>;
-type PriceInfoObjectIds = Record<CoinKey, string>;
 
 function extractObjectValue(source: string, objectName: string, key: string) {
 	const blockPattern = new RegExp(
@@ -71,7 +71,7 @@ function extractCoinMetadata(
 	}
 
 	const entryPattern = new RegExp(
-		`${key}:\\s*\\{[\\s\\S]*?coinType:\\s*([^,\\n]+),[\\s\\S]*?decimals:\\s*([^,\\n]+),[\\s\\S]*?\\}`,
+		`${key}:\\s*\\{[\\s\\S]*?coinType:\\s*([^,\\n]+),[\\s\\S]*?decimals:\\s*([^,\\n]+),[\\s\\S]*?priceInfoObjectId:\\s*'([^']*)',[\\s\\S]*?\\}`,
 	);
 	const entryMatch = blockMatch[1].match(entryPattern);
 
@@ -82,6 +82,7 @@ function extractCoinMetadata(
 	return {
 		coinType: entryMatch[1].trim(),
 		decimals: entryMatch[2].trim(),
+		priceInfoObjectId: entryMatch[3].trim(),
 	};
 }
 
@@ -123,18 +124,16 @@ function renderNetworkFile(
 	{
 		packageIds,
 		coins,
-		priceInfoObjectIds,
 	}: {
 		packageIds: PackageIds;
 		coins: CoinMetadataSources;
-		priceInfoObjectIds: PriceInfoObjectIds;
 	},
 ) {
 	const uppercaseNetwork = network.toUpperCase();
 	const isMainnet = network === 'mainnet';
 	const imports = isMainnet
-		? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\nimport type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';"
-		: "import type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n\tSuigarPriceInfoObjectIds,\n} from '../types/suigar-config.type.js';";
+		? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\nimport type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n} from '../types/suigar-config.type.js';"
+		: "import type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n} from '../types/suigar-config.type.js';";
 
 	return `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
@@ -164,16 +163,13 @@ export const ${uppercaseNetwork}_COINS: SuigarCoinRegistry = {
 \tsui: {
 \t\tcoinType: ${isMainnet ? 'SUI_TYPE_ARG' : coins.sui.coinType},
 \t\tdecimals: ${isMainnet ? 'SUI_DECIMALS' : coins.sui.decimals},
+\t\tpriceInfoObjectId: '${coins.sui.priceInfoObjectId}',
 \t},
 \tusdc: {
 \t\tcoinType: ${coins.usdc.coinType},
 \t\tdecimals: ${coins.usdc.decimals},
+\t\tpriceInfoObjectId: '${coins.usdc.priceInfoObjectId}',
 \t},
-};
-
-export const ${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS: SuigarPriceInfoObjectIds = {
-\tsui: '${priceInfoObjectIds.sui}',
-\tusdc: '${priceInfoObjectIds.usdc}',
 };
 `;
 }
@@ -185,7 +181,6 @@ async function updateNetworkConfig(network: Network) {
 	const uppercaseNetwork = network.toUpperCase();
 	const currentPackageObjectName = `${uppercaseNetwork}_PACKAGE_IDS`;
 	const currentCoinsObjectName = `${uppercaseNetwork}_COINS`;
-	const currentPriceObjectName = `${uppercaseNetwork}_PRICE_INFO_OBJECT_IDS`;
 
 	const packageIds: PackageIds = {
 		sweetHouse: extractObjectValue(
@@ -218,11 +213,6 @@ async function updateNetworkConfig(network: Network) {
 		packageIds[packageKey] = await fetchPackageAddress(baseUrl, packageName);
 	}
 
-	const priceInfoObjectIds: PriceInfoObjectIds = {
-		sui: extractObjectValue(currentSource, currentPriceObjectName, 'sui'),
-		usdc: extractObjectValue(currentSource, currentPriceObjectName, 'usdc'),
-	};
-
 	const coins: CoinMetadataSources = {
 		sui: extractCoinMetadata(currentSource, currentCoinsObjectName, 'sui'),
 		usdc: extractCoinMetadata(currentSource, currentCoinsObjectName, 'usdc'),
@@ -231,7 +221,6 @@ async function updateNetworkConfig(network: Network) {
 	const nextSource = renderNetworkFile(network, {
 		packageIds,
 		coins,
-		priceInfoObjectIds,
 	});
 
 	await writeFile(filePath, nextSource);

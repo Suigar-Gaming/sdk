@@ -6,13 +6,13 @@ import { SuigarNetwork } from './network.type.js';
 export type SuigarCoinMetadata = {
 	coinType: string;
 	decimals: number;
+	priceInfoObjectId: string;
 };
 
 export type SuigarConfigOverrides = {
 	packageIds?: Partial<SuigarPackageIds>;
 	registryIds?: Partial<SuigarRegistryIds>;
 	coins?: Partial<Record<SuigarCoin, Partial<SuigarCoinMetadata>>>;
-	priceInfoObjectIds?: Partial<SuigarPriceInfoObjectIds>;
 };
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
@@ -60,13 +60,10 @@ export type SuigarPackageIds = Record<SuigarPackage, string>;
 export type SuigarRegistry = 'pvpCoinflip';
 export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
-export type SuigarPriceInfoObjectIds = Record<SuigarCoin, string>;
-
 export type SuigarNetworkRegistry<TRegistry> = Record<SuigarNetwork, TRegistry>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
 	registryIds: SuigarRegistryIds;
 	coins: SuigarCoinRegistry;
-	priceInfoObjectIds: SuigarPriceInfoObjectIds;
 };

@@ -168,7 +168,6 @@ client.games.bcs;
 
 - internal package ids by network
 - internal supported coin metadata by network
-- internal price info object ids by network
 - the connected client network
 - the extension name
 
@@ -180,16 +179,15 @@ Supported override areas:
 - `config.packageIds`
 - `config.registryIds`
 - `config.coins`
-- `config.priceInfoObjectIds`
 
-Use `config` when the application needs to patch package ids, supported `sui`/`usdc` coin metadata, or price info object ids before a new SDK release is published.
+Use `config` when the application needs to patch package ids or supported `sui`/`usdc` coin metadata before a new SDK release is published. Each coin entry includes its price-info object id.
 
 Both supported coin keys accept the same partial metadata shape:
 
 ```ts
 coins?: {
-	sui?: { coinType?: string; decimals?: number };
-	usdc?: { coinType?: string; decimals?: number };
+	sui?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
+	usdc?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
 };
 ```
 
@@ -203,10 +201,8 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 				usdc: {
 					coinType: '0xPACKAGE::usdc::USDC',
 					decimals: 6,
+					priceInfoObjectId: '0xPYTH_PRICE_INFO',
 				},
-			},
-			priceInfoObjectIds: {
-				usdc: '0xPYTH_PRICE_INFO',
 			},
 		},
 	}),
@@ -239,7 +235,6 @@ It includes:
 - `packageIds`
 - `registryIds`
 - `coins`
-- `priceInfoObjectIds`
 
 ```ts
 const config = client.suigar.getConfig();

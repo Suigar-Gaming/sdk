@@ -7,12 +7,7 @@ import {
 	SUI_TYPE_ARG,
 } from '@mysten/sui/utils';
 import { describe, expect, it } from 'vitest';
-import {
-	COINS,
-	PACKAGE_IDS,
-	PRICE_INFO_OBJECT_IDS,
-	REGISTRY_IDS,
-} from '../../src/configs/index.js';
+import { COINS, PACKAGE_IDS, REGISTRY_IDS } from '../../src/configs/index.js';
 import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Parameters as PlinkoParameters,
@@ -31,10 +26,12 @@ describe('resolveSuigarConfig', () => {
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(COINS.testnet.sui.coinType),
 			decimals: 9,
+			priceInfoObjectId: COINS.testnet.sui.priceInfoObjectId,
 		});
 		expect(config.coins.usdc).toEqual({
 			coinType: normalizeStructTag(COINS.testnet.usdc.coinType),
 			decimals: 6,
+			priceInfoObjectId: COINS.testnet.usdc.priceInfoObjectId,
 		});
 		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
@@ -50,16 +47,16 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
-		expect(config.priceInfoObjectIds).toEqual(PRICE_INFO_OBJECT_IDS.mainnet);
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(SUI_TYPE_ARG),
 			decimals: SUI_DECIMALS,
+			priceInfoObjectId: COINS.mainnet.sui.priceInfoObjectId,
 		});
 	});
 
 	it('resolves price info object ids through supported coins', () => {
 		const config = resolveSuigarConfig('testnet');
-		config.priceInfoObjectIds.sui = '0xabc';
+		config.coins.sui.priceInfoObjectId = '0xabc';
 
 		expect(resolvePriceInfoObjectId(config, COINS.testnet.sui.coinType)).toBe(
 			'0xabc',
@@ -68,8 +65,8 @@ describe('resolveSuigarConfig', () => {
 
 	it('maps configured coins to supported coin object ids', () => {
 		const config = resolveSuigarConfig('testnet');
-		config.priceInfoObjectIds.sui = '0xsui';
-		config.priceInfoObjectIds.usdc = '0xusdc';
+		config.coins.sui.priceInfoObjectId = '0xsui';
+		config.coins.usdc.priceInfoObjectId = '0xusdc';
 
 		expect(resolvePriceInfoObjectId(config, COINS.testnet.sui.coinType)).toBe(
 			'0xsui',
@@ -88,14 +85,13 @@ describe('resolveSuigarConfig', () => {
 				sui: {
 					coinType: '0x2::sui::SUI',
 					decimals: SUI_DECIMALS,
+					priceInfoObjectId: '0xsui',
 				},
 				usdc: {
 					coinType: '0x999::usdc::USDC',
 					decimals: 4,
+					priceInfoObjectId: '0xprice',
 				},
-			},
-			priceInfoObjectIds: {
-				usdc: '0xprice',
 			},
 		});
 
@@ -103,10 +99,12 @@ describe('resolveSuigarConfig', () => {
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(SUI_TYPE_ARG),
 			decimals: SUI_DECIMALS,
+			priceInfoObjectId: '0xsui',
 		});
 		expect(config.coins.usdc).toEqual({
 			coinType: normalizeStructTag('0x999::usdc::USDC'),
 			decimals: 4,
+			priceInfoObjectId: '0xprice',
 		});
 		expect(resolvePriceInfoObjectId(config, '0x999::usdc::USDC')).toBe(
 			'0xprice',

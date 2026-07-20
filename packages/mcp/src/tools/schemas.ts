@@ -22,6 +22,7 @@ const coinMetadataSchema = z
 	.object({
 		coinType: z.string().min(1).optional(),
 		decimals: z.number().int().nonnegative().optional(),
+		priceInfoObjectId: z.string().min(1).optional(),
 	})
 	.strict();
 
@@ -52,13 +53,6 @@ const configOverridesSchema = z
 			.object({
 				sui: coinMetadataSchema.optional(),
 				usdc: coinMetadataSchema.optional(),
-			})
-			.strict()
-			.optional(),
-		priceInfoObjectIds: z
-			.object({
-				sui: z.string().min(1).optional(),
-				usdc: z.string().min(1).optional(),
 			})
 			.strict()
 			.optional(),
