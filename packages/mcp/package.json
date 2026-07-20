@@ -1,6 +1,6 @@
 {
 	"name": "@suigar/mcp",
-	"version": "1.0.0-beta.10",
+	"version": "1.0.0-beta.11",
 	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
 	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
