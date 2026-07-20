@@ -20,6 +20,8 @@ import {
 	coinflipInputSchema,
 	configIdInputSchema,
 	limboInputSchema,
+	listLegacyNftsInputSchema,
+	listLegacyNftsTool,
 	pvpCoinflipCancelInputSchema,
 	pvpCoinflipCreateInputSchema,
 	pvpCoinflipJoinInputSchema,
@@ -92,7 +94,7 @@ type AppToolMeta = {
 	};
 };
 
-const readTools = [
+const appTools = [
 	{
 		name: 'read_config',
 		title: 'Read Suigar Config',
@@ -111,9 +113,15 @@ const readTools = [
 		annotations: readOnlyToolAnnotations,
 		handler: readGameMetadataTool,
 	},
-] satisfies ToolDefinition[];
-
-const appTools = [
+	{
+		name: 'list_legacy_nfts',
+		title: 'List Legacy Suigar NFTs',
+		description:
+			'List the legacy Suigar NFT catalog and the matching NFTs owned by one address.',
+		inputSchema: listLegacyNftsInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: listLegacyNftsTool,
+	},
 	{
 		name: 'build_coinflip_transaction',
 		title: 'Build Coinflip Transaction',
@@ -190,22 +198,6 @@ const appTools = [
 
 const registerTool = <TInput>(
 	server: McpServer,
-	tool: ToolDefinition & { handler: ToolHandler<TInput> },
-) =>
-	server.registerTool(
-		tool.name,
-		{
-			title: tool.title,
-			description: tool.description,
-			inputSchema: tool.inputSchema,
-			outputSchema: toolOutputSchema,
-			annotations: tool.annotations,
-		},
-		withToolErrors(tool.handler),
-	);
-
-const registerAppToolDefinition = <TInput>(
-	server: McpServer,
 	appToolMeta: AppToolMeta,
 	tool: ToolDefinition & { handler: ToolHandler<TInput> },
 ) =>
@@ -227,10 +219,7 @@ export const registerSuigarTools = (
 	server: McpServer,
 	appToolMeta: AppToolMeta,
 ) => {
-	for (const tool of readTools) {
-		registerTool(server, tool);
-	}
 	for (const tool of appTools) {
-		registerAppToolDefinition(server, appToolMeta, tool);
+		registerTool(server, appToolMeta, tool);
 	}
 };

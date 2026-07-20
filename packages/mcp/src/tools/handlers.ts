@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SuiClientTypes } from '@mysten/sui/client';
 import type { Transaction } from '@mysten/sui/transactions';
 import {
 	GAMES,
@@ -19,6 +20,7 @@ import {
 	toJsonValue,
 	ToolTextResult,
 	type BuilderMode,
+	type ListLegacyNftsResult,
 	type ReadConfigResult,
 	type ReadGameMetadataResult,
 	type ReadOnlyPlan,
@@ -30,6 +32,7 @@ import type {
 	CoinflipInput,
 	ConfigIdInput,
 	LimboInput,
+	ListLegacyNftsInput,
 	PvpCoinflipCancelInput,
 	PvpCoinflipCreateInput,
 	PvpCoinflipJoinInput,
@@ -413,6 +416,66 @@ export const readGameMetadataTool = async (
 			],
 		},
 	} satisfies ReadGameMetadataResult);
+};
+
+export const listLegacyNftsTool = async (
+	input: Partial<ListLegacyNftsInput> = {},
+) => {
+	const bundle = createSuigarClient(getConfigInput(input));
+	const owner = await resolveOwnerAddress(
+		requireString(input.owner, 'owner'),
+		bundle,
+	);
+	const { client, config } = bundle;
+	const nftType = `${config.sdk.packageIds.legacyNft}::nft::Nft`;
+	const factory = await client.core.getObject({
+		objectId: config.sdk.packageIds.legacyNftFactory,
+		include: { content: true },
+	});
+	const catalog = client.suigar.bcs.LegacyNftFactory.parse(
+		factory.object.content,
+	);
+	const ownedNfts = [] as ListLegacyNftsResult['ownedNfts'];
+	let cursor: string | null = null;
+
+	do {
+		const page: SuiClientTypes.ListOwnedObjectsResponse<{ content: true }> =
+			await client.core.listOwnedObjects<{ content: true }>({
+				owner,
+				type: nftType,
+				cursor,
+				include: { content: true },
+			});
+		for (const object of page.objects) {
+			const nft = client.suigar.bcs.LegacyNft.parse(object.content);
+			ownedNfts.push({
+				id: nft.id,
+				specId: nft.spec_id,
+				name: nft.name,
+				description: nft.description,
+				url: nft.url.url,
+				imageUrl: nft.image_url.url,
+			});
+		}
+		cursor = page.cursor;
+	} while (cursor);
+
+	return asTextResponse({
+		network: config.network,
+		config,
+		owner,
+		nftType,
+		nftCatalog: catalog.specs.contents.map(({ value }) => ({
+			id: value.id,
+			name: value.name,
+			description: value.description,
+			url: value.url.url,
+			supply: value.supply.toString(),
+			available: value.available.toString(),
+			price: value.price.toString(),
+		})),
+		ownedNfts,
+	} satisfies ListLegacyNftsResult);
 };
 
 export const buildCoinflipTransactionTool = async (
