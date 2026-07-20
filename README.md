@@ -15,7 +15,7 @@ For Sui TypeScript SDK documentation, visit [sdk.mystenlabs.com](https://sdk.mys
 Install Suigar MCP for all detected coding agents with [add-mcp](https://www.npmjs.com/package/add-mcp):
 
 ```bash
-npx add-mcp @suigar/mcp@latest
+npx add-mcp @suigar/mcp@latest --name suigar
 ```
 
 Add `-y` to skip the installer prompts. Restart or reload your MCP client after installation.

@@ -19,7 +19,7 @@ The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specif
 Install for all detected coding agents with [add-mcp](https://www.npmjs.com/package/add-mcp):
 
 ```bash
-npx add-mcp @suigar/mcp@latest
+npx add-mcp @suigar/mcp@latest --name suigar
 ```
 
 Add `-y` to skip the installer prompts. Restart or reload your MCP client after installation.
