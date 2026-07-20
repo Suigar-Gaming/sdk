@@ -9,6 +9,7 @@ interface PackageJson {
 
 const packageJsonPath = new URL('./package.json', import.meta.url);
 const mcpConfigPath = new URL('./plugin/.mcp.json', import.meta.url);
+const serverManifestPath = new URL('./server.json', import.meta.url);
 const pluginManifestPaths = [
 	new URL('./plugin/plugin.json', import.meta.url),
 	new URL('./plugin/.claude-plugin/plugin.json', import.meta.url),
@@ -54,4 +55,11 @@ await replaceInFile(
 	mcpPackagePattern,
 	`$1@${packageJson.version}$2`,
 	'Missing @suigar/mcp package specifier',
+);
+
+await replaceInFile(
+	serverManifestPath,
+	versionPattern,
+	`$1${packageJson.version}$2`,
+	'Missing version field',
 );
