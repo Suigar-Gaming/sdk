@@ -89,11 +89,16 @@ export function NftView({ payload }: { payload: unknown }) {
 				hidden={catalog.length === 0}
 				title="NFT catalog"
 			>
-				<NftTable headers={['NFT', 'Available', 'Supply', 'Price (SUI)']}>
+				<NftTable
+					headers={['Image', 'NFT', 'Available', 'Supply', 'Price (SUI)']}
+				>
 					{catalog.map((item) => {
 						const nft = asRecord(item);
 						return (
 							<tr className="bg-card/45" key={String(nft.id)}>
+								<td className="px-3 py-2">
+									<NftImage name={String(nft.name)} url={nft.url} />
+								</td>
 								<td className="px-3 py-2 font-bold">
 									<div>{String(nft.name)}</div>
 									<div
