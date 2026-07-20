@@ -16,6 +16,7 @@ import {
 	buildPvpCoinflipJoinTransactionTool,
 	buildRangeTransactionTool,
 	buildWheelTransactionTool,
+	listLegacyNftsTool,
 	readConfigTool,
 	readGameMetadataTool,
 } from '../../src/tools/handlers.js';
@@ -47,6 +48,12 @@ describe('read tools', () => {
 		await expect(
 			readGameMetadataTool({ game: 'slots' as never }),
 		).rejects.toThrow(/Unsupported game/u);
+	});
+
+	it('requires an owner when listing legacy NFTs', async () => {
+		await expect(listLegacyNftsTool({})).rejects.toThrow(
+			'Missing required field: owner.',
+		);
 	});
 });
 
