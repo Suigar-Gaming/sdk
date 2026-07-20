@@ -28,6 +28,31 @@ describe('package exports', () => {
 
 	it('ships synchronized plugin manifests and MCP server config', async () => {
 		expect(packageJson.files).toContain('plugin');
+		expect(packageJson.files).not.toContain('server.json');
+		expect(packageJson.mcpName).toBe('io.github.suigar-gaming/mcp');
+
+		const serverManifest = JSON.parse(
+			await readFile(new URL('../server.json', import.meta.url), 'utf8'),
+		);
+		expect(serverManifest).toMatchObject({
+			$schema:
+				'https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json',
+			name: packageJson.mcpName,
+			version: packageJson.version,
+			repository: {
+				url: 'https://github.com/Suigar-Gaming/ts-sdks',
+				source: 'github',
+			},
+			packages: [
+				{
+					registryType: 'npm',
+					identifier: packageJson.name,
+					version: packageJson.version,
+					transport: { type: 'stdio' },
+					environmentVariables: [],
+				},
+			],
+		});
 
 		const manifestUrls = [
 			new URL('../plugin/plugin.json', import.meta.url),

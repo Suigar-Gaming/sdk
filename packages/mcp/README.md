@@ -16,21 +16,35 @@ The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specif
 
 ## Install
 
+Install for all detected coding agents with [add-mcp](https://www.npmjs.com/package/add-mcp):
+
 ```bash
-npm install @suigar/mcp
+npx add-mcp @suigar/mcp@latest --name suigar
 ```
 
-Use the stdio server from an MCP client:
+Add `-y` to skip the installer prompts. Restart or reload your MCP client after installation.
+
+### Manual configuration
+
+To add the stdio server to an MCP client yourself, use:
 
 ```json
 {
 	"mcpServers": {
 		"suigar": {
 			"command": "npx",
-			"args": ["-y", "@suigar/mcp"]
+			"args": ["-y", "@suigar/mcp@latest"]
 		}
 	}
 }
+```
+
+### Package installation
+
+Install the package directly when you need to import its programmatic API or run a local copy:
+
+```bash
+npm install @suigar/mcp
 ```
 
 The package also ships `plugin/` manifests for plugin-capable hosts:
