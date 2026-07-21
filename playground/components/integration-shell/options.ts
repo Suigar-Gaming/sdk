@@ -8,6 +8,7 @@ export const STANDARD_GAME_OPTIONS = [
 	{ value: 'limbo', label: 'Limbo' },
 	{ value: 'plinko', label: 'Plinko' },
 	{ value: 'range', label: 'Range' },
+	{ value: 'soccer', label: 'Soccer' },
 	{ value: 'wheel', label: 'Wheel' },
 ] as const satisfies ReadonlyArray<{ value: StandardGameId; label: string }>;
 

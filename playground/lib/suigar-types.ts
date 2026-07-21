@@ -92,6 +92,12 @@ export type RangeFormValues = StandardSharedFields & {
 	scale: string;
 };
 
+export type SoccerFormValues = StandardSharedFields & {
+	configId: string;
+	countryId: string;
+	shotZoneId: string;
+};
+
 export type WheelFormValues = StandardSharedFields & {
 	configId: string;
 };
@@ -114,6 +120,7 @@ export type StandardForms = {
 	limbo: LimboFormValues;
 	plinko: PlinkoFormValues;
 	range: RangeFormValues;
+	soccer: SoccerFormValues;
 	wheel: WheelFormValues;
 };
 

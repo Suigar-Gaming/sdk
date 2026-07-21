@@ -19,6 +19,7 @@ import { PvPCoinflipCancelForm } from '@/components/forms/games/pvp-coinflip-can
 import { PvPCoinflipCreateForm } from '@/components/forms/games/pvp-coinflip-create-form';
 import { PvPCoinflipJoinForm } from '@/components/forms/games/pvp-coinflip-join-form';
 import { RangeForm } from '@/components/forms/games/range-form';
+import { SoccerForm } from '@/components/forms/games/soccer-form';
 import { WheelForm } from '@/components/forms/games/wheel-form';
 import {
 	CodeSample,
@@ -700,6 +701,17 @@ function IntegrationControls({
 									rangeBoundsDescription={rangeBoundsDescription}
 								/>
 							) : null}
+							{standardGame === 'soccer' ? (
+								<SoccerForm
+									value={effectiveStandardForms.soccer}
+									onChange={(patch) => updateStandardForm('soccer', patch)}
+									onStakeBlur={() => onStandardStakeBlur('soccer')}
+									configOptions={standardGameParameters?.configOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+								/>
+							) : null}
 							{standardGame === 'wheel' ? (
 								<WheelForm
 									value={effectiveStandardForms.wheel}
@@ -1085,10 +1097,14 @@ function useIntegrationState({
 
 	const normalizedCurrentAccount =
 		currentAccount?.address.toLowerCase() ?? null;
+	const selectedStandardForm =
+		standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
 	const activeConfigId =
-		standardGame === 'plinko' || standardGame === 'wheel'
+		standardGame === 'plinko' ||
+		standardGame === 'soccer' ||
+		standardGame === 'wheel'
 			? resolvePlayableConfigId(
-					standardForms[standardGame].configId,
+					(selectedStandardForm as { configId: string }).configId,
 					standardGameParameters?.configOptions,
 				)
 			: undefined;
@@ -1251,12 +1267,15 @@ function useIntegrationState({
 
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
 		const nextForms: StandardForms = {
-			...standardForms,
-			coinflip: { ...standardForms.coinflip },
-			limbo: { ...standardForms.limbo },
-			plinko: { ...standardForms.plinko },
-			range: { ...standardForms.range },
-			wheel: { ...standardForms.wheel },
+			coinflip: {
+				...DEFAULT_STANDARD_FORMS.coinflip,
+				...standardForms.coinflip,
+			},
+			limbo: { ...DEFAULT_STANDARD_FORMS.limbo, ...standardForms.limbo },
+			plinko: { ...DEFAULT_STANDARD_FORMS.plinko, ...standardForms.plinko },
+			range: { ...DEFAULT_STANDARD_FORMS.range, ...standardForms.range },
+			soccer: { ...DEFAULT_STANDARD_FORMS.soccer, ...standardForms.soccer },
+			wheel: { ...DEFAULT_STANDARD_FORMS.wheel, ...standardForms.wheel },
 		};
 
 		if (standardGame === 'plinko') {
@@ -1269,6 +1288,13 @@ function useIntegrationState({
 		if (standardGame === 'wheel') {
 			nextForms.wheel.configId = resolvePlayableConfigId(
 				standardForms.wheel.configId,
+				standardGameParameters?.configOptions,
+			);
+		}
+
+		if (standardGame === 'soccer') {
+			nextForms.soccer.configId = resolvePlayableConfigId(
+				nextForms.soccer.configId,
 				standardGameParameters?.configOptions,
 			);
 		}
@@ -1423,7 +1449,7 @@ function useIntegrationState({
 		dispatchUi({ type: 'clear-feedback' });
 		setStandardForms((current) => ({
 			...current,
-			[game]: { ...current[game], ...patch },
+			[game]: { ...DEFAULT_STANDARD_FORMS[game], ...current[game], ...patch },
 		}));
 	}
 

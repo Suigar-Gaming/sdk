@@ -225,6 +225,56 @@ export function summarizeStandardGameParameters(
 
 			return { stakeRange, configOptions: configs };
 		}
+		case 'soccer': {
+			const soccerParameters = parameters as StakeParameters & {
+				configs: {
+					contents: Array<
+						ConfigEntry & {
+							value: ConfigEntry['value'] & {
+								shot_zone_ids: number[];
+								shot_zone_multipliers: number[];
+							};
+						}
+					>;
+				};
+				countries: {
+					contents: Array<{ key: number; value: string }>;
+				};
+			};
+			const stakeRange = toStakeRange(
+				toBigInt(soccerParameters.min_stake),
+				toBigInt(soccerParameters.max_stake),
+				decimals,
+			);
+			const configs = toConfigOptions(
+				soccerParameters.configs.contents,
+				decimals,
+				(entry) => ({
+					label: `Config ${entry.key}`,
+					details: [
+						{
+							label: 'Shot zones',
+							value: entry.value.shot_zone_ids.join(', '),
+						},
+					],
+					multiplierValues: entry.value.shot_zone_multipliers.map(
+						(value, index) => ({
+							id: String(entry.value.shot_zone_ids[index]),
+							value: String(value),
+						}),
+					),
+				}),
+			);
+
+			return {
+				stakeRange,
+				configOptions: configs,
+				topLevelDetails: soccerParameters.countries.contents.map((country) => ({
+					label: `Country ${country.key}`,
+					value: country.value,
+				})),
+			};
+		}
 		default:
 			return {
 				stakeRange: {

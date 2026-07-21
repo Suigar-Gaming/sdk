@@ -77,8 +77,9 @@ export function NftPage() {
 
 	React.useEffect(() => {
 		let cancelled = false;
-		const { legacyNft: nftPackageId, legacyNftFactory: nftFactoryId } =
-			client.suigar.getConfig().packageIds;
+		const { legacyNft: nftPackageId } = client.suigar.getConfig().packageIds;
+		const { legacyNftFactory: nftFactoryId } =
+			client.suigar.getConfig().objectIds;
 
 		async function load() {
 			setIsLoading(true);
