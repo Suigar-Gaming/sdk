@@ -30,6 +30,7 @@ import {
 	buildPlinkoTransaction,
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
+	buildSoccerTransaction,
 	buildWheelTransaction,
 } from './transactions/index.js';
 import { TtlClientCache } from './ttl-cache.js';
@@ -46,6 +47,7 @@ import {
 	BuildPlinkoTransactionOptions,
 	BuildPvPCoinflipGameOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
 	Game,
 	PvPCoinflipAction,
@@ -339,6 +341,12 @@ export class SuigarClient {
 						config: this.#config,
 						partner: this.#partner,
 					} as WithPartner<BuildRangeTransactionOptions>);
+				case 'soccer':
+					return buildSoccerTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<BuildSoccerTransactionOptions>);
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,

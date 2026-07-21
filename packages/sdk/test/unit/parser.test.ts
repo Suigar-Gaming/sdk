@@ -73,6 +73,7 @@ describe('parseGameEvent', () => {
 			'limbo',
 			'plinko',
 			'range',
+			'soccer',
 			'wheel',
 		] as const) {
 			expect(
@@ -216,6 +217,25 @@ describe('parseGameDetails', () => {
 				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
 			),
 		).toEqual({ pvp_result: 'loss' });
+	});
+
+	it('decodes soccer-specific u8 and u16 detail values', () => {
+		expect(
+			parseGameDetails(
+				'soccer',
+				gameDetails([
+					{ key: 'soccer_config', value: [9] },
+					{ key: 'country_id', value: [250, 0] },
+					{ key: 'shot_zone_id', value: [4] },
+					{ key: 'is_goal', value: [1] },
+				]),
+			),
+		).toEqual({
+			soccer_config: 9,
+			country_id: 250,
+			shot_zone_id: 4,
+			is_goal: true,
+		});
 	});
 
 	it('narrows parsed detail keys and value types by game id', () => {

@@ -69,6 +69,8 @@ export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 			return config.packageIds.pvpCoinflip;
 		case 'range':
 			return config.packageIds.range;
+		case 'soccer':
+			return config.packageIds.soccer;
 		case 'wheel':
 			return config.packageIds.wheel;
 	}

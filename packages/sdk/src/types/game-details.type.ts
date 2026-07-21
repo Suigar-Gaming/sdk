@@ -11,7 +11,8 @@ export type BetResultGameDetails = InferBcsType<
 	typeof BetResultEvent
 >['game_details'];
 
-export type GameDetailValueType = 'u8' | 'u64' | 'bool' | 'float' | 'string';
+export type GameDetailValueType =
+	'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
 export type GameDetailsSchema = Record<string, GameDetailValueType>;
 
 export type GameDetail<TValueType extends GameDetailValueType> =
@@ -27,6 +28,7 @@ export type GameDetails<TGame extends Game> = {
 
 export const GAME_DETAIL_BCS = {
 	u8: bcs.U8,
+	u16: bcs.U16,
 	u64: bcs.U64,
 	bool: bcs.Bool,
 	float: Float,
@@ -84,11 +86,23 @@ const WHEEL_GAME_DETAILS_SCHEMA = {
 	spin_value: 'u64',
 } satisfies GameDetailsSchema;
 
+const SOCCER_GAME_DETAILS_SCHEMA = {
+	soccer_config: 'u8',
+	outcome_code: 'u16',
+	country_id: 'u16',
+	shot_zone_id: 'u8',
+	is_goal: 'bool',
+	multiplier: 'float',
+	payout_amount: 'u64',
+	draw_value: 'u64',
+} satisfies GameDetailsSchema;
+
 export const GAME_DETAILS_SCHEMAS = {
 	coinflip: COINFLIP_GAME_DETAILS_SCHEMA,
 	limbo: LIMBO_GAME_DETAILS_SCHEMA,
 	plinko: PLINKO_GAME_DETAILS_SCHEMA,
 	'pvp-coinflip': PVP_COINFLIP_GAME_DETAILS_SCHEMA,
 	range: RANGE_GAME_DETAILS_SCHEMA,
+	soccer: SOCCER_GAME_DETAILS_SCHEMA,
 	wheel: WHEEL_GAME_DETAILS_SCHEMA,
 } satisfies Record<Game, GameDetailsSchema>;

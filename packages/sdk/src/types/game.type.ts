@@ -7,6 +7,7 @@ export const GAMES = [
 	'plinko',
 	'pvp-coinflip',
 	'range',
+	'soccer',
 	'wheel',
 ] as const;
 

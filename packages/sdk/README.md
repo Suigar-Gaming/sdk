@@ -94,7 +94,7 @@ import type {
 
 Current game-type subpath exports:
 
-- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
+- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildSoccerTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
@@ -313,6 +313,7 @@ Use `createBetTransaction(gameId, options)` for:
 - `limbo`
 - `plinko`
 - `range`
+- `soccer`
 - `wheel`
 
 ```ts
@@ -351,7 +352,7 @@ Error behavior:
 
 - `RangeError` when `gameId` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
-- `RangeError` from bounded numeric helpers such as `toU8()` when `plinko` or `wheel` `configId` is out of range or not an integer
+- `RangeError` from bounded numeric helpers when a game selection is out of range or not an integer
 
 Per-game options:
 
@@ -359,6 +360,7 @@ Per-game options:
 - `limbo`: `targetMultiplier: number`, `scale?: number`
 - `plinko`: `configId: number`
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
+- `soccer`: `configId: number`, `countryId: number`, `shotZoneId: number`
 - `wheel`: `configId: number`
 
 Examples:
@@ -388,7 +390,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 > - range converts each point with `Math.round(value * scale)`
 > - range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
 > - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-> - plinko and wheel `configId` must fit in `u8`
+> - plinko, soccer, and wheel `configId` values must fit in `u8`; soccer `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
 
 > **Tip:**
 >
@@ -557,7 +559,7 @@ const gameDetails = parseGameDetails(gameId, decoded.game_details);
 
 `parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
 
-- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
+- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
 - `{ gameId: 'pvp-coinflip', eventName: 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 

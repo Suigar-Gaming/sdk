@@ -18,6 +18,7 @@ export const TEST_CONFIG = {
 		plinko: '0x2',
 		pvpCoinflip: '0x3',
 		range: '0x4',
+		soccer: '0x7',
 		wheel: '0x5',
 	},
 	objectIds: {

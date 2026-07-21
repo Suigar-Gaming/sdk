@@ -6,5 +6,6 @@ export * from './limbo.js';
 export * from './plinko.js';
 export * from './pvp-coinflip.js';
 export * from './range.js';
+export * from './soccer.js';
 export * from './shared.js';
 export * from './wheel.js';

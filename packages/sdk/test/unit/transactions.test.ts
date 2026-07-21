@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
+	buildSoccerTransaction,
 } from '../../src/transactions/index.js';
 import {
 	createContractCallMock,
@@ -499,6 +500,51 @@ describe('wheel transaction wrapper', () => {
 				coinType: '0x2::sui::SUI',
 				stake: 1000,
 				configId: -1,
+				config: TEST_CONFIG,
+			}),
+		).toThrow('Value must be a u8 integer');
+	});
+});
+
+describe('soccer transaction wrapper', () => {
+	it('passes validated soccer selections into the generated helper', async () => {
+		const play = createContractCallMock();
+		const { buildSoccerTransaction: buildSoccerTransactionWithMock } =
+			await loadTransactionModuleWithMock<{
+				buildSoccerTransaction: typeof buildSoccerTransaction;
+			}>(
+				'../../src/contracts/soccer/soccer.js',
+				{ play },
+				'../../src/transactions/soccer.js',
+			);
+
+		buildSoccerTransactionWithMock({
+			owner: '0x123',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			configId: 9,
+			countryId: 250,
+			shotZoneId: 4,
+			config: TEST_CONFIG,
+		});
+
+		const options = getFirstMockArg<{
+			package: string;
+			arguments: unknown[];
+		}>(play);
+		expect(options.package).toBe(TEST_CONFIG.packageIds.soccer);
+		expect(options.arguments.slice(4, 7)).toEqual([9, 250, 4]);
+	});
+
+	it('rejects out-of-range soccer selections', () => {
+		expect(() =>
+			buildSoccerTransaction({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+				stake: 1000,
+				configId: 256,
+				countryId: 250,
+				shotZoneId: 4,
 				config: TEST_CONFIG,
 			}),
 		).toThrow('Value must be a u8 integer');

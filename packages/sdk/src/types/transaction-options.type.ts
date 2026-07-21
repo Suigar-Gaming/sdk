@@ -62,6 +62,12 @@ export type BuildRangeTransactionOptions = SharedBetTransactionOptions & {
 	scale?: number;
 };
 
+export type BuildSoccerTransactionOptions = SharedBetTransactionOptions & {
+	configId: number;
+	countryId: number;
+	shotZoneId: number;
+};
+
 export type BuildWheelTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };

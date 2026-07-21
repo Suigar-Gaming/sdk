@@ -24,6 +24,10 @@ import {
 	RangeSettingsKey,
 } from '../contracts/range/range.js';
 import {
+	Parameters as SoccerParameters,
+	SoccerSettingsKey,
+} from '../contracts/soccer/soccer.js';
+import {
 	Parameters as WheelParameters,
 	WheelSettingsKey,
 } from '../contracts/wheel/wheel.js';
@@ -50,6 +54,10 @@ export const GAME_SETTINGS = {
 	range: {
 		settingsKey: RangeSettingsKey,
 		parameters: RangeParameters,
+	},
+	soccer: {
+		settingsKey: SoccerSettingsKey,
+		parameters: SoccerParameters,
 	},
 	wheel: {
 		settingsKey: WheelSettingsKey,

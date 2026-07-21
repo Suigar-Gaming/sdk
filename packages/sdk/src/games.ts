@@ -17,5 +17,6 @@ export type {
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
 } from './types/transaction-options.type.js';
