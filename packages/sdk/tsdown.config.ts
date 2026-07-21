@@ -10,5 +10,7 @@ export default defineConfig({
 		utils: 'src/utils/index.ts',
 	},
 	format: 'esm',
+	dts: true,
+	outDir: 'dist',
 	unbundle: true,
 });
