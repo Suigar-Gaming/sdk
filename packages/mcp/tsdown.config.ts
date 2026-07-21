@@ -13,5 +13,7 @@ export default defineConfig({
 		__SUIGAR_MCP_VERSION__: JSON.stringify(packageJson.version),
 	},
 	format: 'esm',
+	dts: true,
+	outDir: 'dist',
 	unbundle: true,
 });
