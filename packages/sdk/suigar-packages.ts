@@ -55,6 +55,12 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		types: ['RangeSettingsKey', 'Parameters'],
 		functions: ['play'],
 	},
+	soccer: {
+		package: TESTNET_PACKAGE_IDS.soccer,
+		packageName: 'soccer',
+		types: ['SoccerSettingsKey', 'SoccerConfig', 'Parameters'],
+		functions: ['play'],
+	},
 	wheel: {
 		package: TESTNET_PACKAGE_IDS.wheel,
 		packageName: 'wheel',

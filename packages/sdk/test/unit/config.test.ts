@@ -36,6 +36,7 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
 		expect(config.packageIds.plinko).toBe(PACKAGE_IDS.testnet.plinko);
+		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.testnet.soccer);
 		expect(config.registryIds.pvpCoinflip).toBe(
 			REGISTRY_IDS.testnet.pvpCoinflip,
 		);
@@ -46,6 +47,7 @@ describe('resolveSuigarConfig', () => {
 
 		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
+		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.mainnet.soccer);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(SUI_TYPE_ARG),

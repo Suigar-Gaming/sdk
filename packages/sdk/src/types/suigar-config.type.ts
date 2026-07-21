@@ -54,6 +54,7 @@ export type SuigarPackage =
 	| 'plinko'
 	| 'pvpCoinflip'
 	| 'range'
+	| 'soccer'
 	| 'wheel';
 export type SuigarPackageIds = Record<SuigarPackage, string>;
 
