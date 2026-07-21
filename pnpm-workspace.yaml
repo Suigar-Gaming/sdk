@@ -12,8 +12,8 @@ catalogs:
     'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.0
-    '@mysten/codegen': ^0.11.8
-    '@mysten/sui': ^2.22.0
+    '@mysten/codegen': ^0.11.9
+    '@mysten/sui': ^2.22.1
   test:
     'vitest': ^4.1.10
   tooling:
@@ -22,7 +22,7 @@ catalogs:
     'prettier': ^3.9.5
     'react-doctor': ^0.8.1
     'tailwindcss': ^4.3.3
-    'tsdown': ^0.22.9
+    'tsdown': ^0.22.11
   typescript:
     '@types/node': ^24.0.0
     '@types/react': ^19.2.17
