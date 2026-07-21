@@ -707,6 +707,7 @@ function IntegrationControls({
 									onChange={(patch) => updateStandardForm('soccer', patch)}
 									onStakeBlur={() => onStandardStakeBlur('soccer')}
 									configOptions={standardGameParameters?.configOptions}
+									countryOptions={standardGameParameters?.countryOptions}
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}

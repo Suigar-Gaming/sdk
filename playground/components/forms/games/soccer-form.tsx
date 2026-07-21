@@ -12,13 +12,18 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { GameConfigOption, SoccerFormValues } from '@/lib/suigar-types';
+import type {
+	GameConfigOption,
+	GameSelectionOption,
+	SoccerFormValues,
+} from '@/lib/suigar-types';
 
 export function SoccerForm({
 	value,
 	onChange,
 	onStakeBlur,
 	configOptions,
+	countryOptions,
 	isConfigLoading,
 	configError,
 	stakeDescription,
@@ -27,6 +32,7 @@ export function SoccerForm({
 	onChange: (patch: Partial<SoccerFormValues>) => void;
 	onStakeBlur?: () => void;
 	configOptions?: GameConfigOption[];
+	countryOptions?: GameSelectionOption[];
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
@@ -35,6 +41,7 @@ export function SoccerForm({
 		configOptions?.find((option) => option.id === value.configId) ?? null;
 	const playableConfigOptions =
 		configOptions?.filter((option) => option.isPlayable) ?? [];
+	const shotZoneOptions = selectedConfig?.multiplierValues ?? [];
 
 	return (
 		<div className="space-y-6">
@@ -91,32 +98,76 @@ export function SoccerForm({
 			<div className="grid gap-6 sm:grid-cols-2">
 				<Field>
 					<FieldLabel htmlFor="soccerCountryId">Country ID</FieldLabel>
-					<Input
-						id="soccerCountryId"
-						type="number"
-						min="0"
-						max="65535"
-						step="1"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
-						value={value.countryId}
-						onChange={(event) => onChange({ countryId: event.target.value })}
-					/>
+					{countryOptions && countryOptions.length > 0 ? (
+						<Select
+							value={value.countryId}
+							onValueChange={(countryId: string) => onChange({ countryId })}
+						>
+							<SelectTrigger
+								id="soccerCountryId"
+								aria-label="Select Soccer country"
+								className="h-11 px-4 bg-background/55 rounded-2xl"
+							>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent className="max-h-[min(22rem,calc(100vh-6rem))]">
+								{countryOptions.map((option) => (
+									<SelectItem key={option.id} value={option.id}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					) : (
+						<Input
+							id="soccerCountryId"
+							type="number"
+							min="0"
+							max="65535"
+							step="1"
+							className="h-11 px-4 bg-background/55 rounded-2xl"
+							value={value.countryId}
+							onChange={(event) => onChange({ countryId: event.target.value })}
+						/>
+					)}
 					<FieldDescription size="sm">
 						Choose an available country from the game settings.
 					</FieldDescription>
 				</Field>
 				<Field>
 					<FieldLabel htmlFor="soccerShotZoneId">Shot zone ID</FieldLabel>
-					<Input
-						id="soccerShotZoneId"
-						type="number"
-						min="0"
-						max="255"
-						step="1"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
-						value={value.shotZoneId}
-						onChange={(event) => onChange({ shotZoneId: event.target.value })}
-					/>
+					{shotZoneOptions.length > 0 ? (
+						<Select
+							value={value.shotZoneId}
+							onValueChange={(shotZoneId: string) => onChange({ shotZoneId })}
+						>
+							<SelectTrigger
+								id="soccerShotZoneId"
+								aria-label="Select Soccer shot zone"
+								className="h-11 px-4 bg-background/55 rounded-2xl"
+							>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent className="max-h-[min(22rem,calc(100vh-6rem))]">
+								{shotZoneOptions.map((option) => (
+									<SelectItem key={option.id} value={option.id}>
+										Zone {option.id} (x{option.value})
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					) : (
+						<Input
+							id="soccerShotZoneId"
+							type="number"
+							min="0"
+							max="255"
+							step="1"
+							className="h-11 px-4 bg-background/55 rounded-2xl"
+							value={value.shotZoneId}
+							onChange={(event) => onChange({ shotZoneId: event.target.value })}
+						/>
+					)}
 					<FieldDescription size="sm">
 						Use a shot zone available in the selected config.
 					</FieldDescription>

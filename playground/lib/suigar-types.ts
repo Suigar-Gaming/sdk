@@ -59,9 +59,15 @@ export type GameSettingsDetail = {
 	value: string;
 };
 
+export type GameSelectionOption = {
+	id: string;
+	label: string;
+};
+
 export type StandardGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
 	configOptions?: GameConfigOption[];
+	countryOptions?: GameSelectionOption[];
 	topLevelDetails?: GameSettingsDetail[];
 	targetMultiplierRange?: NumberRangeSummary;
 	rangeBounds?: RangeBoundsSummary;

@@ -253,8 +253,16 @@ export function summarizeStandardGameParameters(
 					label: `Config ${entry.key}`,
 					details: [
 						{
+							label: 'Countries',
+							value: String(soccerParameters.countries.contents.length),
+						},
+						{
 							label: 'Shot zones',
-							value: entry.value.shot_zone_ids.join(', '),
+							value: String(entry.value.shot_zone_ids.length),
+						},
+						{
+							label: 'Multipliers',
+							value: String(entry.value.shot_zone_multipliers.length),
 						},
 					],
 					multiplierValues: entry.value.shot_zone_multipliers.map(
@@ -269,6 +277,10 @@ export function summarizeStandardGameParameters(
 			return {
 				stakeRange,
 				configOptions: configs,
+				countryOptions: soccerParameters.countries.contents.map((country) => ({
+					id: String(country.key),
+					label: `${country.value} (${country.key})`,
+				})),
 				topLevelDetails: soccerParameters.countries.contents.map((country) => ({
 					label: `Country ${country.key}`,
 					value: country.value,
