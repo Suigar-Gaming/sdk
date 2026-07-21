@@ -32,7 +32,7 @@ export function buildLimboTransaction(
 				package: config.packageIds.limbo,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

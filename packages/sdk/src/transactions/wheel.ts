@@ -31,7 +31,7 @@ export function buildWheelTransaction(
 				package: config.packageIds.wheel,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

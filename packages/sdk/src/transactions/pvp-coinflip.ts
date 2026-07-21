@@ -50,7 +50,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					package: createOptions.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						createOptions.config.packageIds.sweetHouse,
+						createOptions.config.objectIds.sweetHouse,
 						coinWithBalance({
 							type: normalizedCoinType,
 							balance: stake,
@@ -79,7 +79,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						joinOptions.gameId,
-						joinOptions.config.packageIds.sweetHouse,
+						joinOptions.config.objectIds.sweetHouse,
 						joinOptions.betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
@@ -99,7 +99,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						cancelOptions.gameId,
-						cancelOptions.config.packageIds.sweetHouse,
+						cancelOptions.config.objectIds.sweetHouse,
 					],
 				}),
 			);

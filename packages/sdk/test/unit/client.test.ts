@@ -12,7 +12,7 @@ import {
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { suigar, type SuigarClient } from '../../src/client.js';
-import { COINS, PACKAGE_IDS } from '../../src/configs/index.js';
+import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../../src/configs/index.js';
 import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
@@ -655,7 +655,7 @@ describe('SuigarClient', () => {
 			dynamicFieldLookups: [
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
-					parentId: PACKAGE_IDS.testnet.sweetHouse,
+					parentId: OBJECT_IDS.testnet.sweetHouse,
 					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
@@ -691,7 +691,7 @@ describe('SuigarClient', () => {
 			dynamicFieldLookups: [
 				{
 					nameBcs: LIMBO_SETTINGS_FIELD_BCS,
-					parentId: PACKAGE_IDS.testnet.sweetHouse,
+					parentId: OBJECT_IDS.testnet.sweetHouse,
 					nameType: `${PACKAGE_IDS.testnet.limbo}::limbo::LimboSettingsKey`,
 					childId: '0x222',
 				},
@@ -720,7 +720,7 @@ describe('SuigarClient', () => {
 			dynamicFieldLookups: [
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
-					parentId: PACKAGE_IDS.testnet.sweetHouse,
+					parentId: OBJECT_IDS.testnet.sweetHouse,
 					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
@@ -754,7 +754,7 @@ describe('SuigarClient', () => {
 			dynamicFieldLookups: [
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
-					parentId: PACKAGE_IDS.testnet.sweetHouse,
+					parentId: OBJECT_IDS.testnet.sweetHouse,
 					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
@@ -804,7 +804,7 @@ describe('SuigarClient', () => {
 		baseClient.mockDynamicFieldLookups = [
 			{
 				nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
-				parentId: PACKAGE_IDS.testnet.sweetHouse,
+				parentId: OBJECT_IDS.testnet.sweetHouse,
 				nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
 				childId: '0x222',
 			},

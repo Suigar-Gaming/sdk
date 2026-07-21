@@ -31,7 +31,7 @@ export function buildPlinkoTransaction(
 				package: config.packageIds.plinko,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

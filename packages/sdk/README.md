@@ -177,10 +177,11 @@ Supported override areas:
 - `partner`
 - `cacheTtl`
 - `config.packageIds`
+- `config.objectIds`
 - `config.registryIds`
 - `config.coins`
 
-Use `config` when the application needs to patch package ids or supported `sui`/`usdc` coin metadata before a new SDK release is published. Each coin entry includes its price-info object id.
+Use `config` when the application needs to patch package, singleton object, or registry ids—or supported `sui`/`usdc` coin metadata—before a new SDK release is published. Each coin entry includes its price-info object id.
 
 Both supported coin keys accept the same partial metadata shape:
 
@@ -191,7 +192,7 @@ coins?: {
 };
 ```
 
-`packageIds.legacyNft` exposes the network-specific legacy NFT package id, so applications can derive the `::nft::Nft` type for their own lookup. The `packageIds.legacyNftFactory` object id is available for applications that need to read the legacy NFT catalog. Request `content: true`, then use `client.suigar.bcs.LegacyNftFactory.parse(object.content)` to decode the factory and `client.suigar.bcs.LegacyNft.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or legacy NFT mint transaction builder.
+`packageIds.legacyNft` exposes the network-specific legacy NFT package id, so applications can derive the `::nft::Nft` type for their own lookup. `objectIds.legacyNftFactory` is available for applications that need to read the legacy NFT catalog. Request `content: true`, then use `client.suigar.bcs.LegacyNftFactory.parse(object.content)` to decode the factory and `client.suigar.bcs.LegacyNft.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or legacy NFT mint transaction builder.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(
@@ -600,7 +601,7 @@ Build without regenerating contract bindings:
 pnpm --dir packages/sdk run build:ci
 ```
 
-Regenerate Move contract bindings only:
+Refresh package configuration and regenerate Move contract bindings:
 
 ```bash
 pnpm --dir packages/sdk run codegen

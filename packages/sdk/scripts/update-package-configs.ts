@@ -1,9 +1,10 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SuiGrpcClient } from '@mysten/sui/grpc';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -22,13 +23,10 @@ const REGISTRY_PACKAGE_NAMES = {
 } as const;
 
 type PackageIds = Record<
-	| keyof typeof REGISTRY_PACKAGE_NAMES
-	| 'sweetHouse'
-	| 'legacyNft'
-	| 'legacyNftFactory'
-	| 'soccer',
+	keyof typeof REGISTRY_PACKAGE_NAMES | 'legacyNft' | 'soccer',
 	string
 >;
+type ObjectIds = Record<'sweetHouse' | 'legacyNftFactory', string>;
 type CoinMetadataSource = {
 	coinType: string;
 	decimals: string;
@@ -87,71 +85,64 @@ function extractCoinMetadata(
 	};
 }
 
-async function fetchPackageAddress(baseUrl: string, packageName: string) {
-	const response = await fetch(`${baseUrl}/v1/names/${packageName}`);
-	const payload = (await response.json()) as {
-		message?: string;
-		package_address?: string;
-		package_info?: { id?: string };
-	};
+function getNetworkConfigDirectoryPath(network: Network) {
+	return path.join(rootDir, `src/configs/${network}`);
+}
 
-	if (!response.ok) {
+function getNetworkRpcUrl(network: Network) {
+	return `https://fullnode.${network}.sui.io:443`;
+}
+
+function createNetworkClient(network: Network) {
+	return new SuiGrpcClient({
+		baseUrl: getNetworkRpcUrl(network),
+		network,
+	});
+}
+
+async function assertObjectType({
+	client,
+	objectId,
+	expectedType,
+}: {
+	client: SuiGrpcClient;
+	objectId: string;
+	expectedType: string;
+}) {
+	const { object } = await client.core.getObject({ objectId });
+
+	if (object.type !== expectedType) {
 		throw new Error(
-			`Failed to resolve ${packageName} from ${baseUrl}: ${payload.message ?? response.statusText}`,
+			`Expected ${objectId} to have type ${expectedType}, received ${object.type}`,
 		);
 	}
-
-	const packageAddress = payload.package_address ?? payload.package_info?.id;
-
-	if (!packageAddress) {
-		throw new Error(
-			`Missing package address for ${packageName} from ${baseUrl}`,
-		);
-	}
-
-	return packageAddress;
 }
 
-function getNetworkConfigFilePath(network: Network) {
-	return path.join(rootDir, `src/configs/package.${network}.ts`);
-}
-
-function getNetworkBaseUrl(network: Network) {
-	return `https://${network}.mvr.mystenlabs.com`;
-}
-
-function renderNetworkFile(
+function renderNetworkFiles(
 	network: Network,
 	{
 		packageIds,
+		objectIds,
 		coins,
 	}: {
 		packageIds: PackageIds;
+		objectIds: ObjectIds;
 		coins: CoinMetadataSources;
 	},
 ) {
-	const uppercaseNetwork = network.toUpperCase();
 	const isMainnet = network === 'mainnet';
-	const imports = isMainnet
-		? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\nimport type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n} from '../types/suigar-config.type.js';"
-		: "import type {\n\tSuigarCoinRegistry,\n\tSuigarPackageIds,\n} from '../types/suigar-config.type.js';";
 
-	return `// Copyright (c) Suigar
+	return {
+		packages: `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-${imports}
+import type { SuigarPackageIds } from '../../types/suigar-config.type.js';
 
-// \`sweetHouse\`, \`legacyNft\`, \`legacyNftFactory\`, and \`soccer\` are preserved manually because they are not resolved from MVR.
-export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackageIds = {
-\tsweetHouse:
-\t\t'${packageIds.sweetHouse}',
+// \`legacyNft\` and \`soccer\` are preserved manually because they are not resolved from MVR.
+export const PACKAGE_IDS: SuigarPackageIds = {
+\tcore: '${packageIds.core}',
 \tlegacyNft:
 \t\t'${packageIds.legacyNft}',
-\tlegacyNftFactory:
-\t\t'${packageIds.legacyNftFactory}',
-\tsoccer:
-\t\t'${packageIds.soccer}',
-\tcore: '${packageIds.core}',
 \tcoinflip:
 \t\t'${packageIds.coinflip}',
 \tlimbo: '${packageIds.limbo}',
@@ -159,10 +150,29 @@ export const ${uppercaseNetwork}_PACKAGE_IDS: SuigarPackageIds = {
 \tpvpCoinflip:
 \t\t'${packageIds.pvpCoinflip}',
 \trange: '${packageIds.range}',
+\tsoccer:
+\t\t'${packageIds.soccer}',
 \twheel: '${packageIds.wheel}',
 };
+`,
+		objects: `// Copyright (c) Suigar
+// SPDX-License-Identifier: Apache-2.0
 
-export const ${uppercaseNetwork}_COINS: SuigarCoinRegistry = {
+import type { SuigarObjectIds } from '../../types/suigar-config.type.js';
+
+export const OBJECT_IDS: SuigarObjectIds = {
+\tsweetHouse:
+\t\t'${objectIds.sweetHouse}',
+\tlegacyNftFactory:
+\t\t'${objectIds.legacyNftFactory}',
+};
+`,
+		coins: `// Copyright (c) Suigar
+// SPDX-License-Identifier: Apache-2.0
+
+${isMainnet ? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\n" : ''}import type { SuigarCoinRegistry } from '../../types/suigar-config.type.js';
+
+export const COINS: SuigarCoinRegistry = {
 \tsui: {
 \t\tcoinType: ${isMainnet ? 'SUI_TYPE_ARG' : coins.sui.coinType},
 \t\tdecimals: ${isMainnet ? 'SUI_DECIMALS' : coins.sui.decimals},
@@ -174,35 +184,30 @@ export const ${uppercaseNetwork}_COINS: SuigarCoinRegistry = {
 \t\tpriceInfoObjectId: '${coins.usdc.priceInfoObjectId}',
 \t},
 };
-`;
+`,
+	};
 }
 
 async function updateNetworkConfig(network: Network) {
-	const filePath = getNetworkConfigFilePath(network);
-	const baseUrl = getNetworkBaseUrl(network);
-	const currentSource = await readFile(filePath, 'utf8');
-	const uppercaseNetwork = network.toUpperCase();
-	const currentPackageObjectName = `${uppercaseNetwork}_PACKAGE_IDS`;
-	const currentCoinsObjectName = `${uppercaseNetwork}_COINS`;
+	const configDirectoryPath = getNetworkConfigDirectoryPath(network);
+	const client = createNetworkClient(network);
+	const [packageSource, objectSource, coinSource] = await Promise.all([
+		readFile(path.join(configDirectoryPath, 'packages.ts'), 'utf8'),
+		readFile(path.join(configDirectoryPath, 'objects.ts'), 'utf8'),
+		readFile(path.join(configDirectoryPath, 'coins.ts'), 'utf8'),
+	]);
+	const currentPackageObjectName = 'PACKAGE_IDS';
+	const currentObjectObjectName = 'OBJECT_IDS';
+	const currentCoinsObjectName = 'COINS';
 
 	const packageIds: PackageIds = {
-		sweetHouse: extractObjectValue(
-			currentSource,
-			currentPackageObjectName,
-			'sweetHouse',
-		),
 		legacyNft: extractObjectValue(
-			currentSource,
+			packageSource,
 			currentPackageObjectName,
 			'legacyNft',
 		),
-		legacyNftFactory: extractObjectValue(
-			currentSource,
-			currentPackageObjectName,
-			'legacyNftFactory',
-		),
 		soccer: extractObjectValue(
-			currentSource,
+			packageSource,
 			currentPackageObjectName,
 			'soccer',
 		),
@@ -214,25 +219,59 @@ async function updateNetworkConfig(network: Network) {
 		range: '',
 		wheel: '',
 	};
+	const objectIds: ObjectIds = {
+		sweetHouse: extractObjectValue(
+			objectSource,
+			currentObjectObjectName,
+			'sweetHouse',
+		),
+		legacyNftFactory: extractObjectValue(
+			objectSource,
+			currentObjectObjectName,
+			'legacyNftFactory',
+		),
+	};
 
 	for (const [packageKey, packageName] of Object.entries(
 		REGISTRY_PACKAGE_NAMES,
 	) as Array<[keyof typeof REGISTRY_PACKAGE_NAMES, string]>) {
-		packageIds[packageKey] = await fetchPackageAddress(baseUrl, packageName);
+		packageIds[packageKey] = (
+			await client.core.mvr.resolvePackage({ package: packageName })
+		).package;
 	}
 
+	await assertObjectType({
+		client,
+		objectId: objectIds.sweetHouse,
+		expectedType: `${packageIds.core}::sweethouse::SweetHouse`,
+	});
+	await assertObjectType({
+		client,
+		objectId: objectIds.legacyNftFactory,
+		expectedType: `${packageIds.legacyNft}::nft::Factory`,
+	});
+
 	const coins: CoinMetadataSources = {
-		sui: extractCoinMetadata(currentSource, currentCoinsObjectName, 'sui'),
-		usdc: extractCoinMetadata(currentSource, currentCoinsObjectName, 'usdc'),
+		sui: extractCoinMetadata(coinSource, currentCoinsObjectName, 'sui'),
+		usdc: extractCoinMetadata(coinSource, currentCoinsObjectName, 'usdc'),
 	};
 
-	const nextSource = renderNetworkFile(network, {
+	const nextFiles = renderNetworkFiles(network, {
 		packageIds,
+		objectIds,
 		coins,
 	});
 
-	await writeFile(filePath, nextSource);
-	console.log(`Updated ${network} package config`);
+	await mkdir(configDirectoryPath, { recursive: true });
+	await Promise.all([
+		writeFile(
+			path.join(configDirectoryPath, 'packages.ts'),
+			nextFiles.packages,
+		),
+		writeFile(path.join(configDirectoryPath, 'objects.ts'), nextFiles.objects),
+		writeFile(path.join(configDirectoryPath, 'coins.ts'), nextFiles.coins),
+	]);
+	console.log(`Updated ${network} package configuration`);
 }
 
 for (const network of NETWORKS) {

@@ -420,7 +420,7 @@ export class SuigarClient {
 		const { signal } = options;
 
 		const { dynamicField } = await this.#client.core.getDynamicField({
-			parentId: this.#config.packageIds.sweetHouse,
+			parentId: this.#config.objectIds.sweetHouse,
 			name: {
 				type: `0x2::dynamic_object_field::Wrapper<${gameDefinition.settingsKey.typeTag(
 					{

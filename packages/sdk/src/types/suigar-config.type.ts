@@ -11,6 +11,7 @@ export type SuigarCoinMetadata = {
 
 export type SuigarConfigOverrides = {
 	packageIds?: Partial<SuigarPackageIds>;
+	objectIds?: Partial<SuigarObjectIds>;
 	registryIds?: Partial<SuigarRegistryIds>;
 	coins?: Partial<Record<SuigarCoin, Partial<SuigarCoinMetadata>>>;
 };
@@ -20,7 +21,7 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 	/**
 	 * Network-resolved configuration overrides.
 	 *
-	 * Use this to patch package ids, registry ids, supported coins, or price
+	 * Use this to patch package ids, object ids, registry ids, supported coins, or price
 	 * info object ids when on-chain deployments move faster than the published
 	 * SDK defaults.
 	 */
@@ -45,9 +46,7 @@ export type SuigarCoin = 'sui' | 'usdc';
 export type SuigarCoinRegistry = Record<SuigarCoin, SuigarCoinMetadata>;
 
 export type SuigarPackage =
-	| 'sweetHouse'
 	| 'legacyNft'
-	| 'legacyNftFactory'
 	| 'core'
 	| 'coinflip'
 	| 'limbo'
@@ -58,6 +57,9 @@ export type SuigarPackage =
 	| 'wheel';
 export type SuigarPackageIds = Record<SuigarPackage, string>;
 
+export type SuigarObject = 'sweetHouse' | 'legacyNftFactory';
+export type SuigarObjectIds = Record<SuigarObject, string>;
+
 export type SuigarRegistry = 'pvpCoinflip';
 export type SuigarRegistryIds = Record<SuigarRegistry, string>;
 
@@ -65,6 +67,7 @@ export type SuigarNetworkRegistry<TRegistry> = Record<SuigarNetwork, TRegistry>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
+	objectIds: SuigarObjectIds;
 	registryIds: SuigarRegistryIds;
 	coins: SuigarCoinRegistry;
 };

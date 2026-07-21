@@ -7,7 +7,12 @@ import {
 	SUI_TYPE_ARG,
 } from '@mysten/sui/utils';
 import { describe, expect, it } from 'vitest';
-import { COINS, PACKAGE_IDS, REGISTRY_IDS } from '../../src/configs/index.js';
+import {
+	COINS,
+	OBJECT_IDS,
+	PACKAGE_IDS,
+	REGISTRY_IDS,
+} from '../../src/configs/index.js';
 import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Parameters as PlinkoParameters,
@@ -45,7 +50,10 @@ describe('resolveSuigarConfig', () => {
 	it('uses the selected network package map', () => {
 		const config = resolveSuigarConfig('mainnet');
 
-		expect(config.packageIds.sweetHouse).toBe(PACKAGE_IDS.mainnet.sweetHouse);
+		expect(config.objectIds.sweetHouse).toBe(OBJECT_IDS.mainnet.sweetHouse);
+		expect(config.objectIds.legacyNftFactory).toBe(
+			OBJECT_IDS.mainnet.legacyNftFactory,
+		);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.mainnet.soccer);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
@@ -83,6 +91,9 @@ describe('resolveSuigarConfig', () => {
 			packageIds: {
 				range: '0xoverride',
 			},
+			objectIds: {
+				sweetHouse: '0xoverride-sweet-house',
+			},
 			coins: {
 				sui: {
 					coinType: '0x2::sui::SUI',
@@ -98,6 +109,7 @@ describe('resolveSuigarConfig', () => {
 		});
 
 		expect(config.packageIds.range).toBe('0xoverride');
+		expect(config.objectIds.sweetHouse).toBe('0xoverride-sweet-house');
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(SUI_TYPE_ARG),
 			decimals: SUI_DECIMALS,

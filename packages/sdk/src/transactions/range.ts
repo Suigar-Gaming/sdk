@@ -33,7 +33,7 @@ export function buildRangeTransaction(
 				package: config.packageIds.range,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,
