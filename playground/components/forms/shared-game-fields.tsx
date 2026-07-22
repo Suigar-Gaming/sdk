@@ -87,7 +87,7 @@ export function StandardGameFields<T extends StandardSharedFields>({
 	);
 }
 
-export function BetCountField({
+function BetCountField({
 	value,
 	onChange,
 	betCountLimit,
