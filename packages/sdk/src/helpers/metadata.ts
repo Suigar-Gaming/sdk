@@ -6,7 +6,7 @@ import type {
 	BetMetadataInput,
 	BetMetadataValue,
 	EncodedBetMetadata,
-} from '../types/index.js';
+} from '../types/bet-metadata.type.js';
 
 const PARTNER_METADATA_KEY = 'partner';
 

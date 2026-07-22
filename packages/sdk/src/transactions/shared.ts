@@ -10,19 +10,20 @@ import {
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import {
 	assertConfiguredBetGame,
-	encodeBetMetadata,
 	resolvePriceInfoObjectId,
-} from '../helpers/index.js';
+} from '../helpers/config.js';
+import { encodeBetMetadata } from '../helpers/metadata.js';
+import type { EncodedBetMetadata } from '../types/bet-metadata.type.js';
+import type { Game } from '../types/game.type.js';
 import type {
 	BaseTransactionOptions,
 	CoinTransactionOptions,
-	EncodedBetMetadata,
-	Game,
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	WithPartner,
-} from '../types/index.js';
-import { DEFAULT_GAS_BUDGET_MIST, toBigInt } from '../utils/index.js';
+} from '../types/transaction-options.type.js';
+import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
+import { toBigInt } from '../utils/numeric.js';
 
 type StrictStakeTransactionOptions = {
 	[K in keyof StakeTransactionOptions]-?: Exclude<

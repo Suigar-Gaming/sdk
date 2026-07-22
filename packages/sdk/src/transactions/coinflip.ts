@@ -6,7 +6,7 @@ import { play } from '../contracts/coinflip/coinflip.js';
 import type {
 	BuildCoinflipTransactionOptions,
 	WithPartner,
-} from '../types/index.js';
+} from '../types/transaction-options.type.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildCoinflipTransaction(

@@ -3,7 +3,8 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { BetResultGameDetails, GAME_EVENTS } from '../../src/types/index.js';
+import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
+import { GAME_EVENTS } from '../../src/types/game.type.js';
 import {
 	parseCoinType,
 	parseGameDetails,

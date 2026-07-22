@@ -6,8 +6,8 @@ import { play } from '../contracts/soccer/soccer.js';
 import type {
 	BuildSoccerTransactionOptions,
 	WithPartner,
-} from '../types/index.js';
-import { toU8, toU16 } from '../utils/index.js';
+} from '../types/transaction-options.type.js';
+import { toU8, toU16 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildSoccerTransaction(

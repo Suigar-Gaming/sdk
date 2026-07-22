@@ -87,7 +87,7 @@ const GAME_TO_TOOLS = {
 		'build_pvp_coinflip_join_transaction',
 		'build_pvp_coinflip_cancel_transaction',
 	],
-} as const satisfies Record<Game, readonly string[]>;
+} as const satisfies Record<Game, ReadonlyArray<string>>;
 
 const BET_COUNT_LIMITS: Partial<
 	Record<Game, { parameter: string; label: string }>

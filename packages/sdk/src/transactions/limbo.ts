@@ -6,8 +6,8 @@ import { play } from '../contracts/limbo/limbo.js';
 import type {
 	BuildLimboTransactionOptions,
 	WithPartner,
-} from '../types/index.js';
-import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/index.js';
+} from '../types/transaction-options.type.js';
+import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildLimboTransaction(

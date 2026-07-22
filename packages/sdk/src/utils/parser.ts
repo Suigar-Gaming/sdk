@@ -5,19 +5,21 @@ import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 import {
-	BetResultGameDetails,
 	GAME_DETAIL_BCS,
 	GAME_DETAILS_SCHEMAS,
-	GAME_EVENTS,
-	GameDetail,
-	GameDetails,
-	GameEvent,
-	GAMES,
-	MoveFloat,
-	SuigarGameEvent,
-	type Game,
+	type BetResultGameDetails,
+	type GameDetail,
+	type GameDetails,
 	type GameDetailValueType,
-} from '../types/index.js';
+} from '../types/game-details.type.js';
+import {
+	GAME_EVENTS,
+	GAMES,
+	type Game,
+	type GameEvent,
+	type SuigarGameEvent,
+} from '../types/game.type.js';
+import type { MoveFloat } from '../types/move-float.type.js';
 import { fromMoveFloat } from './numeric.js';
 
 const textDecoder = new TextDecoder();

@@ -8,14 +8,14 @@ import {
 	PACKAGE_IDS,
 	REGISTRY_IDS,
 } from '../configs/index.js';
+import type { Game } from '../types/game.type.js';
+import type { SuigarNetwork } from '../types/network.type.js';
 import type {
-	Game,
 	SuigarCoin,
 	SuigarCoinMetadata,
 	SuigarConfig,
 	SuigarConfigOverrides,
-	SuigarNetwork,
-} from '../types/index.js';
+} from '../types/suigar-config.type.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 

@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { SuigarNetwork } from './network.type.js';
+import type { SuigarNetwork } from './network.type.js';
 
 export type SuigarCoinMetadata = {
 	coinType: string;

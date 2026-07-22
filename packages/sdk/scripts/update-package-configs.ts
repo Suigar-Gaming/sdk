@@ -4,12 +4,16 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { SuiClientTypes } from '@mysten/sui/client';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 
-const NETWORKS = ['testnet', 'mainnet'] as const;
+const NETWORKS = [
+	'testnet',
+	'mainnet',
+] as const satisfies ReadonlyArray<SuiClientTypes.Network>;
 type Network = (typeof NETWORKS)[number];
 
 const REGISTRY_PACKAGE_NAMES = {

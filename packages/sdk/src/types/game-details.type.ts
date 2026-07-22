@@ -1,9 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { InferBcsType } from '@mysten/bcs';
+import type { BcsType, InferBcsType } from '@mysten/bcs';
 import { bcs } from '@mysten/sui/bcs';
-import { BetResultEvent } from '../contracts/core/core.js';
+import type { BetResultEvent } from '../contracts/core/core.js';
 import { Float } from '../contracts/core/float.js';
 import type { Game } from './game.type.js';
 
@@ -33,7 +33,7 @@ export const GAME_DETAIL_BCS = {
 	bool: bcs.Bool,
 	float: Float,
 	string: bcs.String,
-} as const;
+} as const satisfies Record<GameDetailValueType, BcsType<any>>;
 
 const COINFLIP_GAME_DETAILS_SCHEMA = {
 	player_bet: 'string',
