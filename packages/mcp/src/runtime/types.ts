@@ -4,7 +4,7 @@
 import type { SuiClientTypes } from '@mysten/sui/client';
 import type { suigar, SuigarClient, SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
-import type { FormattedAmount } from '../utils/amount.js';
+import type { FormattedAmount } from '../utils/index.js';
 
 export type SuigarConfig = ReturnType<SuigarClient['getConfig']>;
 export type SuigarConfigOverrides = NonNullable<
