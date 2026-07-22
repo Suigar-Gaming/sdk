@@ -15,6 +15,7 @@ import {
 	buildPvpCoinflipCreateTransactionTool,
 	buildPvpCoinflipJoinTransactionTool,
 	buildRangeTransactionTool,
+	buildSoccerTransactionTool,
 	buildWheelTransactionTool,
 	listNftsTool,
 	readConfigTool,
@@ -35,6 +36,8 @@ describe('read tools', () => {
 
 		expect(content.network).toBe('testnet');
 		expect(content.config.sdk.packageIds.coinflip).toMatch(/^0x/u);
+		expect(content.config.sdk.packageIds.soccer).toMatch(/^0x/u);
+		expect(content.config.sdk.objectIds.sweetHouse).toMatch(/^0x/u);
 		expect(content.config.sdk.coins.sui.coinType).toMatch(/::/u);
 		expect(content.supportedGames.map((game) => game.id)).toContain(
 			'pvp-coinflip',
@@ -83,6 +86,16 @@ describe('read-only transaction tools', () => {
 					mode: 'read-only',
 					leftPoint: 0.1,
 					rightPoint: 0.4,
+				}),
+		],
+		[
+			'soccer',
+			() =>
+				buildSoccerTransactionTool({
+					mode: 'read-only',
+					configId: 0,
+					countryId: 0,
+					shotZoneId: 0,
 				}),
 		],
 		[
@@ -202,7 +215,7 @@ describe('build transaction tools', () => {
 			.mockResolvedValue(new Uint8Array([1]));
 
 		try {
-			const [limbo, plinko, wheel, range] = await Promise.all([
+			const [limbo, plinko, wheel, range, soccer] = await Promise.all([
 				buildLimboTransactionTool({
 					mode: 'build',
 					owner,
@@ -229,6 +242,14 @@ describe('build transaction tools', () => {
 					rightPoint: 75,
 					outOfRange: true,
 				}),
+				buildSoccerTransactionTool({
+					mode: 'build',
+					owner,
+					stake: 1,
+					configId: 1,
+					countryId: 2,
+					shotZoneId: 3,
+				}),
 			]);
 
 			expect(
@@ -243,6 +264,9 @@ describe('build transaction tools', () => {
 			expect(
 				(range.structuredContent as BuildTransactionResult).summary.gameInputs,
 			).toEqual({ leftPoint: 25, rightPoint: 75, outOfRange: true });
+			expect(
+				(soccer.structuredContent as BuildTransactionResult).summary.gameInputs,
+			).toEqual({ configId: 1, countryId: 2, shotZoneId: 3 });
 		} finally {
 			buildSpy.mockRestore();
 		}

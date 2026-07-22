@@ -16,6 +16,7 @@ import {
 	buildPvpCoinflipCreateTransactionTool,
 	buildPvpCoinflipJoinTransactionTool,
 	buildRangeTransactionTool,
+	buildSoccerTransactionTool,
 	buildWheelTransactionTool,
 	coinflipInputSchema,
 	configIdInputSchema,
@@ -30,6 +31,7 @@ import {
 	readConfigTool,
 	readGameMetadataInputSchema,
 	readGameMetadataTool,
+	soccerInputSchema,
 	toolOutputSchema,
 } from '../tools/index.js';
 
@@ -166,6 +168,15 @@ const appTools = [
 		inputSchema: rangeInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildRangeTransactionTool,
+	},
+	{
+		name: 'build_soccer_transaction',
+		title: 'Build Soccer Transaction',
+		description:
+			'Build, dry-run, or inspect an unsigned Suigar Soccer transaction.',
+		inputSchema: soccerInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: buildSoccerTransactionTool,
 	},
 	{
 		name: 'build_pvp_coinflip_create_transaction',

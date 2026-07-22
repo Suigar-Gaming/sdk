@@ -30,16 +30,22 @@ const configOverridesSchema = z
 	.object({
 		packageIds: z
 			.object({
-				sweetHouse: z.string().min(1).optional(),
 				legacyNft: z.string().min(1).optional(),
-				legacyNftFactory: z.string().min(1).optional(),
 				core: z.string().min(1).optional(),
 				coinflip: z.string().min(1).optional(),
 				limbo: z.string().min(1).optional(),
 				plinko: z.string().min(1).optional(),
 				pvpCoinflip: z.string().min(1).optional(),
 				range: z.string().min(1).optional(),
+				soccer: z.string().min(1).optional(),
 				wheel: z.string().min(1).optional(),
+			})
+			.strict()
+			.optional(),
+		objectIds: z
+			.object({
+				sweetHouse: z.string().min(1).optional(),
+				legacyNftFactory: z.string().min(1).optional(),
 			})
 			.strict()
 			.optional(),
@@ -193,6 +199,32 @@ export const rangeInputSchema = stakeBuildInputSchema
 	})
 	.strict();
 
+export const soccerInputSchema = stakeBuildInputSchema
+	.extend({
+		configId: z
+			.number()
+			.int()
+			.min(0)
+			.max(255)
+			.optional()
+			.describe('On-chain Soccer config id.'),
+		countryId: z
+			.number()
+			.int()
+			.min(0)
+			.max(65_535)
+			.optional()
+			.describe('On-chain Soccer country id.'),
+		shotZoneId: z
+			.number()
+			.int()
+			.min(0)
+			.max(255)
+			.optional()
+			.describe('On-chain Soccer shot zone id.'),
+	})
+	.strict();
+
 export const pvpCoinflipCreateInputSchema = commonBuildInputSchema
 	.extend({
 		stake: currencyAmountSchema
@@ -266,6 +298,7 @@ export type CoinflipInput = z.input<typeof coinflipInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;
 export type ConfigIdInput = z.input<typeof configIdInputSchema>;
 export type RangeInput = z.input<typeof rangeInputSchema>;
+export type SoccerInput = z.input<typeof soccerInputSchema>;
 export type PvpCoinflipCreateInput = z.input<
 	typeof pvpCoinflipCreateInputSchema
 >;

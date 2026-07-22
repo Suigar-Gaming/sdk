@@ -28,6 +28,7 @@ const registeredToolNames = [
 	'build_pvp_coinflip_create_transaction',
 	'build_pvp_coinflip_join_transaction',
 	'build_range_transaction',
+	'build_soccer_transaction',
 	'build_wheel_transaction',
 ];
 

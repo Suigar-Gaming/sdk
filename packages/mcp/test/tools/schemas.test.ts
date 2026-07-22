@@ -6,6 +6,7 @@ import {
 	coinflipInputSchema,
 	configInputSchema,
 	pvpCoinflipJoinInputSchema,
+	soccerInputSchema,
 	toolOutputSchema,
 } from '../../src/tools/schemas.js';
 
@@ -28,6 +29,24 @@ describe('config input schema', () => {
 			/Invalid URL/u,
 		);
 	});
+
+	it('uses the SDK package, object, and registry override groups', () => {
+		expect(
+			configInputSchema.parse({
+				config: {
+					packageIds: { soccer: '0xsoccer' },
+					objectIds: { sweetHouse: '0xsweet-house' },
+					registryIds: { pvpCoinflip: '0xpvp-registry' },
+				},
+			}),
+		).toMatchObject({
+			config: {
+				packageIds: { soccer: '0xsoccer' },
+				objectIds: { sweetHouse: '0xsweet-house' },
+				registryIds: { pvpCoinflip: '0xpvp-registry' },
+			},
+		});
+	});
 });
 
 describe('build input schemas', () => {
@@ -49,6 +68,19 @@ describe('build input schemas', () => {
 	it('keeps PvP join game id optional for read-only planning', () => {
 		expect(pvpCoinflipJoinInputSchema.parse({ mode: 'read-only' }).mode).toBe(
 			'read-only',
+		);
+	});
+
+	it('bounds Soccer ids to their Move integer widths', () => {
+		expect(
+			soccerInputSchema.parse({
+				configId: 255,
+				countryId: 65_535,
+				shotZoneId: 255,
+			}),
+		).toMatchObject({ countryId: 65_535 });
+		expect(() => soccerInputSchema.parse({ countryId: 65_536 })).toThrow(
+			/Too big/u,
 		);
 	});
 });

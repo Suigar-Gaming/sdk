@@ -94,6 +94,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_coinflip_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
+- `build_soccer_transaction`
 - `build_wheel_transaction`
 - `build_range_transaction`
 - `build_pvp_coinflip_create_transaction`
@@ -131,7 +132,7 @@ For `build` and `dry-run`, provide `owner`, a raw Sui address, SuiNS name such a
 
 Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `useGasCoin` for native SUI bets. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings.
 
-Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`.
+Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `configId`/`countryId`/`shotZoneId` for Soccer, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`.
 
 ## Config
 
@@ -142,16 +143,19 @@ Optional `config` input follows the public SDK extension override shape:
 ```ts
 {
 	packageIds?: {
-		sweetHouse?: string;
 		legacyNft?: string;
-		legacyNftFactory?: string;
 		core?: string;
 		coinflip?: string;
 		limbo?: string;
 		plinko?: string;
 		pvpCoinflip?: string;
 		range?: string;
+		soccer?: string;
 		wheel?: string;
+	};
+	objectIds?: {
+		sweetHouse?: string;
+		legacyNftFactory?: string;
 	};
 	registryIds?: { pvpCoinflip?: string };
 	coins?: {

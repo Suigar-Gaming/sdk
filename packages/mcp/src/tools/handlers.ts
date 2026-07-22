@@ -39,6 +39,7 @@ import type {
 	RangeInput,
 	ReadConfigInput,
 	ReadGameMetadataInput,
+	SoccerInput,
 } from './schemas.js';
 
 type TransactionToolInput =
@@ -46,18 +47,20 @@ type TransactionToolInput =
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput
+	| SoccerInput
 	| PvpCoinflipCreateInput
 	| PvpCoinflipJoinInput
 	| PvpCoinflipCancelInput;
 
 type StandardTransactionToolInput =
-	CoinflipInput | LimboInput | ConfigIdInput | RangeInput;
+	CoinflipInput | LimboInput | ConfigIdInput | RangeInput | SoccerInput;
 
 const GAME_LABELS = {
 	coinflip: 'Coinflip',
 	limbo: 'Limbo',
 	plinko: 'Plinko',
 	range: 'Range',
+	soccer: 'Soccer',
 	wheel: 'Wheel',
 	'pvp-coinflip': 'PvP Coinflip',
 } as const satisfies Record<Game, string>;
@@ -67,6 +70,7 @@ const GAME_TO_PACKAGE_KEY = {
 	limbo: 'limbo',
 	plinko: 'plinko',
 	range: 'range',
+	soccer: 'soccer',
 	wheel: 'wheel',
 	'pvp-coinflip': 'pvpCoinflip',
 } as const satisfies Record<Game, keyof ResolvedMcpConfig['sdk']['packageIds']>;
@@ -76,6 +80,7 @@ const GAME_TO_TOOLS = {
 	limbo: ['build_limbo_transaction'],
 	plinko: ['build_plinko_transaction'],
 	range: ['build_range_transaction'],
+	soccer: ['build_soccer_transaction'],
 	wheel: ['build_wheel_transaction'],
 	'pvp-coinflip': [
 		'build_pvp_coinflip_create_transaction',
@@ -427,7 +432,7 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 	const { client, config } = bundle;
 	const nftType = `${config.sdk.packageIds.legacyNft}::nft::Nft`;
 	const factory = await client.core.getObject({
-		objectId: config.sdk.packageIds.legacyNftFactory,
+		objectId: config.sdk.objectIds.legacyNftFactory,
 		include: { content: true },
 	});
 	const catalog = client.suigar.bcs.LegacyNftFactory.parse(
@@ -601,6 +606,44 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 				leftPoint,
 				rightPoint,
 				outOfRange,
+			}),
+	});
+};
+
+export const buildSoccerTransactionTool = async (input: SoccerInput = {}) => {
+	if (getMode(input.mode) === 'read-only') {
+		return asTextResponse(
+			readOnlyPlan({
+				input,
+				game: 'soccer',
+				requiredInputs: [
+					'owner',
+					'stake',
+					'configId',
+					'countryId',
+					'shotZoneId',
+				],
+				notes: [
+					'Config, country, and shot zone ids select the on-chain Soccer game settings.',
+				],
+			}),
+		);
+	}
+
+	const configId = requireNumber(input.configId, 'configId');
+	const countryId = requireNumber(input.countryId, 'countryId');
+	const shotZoneId = requireNumber(input.shotZoneId, 'shotZoneId');
+	return executeTransactionTool({
+		input,
+		game: 'soccer',
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { configId, countryId, shotZoneId },
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction('soccer', {
+				...(await stakeOptions(input, bundle)),
+				configId,
+				countryId,
+				shotZoneId,
 			}),
 	});
 };
