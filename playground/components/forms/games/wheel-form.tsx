@@ -12,7 +12,11 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { GameConfigOption, WheelFormValues } from '@/lib/suigar-types';
+import type {
+	BetCountLimitSummary,
+	GameConfigOption,
+	WheelFormValues,
+} from '@/lib/suigar-types';
 
 export function WheelForm({
 	value,
@@ -22,6 +26,7 @@ export function WheelForm({
 	isConfigLoading,
 	configError,
 	stakeDescription,
+	betCountLimit,
 }: {
 	value: WheelFormValues;
 	onChange: (patch: Partial<WheelFormValues>) => void;
@@ -30,6 +35,7 @@ export function WheelForm({
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -76,12 +82,12 @@ export function WheelForm({
 					) : isConfigLoading ? (
 						<span className="inline-flex items-center gap-1.5">
 							<Spinner className="size-3.5" />
-							Loading Wheel configs from on-chain parameters.
+							Loading Wheel configs from on-chain parameters
 						</span>
 					) : configError ? (
 						`Unable to load on-chain Wheel configs: ${configError}`
 					) : (
-						'Enter a wheel config id manually if on-chain configs are unavailable.'
+						'Enter a wheel config id manually if on-chain configs are unavailable'
 					)}
 				</FieldDescription>
 			</Field>
@@ -90,6 +96,7 @@ export function WheelForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

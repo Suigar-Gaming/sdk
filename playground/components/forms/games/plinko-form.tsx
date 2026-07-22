@@ -12,7 +12,11 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { GameConfigOption, PlinkoFormValues } from '@/lib/suigar-types';
+import type {
+	BetCountLimitSummary,
+	GameConfigOption,
+	PlinkoFormValues,
+} from '@/lib/suigar-types';
 
 export function PlinkoForm({
 	value,
@@ -22,6 +26,7 @@ export function PlinkoForm({
 	isConfigLoading,
 	configError,
 	stakeDescription,
+	betCountLimit,
 }: {
 	value: PlinkoFormValues;
 	onChange: (patch: Partial<PlinkoFormValues>) => void;
@@ -30,6 +35,7 @@ export function PlinkoForm({
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -76,12 +82,12 @@ export function PlinkoForm({
 					) : isConfigLoading ? (
 						<span className="inline-flex items-center gap-1.5">
 							<Spinner className="size-3.5" />
-							Loading Plinko configs from on-chain parameters.
+							Loading Plinko configs from on-chain parameters
 						</span>
 					) : configError ? (
 						`Unable to load on-chain Plinko configs: ${configError}`
 					) : (
-						'Enter a board config id manually if on-chain configs are unavailable.'
+						'Enter a board config id manually if on-chain configs are unavailable'
 					)}
 				</FieldDescription>
 			</Field>
@@ -90,6 +96,7 @@ export function PlinkoForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

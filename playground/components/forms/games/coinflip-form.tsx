@@ -10,18 +10,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import type { CoinflipFormValues } from '@/lib/suigar-types';
+import type {
+	BetCountLimitSummary,
+	CoinflipFormValues,
+} from '@/lib/suigar-types';
 
 export function CoinflipForm({
 	value,
 	onChange,
 	onStakeBlur,
 	stakeDescription,
+	betCountLimit,
 }: {
 	value: CoinflipFormValues;
 	onChange: (patch: Partial<CoinflipFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	return (
 		<div className="space-y-6">
@@ -50,6 +55,7 @@ export function CoinflipForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

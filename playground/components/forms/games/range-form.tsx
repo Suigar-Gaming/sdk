@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { getRangePointMax, parseOptionalNumber } from '@/lib/suigar-app';
-import type { RangeFormValues } from '@/lib/suigar-types';
+import type { BetCountLimitSummary, RangeFormValues } from '@/lib/suigar-types';
 
 export function RangeForm({
 	value,
@@ -21,12 +21,14 @@ export function RangeForm({
 	onStakeBlur,
 	stakeDescription,
 	rangeBoundsDescription,
+	betCountLimit,
 }: {
 	value: RangeFormValues;
 	onChange: (patch: Partial<RangeFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	rangeBoundsDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -54,7 +56,7 @@ export function RangeForm({
 					<FieldDescription size="sm">
 						Allowed range: <FieldCode>0</FieldCode> to{' '}
 						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
-						<FieldCode>{String(effectiveScale)}</FieldCode>.
+						<FieldCode>{String(effectiveScale)}</FieldCode>
 					</FieldDescription>
 				</Field>
 				<Field>
@@ -71,7 +73,7 @@ export function RangeForm({
 					/>
 					<FieldDescription size="sm">
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
-						larger scales reduce the allowed frontend range.
+						larger scales reduce the allowed frontend range
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
@@ -91,7 +93,7 @@ export function RangeForm({
 					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
 						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
-						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>.
+						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
@@ -108,7 +110,7 @@ export function RangeForm({
 							/>
 						</div>
 						<FieldDescription size="sm">
-							Flip the win condition outside the interval.
+							Flip the win condition outside the interval
 						</FieldDescription>
 					</Field>
 				</div>
@@ -118,6 +120,7 @@ export function RangeForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

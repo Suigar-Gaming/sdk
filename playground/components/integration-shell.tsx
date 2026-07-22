@@ -670,6 +670,7 @@ function IntegrationControls({
 									onChange={(patch) => updateStandardForm('coinflip', patch)}
 									onStakeBlur={() => onStandardStakeBlur('coinflip')}
 									stakeDescription={stakeDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 							{standardGame === 'limbo' ? (
@@ -679,6 +680,7 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('limbo')}
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 							{standardGame === 'plinko' ? (
@@ -690,6 +692,7 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 							{standardGame === 'range' ? (
@@ -699,6 +702,7 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('range')}
 									stakeDescription={stakeDescription}
 									rangeBoundsDescription={rangeBoundsDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 							{standardGame === 'soccer' ? (
@@ -711,6 +715,7 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 							{standardGame === 'wheel' ? (
@@ -722,6 +727,7 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
+									betCountLimit={standardGameParameters?.betCountLimit}
 								/>
 							) : null}
 						</>
@@ -745,7 +751,7 @@ function IntegrationControls({
 												</FieldLabel>
 												<FieldDescription size="sm">
 													Public unresolved lobbies stay visible even when the
-													wallet is disconnected.
+													wallet is disconnected
 												</FieldDescription>
 											</div>
 											<Switch
@@ -1224,7 +1230,6 @@ function useIntegrationState({
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.targetMultiplierRange.max)}
 				</FieldCode>
-				.
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters]);
@@ -1261,7 +1266,6 @@ function useIntegrationState({
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.rangeBounds.maxRtp)}
 				</FieldCode>
-				.
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
@@ -1298,6 +1302,20 @@ function useIntegrationState({
 				nextForms.soccer.configId,
 				standardGameParameters?.configOptions,
 			);
+		}
+
+		const betCountLimit = standardGameParameters?.betCountLimit;
+		if (betCountLimit) {
+			const form = nextForms[standardGame];
+			const betCount = form.betCount.trim();
+			if (betCountLimit.max === BigInt(1)) {
+				form.betCount = '1';
+			} else if (
+				/^\d+$/.test(betCount) &&
+				BigInt(betCount) > betCountLimit.max
+			) {
+				form.betCount = betCountLimit.max.toString();
+			}
 		}
 
 		if (standardGameParameters?.targetMultiplierRange) {

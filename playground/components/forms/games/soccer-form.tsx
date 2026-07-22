@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import type {
+	BetCountLimitSummary,
 	GameConfigOption,
 	GameSelectionOption,
 	SoccerFormValues,
@@ -27,6 +28,7 @@ export function SoccerForm({
 	isConfigLoading,
 	configError,
 	stakeDescription,
+	betCountLimit,
 }: {
 	value: SoccerFormValues;
 	onChange: (patch: Partial<SoccerFormValues>) => void;
@@ -36,6 +38,7 @@ export function SoccerForm({
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -85,12 +88,12 @@ export function SoccerForm({
 					) : isConfigLoading ? (
 						<span className="inline-flex items-center gap-1.5">
 							<Spinner className="size-3.5" />
-							Loading Soccer configs from on-chain parameters.
+							Loading Soccer configs from on-chain parameters
 						</span>
 					) : configError ? (
 						`Unable to load on-chain Soccer configs: ${configError}`
 					) : (
-						'Enter a Soccer config id manually if on-chain configs are unavailable.'
+						'Enter a Soccer config id manually if on-chain configs are unavailable'
 					)}
 				</FieldDescription>
 			</Field>
@@ -131,7 +134,7 @@ export function SoccerForm({
 						/>
 					)}
 					<FieldDescription size="sm">
-						Choose an available country from the game settings.
+						Choose an available country from the game settings
 					</FieldDescription>
 				</Field>
 				<Field>
@@ -169,7 +172,7 @@ export function SoccerForm({
 						/>
 					)}
 					<FieldDescription size="sm">
-						Use a shot zone available in the selected config.
+						Use a shot zone available in the selected config
 					</FieldDescription>
 				</Field>
 			</div>
@@ -179,6 +182,7 @@ export function SoccerForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

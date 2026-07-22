@@ -64,7 +64,7 @@ export function PvPCoinflipCreateForm({
 						/>
 					</div>
 					<FieldDescription size="sm">
-						Marks the game as private on-chain.
+						Marks the game as private on-chain
 					</FieldDescription>
 				</Field>
 			</FieldGroup>

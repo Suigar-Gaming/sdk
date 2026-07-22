@@ -64,8 +64,14 @@ export type GameSelectionOption = {
 	label: string;
 };
 
+export type BetCountLimitSummary = {
+	max: bigint;
+	label: string;
+};
+
 export type StandardGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
+	betCountLimit?: BetCountLimitSummary;
 	configOptions?: GameConfigOption[];
 	countryOptions?: GameSelectionOption[];
 	topLevelDetails?: GameSettingsDetail[];

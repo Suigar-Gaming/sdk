@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { parseOptionalNumber } from '@/lib/suigar-app';
-import type { LimboFormValues } from '@/lib/suigar-types';
+import type { BetCountLimitSummary, LimboFormValues } from '@/lib/suigar-types';
 
 export function LimboForm({
 	value,
@@ -20,12 +20,14 @@ export function LimboForm({
 	onStakeBlur,
 	stakeDescription,
 	targetMultiplierDescription,
+	betCountLimit,
 }: {
 	value: LimboFormValues;
 	onChange: (patch: Partial<LimboFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	targetMultiplierDescription?: React.ReactNode;
+	betCountLimit?: BetCountLimitSummary;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -54,7 +56,7 @@ export function LimboForm({
 						scale <FieldCode>{String(effectiveScale)}</FieldCode>, a target
 						multiplier of <FieldCode>2.5</FieldCode> becomes{' '}
 						<FieldCode>{String(Math.round(2.5 * effectiveScale))}</FieldCode>{' '}
-						on-chain.
+						on-chain
 					</FieldDescription>
 					{targetMultiplierDescription}
 				</Field>
@@ -72,7 +74,7 @@ export function LimboForm({
 					/>
 					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
-						<FieldCode>{String(DEFAULT_LIMBO_MULTIPLIER_SCALE)}</FieldCode>.
+						<FieldCode>{String(DEFAULT_LIMBO_MULTIPLIER_SCALE)}</FieldCode>
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
@@ -81,6 +83,7 @@ export function LimboForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
+				betCountLimit={betCountLimit}
 			/>
 		</div>
 	);

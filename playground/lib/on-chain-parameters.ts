@@ -112,6 +112,7 @@ export function summarizeStandardGameParameters(
 			const limboParameters = parameters as StakeParameters & {
 				min_target_multiplier: number;
 				max_target_multiplier: number;
+				max_number_of_games: bigint | string | number;
 			};
 			const stakeRange = toStakeRange(
 				toBigInt(limboParameters.min_stake),
@@ -121,6 +122,10 @@ export function summarizeStandardGameParameters(
 
 			return {
 				stakeRange,
+				betCountLimit: {
+					max: toBigInt(limboParameters.max_number_of_games),
+					label: 'games',
+				},
 				targetMultiplierRange: {
 					min: limboParameters.min_target_multiplier,
 					max: limboParameters.max_target_multiplier,
@@ -133,6 +138,7 @@ export function summarizeStandardGameParameters(
 				max_zone_size: bigint | string | number;
 				min_rtp: number;
 				max_rtp: number;
+				max_number_of_games: bigint | string | number;
 			};
 			const stakeRange = toStakeRange(
 				toBigInt(rangeParameters.min_stake),
@@ -142,6 +148,10 @@ export function summarizeStandardGameParameters(
 
 			return {
 				stakeRange,
+				betCountLimit: {
+					max: toBigInt(rangeParameters.max_number_of_games),
+					label: 'games',
+				},
 				rangeBounds: {
 					minZoneSize: Number(rangeParameters.min_zone_size),
 					maxZoneSize: Number(rangeParameters.max_zone_size),
@@ -152,6 +162,7 @@ export function summarizeStandardGameParameters(
 		}
 		case 'plinko': {
 			const plinkoParameters = parameters as StakeParameters & {
+				max_number_of_balls: bigint | string | number;
 				configs: {
 					contents: Array<
 						ConfigEntry & {
@@ -184,10 +195,18 @@ export function summarizeStandardGameParameters(
 				}),
 			);
 
-			return { stakeRange, configOptions: configs };
+			return {
+				stakeRange,
+				betCountLimit: {
+					max: toBigInt(plinkoParameters.max_number_of_balls),
+					label: 'balls',
+				},
+				configOptions: configs,
+			};
 		}
 		case 'wheel': {
 			const wheelParameters = parameters as StakeParameters & {
+				max_number_of_spins: bigint | string | number;
 				configs: {
 					contents: Array<
 						ConfigEntry & {
@@ -223,10 +242,18 @@ export function summarizeStandardGameParameters(
 				}),
 			);
 
-			return { stakeRange, configOptions: configs };
+			return {
+				stakeRange,
+				betCountLimit: {
+					max: toBigInt(wheelParameters.max_number_of_spins),
+					label: 'spins',
+				},
+				configOptions: configs,
+			};
 		}
 		case 'soccer': {
 			const soccerParameters = parameters as StakeParameters & {
+				max_number_of_shots: bigint | string | number;
 				configs: {
 					contents: Array<
 						ConfigEntry & {
@@ -276,6 +303,10 @@ export function summarizeStandardGameParameters(
 
 			return {
 				stakeRange,
+				betCountLimit: {
+					max: toBigInt(soccerParameters.max_number_of_shots),
+					label: 'shots',
+				},
 				configOptions: configs,
 				countryOptions: soccerParameters.countries.contents.map((country) => ({
 					id: String(country.key),

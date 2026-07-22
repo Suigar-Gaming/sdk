@@ -1,9 +1,18 @@
 'use client';
 
 import type * as React from 'react';
-import { Field, FieldLabel } from '@/components/ui/field';
+import {
+	Field,
+	FieldCode,
+	FieldDescription,
+	FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import type { SharedFields, StandardSharedFields } from '@/lib/suigar-types';
+import type {
+	BetCountLimitSummary,
+	SharedFields,
+	StandardSharedFields,
+} from '@/lib/suigar-types';
 
 type SharedGameFieldsProps<T extends SharedFields> = {
 	value: T;
@@ -32,14 +41,18 @@ export function SharedGameFields<T extends SharedFields>({
 }
 
 type StandardGameFieldsProps<T extends StandardSharedFields> =
-	SharedGameFieldsProps<T>;
+	SharedGameFieldsProps<T> & {
+		betCountLimit?: BetCountLimitSummary;
+	};
 
 export function StandardGameFields<T extends StandardSharedFields>({
 	value,
 	onChange,
 	onStakeBlur,
 	description,
+	betCountLimit,
 }: StandardGameFieldsProps<T>) {
+	const isBetCountFixed = betCountLimit?.max === BigInt(1);
 	return (
 		<div className="grid gap-4 md:grid-cols-2">
 			<StakeField
@@ -55,6 +68,8 @@ export function StandardGameFields<T extends StandardSharedFields>({
 					type="number"
 					step="1"
 					min="1"
+					max={betCountLimit?.max.toString()}
+					disabled={isBetCountFixed}
 					inputMode="numeric"
 					className="h-11 px-4 bg-background/55 rounded-2xl"
 					value={value.betCount ?? ''}
@@ -63,6 +78,12 @@ export function StandardGameFields<T extends StandardSharedFields>({
 					}
 					placeholder="defaults to 1"
 				/>
+				{betCountLimit ? (
+					<FieldDescription size="sm">
+						Maximum {betCountLimit.label} per transaction:{' '}
+						<FieldCode>{betCountLimit.max.toString()}</FieldCode>
+					</FieldDescription>
+				) : null}
 			</Field>
 		</div>
 	);
