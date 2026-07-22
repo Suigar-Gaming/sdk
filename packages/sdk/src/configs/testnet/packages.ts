@@ -3,7 +3,7 @@
 
 import type { SuigarPackageIds } from '../../types/index.js';
 
-// `legacyNft` and `soccer` are preserved manually because they are not resolved from MVR.
+// `legacyNft` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 	core: '0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc',
 	legacyNft:

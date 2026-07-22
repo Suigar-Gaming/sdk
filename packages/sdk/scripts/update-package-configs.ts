@@ -23,11 +23,12 @@ const REGISTRY_PACKAGE_NAMES = {
 	plinko: '@suigar/plinko',
 	pvpCoinflip: '@suigar/pvp-coinflip',
 	range: '@suigar/range',
+	soccer: '@suigar/soccer',
 	wheel: '@suigar/wheel',
 } as const;
 
 type PackageIds = Record<
-	keyof typeof REGISTRY_PACKAGE_NAMES | 'legacyNft' | 'soccer',
+	keyof typeof REGISTRY_PACKAGE_NAMES | 'legacyNft',
 	string
 >;
 type ObjectIds = Record<'sweetHouse' | 'legacyNftFactory', string>;
@@ -142,7 +143,7 @@ function renderNetworkFiles(
 
 import type { SuigarPackageIds } from '../../types/index.js';
 
-// \`legacyNft\` and \`soccer\` are preserved manually because they are not resolved from MVR.
+// \`legacyNft\` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 \tcore: '${packageIds.core}',
 \tlegacyNft:
@@ -210,17 +211,13 @@ async function updateNetworkConfig(network: Network) {
 			currentPackageObjectName,
 			'legacyNft',
 		),
-		soccer: extractObjectValue(
-			packageSource,
-			currentPackageObjectName,
-			'soccer',
-		),
 		core: '',
 		coinflip: '',
 		limbo: '',
 		plinko: '',
 		pvpCoinflip: '',
 		range: '',
+		soccer: '',
 		wheel: '',
 	};
 	const objectIds: ObjectIds = {
