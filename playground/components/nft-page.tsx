@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
-import { Check, Gem } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 import type { SuigarClient } from '@suigar/sdk';
@@ -155,10 +155,6 @@ export function NftPage() {
 				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<div className="mb-2 flex items-center gap-2 text-secondary">
-								<Gem className="size-5" />
-								<span className="text-sm font-semibold">NFT collection</span>
-							</div>
 							<h1 className="text-3xl leading-none md:text-5xl">
 								Your Suigar NFTs
 							</h1>
