@@ -20,7 +20,7 @@ type NftSpec = {
 	id: string;
 	name: string;
 	description: string;
-	imageUrl: string;
+	imageUrl: string | undefined;
 	available: string | undefined;
 	supply: string | undefined;
 };
@@ -30,6 +30,15 @@ type OwnedNftDisplay = {
 	description: string | undefined;
 	imageUrl: string | undefined;
 };
+
+function toSafeImageUrl(value: string): string | undefined {
+	try {
+		const url = new URL(value);
+		return url.protocol === 'https:' ? url.href : undefined;
+	} catch {
+		return undefined;
+	}
+}
 
 async function getOwnedNftsBySpec(
 	client: ReturnType<typeof useCurrentClient> & { suigar: SuigarClient },
@@ -55,7 +64,7 @@ async function getOwnedNftsBySpec(
 			ownedNftsBySpec.set(parsedNft.spec_id, {
 				name: parsedNft.name,
 				description: parsedNft.description,
-				imageUrl: parsedNft.image_url.url,
+				imageUrl: toSafeImageUrl(parsedNft.image_url.url),
 			});
 		}
 		cursor = page.cursor;
@@ -100,7 +109,7 @@ export function NftPage() {
 					id: value.id,
 					name: value.name,
 					description: value.description,
-					imageUrl: value.url.url,
+					imageUrl: toSafeImageUrl(value.url.url),
 					available: value.available.toString(),
 					supply: value.supply.toString(),
 				}));
