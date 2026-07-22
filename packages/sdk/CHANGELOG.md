@@ -11,7 +11,7 @@
 ### Minor Changes
 
 - e664f02: Load game parameters with fewer network calls by retrieving the game settings field ID without fetching its object. Export `isMoveFloat` and `isMoveI64` from `@suigar/sdk/utils`, and return Move float parameter fields as JavaScript numbers, including multipliers nested in game configs.
-- be697d7: Expose network-resolved NFT V1 package and factory object ids, plus BCS helpers for decoding NFT V1 factory and owned NFT objects.
+- be697d7: Expose network-resolved legacy NFT package and factory object ids, plus BCS helpers for decoding legacy NFT factory and owned NFT objects.
 
 ## 2.0.0-beta.28
 
