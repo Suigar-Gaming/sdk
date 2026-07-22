@@ -20,6 +20,8 @@ import type {
 
 type TxApi = SuigarClient['tx'];
 
+const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/;
+
 export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
 function getBetCountInput(fields: StandardSharedFields) {
@@ -27,7 +29,7 @@ function getBetCountInput(fields: StandardSharedFields) {
 }
 
 function parseBetCount(value: string) {
-	if (!/^\d+$/.test(value)) {
+	if (!NON_NEGATIVE_INTEGER_PATTERN.test(value)) {
 		throw new Error('Bet count must be a whole number.');
 	}
 

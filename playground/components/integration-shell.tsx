@@ -126,6 +126,8 @@ type CoinBalancesState = {
 	balanceOwner: string | null;
 };
 
+const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/u;
+
 function clampBetCount<T extends StandardSharedFields>(
 	form: T,
 	max: bigint,
@@ -134,7 +136,7 @@ function clampBetCount<T extends StandardSharedFields>(
 	const nextBetCount =
 		max === BigInt(1)
 			? '1'
-			: /^\d+$/u.test(betCount) && BigInt(betCount) > max
+			: NON_NEGATIVE_INTEGER_PATTERN.test(betCount) && BigInt(betCount) > max
 				? max.toString()
 				: form.betCount;
 

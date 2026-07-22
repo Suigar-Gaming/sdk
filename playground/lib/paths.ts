@@ -1,5 +1,8 @@
+const TRAILING_SLASH_PATTERN = /\/+$/;
+const ABSOLUTE_URL_PATTERN = /^(?:[a-z]+:)?\/\//i;
+
 function normalizeBasePath(value: string): string {
-	const trimmedValue = value.trim().replace(/\/+$/, '');
+	const trimmedValue = value.trim().replace(TRAILING_SLASH_PATTERN, '');
 
 	if (!trimmedValue) {
 		return '';
@@ -11,7 +14,7 @@ function normalizeBasePath(value: string): string {
 export const basePath = normalizeBasePath(process.env.BASE_PATH ?? '');
 
 export function withBasePath(assetPath: string): string {
-	if (/^(?:[a-z]+:)?\/\//i.test(assetPath) || assetPath.startsWith('data:')) {
+	if (ABSOLUTE_URL_PATTERN.test(assetPath) || assetPath.startsWith('data:')) {
 		return assetPath;
 	}
 

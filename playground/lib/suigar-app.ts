@@ -6,6 +6,8 @@ import type {
 	StandardForms,
 } from '@/lib/suigar-types';
 
+const DECIMAL_AMOUNT_PATTERN = /^\d+(\.\d+)?$/;
+
 const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',
 };
@@ -79,7 +81,7 @@ export function toAtomicAmount(value: string | undefined, decimals: number) {
 		throw new Error('Stake is required.');
 	}
 
-	if (!/^\d+(\.\d+)?$/.test(trimmed)) {
+	if (!DECIMAL_AMOUNT_PATTERN.test(trimmed)) {
 		throw new Error('Stake must be a positive number.');
 	}
 
