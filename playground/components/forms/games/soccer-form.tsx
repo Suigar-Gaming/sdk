@@ -29,6 +29,7 @@ export function SoccerForm({
 	configError,
 	stakeDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: SoccerFormValues;
 	onChange: (patch: Partial<SoccerFormValues>) => void;
@@ -39,6 +40,7 @@ export function SoccerForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -183,6 +185,7 @@ export function SoccerForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

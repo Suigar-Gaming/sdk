@@ -27,6 +27,7 @@ export function WheelForm({
 	configError,
 	stakeDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: WheelFormValues;
 	onChange: (patch: Partial<WheelFormValues>) => void;
@@ -36,6 +37,7 @@ export function WheelForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -97,6 +99,7 @@ export function WheelForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

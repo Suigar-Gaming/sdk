@@ -21,6 +21,7 @@ export function LimboForm({
 	stakeDescription,
 	targetMultiplierDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: LimboFormValues;
 	onChange: (patch: Partial<LimboFormValues>) => void;
@@ -28,6 +29,7 @@ export function LimboForm({
 	stakeDescription?: React.ReactNode;
 	targetMultiplierDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -84,6 +86,7 @@ export function LimboForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

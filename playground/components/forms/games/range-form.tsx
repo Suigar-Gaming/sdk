@@ -22,6 +22,7 @@ export function RangeForm({
 	stakeDescription,
 	rangeBoundsDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: RangeFormValues;
 	onChange: (patch: Partial<RangeFormValues>) => void;
@@ -29,6 +30,7 @@ export function RangeForm({
 	stakeDescription?: React.ReactNode;
 	rangeBoundsDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -121,6 +123,7 @@ export function RangeForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

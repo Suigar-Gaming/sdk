@@ -8,6 +8,7 @@ import {
 	FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import type {
 	BetCountLimitSummary,
 	SharedFields,
@@ -43,6 +44,7 @@ export function SharedGameFields<T extends SharedFields>({
 type StandardGameFieldsProps<T extends StandardSharedFields> =
 	SharedGameFieldsProps<T> & {
 		betCountLimit?: BetCountLimitSummary;
+		isBetCountLimitLoading?: boolean;
 	};
 
 export function StandardGameFields<T extends StandardSharedFields>({
@@ -51,6 +53,7 @@ export function StandardGameFields<T extends StandardSharedFields>({
 	onStakeBlur,
 	description,
 	betCountLimit,
+	isBetCountLimitLoading = false,
 }: StandardGameFieldsProps<T>) {
 	const isBetCountFixed = betCountLimit?.max === BigInt(1);
 	return (
@@ -69,7 +72,7 @@ export function StandardGameFields<T extends StandardSharedFields>({
 					step="1"
 					min="1"
 					max={betCountLimit?.max.toString()}
-					disabled={isBetCountFixed}
+					disabled={isBetCountFixed || isBetCountLimitLoading}
 					inputMode="numeric"
 					className="h-11 px-4 bg-background/55 rounded-2xl"
 					value={value.betCount ?? ''}
@@ -78,7 +81,14 @@ export function StandardGameFields<T extends StandardSharedFields>({
 					}
 					placeholder="defaults to 1"
 				/>
-				{betCountLimit ? (
+				{isBetCountLimitLoading ? (
+					<FieldDescription size="sm">
+						<span className="inline-flex items-center gap-1.5">
+							<Spinner className="size-3.5" />
+							Loading maximum bet count from on-chain parameters
+						</span>
+					</FieldDescription>
+				) : betCountLimit ? (
 					<FieldDescription size="sm">
 						Maximum {betCountLimit.label} per transaction:{' '}
 						<FieldCode>{betCountLimit.max.toString()}</FieldCode>

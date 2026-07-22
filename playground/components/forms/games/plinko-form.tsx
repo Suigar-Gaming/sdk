@@ -27,6 +27,7 @@ export function PlinkoForm({
 	configError,
 	stakeDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: PlinkoFormValues;
 	onChange: (patch: Partial<PlinkoFormValues>) => void;
@@ -36,6 +37,7 @@ export function PlinkoForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -97,6 +99,7 @@ export function PlinkoForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

@@ -671,6 +671,7 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('coinflip')}
 									stakeDescription={stakeDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'limbo' ? (
@@ -681,6 +682,7 @@ function IntegrationControls({
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'plinko' ? (
@@ -693,6 +695,7 @@ function IntegrationControls({
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'range' ? (
@@ -703,6 +706,7 @@ function IntegrationControls({
 									stakeDescription={stakeDescription}
 									rangeBoundsDescription={rangeBoundsDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'soccer' ? (
@@ -716,6 +720,7 @@ function IntegrationControls({
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'wheel' ? (
@@ -728,6 +733,7 @@ function IntegrationControls({
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
 									betCountLimit={standardGameParameters?.betCountLimit}
+									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 						</>

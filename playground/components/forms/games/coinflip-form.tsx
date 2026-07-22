@@ -21,12 +21,14 @@ export function CoinflipForm({
 	onStakeBlur,
 	stakeDescription,
 	betCountLimit,
+	isBetCountLimitLoading,
 }: {
 	value: CoinflipFormValues;
 	onChange: (patch: Partial<CoinflipFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	betCountLimit?: BetCountLimitSummary;
+	isBetCountLimitLoading?: boolean;
 }) {
 	return (
 		<div className="space-y-6">
@@ -56,6 +58,7 @@ export function CoinflipForm({
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
 				betCountLimit={betCountLimit}
+				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);
