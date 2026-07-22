@@ -234,6 +234,7 @@ This is intended mainly for debugging and inspection, for example to verify the 
 It includes:
 
 - `packageIds`
+- `objectIds`
 - `registryIds`
 - `coins`
 
