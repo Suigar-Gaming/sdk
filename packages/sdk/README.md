@@ -352,7 +352,9 @@ Error behavior:
 
 - `RangeError` when `gameId` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
-- `RangeError` from bounded numeric helpers when a game selection is out of range or not an integer
+- `RangeError` when a Plinko or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Soccer `configId` or `shotZoneId` is not a `u8` integer (`0..255`), or its `countryId` is not a `u16` integer (`0..65535`)
+- `TypeError` when those selection values are not finite numbers or plain integer strings
 
 Per-game options:
 
