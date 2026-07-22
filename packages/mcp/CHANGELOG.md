@@ -1,5 +1,25 @@
 # @suigar/mcp
 
+## 1.0.0-beta.14
+
+### Major Changes
+
+- fa890ea: Rename the NFT configuration and BCS APIs from legacy names to NFT V1 names, and generate the NFT V1 decoding bindings from the on-chain package.
+
+### Minor Changes
+
+- fa890ea: Add Soccer transaction planning and unsigned transaction building. Align SDK configuration overrides with separate package, object, and registry id groups.
+
+### Patch Changes
+
+- d32fc51: Refresh Mysten and build-tool dependency metadata.
+- Updated dependencies [fa890ea]
+- Updated dependencies [d32fc51]
+- Updated dependencies [fa890ea]
+- Updated dependencies [fa890ea]
+- Updated dependencies [fa890ea]
+  - @suigar/sdk@2.0.0-beta.31
+
 ## 1.0.0-beta.13
 
 ### Minor Changes
