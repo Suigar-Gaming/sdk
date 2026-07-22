@@ -28,7 +28,9 @@ import {
 	type TransactionSummaryContext,
 } from '../runtime/index.js';
 import {
+	BASE_UNIT_AMOUNT_PATTERN,
 	formatBaseUnitAmount,
+	POSITIVE_INTEGER_PATTERN,
 	toBaseUnits,
 	toCurrencyAmountText,
 } from '../utils/index.js';
@@ -102,9 +104,6 @@ const BET_COUNT_LIMITS: Partial<
 	soccer: { parameter: 'max_number_of_shots', label: 'shots' },
 	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
 };
-
-const POSITIVE_INTEGER_PATTERN = /^[1-9]\d*$/u;
-const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/u;
 
 const json = (value: unknown) =>
 	JSON.stringify(
@@ -321,7 +320,7 @@ const enforceBetCountLimit = async (
 		(typeof max !== 'bigint' &&
 			typeof max !== 'number' &&
 			typeof max !== 'string') ||
-		!NON_NEGATIVE_INTEGER_PATTERN.test(String(max))
+		!BASE_UNIT_AMOUNT_PATTERN.test(String(max))
 	) {
 		throw new Error(
 			`Unable to read ${limit.parameter} from on-chain ${GAME_LABELS[game]} parameters.`,

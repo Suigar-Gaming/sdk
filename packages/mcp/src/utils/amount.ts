@@ -5,6 +5,7 @@ import { parseToUnits, SUI_DECIMALS } from '@mysten/sui/utils';
 
 export const BASE_UNIT_AMOUNT_PATTERN = /^\d+$/u;
 export const CURRENCY_AMOUNT_PATTERN = /^(?:\d+|\d+\.\d+|\.\d+)$/u;
+export const POSITIVE_INTEGER_PATTERN = /^[1-9]\d*$/u;
 const TRAILING_ZERO_PATTERN = /0+$/u;
 
 export type FormattedAmount = {
