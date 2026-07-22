@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import type {
-	BetCountLimitSummary,
 	GameConfigOption,
 	GameSelectionOption,
 	SoccerFormValues,
@@ -28,8 +27,6 @@ export function SoccerForm({
 	isConfigLoading,
 	configError,
 	stakeDescription,
-	betCountLimit,
-	isBetCountLimitLoading,
 }: {
 	value: SoccerFormValues;
 	onChange: (patch: Partial<SoccerFormValues>) => void;
@@ -39,8 +36,6 @@ export function SoccerForm({
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
-	betCountLimit?: BetCountLimitSummary;
-	isBetCountLimitLoading?: boolean;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -184,8 +179,6 @@ export function SoccerForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
-				betCountLimit={betCountLimit}
-				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

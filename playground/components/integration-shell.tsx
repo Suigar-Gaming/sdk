@@ -21,6 +21,7 @@ import { PvPCoinflipJoinForm } from '@/components/forms/games/pvp-coinflip-join-
 import { RangeForm } from '@/components/forms/games/range-form';
 import { SoccerForm } from '@/components/forms/games/soccer-form';
 import { WheelForm } from '@/components/forms/games/wheel-form';
+import { StandardGameBetCountProvider } from '@/components/forms/shared-game-fields';
 import {
 	CodeSample,
 	CodeSampleSkeleton,
@@ -663,15 +664,20 @@ function IntegrationControls({
 			>
 				<div className="space-y-6">
 					{mode === 'standard' ? (
-						<>
+						<StandardGameBetCountProvider
+							value={effectiveStandardForms[standardGame].betCount}
+							onChange={(betCount) =>
+								updateStandardForm(standardGame, { betCount })
+							}
+							betCountLimit={standardGameParameters?.betCountLimit}
+							isLoading={isStandardGameParametersLoading}
+						>
 							{standardGame === 'coinflip' ? (
 								<CoinflipForm
 									value={effectiveStandardForms.coinflip}
 									onChange={(patch) => updateStandardForm('coinflip', patch)}
 									onStakeBlur={() => onStandardStakeBlur('coinflip')}
 									stakeDescription={stakeDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'limbo' ? (
@@ -681,8 +687,6 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('limbo')}
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'plinko' ? (
@@ -694,8 +698,6 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'range' ? (
@@ -705,8 +707,6 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('range')}
 									stakeDescription={stakeDescription}
 									rangeBoundsDescription={rangeBoundsDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'soccer' ? (
@@ -719,8 +719,6 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
 							{standardGame === 'wheel' ? (
@@ -732,11 +730,9 @@ function IntegrationControls({
 									isConfigLoading={isStandardGameParametersLoading}
 									configError={standardGameParametersError}
 									stakeDescription={stakeDescription}
-									betCountLimit={standardGameParameters?.betCountLimit}
-									isBetCountLimitLoading={isStandardGameParametersLoading}
 								/>
 							) : null}
-						</>
+						</StandardGameBetCountProvider>
 					) : (
 						<>
 							{pvpAction === 'create' ? (

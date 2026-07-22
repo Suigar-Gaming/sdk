@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { parseOptionalNumber } from '@/lib/suigar-app';
-import type { BetCountLimitSummary, LimboFormValues } from '@/lib/suigar-types';
+import type { LimboFormValues } from '@/lib/suigar-types';
 
 export function LimboForm({
 	value,
@@ -20,16 +20,12 @@ export function LimboForm({
 	onStakeBlur,
 	stakeDescription,
 	targetMultiplierDescription,
-	betCountLimit,
-	isBetCountLimitLoading,
 }: {
 	value: LimboFormValues;
 	onChange: (patch: Partial<LimboFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	targetMultiplierDescription?: React.ReactNode;
-	betCountLimit?: BetCountLimitSummary;
-	isBetCountLimitLoading?: boolean;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -85,8 +81,6 @@ export function LimboForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
-				betCountLimit={betCountLimit}
-				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

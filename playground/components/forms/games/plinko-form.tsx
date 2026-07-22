@@ -12,11 +12,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type {
-	BetCountLimitSummary,
-	GameConfigOption,
-	PlinkoFormValues,
-} from '@/lib/suigar-types';
+import type { GameConfigOption, PlinkoFormValues } from '@/lib/suigar-types';
 
 export function PlinkoForm({
 	value,
@@ -26,8 +22,6 @@ export function PlinkoForm({
 	isConfigLoading,
 	configError,
 	stakeDescription,
-	betCountLimit,
-	isBetCountLimitLoading,
 }: {
 	value: PlinkoFormValues;
 	onChange: (patch: Partial<PlinkoFormValues>) => void;
@@ -36,8 +30,6 @@ export function PlinkoForm({
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
-	betCountLimit?: BetCountLimitSummary;
-	isBetCountLimitLoading?: boolean;
 }) {
 	const selectedConfig =
 		configOptions?.find((option) => option.id === value.configId) ?? null;
@@ -98,8 +90,6 @@ export function PlinkoForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
-				betCountLimit={betCountLimit}
-				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);

@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { getRangePointMax, parseOptionalNumber } from '@/lib/suigar-app';
-import type { BetCountLimitSummary, RangeFormValues } from '@/lib/suigar-types';
+import type { RangeFormValues } from '@/lib/suigar-types';
 
 export function RangeForm({
 	value,
@@ -21,16 +21,12 @@ export function RangeForm({
 	onStakeBlur,
 	stakeDescription,
 	rangeBoundsDescription,
-	betCountLimit,
-	isBetCountLimitLoading,
 }: {
 	value: RangeFormValues;
 	onChange: (patch: Partial<RangeFormValues>) => void;
 	onStakeBlur?: () => void;
 	stakeDescription?: React.ReactNode;
 	rangeBoundsDescription?: React.ReactNode;
-	betCountLimit?: BetCountLimitSummary;
-	isBetCountLimitLoading?: boolean;
 }) {
 	const configuredScale = parseOptionalNumber(value.scale);
 	const effectiveScale =
@@ -122,8 +118,6 @@ export function RangeForm({
 				onChange={onChange}
 				onStakeBlur={onStakeBlur}
 				description={stakeDescription}
-				betCountLimit={betCountLimit}
-				isBetCountLimitLoading={isBetCountLimitLoading}
 			/>
 		</div>
 	);
