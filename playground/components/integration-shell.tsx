@@ -101,6 +101,7 @@ import type {
 	StandardForms,
 	StandardGameId,
 	StandardGameParametersSummary,
+	StandardSharedFields,
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 import {
@@ -124,6 +125,23 @@ type CoinBalancesState = {
 	coinBalances: Record<SupportedCoinKey, CoinBalanceState>;
 	balanceOwner: string | null;
 };
+
+function clampBetCount<T extends StandardSharedFields>(
+	form: T,
+	max: bigint,
+): T {
+	const betCount = form.betCount.trim();
+	const nextBetCount =
+		max === BigInt(1)
+			? '1'
+			: /^\d+$/u.test(betCount) && BigInt(betCount) > max
+				? max.toString()
+				: form.betCount;
+
+	return nextBetCount === form.betCount
+		? form
+		: { ...form, betCount: nextBetCount };
+}
 type LobbyState = {
 	games: PvPCoinflipLobbyGame[];
 	error: string | null;
@@ -1273,7 +1291,7 @@ function useIntegrationState({
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
 
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
-		const nextForms: StandardForms = {
+		let nextForms: StandardForms = {
 			coinflip: {
 				...DEFAULT_STANDARD_FORMS.coinflip,
 				...standardForms.coinflip,
@@ -1308,15 +1326,43 @@ function useIntegrationState({
 
 		const betCountLimit = standardGameParameters?.betCountLimit;
 		if (betCountLimit) {
-			const form = nextForms[standardGame];
-			const betCount = form.betCount.trim();
-			if (betCountLimit.max === BigInt(1)) {
-				form.betCount = '1';
-			} else if (
-				/^\d+$/.test(betCount) &&
-				BigInt(betCount) > betCountLimit.max
-			) {
-				form.betCount = betCountLimit.max.toString();
+			switch (standardGame) {
+				case 'coinflip':
+					nextForms = {
+						...nextForms,
+						coinflip: clampBetCount(nextForms.coinflip, betCountLimit.max),
+					};
+					break;
+				case 'limbo':
+					nextForms = {
+						...nextForms,
+						limbo: clampBetCount(nextForms.limbo, betCountLimit.max),
+					};
+					break;
+				case 'plinko':
+					nextForms = {
+						...nextForms,
+						plinko: clampBetCount(nextForms.plinko, betCountLimit.max),
+					};
+					break;
+				case 'range':
+					nextForms = {
+						...nextForms,
+						range: clampBetCount(nextForms.range, betCountLimit.max),
+					};
+					break;
+				case 'soccer':
+					nextForms = {
+						...nextForms,
+						soccer: clampBetCount(nextForms.soccer, betCountLimit.max),
+					};
+					break;
+				case 'wheel':
+					nextForms = {
+						...nextForms,
+						wheel: clampBetCount(nextForms.wheel, betCountLimit.max),
+					};
+					break;
 			}
 		}
 
