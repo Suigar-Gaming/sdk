@@ -1,5 +1,21 @@
 # @suigar/sdk
 
+## 2.0.0-beta.31
+
+### Major Changes
+
+- fa890ea: Rename the NFT configuration and BCS APIs from legacy names to NFT V1 names, and generate the NFT V1 decoding bindings from the on-chain package.
+- fa890ea: Split singleton object ids into `config.objectIds`, leaving only Move package addresses in `config.packageIds`; `sweetHouse` and `legacyNftFactory` move to `config.objectIds`. Network configuration files now use consistent package, object, registry, and coin modules.
+
+### Minor Changes
+
+- fa890ea: Add Soccer generated bindings, parameters, event detail parsing, and standard game transaction building through `createBetTransaction('soccer', ...)`.
+
+### Patch Changes
+
+- d32fc51: Refresh Mysten and build-tool dependency metadata.
+- fa890ea: Narrow `SuigarGameEvent` so standard games only pair with `BetResultEvent`, while PvP games support all recognized event names.
+
 ## 2.0.0-beta.30
 
 ### Minor Changes
