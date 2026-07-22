@@ -13,15 +13,15 @@ import {
 	resolvePriceInfoObjectId,
 } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
-import type { EncodedBetMetadata } from '../types/bet-metadata.type.js';
-import type { Game } from '../types/game.type.js';
 import type {
 	BaseTransactionOptions,
 	CoinTransactionOptions,
+	EncodedBetMetadata,
+	Game,
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	WithPartner,
-} from '../types/transaction-options.type.js';
+} from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
 import { toBigInt } from '../utils/numeric.js';
 

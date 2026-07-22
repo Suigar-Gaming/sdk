@@ -4,7 +4,7 @@
 import type {
 	SuigarCoinRegistry,
 	SuigarNetworkRegistry,
-} from '../types/suigar-config.type.js';
+} from '../types/index.js';
 import { COINS as MAINNET_COINS } from './mainnet/coins.js';
 import { COINS as TESTNET_COINS } from './testnet/coins.js';
 

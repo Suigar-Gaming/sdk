@@ -6,7 +6,7 @@ import { play } from '../contracts/wheel/wheel.js';
 import type {
 	BuildWheelTransactionOptions,
 	WithPartner,
-} from '../types/transaction-options.type.js';
+} from '../types/index.js';
 import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

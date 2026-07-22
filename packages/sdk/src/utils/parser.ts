@@ -7,19 +7,18 @@ import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 import {
 	GAME_DETAIL_BCS,
 	GAME_DETAILS_SCHEMAS,
-	type BetResultGameDetails,
-	type GameDetail,
-	type GameDetails,
-	type GameDetailValueType,
 } from '../types/game-details.type.js';
-import {
-	GAME_EVENTS,
-	GAMES,
-	type Game,
-	type GameEvent,
-	type SuigarGameEvent,
-} from '../types/game.type.js';
-import type { MoveFloat } from '../types/move-float.type.js';
+import { GAME_EVENTS, GAMES } from '../types/game.type.js';
+import type {
+	BetResultGameDetails,
+	Game,
+	GameDetail,
+	GameDetails,
+	GameDetailValueType,
+	GameEvent,
+	MoveFloat,
+	SuigarGameEvent,
+} from '../types/index.js';
 import { fromMoveFloat } from './numeric.js';
 
 const textDecoder = new TextDecoder();

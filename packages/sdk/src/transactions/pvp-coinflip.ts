@@ -10,14 +10,14 @@ import {
 } from '../contracts/pvp-coinflip/pvp_coinflip.js';
 import { resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
-import type { PvPCoinflipAction } from '../types/game.type.js';
 import type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCreatePvPCoinflipTransactionOptions,
 	BuildPvPCoinflipTransactionOptions,
+	PvPCoinflipAction,
 	ResolvedJoinPvPCoinflipTransactionOptions,
 	WithPartner,
-} from '../types/transaction-options.type.js';
+} from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
 import { createBaseGameTransaction } from './shared.js';
 

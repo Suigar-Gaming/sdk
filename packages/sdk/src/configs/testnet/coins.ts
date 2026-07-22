@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarCoinRegistry } from '../../types/suigar-config.type.js';
+import type { SuigarCoinRegistry } from '../../types/index.js';
 
 export const COINS: SuigarCoinRegistry = {
 	sui: {

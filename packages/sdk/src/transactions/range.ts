@@ -6,7 +6,7 @@ import { play } from '../contracts/range/range.js';
 import type {
 	BuildRangeTransactionOptions,
 	WithPartner,
-} from '../types/transaction-options.type.js';
+} from '../types/index.js';
 import { DEFAULT_RANGE_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 

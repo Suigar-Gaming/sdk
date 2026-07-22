@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarObjectIds } from '../../types/suigar-config.type.js';
+import type { SuigarObjectIds } from '../../types/index.js';
 
 export const OBJECT_IDS: SuigarObjectIds = {
 	sweetHouse:

@@ -140,7 +140,7 @@ function renderNetworkFiles(
 		packages: `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarPackageIds } from '../../types/suigar-config.type.js';
+import type { SuigarPackageIds } from '../../types/index.js';
 
 // \`legacyNft\` and \`soccer\` are preserved manually because they are not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
@@ -162,7 +162,7 @@ export const PACKAGE_IDS: SuigarPackageIds = {
 		objects: `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarObjectIds } from '../../types/suigar-config.type.js';
+import type { SuigarObjectIds } from '../../types/index.js';
 
 export const OBJECT_IDS: SuigarObjectIds = {
 \tsweetHouse:
@@ -174,7 +174,7 @@ export const OBJECT_IDS: SuigarObjectIds = {
 		coins: `// Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-${isMainnet ? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\n" : ''}import type { SuigarCoinRegistry } from '../../types/suigar-config.type.js';
+${isMainnet ? "import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';\n" : ''}import type { SuigarCoinRegistry } from '../../types/index.js';
 
 export const COINS: SuigarCoinRegistry = {
 \tsui: {

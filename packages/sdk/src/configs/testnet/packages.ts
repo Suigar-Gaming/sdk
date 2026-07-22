@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuigarPackageIds } from '../../types/suigar-config.type.js';
+import type { SuigarPackageIds } from '../../types/index.js';
 
 // `legacyNft` and `soccer` are preserved manually because they are not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {

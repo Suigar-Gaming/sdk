@@ -34,39 +34,29 @@ import {
 	buildWheelTransaction,
 } from './transactions/index.js';
 import { TtlClientCache } from './ttl-cache.js';
-import type {
-	BuildGameOptions,
-	BuildPvPCoinflipGameOptions,
-} from './types/build-game-transaction-options.type.js';
-import {
-	GAME_SETTINGS,
-	type GameParameters,
-	type GetGameParametersOptions,
-	type OnChainGameParameters,
-} from './types/game-settings.type.js';
-import type {
-	Game,
-	PvPCoinflipAction,
-	StandardGame,
-} from './types/game.type.js';
-import {
-	SUPPORTED_SUI_NETWORKS,
-	type SuigarNetwork,
-} from './types/network.type.js';
-import type {
-	SuigarConfig,
-	SuigarExtensionOptions,
-} from './types/suigar-config.type.js';
+import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	BuildCoinflipTransactionOptions,
+	BuildGameOptions,
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
+	BuildPvPCoinflipGameOptions,
 	BuildRangeTransactionOptions,
 	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
+	Game,
+	GameParameters,
+	GetGameParametersOptions,
+	OnChainGameParameters,
+	PvPCoinflipAction,
+	StandardGame,
+	SuigarConfig,
+	SuigarExtensionOptions,
+	SuigarNetwork,
 	WithPartner,
 	WithThrowOnError,
-} from './types/transaction-options.type.js';
+} from './types/index.js';
+import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
 import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({

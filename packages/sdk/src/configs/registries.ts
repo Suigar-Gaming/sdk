@@ -4,7 +4,7 @@
 import type {
 	SuigarNetworkRegistry,
 	SuigarRegistryIds,
-} from '../types/suigar-config.type.js';
+} from '../types/index.js';
 import { REGISTRY_IDS as MAINNET_REGISTRY_IDS } from './mainnet/registries.js';
 import { REGISTRY_IDS as TESTNET_REGISTRY_IDS } from './testnet/registries.js';
 
