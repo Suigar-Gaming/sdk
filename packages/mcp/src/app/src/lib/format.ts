@@ -6,16 +6,6 @@ import type { AnyRecord, DefinitionEntry } from './types.js';
 export const asRecord = (value: unknown): AnyRecord =>
 	value && typeof value === 'object' ? (value as AnyRecord) : {};
 
-export const shortId = (value: unknown) => {
-	const id =
-		typeof value === 'string' ||
-		typeof value === 'number' ||
-		typeof value === 'bigint'
-			? String(value)
-			: '';
-	return id.length > 18 ? `${id.slice(0, 10)}...${id.slice(-6)}` : id;
-};
-
 export const isRecord = (value: unknown): value is AnyRecord =>
 	value !== null && typeof value === 'object';
 

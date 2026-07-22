@@ -4,6 +4,7 @@
 import type { SuiClientTypes } from '@mysten/sui/client';
 import type { suigar, SuigarClient, SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
+import type { FormattedAmount } from '../utils/amount.js';
 
 export type SuigarConfig = ReturnType<SuigarClient['getConfig']>;
 export type SuigarConfigOverrides = NonNullable<
@@ -73,11 +74,6 @@ export type TransactionSummary = {
 	inputs: number;
 	objectInputs: string[];
 } & TransactionSummaryDetails;
-
-export type FormattedAmount = {
-	raw: string;
-	display: string;
-};
 
 export type DryRunEventSummary = {
 	type: string;

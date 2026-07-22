@@ -4,8 +4,8 @@
 import { SUI_DECIMALS } from '@mysten/sui/utils';
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { formatAmount } from '../utils/index.js';
 import type { SuigarClientBundle } from './client.js';
-import { formatAmount } from './format.js';
 import type {
 	DryRunEventSummary,
 	DryRunSummary,

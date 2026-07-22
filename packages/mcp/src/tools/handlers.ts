@@ -14,7 +14,6 @@ import {
 	buildTransactionResult,
 	createSuigarClient,
 	DEFAULT_NETWORK,
-	formatBaseUnitAmount,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	toJsonValue,
@@ -28,6 +27,11 @@ import {
 	type ToolTextResult,
 	type TransactionSummaryContext,
 } from '../runtime/index.js';
+import {
+	formatBaseUnitAmount,
+	toBaseUnits,
+	toCurrencyAmountText,
+} from '../utils/index.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,
@@ -113,8 +117,6 @@ const asTextResponse = <T extends ToolTextResult['structuredContent']>(
 	structuredContent,
 });
 
-const currencyAmountPattern = /^(?:\d+|\d+\.\d+|\.\d+)$/u;
-
 const coinMetadataForAmount = (
 	config: ResolvedMcpConfig,
 	coinType?: string,
@@ -135,36 +137,6 @@ const coinMetadataForAmount = (
 		coinType: resolvedCoinType,
 		decimals: coin.decimals,
 	};
-};
-
-const toCurrencyAmountText = (value: unknown, fieldName: string): string => {
-	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
-		return String(value);
-	}
-	if (typeof value === 'string' && currencyAmountPattern.test(value.trim())) {
-		return value.trim();
-	}
-	throw new TypeError(
-		`Missing or invalid ${fieldName}. Provide a non-negative currency amount such as 1, 2, or 1.5.`,
-	);
-};
-
-const toBaseUnits = (
-	value: unknown,
-	fieldName: string,
-	decimals: number,
-): bigint => {
-	const amount = toCurrencyAmountText(value, fieldName);
-	const [rawWhole, rawFraction = ''] = amount.split('.');
-	const whole = rawWhole === '' ? '0' : rawWhole;
-	const overflow = rawFraction.slice(decimals);
-	if (/[^0]/u.test(overflow)) {
-		throw new RangeError(
-			`${fieldName} has more fractional digits than the configured coin decimals (${decimals}).`,
-		);
-	}
-	const fraction = rawFraction.slice(0, decimals).padEnd(decimals, '0');
-	return BigInt(whole) * 10n ** BigInt(decimals) + BigInt(fraction || '0');
 };
 
 const toPositiveInteger = (
@@ -371,7 +343,9 @@ const stakeOptions = async (
 		stake: toBaseUnits(input.stake, 'stake', decimals),
 		...(input.cashStake == null
 			? {}
-			: { cashStake: toBaseUnits(input.cashStake, 'cashStake', decimals) }),
+			: {
+					cashStake: toBaseUnits(input.cashStake, 'cashStake', decimals),
+				}),
 		...(input.betCount == null
 			? {}
 			: { betCount: toPositiveInteger(input.betCount, 'betCount') }),
@@ -727,17 +701,15 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 			creatorSide,
 			...(input.isPrivate == null ? {} : { isPrivate: input.isPrivate }),
 		},
-		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createPvPCoinflipTransaction('create', {
+		createTransaction: async (bundle) => {
+			const { decimals } = coinMetadataForAmount(bundle.config, input.coinType);
+			return bundle.client.suigar.tx.createPvPCoinflipTransaction('create', {
 				...(await commonOptions(input, bundle)),
-				stake: toBaseUnits(
-					input.stake,
-					'stake',
-					coinMetadataForAmount(bundle.config, input.coinType).decimals,
-				),
+				stake: toBaseUnits(input.stake, 'stake', decimals),
 				side: creatorSide,
 				isPrivate: input.isPrivate,
-			}),
+			});
+		},
 	});
 };
 
