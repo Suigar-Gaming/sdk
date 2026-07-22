@@ -117,7 +117,9 @@ export function NftPage() {
 					? await getOwnedNftsBySpec(
 							client,
 							accountAddress,
-							`${nftPackageId}::nft::Nft`,
+							client.suigar.bcs.NftV1.typeTag({
+								package: nftPackageId,
+							}),
 						)
 					: new Map<string, OwnedNftDisplay>();
 				if (!cancelled) {

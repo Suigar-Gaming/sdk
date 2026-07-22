@@ -192,7 +192,7 @@ coins?: {
 };
 ```
 
-`packageIds.nftV1` exposes the network-specific NFT V1 package id, so applications can derive the `::nft::Nft` type for their own lookup. `objectIds.nftV1Factory` is available for applications that need to read the NFT V1 catalog. Request `content: true`, then use `client.suigar.bcs.NftV1Factory.parse(object.content)` to decode the factory and `client.suigar.bcs.NftV1.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or NFT V1 mint transaction builder.
+`packageIds.nftV1` exposes the network-specific NFT V1 package id. Use `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })` when querying owned NFTs instead of constructing the Move type string manually. `objectIds.nftV1Factory` is available for applications that need to read the NFT V1 catalog. Request `content: true`, then use `client.suigar.bcs.NftV1Factory.parse(object.content)` to decode the factory and `client.suigar.bcs.NftV1.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or NFT V1 mint transaction builder.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(

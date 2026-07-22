@@ -479,7 +479,9 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 		bundle,
 	);
 	const { client, config } = bundle;
-	const nftType = `${config.sdk.packageIds.nftV1}::nft::Nft`;
+	const nftType = client.suigar.bcs.NftV1.typeTag({
+		package: config.sdk.packageIds.nftV1,
+	});
 	const factory = await client.core.getObject({
 		objectId: config.sdk.objectIds.nftV1Factory,
 		include: { content: true },
