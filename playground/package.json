@@ -8,12 +8,12 @@
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"start": "next start",
+		"typecheck": "tsc --noEmit",
+		"doctor": "react-doctor --yes",
 		"prettier": "prettier --check --ignore-unknown .",
 		"prettier:fix": "prettier --write --ignore-unknown .",
 		"lint": "pnpm run oxlint && pnpm run prettier",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix",
-		"typecheck": "tsc --noEmit",
-		"doctor": "react-doctor --yes"
+		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
 	},
 	"dependencies": {
 		"@mysten/dapp-kit-core": "^1.6.9",
