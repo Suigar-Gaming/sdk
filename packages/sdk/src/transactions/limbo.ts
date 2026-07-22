@@ -7,7 +7,7 @@ import type {
 	BuildLimboTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/index.js';
+import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildLimboTransaction(
@@ -32,7 +32,7 @@ export function buildLimboTransaction(
 				package: config.packageIds.limbo,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

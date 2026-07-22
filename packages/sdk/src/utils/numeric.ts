@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { MoveFloat } from '../types/index.js';
+import type { MoveFloat } from '../types/index.js';
 
 /**
  * Checks whether a value is a generated Move `i64` wrapper.

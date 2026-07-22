@@ -5,18 +5,19 @@ import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
 import {
-	BetResultGameDetails,
 	GAME_DETAIL_BCS,
 	GAME_DETAILS_SCHEMAS,
-	GAME_EVENTS,
+} from '../types/game-details.type.js';
+import { GAME_EVENTS, GAMES } from '../types/game.type.js';
+import type {
+	BetResultGameDetails,
+	Game,
 	GameDetail,
 	GameDetails,
+	GameDetailValueType,
 	GameEvent,
-	GAMES,
 	MoveFloat,
 	SuigarGameEvent,
-	type Game,
-	type GameDetailValueType,
 } from '../types/index.js';
 import { fromMoveFloat } from './numeric.js';
 
@@ -62,7 +63,8 @@ export function parseGameEvent(
 
 	if (
 		!GAME_EVENTS.includes(eventName as GameEvent) ||
-		typeof gameId !== 'string'
+		typeof gameId !== 'string' ||
+		(gameId !== 'pvp-coinflip' && eventName !== 'BetResultEvent')
 	) {
 		return null;
 	}

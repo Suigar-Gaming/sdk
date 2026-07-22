@@ -26,12 +26,25 @@ function toTitleCase(value: string) {
 	return value.replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+const explorerBaseUrl = 'https://testnet.suivision.xyz';
+
+function toExplorerUrl(path: string, identifier: string, search?: string) {
+	const url = new URL(
+		`${path}/${encodeURIComponent(identifier)}`,
+		explorerBaseUrl,
+	);
+	if (search) {
+		url.search = search;
+	}
+	return url.toString();
+}
+
 function toTransactionUrl(digest: string) {
-	return `https://testnet.suivision.xyz/txblock/${digest}?tab=Changes`;
+	return toExplorerUrl('/txblock', digest, 'tab=Changes');
 }
 
 function toAccountUrl(address: string) {
-	return `https://testnet.suivision.xyz/account/${address}`;
+	return toExplorerUrl('/account', address);
 }
 
 const eventTimestampFormatter = new Intl.DateTimeFormat('en-US', {

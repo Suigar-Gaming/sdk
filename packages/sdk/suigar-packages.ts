@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { TESTNET_PACKAGE_IDS } from './src/configs/package.testnet.ts';
+import { PACKAGE_IDS as TESTNET_PACKAGE_IDS } from './src/configs/testnet/packages.ts';
 
 export interface PackageInfo {
 	package: string;
@@ -11,6 +11,12 @@ export interface PackageInfo {
 }
 
 export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
+	nft: {
+		package: TESTNET_PACKAGE_IDS.nftV1,
+		packageName: 'nft-v1',
+		types: ['Factory', 'Nft'],
+		functions: false,
+	},
 	core: {
 		package: TESTNET_PACKAGE_IDS.core,
 		packageName: 'core',
@@ -53,6 +59,12 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		package: TESTNET_PACKAGE_IDS.range,
 		packageName: 'range',
 		types: ['RangeSettingsKey', 'Parameters'],
+		functions: ['play'],
+	},
+	soccer: {
+		package: TESTNET_PACKAGE_IDS.soccer,
+		packageName: 'soccer',
+		types: ['SoccerSettingsKey', 'SoccerConfig', 'Parameters'],
 		functions: ['play'],
 	},
 	wheel: {

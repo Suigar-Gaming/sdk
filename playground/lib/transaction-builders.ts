@@ -11,6 +11,7 @@ import type {
 	PvPCoinflipJoinFormValues,
 	RangeFormValues,
 	SharedFields,
+	SoccerFormValues,
 	StandardForms,
 	StandardGameId,
 	StandardSharedFields,
@@ -162,6 +163,16 @@ export function buildStandardTransaction<K extends StandardGameId>(
 				baseOptions.scale = scale;
 				codeLines.push(`scale: ${scale},`);
 			}
+			break;
+		}
+		case 'soccer': {
+			const typedForm = form as SoccerFormValues;
+			baseOptions.configId = Number(typedForm.configId);
+			baseOptions.countryId = Number(typedForm.countryId);
+			baseOptions.shotZoneId = Number(typedForm.shotZoneId);
+			codeLines.push(`configId: ${Number(typedForm.configId)},`);
+			codeLines.push(`countryId: ${Number(typedForm.countryId)},`);
+			codeLines.push(`shotZoneId: ${Number(typedForm.shotZoneId)},`);
 			break;
 		}
 		case 'wheel': {

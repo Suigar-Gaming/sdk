@@ -94,7 +94,7 @@ import type {
 
 Current game-type subpath exports:
 
-- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
+- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `BuildCoinflipTransactionOptions`, `BuildLimboTransactionOptions`, `BuildPlinkoTransactionOptions`, `BuildRangeTransactionOptions`, `BuildSoccerTransactionOptions`, `BuildWheelTransactionOptions`, `BuildCreatePvPCoinflipTransactionOptions`, `BuildJoinPvPCoinflipTransactionOptions`, `BuildCancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
@@ -177,10 +177,11 @@ Supported override areas:
 - `partner`
 - `cacheTtl`
 - `config.packageIds`
+- `config.objectIds`
 - `config.registryIds`
 - `config.coins`
 
-Use `config` when the application needs to patch package ids or supported `sui`/`usdc` coin metadata before a new SDK release is published. Each coin entry includes its price-info object id.
+Use `config` when the application needs to patch package, singleton object, or registry ids—or supported `sui`/`usdc` coin metadata—before a new SDK release is published. Each coin entry includes its price-info object id.
 
 Both supported coin keys accept the same partial metadata shape:
 
@@ -191,7 +192,7 @@ coins?: {
 };
 ```
 
-`packageIds.legacyNft` exposes the network-specific legacy NFT package id, so applications can derive the `::nft::Nft` type for their own lookup. The `packageIds.legacyNftFactory` object id is available for applications that need to read the legacy NFT catalog. Request `content: true`, then use `client.suigar.bcs.LegacyNftFactory.parse(object.content)` to decode the factory and `client.suigar.bcs.LegacyNft.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or legacy NFT mint transaction builder.
+`packageIds.nftV1` exposes the network-specific NFT V1 package id. Use `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })` when querying owned NFTs instead of constructing the Move type string manually. `objectIds.nftV1Factory` is available for applications that need to read the NFT V1 catalog. Request `content: true`, then use `client.suigar.bcs.NftV1Factory.parse(object.content)` to decode the factory and `client.suigar.bcs.NftV1.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or NFT V1 mint transaction builder.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(
@@ -233,6 +234,7 @@ This is intended mainly for debugging and inspection, for example to verify the 
 It includes:
 
 - `packageIds`
+- `objectIds`
 - `registryIds`
 - `coins`
 
@@ -312,6 +314,7 @@ Use `createBetTransaction(gameId, options)` for:
 - `limbo`
 - `plinko`
 - `range`
+- `soccer`
 - `wheel`
 
 ```ts
@@ -350,7 +353,9 @@ Error behavior:
 
 - `RangeError` when `gameId` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
-- `RangeError` from bounded numeric helpers such as `toU8()` when `plinko` or `wheel` `configId` is out of range or not an integer
+- `RangeError` when a Plinko or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Soccer `configId` or `shotZoneId` is not a `u8` integer (`0..255`), or its `countryId` is not a `u16` integer (`0..65535`)
+- `TypeError` when those selection values are not finite numbers or plain integer strings
 
 Per-game options:
 
@@ -358,6 +363,7 @@ Per-game options:
 - `limbo`: `targetMultiplier: number`, `scale?: number`
 - `plinko`: `configId: number`
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
+- `soccer`: `configId: number`, `countryId: number`, `shotZoneId: number`
 - `wheel`: `configId: number`
 
 Examples:
@@ -387,7 +393,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 > - range converts each point with `Math.round(value * scale)`
 > - range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
 > - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-> - plinko and wheel `configId` must fit in `u8`
+> - plinko, soccer, and wheel `configId` values must fit in `u8`; soccer `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
 
 > **Tip:**
 >
@@ -556,8 +562,8 @@ const gameDetails = parseGameDetails(gameId, decoded.game_details);
 
 `parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
 
-- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
-- `{ gameId: 'pvp-coinflip', eventName: 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
+- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
+- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 
 When the extension is configured with `partner`, decoded event `metadata` will contain that partner wallet address under the `partner` entry.
@@ -600,7 +606,7 @@ Build without regenerating contract bindings:
 pnpm --dir packages/sdk run build:ci
 ```
 
-Regenerate Move contract bindings only:
+Refresh package configuration and regenerate Move contract bindings:
 
 ```bash
 pnpm --dir packages/sdk run codegen

@@ -4,12 +4,6 @@
 export { GAMES } from './types/game.type.js';
 export type {
 	CoinSide,
-	Game,
-	PvPCoinflipAction,
-	PvPGame,
-	StandardGame,
-} from './types/game.type.js';
-export type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCoinflipTransactionOptions,
 	BuildCreatePvPCoinflipTransactionOptions,
@@ -17,5 +11,10 @@ export type {
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
-} from './types/transaction-options.type.js';
+	Game,
+	PvPCoinflipAction,
+	PvPGame,
+	StandardGame,
+} from './types/index.js';

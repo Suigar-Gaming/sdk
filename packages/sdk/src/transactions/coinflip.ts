@@ -28,7 +28,7 @@ export function buildCoinflipTransaction(
 				package: config.packageIds.coinflip,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

@@ -9,9 +9,12 @@ import {
 	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
-import { LegacyNft, LegacyNftFactory } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import {
+	Nft as NftV1,
+	Factory as NftV1Factory,
+} from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
@@ -30,33 +33,33 @@ import {
 	buildPlinkoTransaction,
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
+	buildSoccerTransaction,
 	buildWheelTransaction,
 } from './transactions/index.js';
 import { TtlClientCache } from './ttl-cache.js';
-import {
-	GAME_SETTINGS,
-	type GameParameters,
-	type GetGameParametersOptions,
-	type OnChainGameParameters,
-} from './types/game-settings.type.js';
-import {
+import { GAME_SETTINGS } from './types/game-settings.type.js';
+import type {
 	BuildCoinflipTransactionOptions,
 	BuildGameOptions,
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildPvPCoinflipGameOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
 	Game,
+	GameParameters,
+	GetGameParametersOptions,
+	OnChainGameParameters,
 	PvPCoinflipAction,
 	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
-	SUPPORTED_SUI_NETWORKS,
 	WithPartner,
 	WithThrowOnError,
 } from './types/index.js';
+import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
 import { parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
@@ -269,13 +272,13 @@ export class SuigarClient {
 	bcs = {
 		// Objects
 		/**
-		 * Shared factory containing legacy Suigar NFT specifications.
+		 * Shared factory containing Suigar NFT V1 specifications.
 		 */
-		LegacyNftFactory,
+		NftV1Factory,
 		/**
-		 * Minted legacy Suigar NFT owned directly by an address.
+		 * Minted Suigar NFT V1 owned directly by an address.
 		 */
-		LegacyNft,
+		NftV1,
 		/**
 		 * Object representing the state of a PvP coinflip game, as stored on-chain.
 		 */
@@ -339,6 +342,12 @@ export class SuigarClient {
 						config: this.#config,
 						partner: this.#partner,
 					} as WithPartner<BuildRangeTransactionOptions>);
+				case 'soccer':
+					return buildSoccerTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<BuildSoccerTransactionOptions>);
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,
@@ -419,14 +428,14 @@ export class SuigarClient {
 		const gameDefinition = GAME_SETTINGS[game];
 		const { signal } = options;
 
-		const { dynamicField } = await this.#client.core.getDynamicField({
-			parentId: this.#config.packageIds.sweetHouse,
+		const {
+			object: { objectId },
+		} = await this.#client.core.getDynamicObjectField({
+			parentId: this.#config.objectIds.sweetHouse,
 			name: {
-				type: `0x2::dynamic_object_field::Wrapper<${gameDefinition.settingsKey.typeTag(
-					{
-						package: resolveGamePackageId(this.#config, game),
-					},
-				)}>`,
+				type: gameDefinition.settingsKey.typeTag({
+					package: resolveGamePackageId(this.#config, game),
+				}),
 				bcs: gameDefinition.settingsKey
 					.serialize({ dummy_field: false })
 					.toBytes(),
@@ -435,7 +444,7 @@ export class SuigarClient {
 		});
 
 		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: dynamicField.childId!,
+			parentId: objectId,
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({

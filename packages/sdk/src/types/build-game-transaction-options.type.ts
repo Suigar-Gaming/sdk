@@ -8,6 +8,7 @@ import type {
 	BuildPlinkoTransactionOptions,
 	BuildPvPCoinflipTransactionOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
 } from './transaction-options.type.js';
 
@@ -24,7 +25,9 @@ export type BuildGameOptions<GameId extends StandardGame> =
 					? WithoutConfig<BuildPlinkoTransactionOptions>
 					: GameId extends 'range'
 						? WithoutConfig<BuildRangeTransactionOptions>
-						: never;
+						: GameId extends 'soccer'
+							? WithoutConfig<BuildSoccerTransactionOptions>
+							: never;
 
 export type BuildPvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
 	WithoutConfig<BuildPvPCoinflipTransactionOptions<Action>>;

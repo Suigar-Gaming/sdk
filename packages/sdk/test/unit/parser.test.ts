@@ -3,7 +3,9 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { BetResultGameDetails, GAME_EVENTS } from '../../src/types/index.js';
+import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
+import type { SuigarGameEvent } from '../../src/types/game.type.js';
+import { GAME_EVENTS } from '../../src/types/game.type.js';
 import {
 	parseCoinType,
 	parseGameDetails,
@@ -34,6 +36,24 @@ function createEvent(options: {
 }
 
 describe('parseGameEvent', () => {
+	it('models valid game and event combinations as a discriminated union', () => {
+		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
+			| {
+					gameId:
+						'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					eventName: 'BetResultEvent';
+			  }
+			| {
+					gameId: 'pvp-coinflip';
+					eventName:
+						| 'BetResultEvent'
+						| 'GameCreatedEvent'
+						| 'GameResolvedEvent'
+						| 'GameCancelledEvent';
+			  }
+		>();
+	});
+
 	it('parses standard bet result events', () => {
 		expect(
 			parseGameEvent(
@@ -73,6 +93,7 @@ describe('parseGameEvent', () => {
 			'limbo',
 			'plinko',
 			'range',
+			'soccer',
 			'wheel',
 		] as const) {
 			expect(
@@ -119,6 +140,18 @@ describe('parseGameEvent', () => {
 					module: 'coinflip',
 					eventType:
 						'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip::UnexpectedEvent<0x2::sui::SUI>',
+				}),
+			),
+		).toBeNull();
+	});
+
+	it('returns null when a standard game emits a PvP-only event name', () => {
+		expect(
+			parseGameEvent(
+				createEvent({
+					module: 'coinflip',
+					eventType:
+						'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip::GameCreatedEvent<0x2::sui::SUI>',
 				}),
 			),
 		).toBeNull();
@@ -216,6 +249,25 @@ describe('parseGameDetails', () => {
 				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
 			),
 		).toEqual({ pvp_result: 'loss' });
+	});
+
+	it('decodes soccer-specific u8 and u16 detail values', () => {
+		expect(
+			parseGameDetails(
+				'soccer',
+				gameDetails([
+					{ key: 'soccer_config', value: [9] },
+					{ key: 'country_id', value: [250, 0] },
+					{ key: 'shot_zone_id', value: [4] },
+					{ key: 'is_goal', value: [1] },
+				]),
+			),
+		).toEqual({
+			soccer_config: 9,
+			country_id: 250,
+			shot_zone_id: 4,
+			is_goal: true,
+		});
 	});
 
 	it('narrows parsed detail keys and value types by game id', () => {

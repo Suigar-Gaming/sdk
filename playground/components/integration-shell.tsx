@@ -19,7 +19,9 @@ import { PvPCoinflipCancelForm } from '@/components/forms/games/pvp-coinflip-can
 import { PvPCoinflipCreateForm } from '@/components/forms/games/pvp-coinflip-create-form';
 import { PvPCoinflipJoinForm } from '@/components/forms/games/pvp-coinflip-join-form';
 import { RangeForm } from '@/components/forms/games/range-form';
+import { SoccerForm } from '@/components/forms/games/soccer-form';
 import { WheelForm } from '@/components/forms/games/wheel-form';
+import { StandardGameBetCountProvider } from '@/components/forms/shared-game-fields';
 import {
 	CodeSample,
 	CodeSampleSkeleton,
@@ -99,6 +101,7 @@ import type {
 	StandardForms,
 	StandardGameId,
 	StandardGameParametersSummary,
+	StandardSharedFields,
 	SupportedCoinKey,
 } from '@/lib/suigar-types';
 import {
@@ -122,6 +125,23 @@ type CoinBalancesState = {
 	coinBalances: Record<SupportedCoinKey, CoinBalanceState>;
 	balanceOwner: string | null;
 };
+
+function clampBetCount<T extends StandardSharedFields>(
+	form: T,
+	max: bigint,
+): T {
+	const betCount = form.betCount.trim();
+	const nextBetCount =
+		max === BigInt(1)
+			? '1'
+			: /^\d+$/u.test(betCount) && BigInt(betCount) > max
+				? max.toString()
+				: form.betCount;
+
+	return nextBetCount === form.betCount
+		? form
+		: { ...form, betCount: nextBetCount };
+}
 type LobbyState = {
 	games: PvPCoinflipLobbyGame[];
 	error: string | null;
@@ -662,7 +682,14 @@ function IntegrationControls({
 			>
 				<div className="space-y-6">
 					{mode === 'standard' ? (
-						<>
+						<StandardGameBetCountProvider
+							value={effectiveStandardForms[standardGame].betCount}
+							onChange={(betCount) =>
+								updateStandardForm(standardGame, { betCount })
+							}
+							betCountLimit={standardGameParameters?.betCountLimit}
+							isLoading={isStandardGameParametersLoading}
+						>
 							{standardGame === 'coinflip' ? (
 								<CoinflipForm
 									value={effectiveStandardForms.coinflip}
@@ -700,6 +727,18 @@ function IntegrationControls({
 									rangeBoundsDescription={rangeBoundsDescription}
 								/>
 							) : null}
+							{standardGame === 'soccer' ? (
+								<SoccerForm
+									value={effectiveStandardForms.soccer}
+									onChange={(patch) => updateStandardForm('soccer', patch)}
+									onStakeBlur={() => onStandardStakeBlur('soccer')}
+									configOptions={standardGameParameters?.configOptions}
+									countryOptions={standardGameParameters?.countryOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+								/>
+							) : null}
 							{standardGame === 'wheel' ? (
 								<WheelForm
 									value={effectiveStandardForms.wheel}
@@ -711,7 +750,7 @@ function IntegrationControls({
 									stakeDescription={stakeDescription}
 								/>
 							) : null}
-						</>
+						</StandardGameBetCountProvider>
 					) : (
 						<>
 							{pvpAction === 'create' ? (
@@ -732,7 +771,7 @@ function IntegrationControls({
 												</FieldLabel>
 												<FieldDescription size="sm">
 													Public unresolved lobbies stay visible even when the
-													wallet is disconnected.
+													wallet is disconnected
 												</FieldDescription>
 											</div>
 											<Switch
@@ -1085,10 +1124,14 @@ function useIntegrationState({
 
 	const normalizedCurrentAccount =
 		currentAccount?.address.toLowerCase() ?? null;
+	const selectedStandardForm =
+		standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
 	const activeConfigId =
-		standardGame === 'plinko' || standardGame === 'wheel'
+		standardGame === 'plinko' ||
+		standardGame === 'soccer' ||
+		standardGame === 'wheel'
 			? resolvePlayableConfigId(
-					standardForms[standardGame].configId,
+					(selectedStandardForm as { configId: string }).configId,
 					standardGameParameters?.configOptions,
 				)
 			: undefined;
@@ -1207,7 +1250,6 @@ function useIntegrationState({
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.targetMultiplierRange.max)}
 				</FieldCode>
-				.
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters]);
@@ -1244,19 +1286,21 @@ function useIntegrationState({
 				<FieldCode>
 					{formatInputNumber(standardGameParameters.rangeBounds.maxRtp)}
 				</FieldCode>
-				.
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
 
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
-		const nextForms: StandardForms = {
-			...standardForms,
-			coinflip: { ...standardForms.coinflip },
-			limbo: { ...standardForms.limbo },
-			plinko: { ...standardForms.plinko },
-			range: { ...standardForms.range },
-			wheel: { ...standardForms.wheel },
+		let nextForms: StandardForms = {
+			coinflip: {
+				...DEFAULT_STANDARD_FORMS.coinflip,
+				...standardForms.coinflip,
+			},
+			limbo: { ...DEFAULT_STANDARD_FORMS.limbo, ...standardForms.limbo },
+			plinko: { ...DEFAULT_STANDARD_FORMS.plinko, ...standardForms.plinko },
+			range: { ...DEFAULT_STANDARD_FORMS.range, ...standardForms.range },
+			soccer: { ...DEFAULT_STANDARD_FORMS.soccer, ...standardForms.soccer },
+			wheel: { ...DEFAULT_STANDARD_FORMS.wheel, ...standardForms.wheel },
 		};
 
 		if (standardGame === 'plinko') {
@@ -1271,6 +1315,55 @@ function useIntegrationState({
 				standardForms.wheel.configId,
 				standardGameParameters?.configOptions,
 			);
+		}
+
+		if (standardGame === 'soccer') {
+			nextForms.soccer.configId = resolvePlayableConfigId(
+				nextForms.soccer.configId,
+				standardGameParameters?.configOptions,
+			);
+		}
+
+		const betCountLimit = standardGameParameters?.betCountLimit;
+		if (betCountLimit) {
+			switch (standardGame) {
+				case 'coinflip':
+					nextForms = {
+						...nextForms,
+						coinflip: clampBetCount(nextForms.coinflip, betCountLimit.max),
+					};
+					break;
+				case 'limbo':
+					nextForms = {
+						...nextForms,
+						limbo: clampBetCount(nextForms.limbo, betCountLimit.max),
+					};
+					break;
+				case 'plinko':
+					nextForms = {
+						...nextForms,
+						plinko: clampBetCount(nextForms.plinko, betCountLimit.max),
+					};
+					break;
+				case 'range':
+					nextForms = {
+						...nextForms,
+						range: clampBetCount(nextForms.range, betCountLimit.max),
+					};
+					break;
+				case 'soccer':
+					nextForms = {
+						...nextForms,
+						soccer: clampBetCount(nextForms.soccer, betCountLimit.max),
+					};
+					break;
+				case 'wheel':
+					nextForms = {
+						...nextForms,
+						wheel: clampBetCount(nextForms.wheel, betCountLimit.max),
+					};
+					break;
+			}
 		}
 
 		if (standardGameParameters?.targetMultiplierRange) {
@@ -1423,7 +1516,7 @@ function useIntegrationState({
 		dispatchUi({ type: 'clear-feedback' });
 		setStandardForms((current) => ({
 			...current,
-			[game]: { ...current[game], ...patch },
+			[game]: { ...DEFAULT_STANDARD_FORMS[game], ...current[game], ...patch },
 		}));
 	}
 

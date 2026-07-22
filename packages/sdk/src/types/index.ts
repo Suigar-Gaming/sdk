@@ -4,6 +4,7 @@
 export * from './bet-metadata.type.js';
 export * from './build-game-transaction-options.type.js';
 export * from './game-details.type.js';
+export * from './game-settings.type.js';
 export * from './game.type.js';
 export * from './move-float.type.js';
 export * from './network.type.js';

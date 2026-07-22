@@ -35,6 +35,12 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 		outOfRange: false,
 		scale: '',
 	},
+	soccer: {
+		...DEFAULT_STANDARD_SHARED_FIELDS,
+		configId: '',
+		countryId: '',
+		shotZoneId: '',
+	},
 	wheel: {
 		...DEFAULT_STANDARD_SHARED_FIELDS,
 		configId: '',

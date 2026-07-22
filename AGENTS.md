@@ -166,7 +166,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
-- exposing `packageIds.legacyNft` and `packageIds.legacyNftFactory` for applications that need legacy NFT lookups without adding an NFT client surface to this SDK; derive `${client.suigar.getConfig().packageIds.legacyNft}::nft::Nft`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.LegacyNft.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.LegacyNftFactory.parse(object.content)`, while leaving legacy NFT minting outside this SDK
+- exposing `packageIds.nftV1` and `objectIds.nftV1Factory` for applications that need NFT V1 lookups without adding an NFT client surface to this SDK; derive the owned-NFT query type with `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.NftV1.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.NftV1Factory.parse(object.content)`, while leaving NFT V1 minting outside this SDK
 - treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 
 `client.suigar.getGameParameters(game, options?)` first reads the selected game's settings object from SweetHouse, then reads that game's coin-specific `Parameters<T>` object, parses it with the generated type, decodes Move float fields into JavaScript numbers (including nested Plinko and Wheel config multipliers), and caches the parsed result for `cacheTtl`.
@@ -190,7 +190,7 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - Register tools with modern MCP SDK APIs such as `McpServer.registerTool` and `registerAppTool`.
 - Always return both text `content` and `structuredContent`.
 - Keep tool errors actionable and include the field/config/network detail needed for an agent to retry.
-- Keep SDK-style MCP config documentation aligned with `SuigarConfigOverrides`: both `coins.sui` and `coins.usdc` accept optional `coinType` and `decimals` metadata.
+- Keep SDK-style MCP config documentation aligned with `SuigarConfigOverrides`: both `coins.sui` and `coins.usdc` accept optional `coinType`, `decimals`, and `priceInfoObjectId` metadata.
 - The MCP App is an inspector UI only. It must not sign or execute transactions, and it should include restrictive `_meta.ui.csp` metadata.
 - Do not reintroduce explicit coin object sourcing or copied transaction builders unless the SDK adds a public API for that behavior.
 - If a new MCP behavior requires an SDK change, add the SDK change, tests, docs, and an `@suigar/sdk` changeset entry in the same task.

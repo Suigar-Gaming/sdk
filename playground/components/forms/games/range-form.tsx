@@ -54,7 +54,7 @@ export function RangeForm({
 					<FieldDescription size="sm">
 						Allowed range: <FieldCode>0</FieldCode> to{' '}
 						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
-						<FieldCode>{String(effectiveScale)}</FieldCode>.
+						<FieldCode>{String(effectiveScale)}</FieldCode>
 					</FieldDescription>
 				</Field>
 				<Field>
@@ -71,7 +71,7 @@ export function RangeForm({
 					/>
 					<FieldDescription size="sm">
 						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
-						larger scales reduce the allowed frontend range.
+						larger scales reduce the allowed frontend range
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
@@ -91,7 +91,7 @@ export function RangeForm({
 					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
 						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
-						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>.
+						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
@@ -108,7 +108,7 @@ export function RangeForm({
 							/>
 						</div>
 						<FieldDescription size="sm">
-							Flip the win condition outside the interval.
+							Flip the win condition outside the interval
 						</FieldDescription>
 					</Field>
 				</div>

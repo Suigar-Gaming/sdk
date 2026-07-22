@@ -11,6 +11,7 @@ import type {
 	BuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions,
 	CoinSide,
 	Game,
@@ -33,6 +34,7 @@ import type {
 	BuildLimboTransactionOptions as InternalBuildLimboTransactionOptions,
 	BuildPlinkoTransactionOptions as InternalBuildPlinkoTransactionOptions,
 	BuildRangeTransactionOptions as InternalBuildRangeTransactionOptions,
+	BuildSoccerTransactionOptions as InternalBuildSoccerTransactionOptions,
 	BuildWheelTransactionOptions as InternalBuildWheelTransactionOptions,
 } from '../../src/types/transaction-options.type.js';
 import {
@@ -70,6 +72,7 @@ describe('public source subpath modules', () => {
 			'plinko',
 			'pvp-coinflip',
 			'range',
+			'soccer',
 			'wheel',
 		]);
 	});
@@ -132,6 +135,7 @@ describe('public source subpath modules', () => {
 		expectTypeOf<BuildLimboTransactionOptions>().toEqualTypeOf<InternalBuildLimboTransactionOptions>();
 		expectTypeOf<BuildPlinkoTransactionOptions>().toEqualTypeOf<InternalBuildPlinkoTransactionOptions>();
 		expectTypeOf<BuildRangeTransactionOptions>().toEqualTypeOf<InternalBuildRangeTransactionOptions>();
+		expectTypeOf<BuildSoccerTransactionOptions>().toEqualTypeOf<InternalBuildSoccerTransactionOptions>();
 		expectTypeOf<BuildWheelTransactionOptions>().toEqualTypeOf<InternalBuildWheelTransactionOptions>();
 		expectTypeOf<BuildCreatePvPCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildCreatePvPCoinflipTransactionOptions>();
 		expectTypeOf<BuildJoinPvPCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildJoinPvPCoinflipTransactionOptions>();

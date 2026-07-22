@@ -7,7 +7,7 @@ import type {
 	BuildWheelTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { toU8 } from '../utils/index.js';
+import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildWheelTransaction(
@@ -31,7 +31,7 @@ export function buildWheelTransaction(
 				package: config.packageIds.wheel,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

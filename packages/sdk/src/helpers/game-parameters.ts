@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { GameParameterValue } from '../types/game-settings.type.js';
+import type { GameParameterValue } from '../types/index.js';
 import { fromMoveFloat, isMoveFloat } from '../utils/numeric.js';
 
 /**

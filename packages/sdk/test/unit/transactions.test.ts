@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
+	buildSoccerTransaction,
 } from '../../src/transactions/index.js';
 import {
 	createContractCallMock,
@@ -317,7 +318,7 @@ describe('coinflip transaction wrapper', () => {
 		expect(options.typeArguments).toEqual([
 			normalizeStructTag('0x2::sui::SUI'),
 		]);
-		expect(options.arguments[0]).toBe(TEST_CONFIG.packageIds.sweetHouse);
+		expect(options.arguments[0]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments[1]).toBe(1000n);
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
@@ -505,6 +506,51 @@ describe('wheel transaction wrapper', () => {
 	});
 });
 
+describe('soccer transaction wrapper', () => {
+	it('passes validated soccer selections into the generated helper', async () => {
+		const play = createContractCallMock();
+		const { buildSoccerTransaction: buildSoccerTransactionWithMock } =
+			await loadTransactionModuleWithMock<{
+				buildSoccerTransaction: typeof buildSoccerTransaction;
+			}>(
+				'../../src/contracts/soccer/soccer.js',
+				{ play },
+				'../../src/transactions/soccer.js',
+			);
+
+		buildSoccerTransactionWithMock({
+			owner: '0x123',
+			coinType: '0x2::sui::SUI',
+			stake: 1000,
+			configId: 9,
+			countryId: 250,
+			shotZoneId: 4,
+			config: TEST_CONFIG,
+		});
+
+		const options = getFirstMockArg<{
+			package: string;
+			arguments: unknown[];
+		}>(play);
+		expect(options.package).toBe(TEST_CONFIG.packageIds.soccer);
+		expect(options.arguments.slice(4, 7)).toEqual([9, 250, 4]);
+	});
+
+	it('rejects out-of-range soccer selections', () => {
+		expect(() =>
+			buildSoccerTransaction({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+				stake: 1000,
+				configId: 256,
+				countryId: 250,
+				shotZoneId: 4,
+				config: TEST_CONFIG,
+			}),
+		).toThrow('Value must be a u8 integer');
+	});
+});
+
 describe('pvp coinflip transaction wrapper', () => {
 	it('passes create action arguments into the generated helper', async () => {
 		const createGame = createContractCallMock();
@@ -542,7 +588,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		expect(options.typeArguments).toEqual([
 			normalizeStructTag('0x2::sui::SUI'),
 		]);
-		expect(options.arguments[0]).toBe(TEST_CONFIG.packageIds.sweetHouse);
+		expect(options.arguments[0]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments[2]).toBe(true);
 		expect(options.arguments[3]).toBe(true);
 		expect(options.arguments[4]).toEqual(['partner', 'label']);
@@ -584,7 +630,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		}>(joinGame);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments[0]).toBe('0x999');
-		expect(options.arguments[1]).toBe(TEST_CONFIG.packageIds.sweetHouse);
+		expect(options.arguments[1]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments[3]).toEqual(['partner', 'label']);
 		expect(options.arguments[4]).toEqual([
 			Array.from(Buffer.from(partner.slice(2), 'hex')),
@@ -620,7 +666,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		}>(cancelGame);
 		expect(options.arguments).toEqual([
 			'0x999',
-			TEST_CONFIG.packageIds.sweetHouse,
+			TEST_CONFIG.objectIds.sweetHouse,
 		]);
 	});
 });

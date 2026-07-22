@@ -10,15 +10,14 @@ import {
 	type PvPCoinflipAction,
 	type StandardGame,
 } from '@suigar/sdk/games';
-import { formatBaseUnitAmount } from '../runtime/format.js';
 import {
 	buildTransactionResult,
 	createSuigarClient,
 	DEFAULT_NETWORK,
+	formatBaseUnitAmount,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	toJsonValue,
-	ToolTextResult,
 	type BuilderMode,
 	type ListNftsResult,
 	type ReadConfigResult,
@@ -26,6 +25,7 @@ import {
 	type ReadOnlyPlan,
 	type ResolvedMcpConfig,
 	type SuigarClientBundle,
+	type ToolTextResult,
 	type TransactionSummaryContext,
 } from '../runtime/index.js';
 import type {
@@ -39,6 +39,7 @@ import type {
 	RangeInput,
 	ReadConfigInput,
 	ReadGameMetadataInput,
+	SoccerInput,
 } from './schemas.js';
 
 type TransactionToolInput =
@@ -46,18 +47,20 @@ type TransactionToolInput =
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput
+	| SoccerInput
 	| PvpCoinflipCreateInput
 	| PvpCoinflipJoinInput
 	| PvpCoinflipCancelInput;
 
 type StandardTransactionToolInput =
-	CoinflipInput | LimboInput | ConfigIdInput | RangeInput;
+	CoinflipInput | LimboInput | ConfigIdInput | RangeInput | SoccerInput;
 
 const GAME_LABELS = {
 	coinflip: 'Coinflip',
 	limbo: 'Limbo',
 	plinko: 'Plinko',
 	range: 'Range',
+	soccer: 'Soccer',
 	wheel: 'Wheel',
 	'pvp-coinflip': 'PvP Coinflip',
 } as const satisfies Record<Game, string>;
@@ -67,6 +70,7 @@ const GAME_TO_PACKAGE_KEY = {
 	limbo: 'limbo',
 	plinko: 'plinko',
 	range: 'range',
+	soccer: 'soccer',
 	wheel: 'wheel',
 	'pvp-coinflip': 'pvpCoinflip',
 } as const satisfies Record<Game, keyof ResolvedMcpConfig['sdk']['packageIds']>;
@@ -76,13 +80,24 @@ const GAME_TO_TOOLS = {
 	limbo: ['build_limbo_transaction'],
 	plinko: ['build_plinko_transaction'],
 	range: ['build_range_transaction'],
+	soccer: ['build_soccer_transaction'],
 	wheel: ['build_wheel_transaction'],
 	'pvp-coinflip': [
 		'build_pvp_coinflip_create_transaction',
 		'build_pvp_coinflip_join_transaction',
 		'build_pvp_coinflip_cancel_transaction',
 	],
-} as const satisfies Record<Game, readonly string[]>;
+} as const satisfies Record<Game, ReadonlyArray<string>>;
+
+const BET_COUNT_LIMITS: Partial<
+	Record<Game, { parameter: string; label: string }>
+> = {
+	limbo: { parameter: 'max_number_of_games', label: 'games' },
+	plinko: { parameter: 'max_number_of_balls', label: 'balls' },
+	range: { parameter: 'max_number_of_games', label: 'games' },
+	soccer: { parameter: 'max_number_of_shots', label: 'shots' },
+	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
+};
 
 const json = (value: unknown) =>
 	JSON.stringify(
@@ -308,6 +323,44 @@ const commonOptions = async (
 	};
 };
 
+const enforceBetCountLimit = async (
+	game: Game,
+	input: TransactionToolInput,
+	bundle: SuigarClientBundle,
+) => {
+	if (!('betCount' in input) || input.betCount == null) {
+		return;
+	}
+
+	const limit = BET_COUNT_LIMITS[game];
+	if (!limit) {
+		return;
+	}
+
+	const requested = BigInt(toPositiveInteger(input.betCount, 'betCount'));
+	const parameters = await bundle.client.suigar.getGameParameters(game, {
+		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
+	});
+	const max = (parameters as Record<string, unknown>)[limit.parameter];
+	if (
+		(typeof max !== 'bigint' &&
+			typeof max !== 'number' &&
+			typeof max !== 'string') ||
+		!/^\d+$/u.test(String(max))
+	) {
+		throw new Error(
+			`Unable to read ${limit.parameter} from on-chain ${GAME_LABELS[game]} parameters.`,
+		);
+	}
+
+	const maximum = BigInt(max);
+	if (requested > maximum) {
+		throw new RangeError(
+			`betCount cannot exceed ${maximum.toString()} ${limit.label} per ${GAME_LABELS[game]} transaction.`,
+		);
+	}
+};
+
 const stakeOptions = async (
 	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
@@ -325,7 +378,7 @@ const stakeOptions = async (
 	};
 };
 
-const executeTransactionTool = async ({
+const buildTransactionTool = async ({
 	input,
 	game,
 	action,
@@ -349,6 +402,7 @@ const executeTransactionTool = async ({
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
+	await enforceBetCountLimit(game, input, bundle);
 	const coin = coinMetadataForAmount(bundle.config, input.coinType);
 	const baseStake =
 		stake ??
@@ -425,14 +479,14 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 		bundle,
 	);
 	const { client, config } = bundle;
-	const nftType = `${config.sdk.packageIds.legacyNft}::nft::Nft`;
+	const nftType = client.suigar.bcs.NftV1.typeTag({
+		package: config.sdk.packageIds.nftV1,
+	});
 	const factory = await client.core.getObject({
-		objectId: config.sdk.packageIds.legacyNftFactory,
+		objectId: config.sdk.objectIds.nftV1Factory,
 		include: { content: true },
 	});
-	const catalog = client.suigar.bcs.LegacyNftFactory.parse(
-		factory.object.content,
-	);
+	const catalog = client.suigar.bcs.NftV1Factory.parse(factory.object.content);
 	const ownedNfts = [] as ListNftsResult['ownedNfts'];
 	let cursor: string | null = null;
 
@@ -445,7 +499,7 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 				include: { content: true },
 			});
 		for (const object of page.objects) {
-			const nft = client.suigar.bcs.LegacyNft.parse(object.content);
+			const nft = client.suigar.bcs.NftV1.parse(object.content);
 			ownedNfts.push({
 				id: nft.id,
 				specId: nft.spec_id,
@@ -494,7 +548,7 @@ export const buildCoinflipTransactionTool = async (
 	}
 
 	const side = requireString(input.side, 'side') as CoinSide;
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'coinflip',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
@@ -525,7 +579,7 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 		input.targetMultiplier,
 		'targetMultiplier',
 	);
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'limbo',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
@@ -554,7 +608,7 @@ const buildConfigIdTransactionTool = async (
 	}
 
 	const configId = requireNumber(input.configId, 'configId');
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game,
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
@@ -590,7 +644,7 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 	const leftPoint = requireNumber(input.leftPoint, 'leftPoint');
 	const rightPoint = requireNumber(input.rightPoint, 'rightPoint');
 	const outOfRange = Boolean(input.outOfRange);
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'range',
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
@@ -601,6 +655,44 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 				leftPoint,
 				rightPoint,
 				outOfRange,
+			}),
+	});
+};
+
+export const buildSoccerTransactionTool = async (input: SoccerInput = {}) => {
+	if (getMode(input.mode) === 'read-only') {
+		return asTextResponse(
+			readOnlyPlan({
+				input,
+				game: 'soccer',
+				requiredInputs: [
+					'owner',
+					'stake',
+					'configId',
+					'countryId',
+					'shotZoneId',
+				],
+				notes: [
+					'Config, country, and shot zone ids select the on-chain Soccer game settings.',
+				],
+			}),
+		);
+	}
+
+	const configId = requireNumber(input.configId, 'configId');
+	const countryId = requireNumber(input.countryId, 'countryId');
+	const shotZoneId = requireNumber(input.shotZoneId, 'shotZoneId');
+	return buildTransactionTool({
+		input,
+		game: 'soccer',
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { configId, countryId, shotZoneId },
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createBetTransaction('soccer', {
+				...(await stakeOptions(input, bundle)),
+				configId,
+				countryId,
+				shotZoneId,
 			}),
 	});
 };
@@ -626,7 +718,7 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 		input.creatorSide,
 		'creatorSide',
 	) as CoinSide;
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'create',
@@ -667,7 +759,7 @@ export const buildPvpCoinflipJoinTransactionTool = async (
 	}
 
 	const gameId = requireString(input.gameId, 'gameId');
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'join',
@@ -698,7 +790,7 @@ export const buildPvpCoinflipCancelTransactionTool = async (
 	}
 
 	const gameId = requireString(input.gameId, 'gameId');
-	return executeTransactionTool({
+	return buildTransactionTool({
 		input,
 		game: 'pvp-coinflip',
 		action: 'cancel',

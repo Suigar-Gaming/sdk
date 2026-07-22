@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
-import { Check, Gem } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 import type { SuigarClient } from '@suigar/sdk';
@@ -20,7 +20,7 @@ type NftSpec = {
 	id: string;
 	name: string;
 	description: string;
-	imageUrl: string;
+	imageUrl: string | undefined;
 	available: string | undefined;
 	supply: string | undefined;
 };
@@ -30,6 +30,15 @@ type OwnedNftDisplay = {
 	description: string | undefined;
 	imageUrl: string | undefined;
 };
+
+function toSafeImageUrl(value: string): string | undefined {
+	try {
+		const url = new URL(value);
+		return url.protocol === 'https:' ? url.href : undefined;
+	} catch {
+		return undefined;
+	}
+}
 
 async function getOwnedNftsBySpec(
 	client: ReturnType<typeof useCurrentClient> & { suigar: SuigarClient },
@@ -49,13 +58,13 @@ async function getOwnedNftsBySpec(
 		});
 		for (const nft of page.objects) {
 			if (nft instanceof Error || !nft.content) continue;
-			const parsedNft = client.suigar.bcs.LegacyNft.parse(nft.content);
+			const parsedNft = client.suigar.bcs.NftV1.parse(nft.content);
 			if (ownedNftsBySpec.has(parsedNft.spec_id)) continue;
 
 			ownedNftsBySpec.set(parsedNft.spec_id, {
 				name: parsedNft.name,
 				description: parsedNft.description,
-				imageUrl: parsedNft.image_url.url,
+				imageUrl: toSafeImageUrl(parsedNft.image_url.url),
 			});
 		}
 		cursor = page.cursor;
@@ -77,8 +86,8 @@ export function NftPage() {
 
 	React.useEffect(() => {
 		let cancelled = false;
-		const { legacyNft: nftPackageId, legacyNftFactory: nftFactoryId } =
-			client.suigar.getConfig().packageIds;
+		const { nftV1: nftPackageId } = client.suigar.getConfig().packageIds;
+		const { nftV1Factory: nftFactoryId } = client.suigar.getConfig().objectIds;
 
 		async function load() {
 			setIsLoading(true);
@@ -92,14 +101,12 @@ export function NftPage() {
 				if (!object.content) {
 					throw new Error('The NFT factory did not return BCS content.');
 				}
-				const factory = client.suigar.bcs.LegacyNftFactory.parse(
-					object.content,
-				);
+				const factory = client.suigar.bcs.NftV1Factory.parse(object.content);
 				const nextSpecs = factory.specs.contents.map(({ value }) => ({
 					id: value.id,
 					name: value.name,
 					description: value.description,
-					imageUrl: value.url.url,
+					imageUrl: toSafeImageUrl(value.url.url),
 					available: value.available.toString(),
 					supply: value.supply.toString(),
 				}));
@@ -110,7 +117,9 @@ export function NftPage() {
 					? await getOwnedNftsBySpec(
 							client,
 							accountAddress,
-							`${nftPackageId}::nft::Nft`,
+							client.suigar.bcs.NftV1.typeTag({
+								package: nftPackageId,
+							}),
 						)
 					: new Map<string, OwnedNftDisplay>();
 				if (!cancelled) {
@@ -146,10 +155,6 @@ export function NftPage() {
 				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<div className="mb-2 flex items-center gap-2 text-secondary">
-								<Gem className="size-5" />
-								<span className="text-sm font-semibold">NFT collection</span>
-							</div>
 							<h1 className="text-3xl leading-none md:text-5xl">
 								Your Suigar NFTs
 							</h1>

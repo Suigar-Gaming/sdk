@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { normalizeStructTag } from '@mysten/sui/utils';
-import { COINS, PACKAGE_IDS, REGISTRY_IDS } from '../configs/index.js';
+import {
+	COINS,
+	OBJECT_IDS,
+	PACKAGE_IDS,
+	REGISTRY_IDS,
+} from '../configs/index.js';
 import type {
 	Game,
 	SuigarCoin,
@@ -19,6 +24,7 @@ export function resolveSuigarConfig(
 	overrides: SuigarConfigOverrides = {},
 ): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
+	const objectIds = OBJECT_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
 	const coins = COINS[network];
 
@@ -36,6 +42,7 @@ export function resolveSuigarConfig(
 
 	return {
 		packageIds: { ...packageIds, ...overrides.packageIds },
+		objectIds: { ...objectIds, ...overrides.objectIds },
 		registryIds: { ...registryIds, ...overrides.registryIds },
 		coins: resolvedCoins,
 	};
@@ -62,6 +69,8 @@ export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 			return config.packageIds.pvpCoinflip;
 		case 'range':
 			return config.packageIds.range;
+		case 'soccer':
+			return config.packageIds.soccer;
 		case 'wheel':
 			return config.packageIds.wheel;
 	}

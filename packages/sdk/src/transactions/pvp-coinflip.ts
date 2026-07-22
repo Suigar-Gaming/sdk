@@ -8,10 +8,8 @@ import {
 	createGame,
 	joinGame,
 } from '../contracts/pvp-coinflip/pvp_coinflip.js';
-import {
-	encodeBetMetadata,
-	resolvePriceInfoObjectId,
-} from '../helpers/index.js';
+import { resolvePriceInfoObjectId } from '../helpers/config.js';
+import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	BuildCancelPvPCoinflipTransactionOptions,
 	BuildCreatePvPCoinflipTransactionOptions,
@@ -20,7 +18,7 @@ import type {
 	ResolvedJoinPvPCoinflipTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { toBigInt } from '../utils/index.js';
+import { toBigInt } from '../utils/numeric.js';
 import { createBaseGameTransaction } from './shared.js';
 
 type PvPCoinflipTransactionOptionsWithPartner<
@@ -50,7 +48,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					package: createOptions.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						createOptions.config.packageIds.sweetHouse,
+						createOptions.config.objectIds.sweetHouse,
 						coinWithBalance({
 							type: normalizedCoinType,
 							balance: stake,
@@ -79,7 +77,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						joinOptions.gameId,
-						joinOptions.config.packageIds.sweetHouse,
+						joinOptions.config.objectIds.sweetHouse,
 						joinOptions.betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
@@ -99,7 +97,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						cancelOptions.gameId,
-						cancelOptions.config.packageIds.sweetHouse,
+						cancelOptions.config.objectIds.sweetHouse,
 					],
 				}),
 			);

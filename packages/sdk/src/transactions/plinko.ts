@@ -7,7 +7,7 @@ import type {
 	BuildPlinkoTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { toU8 } from '../utils/index.js';
+import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildPlinkoTransaction(
@@ -31,7 +31,7 @@ export function buildPlinkoTransaction(
 				package: config.packageIds.plinko,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

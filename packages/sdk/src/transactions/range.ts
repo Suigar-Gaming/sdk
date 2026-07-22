@@ -7,7 +7,7 @@ import type {
 	BuildRangeTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
-import { DEFAULT_RANGE_SCALE } from '../utils/index.js';
+import { DEFAULT_RANGE_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildRangeTransaction(
@@ -33,7 +33,7 @@ export function buildRangeTransaction(
 				package: config.packageIds.range,
 				typeArguments: [coinType],
 				arguments: [
-					config.packageIds.sweetHouse,
+					config.objectIds.sweetHouse,
 					stake,
 					betCoin,
 					betCount,

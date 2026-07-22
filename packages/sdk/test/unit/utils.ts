@@ -11,16 +11,19 @@ const textEncoder = new TextEncoder();
 
 export const TEST_CONFIG = {
 	packageIds: {
-		sweetHouse: '0x456',
-		legacyNft: '0xlegacy-nft',
-		legacyNftFactory: '0xlegacy-nft-factory',
+		nftV1: '0xnft-v1',
 		core: '0xcore',
 		coinflip: '0xabc',
 		limbo: '0x1',
 		plinko: '0x2',
 		pvpCoinflip: '0x3',
 		range: '0x4',
+		soccer: '0x7',
 		wheel: '0x5',
+	},
+	objectIds: {
+		sweetHouse: '0x456',
+		nftV1Factory: '0xnft-v1-factory',
 	},
 	registryIds: {
 		pvpCoinflip: '0xregistry',

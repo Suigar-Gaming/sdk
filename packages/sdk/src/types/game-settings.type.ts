@@ -1,8 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { InferBcsType } from '@mysten/bcs';
-import { SuiClientTypes } from '@mysten/sui/client';
+import type { InferBcsType } from '@mysten/bcs';
+import type { SuiClientTypes } from '@mysten/sui/client';
 import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,
@@ -23,6 +23,11 @@ import {
 	Parameters as RangeParameters,
 	RangeSettingsKey,
 } from '../contracts/range/range.js';
+import {
+	Parameters as SoccerParameters,
+	SoccerSettingsKey,
+} from '../contracts/soccer/soccer.js';
+import type { MoveStruct } from '../contracts/utils/index.js';
 import {
 	Parameters as WheelParameters,
 	WheelSettingsKey,
@@ -51,11 +56,18 @@ export const GAME_SETTINGS = {
 		settingsKey: RangeSettingsKey,
 		parameters: RangeParameters,
 	},
+	soccer: {
+		settingsKey: SoccerSettingsKey,
+		parameters: SoccerParameters,
+	},
 	wheel: {
 		settingsKey: WheelSettingsKey,
 		parameters: WheelParameters,
 	},
-} as const;
+} as const satisfies Record<
+	Game,
+	{ settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }
+>;
 
 type OnChainGameParametersMap = {
 	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;

@@ -59,9 +59,21 @@ export type GameSettingsDetail = {
 	value: string;
 };
 
+export type GameSelectionOption = {
+	id: string;
+	label: string;
+};
+
+export type BetCountLimitSummary = {
+	max: bigint;
+	label: string;
+};
+
 export type StandardGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
+	betCountLimit?: BetCountLimitSummary;
 	configOptions?: GameConfigOption[];
+	countryOptions?: GameSelectionOption[];
 	topLevelDetails?: GameSettingsDetail[];
 	targetMultiplierRange?: NumberRangeSummary;
 	rangeBounds?: RangeBoundsSummary;
@@ -92,6 +104,12 @@ export type RangeFormValues = StandardSharedFields & {
 	scale: string;
 };
 
+export type SoccerFormValues = StandardSharedFields & {
+	configId: string;
+	countryId: string;
+	shotZoneId: string;
+};
+
 export type WheelFormValues = StandardSharedFields & {
 	configId: string;
 };
@@ -114,6 +132,7 @@ export type StandardForms = {
 	limbo: LimboFormValues;
 	plinko: PlinkoFormValues;
 	range: RangeFormValues;
+	soccer: SoccerFormValues;
 	wheel: WheelFormValues;
 };
 
