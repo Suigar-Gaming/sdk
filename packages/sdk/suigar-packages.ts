@@ -11,6 +11,12 @@ export interface PackageInfo {
 }
 
 export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
+	nft: {
+		package: TESTNET_PACKAGE_IDS.nftV1,
+		packageName: 'nft-v1',
+		types: ['Factory', 'Nft'],
+		functions: false,
+	},
 	core: {
 		package: TESTNET_PACKAGE_IDS.core,
 		packageName: 'core',

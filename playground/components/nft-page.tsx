@@ -58,7 +58,7 @@ async function getOwnedNftsBySpec(
 		});
 		for (const nft of page.objects) {
 			if (nft instanceof Error || !nft.content) continue;
-			const parsedNft = client.suigar.bcs.LegacyNft.parse(nft.content);
+			const parsedNft = client.suigar.bcs.NftV1.parse(nft.content);
 			if (ownedNftsBySpec.has(parsedNft.spec_id)) continue;
 
 			ownedNftsBySpec.set(parsedNft.spec_id, {
@@ -86,9 +86,8 @@ export function NftPage() {
 
 	React.useEffect(() => {
 		let cancelled = false;
-		const { legacyNft: nftPackageId } = client.suigar.getConfig().packageIds;
-		const { legacyNftFactory: nftFactoryId } =
-			client.suigar.getConfig().objectIds;
+		const { nftV1: nftPackageId } = client.suigar.getConfig().packageIds;
+		const { nftV1Factory: nftFactoryId } = client.suigar.getConfig().objectIds;
 
 		async function load() {
 			setIsLoading(true);
@@ -102,9 +101,7 @@ export function NftPage() {
 				if (!object.content) {
 					throw new Error('The NFT factory did not return BCS content.');
 				}
-				const factory = client.suigar.bcs.LegacyNftFactory.parse(
-					object.content,
-				);
+				const factory = client.suigar.bcs.NftV1Factory.parse(object.content);
 				const nextSpecs = factory.specs.contents.map(({ value }) => ({
 					id: value.id,
 					name: value.name,

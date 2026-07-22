@@ -9,9 +9,12 @@ import {
 	type TransactionArgument,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
-import { LegacyNft, LegacyNftFactory } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import {
+	Nft as NftV1,
+	Factory as NftV1Factory,
+} from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
@@ -269,13 +272,13 @@ export class SuigarClient {
 	bcs = {
 		// Objects
 		/**
-		 * Shared factory containing legacy Suigar NFT specifications.
+		 * Shared factory containing Suigar NFT V1 specifications.
 		 */
-		LegacyNftFactory,
+		NftV1Factory,
 		/**
-		 * Minted legacy Suigar NFT owned directly by an address.
+		 * Minted Suigar NFT V1 owned directly by an address.
 		 */
-		LegacyNft,
+		NftV1,
 		/**
 		 * Object representing the state of a PvP coinflip game, as stored on-chain.
 		 */

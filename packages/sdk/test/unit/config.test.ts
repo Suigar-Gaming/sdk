@@ -51,9 +51,7 @@ describe('resolveSuigarConfig', () => {
 		const config = resolveSuigarConfig('mainnet');
 
 		expect(config.objectIds.sweetHouse).toBe(OBJECT_IDS.mainnet.sweetHouse);
-		expect(config.objectIds.legacyNftFactory).toBe(
-			OBJECT_IDS.mainnet.legacyNftFactory,
-		);
+		expect(config.objectIds.nftV1Factory).toBe(OBJECT_IDS.mainnet.nftV1Factory);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
 		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.mainnet.soccer);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);

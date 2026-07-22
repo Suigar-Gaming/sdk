@@ -3,11 +3,10 @@
 
 import type { SuigarPackageIds } from '../../types/index.js';
 
-// `legacyNft` is preserved manually because it is not resolved from MVR.
+// `nftV1` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 	core: '0xcbb0929f21450013ebe5e86e7139f2409da2e3ed212c51126a7e6448b795a43f',
-	legacyNft:
-		'0x611e724cbd74e740ab0ae4fbbf1b57f44d9e75be7d0135704ad86eab7e518a12',
+	nftV1: '0x611e724cbd74e740ab0ae4fbbf1b57f44d9e75be7d0135704ad86eab7e518a12',
 	coinflip:
 		'0xca96885371150f55653f7fab9e9b146f5a19698b1002bdff42159ea9d2ba7d7e',
 	limbo: '0x89db6a55ad4e650cad641b6f9fd90b391b22b1d9adbb2cabbfeb94a9eeda7026',

@@ -908,11 +908,11 @@ describe('SuigarClient', () => {
 	it('exposes BCS schemas under their current event keys', async () => {
 		const client = createSuigarTestClient();
 
-		expect(client.suigar.bcs.LegacyNftFactory).toBeDefined();
-		expect(client.suigar.bcs.LegacyNft).toBeDefined();
+		expect(client.suigar.bcs.NftV1Factory).toBeDefined();
+		expect(client.suigar.bcs.NftV1).toBeDefined();
 		expect(
-			client.suigar.bcs.LegacyNftFactory.parse(
-				client.suigar.bcs.LegacyNftFactory.serialize({
+			client.suigar.bcs.NftV1Factory.parse(
+				client.suigar.bcs.NftV1Factory.serialize({
 					id: '0x1',
 					specs: {
 						contents: [
@@ -921,7 +921,7 @@ describe('SuigarClient', () => {
 								value: {
 									id: '0x2',
 									name: 'Suigar Cane',
-									description: 'A legacy Suigar NFT',
+									description: 'A Suigar NFT V1',
 									url: { url: 'https://suigar.com/cane.png' },
 									supply: 500n,
 									available: 494n,

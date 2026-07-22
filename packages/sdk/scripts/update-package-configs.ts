@@ -27,11 +27,8 @@ const REGISTRY_PACKAGE_NAMES = {
 	wheel: '@suigar/wheel',
 } as const;
 
-type PackageIds = Record<
-	keyof typeof REGISTRY_PACKAGE_NAMES | 'legacyNft',
-	string
->;
-type ObjectIds = Record<'sweetHouse' | 'legacyNftFactory', string>;
+type PackageIds = Record<keyof typeof REGISTRY_PACKAGE_NAMES | 'nftV1', string>;
+type ObjectIds = Record<'sweetHouse' | 'nftV1Factory', string>;
 type CoinMetadataSource = {
 	coinType: string;
 	decimals: string;
@@ -143,11 +140,11 @@ function renderNetworkFiles(
 
 import type { SuigarPackageIds } from '../../types/index.js';
 
-// \`legacyNft\` is preserved manually because it is not resolved from MVR.
+// \`nftV1\` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 \tcore: '${packageIds.core}',
-\tlegacyNft:
-\t\t'${packageIds.legacyNft}',
+\tnftV1:
+\t\t'${packageIds.nftV1}',
 \tcoinflip:
 \t\t'${packageIds.coinflip}',
 \tlimbo: '${packageIds.limbo}',
@@ -168,8 +165,8 @@ import type { SuigarObjectIds } from '../../types/index.js';
 export const OBJECT_IDS: SuigarObjectIds = {
 \tsweetHouse:
 \t\t'${objectIds.sweetHouse}',
-\tlegacyNftFactory:
-\t\t'${objectIds.legacyNftFactory}',
+\tnftV1Factory:
+\t\t'${objectIds.nftV1Factory}',
 };
 `,
 		coins: `// Copyright (c) Suigar
@@ -206,11 +203,7 @@ async function updateNetworkConfig(network: Network) {
 	const currentCoinsObjectName = 'COINS';
 
 	const packageIds: PackageIds = {
-		legacyNft: extractObjectValue(
-			packageSource,
-			currentPackageObjectName,
-			'legacyNft',
-		),
+		nftV1: extractObjectValue(packageSource, currentPackageObjectName, 'nftV1'),
 		core: '',
 		coinflip: '',
 		limbo: '',
@@ -226,10 +219,10 @@ async function updateNetworkConfig(network: Network) {
 			currentObjectObjectName,
 			'sweetHouse',
 		),
-		legacyNftFactory: extractObjectValue(
+		nftV1Factory: extractObjectValue(
 			objectSource,
 			currentObjectObjectName,
-			'legacyNftFactory',
+			'nftV1Factory',
 		),
 	};
 
@@ -248,8 +241,8 @@ async function updateNetworkConfig(network: Network) {
 	});
 	await assertObjectType({
 		client,
-		objectId: objectIds.legacyNftFactory,
-		expectedType: `${packageIds.legacyNft}::nft::Factory`,
+		objectId: objectIds.nftV1Factory,
+		expectedType: `${packageIds.nftV1}::nft::Factory`,
 	});
 
 	const coins: CoinMetadataSources = {

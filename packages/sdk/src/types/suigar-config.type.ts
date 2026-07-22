@@ -46,7 +46,7 @@ export type SuigarCoin = 'sui' | 'usdc';
 export type SuigarCoinRegistry = Record<SuigarCoin, SuigarCoinMetadata>;
 
 export type SuigarPackage =
-	| 'legacyNft'
+	| 'nftV1'
 	| 'core'
 	| 'coinflip'
 	| 'limbo'
@@ -57,7 +57,7 @@ export type SuigarPackage =
 	| 'wheel';
 export type SuigarPackageIds = Record<SuigarPackage, string>;
 
-export type SuigarObject = 'sweetHouse' | 'legacyNftFactory';
+export type SuigarObject = 'sweetHouse' | 'nftV1Factory';
 export type SuigarObjectIds = Record<SuigarObject, string>;
 
 export type SuigarRegistry = 'pvpCoinflip';

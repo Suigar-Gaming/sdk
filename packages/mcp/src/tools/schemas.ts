@@ -30,7 +30,7 @@ const configOverridesSchema = z
 	.object({
 		packageIds: z
 			.object({
-				legacyNft: z.string().min(1).optional(),
+				nftV1: z.string().min(1).optional(),
 				core: z.string().min(1).optional(),
 				coinflip: z.string().min(1).optional(),
 				limbo: z.string().min(1).optional(),
@@ -45,7 +45,7 @@ const configOverridesSchema = z
 		objectIds: z
 			.object({
 				sweetHouse: z.string().min(1).optional(),
-				legacyNftFactory: z.string().min(1).optional(),
+				nftV1Factory: z.string().min(1).optional(),
 			})
 			.strict()
 			.optional(),

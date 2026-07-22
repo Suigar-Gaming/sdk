@@ -479,14 +479,12 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 		bundle,
 	);
 	const { client, config } = bundle;
-	const nftType = `${config.sdk.packageIds.legacyNft}::nft::Nft`;
+	const nftType = `${config.sdk.packageIds.nftV1}::nft::Nft`;
 	const factory = await client.core.getObject({
-		objectId: config.sdk.objectIds.legacyNftFactory,
+		objectId: config.sdk.objectIds.nftV1Factory,
 		include: { content: true },
 	});
-	const catalog = client.suigar.bcs.LegacyNftFactory.parse(
-		factory.object.content,
-	);
+	const catalog = client.suigar.bcs.NftV1Factory.parse(factory.object.content);
 	const ownedNfts = [] as ListNftsResult['ownedNfts'];
 	let cursor: string | null = null;
 
@@ -499,7 +497,7 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 				include: { content: true },
 			});
 		for (const object of page.objects) {
-			const nft = client.suigar.bcs.LegacyNft.parse(object.content);
+			const nft = client.suigar.bcs.NftV1.parse(object.content);
 			ownedNfts.push({
 				id: nft.id,
 				specId: nft.spec_id,

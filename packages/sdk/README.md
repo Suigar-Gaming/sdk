@@ -192,7 +192,7 @@ coins?: {
 };
 ```
 
-`packageIds.legacyNft` exposes the network-specific legacy NFT package id, so applications can derive the `::nft::Nft` type for their own lookup. `objectIds.legacyNftFactory` is available for applications that need to read the legacy NFT catalog. Request `content: true`, then use `client.suigar.bcs.LegacyNftFactory.parse(object.content)` to decode the factory and `client.suigar.bcs.LegacyNft.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or legacy NFT mint transaction builder.
+`packageIds.nftV1` exposes the network-specific NFT V1 package id, so applications can derive the `::nft::Nft` type for their own lookup. `objectIds.nftV1Factory` is available for applications that need to read the NFT V1 catalog. Request `content: true`, then use `client.suigar.bcs.NftV1Factory.parse(object.content)` to decode the factory and `client.suigar.bcs.NftV1.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or NFT V1 mint transaction builder.
 
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(

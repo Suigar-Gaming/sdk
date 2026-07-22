@@ -145,7 +145,7 @@ Optional `config` input follows the public SDK extension override shape:
 ```ts
 {
 	packageIds?: {
-		legacyNft?: string;
+		nftV1?: string;
 		core?: string;
 		coinflip?: string;
 		limbo?: string;
@@ -157,7 +157,7 @@ Optional `config` input follows the public SDK extension override shape:
 	};
 	objectIds?: {
 		sweetHouse?: string;
-		legacyNftFactory?: string;
+		nftV1Factory?: string;
 	};
 	registryIds?: { pvpCoinflip?: string };
 	coins?: {
