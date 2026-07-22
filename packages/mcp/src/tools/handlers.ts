@@ -10,24 +10,26 @@ import {
 	type PvPCoinflipAction,
 	type StandardGame,
 } from '@suigar/sdk/games';
-import { formatBaseUnitAmount } from '../runtime/format.js';
 import {
 	buildTransactionResult,
 	createSuigarClient,
 	DEFAULT_NETWORK,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
-	toJsonValue,
-	ToolTextResult,
-	type BuilderMode,
-	type ListNftsResult,
-	type ReadConfigResult,
-	type ReadGameMetadataResult,
-	type ReadOnlyPlan,
-	type ResolvedMcpConfig,
 	type SuigarClientBundle,
-	type TransactionSummaryContext,
-} from '../runtime/index.js';
+} from '../runtime/client.js';
+import { toJsonValue } from '../runtime/dry-run.js';
+import { formatBaseUnitAmount } from '../runtime/format.js';
+import type {
+	BuilderMode,
+	ListNftsResult,
+	ReadConfigResult,
+	ReadGameMetadataResult,
+	ReadOnlyPlan,
+	ResolvedMcpConfig,
+	ToolTextResult,
+	TransactionSummaryContext,
+} from '../runtime/types.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,

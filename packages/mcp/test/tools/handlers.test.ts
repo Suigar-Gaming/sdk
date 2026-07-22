@@ -3,7 +3,7 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
-import {
+import type {
 	BuildTransactionResult,
 	ReadOnlyPlan,
 } from '../../src/runtime/types.js';

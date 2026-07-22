@@ -7,7 +7,7 @@ import {
 } from '@modelcontextprotocol/ext-apps/server';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
-import type { ToolTextResult } from '../runtime/index.js';
+import type { ToolTextResult } from '../runtime/types.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -18,22 +18,24 @@ import {
 	buildRangeTransactionTool,
 	buildSoccerTransactionTool,
 	buildWheelTransactionTool,
+	listNftsTool,
+	readConfigTool,
+	readGameMetadataTool,
+} from '../tools/handlers.js';
+import {
 	coinflipInputSchema,
 	configIdInputSchema,
 	limboInputSchema,
 	listNftsInputSchema,
-	listNftsTool,
 	pvpCoinflipCancelInputSchema,
 	pvpCoinflipCreateInputSchema,
 	pvpCoinflipJoinInputSchema,
 	rangeInputSchema,
 	readConfigInputSchema,
-	readConfigTool,
 	readGameMetadataInputSchema,
-	readGameMetadataTool,
 	soccerInputSchema,
 	toolOutputSchema,
-} from '../tools/index.js';
+} from '../tools/schemas.js';
 
 const errorText = (error: unknown) => {
 	if (error instanceof Error) {
