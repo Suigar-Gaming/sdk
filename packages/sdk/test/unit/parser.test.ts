@@ -4,6 +4,7 @@
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
+import type { SuigarGameEvent } from '../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../src/types/game.type.js';
 import {
 	parseCoinType,
@@ -35,6 +36,24 @@ function createEvent(options: {
 }
 
 describe('parseGameEvent', () => {
+	it('models valid game and event combinations as a discriminated union', () => {
+		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
+			| {
+					gameId:
+						'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					eventName: 'BetResultEvent';
+			  }
+			| {
+					gameId: 'pvp-coinflip';
+					eventName:
+						| 'BetResultEvent'
+						| 'GameCreatedEvent'
+						| 'GameResolvedEvent'
+						| 'GameCancelledEvent';
+			  }
+		>();
+	});
+
 	it('parses standard bet result events', () => {
 		expect(
 			parseGameEvent(
@@ -121,6 +140,18 @@ describe('parseGameEvent', () => {
 					module: 'coinflip',
 					eventType:
 						'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip::UnexpectedEvent<0x2::sui::SUI>',
+				}),
+			),
+		).toBeNull();
+	});
+
+	it('returns null when a standard game emits a PvP-only event name', () => {
+		expect(
+			parseGameEvent(
+				createEvent({
+					module: 'coinflip',
+					eventType:
+						'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip::GameCreatedEvent<0x2::sui::SUI>',
 				}),
 			),
 		).toBeNull();

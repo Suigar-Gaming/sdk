@@ -28,7 +28,18 @@ export type PvPCoinflipAction = 'create' | 'join' | 'cancel';
 
 export type GameEvent = (typeof GAME_EVENTS)[number];
 
-export type SuigarGameEvent = {
-	gameId: Game;
-	eventName: GameEvent;
-};
+/**
+ * A supported Suigar game event.
+ *
+ * Standard games emit only `BetResultEvent`, while PvP game modules can emit
+ * every event in `GAME_EVENTS`.
+ */
+export type SuigarGameEvent =
+	| {
+			gameId: StandardGame;
+			eventName: 'BetResultEvent';
+	  }
+	| {
+			gameId: PvPGame;
+			eventName: GameEvent;
+	  };

@@ -63,7 +63,8 @@ export function parseGameEvent(
 
 	if (
 		!GAME_EVENTS.includes(eventName as GameEvent) ||
-		typeof gameId !== 'string'
+		typeof gameId !== 'string' ||
+		(gameId !== 'pvp-coinflip' && eventName !== 'BetResultEvent')
 	) {
 		return null;
 	}
