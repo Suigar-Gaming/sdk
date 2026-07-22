@@ -271,8 +271,6 @@ class TestClient extends CoreClient {
 		parentId: string;
 	}> = [];
 
-	getDynamicFieldCalls: SuiClientTypes.GetDynamicFieldOptions[] = [];
-
 	getDynamicObjectFieldCalls: SuiClientTypes.GetDynamicObjectFieldOptions[] =
 		[];
 
@@ -445,40 +443,6 @@ class TestClient extends CoreClient {
 		};
 	};
 
-	getDynamicField: CoreClient['getDynamicField'] = async (options) => {
-		this.getDynamicFieldCalls.push(options);
-		const lookup = this.mockDynamicFieldLookups.find(
-			(entry) =>
-				entry.parentId === options.parentId &&
-				[
-					entry.nameType,
-					`0x2::dynamic_object_field::Wrapper<${entry.nameType}>`,
-				].includes(options.name.type),
-		);
-
-		if (!lookup) {
-			throw new Error(`No dynamic field found for ${options.name.type}`);
-		}
-
-		return {
-			dynamicField: {
-				$kind: 'DynamicObject',
-				childId: lookup.childId,
-				fieldId: `${lookup.childId}-field`,
-				type: 'DynamicObject',
-				name: options.name,
-				value: {
-					type: '0x2::object::ID',
-					bcs: new Uint8Array(),
-				},
-				valueType: '0x2::object::ID',
-				version: '1',
-				digest: `${lookup.childId}-digest`,
-				previousTransaction: null,
-			},
-		};
-	};
-
 	getDynamicObjectField: CoreClient['getDynamicObjectField'] = async <
 		Include extends SuiClientTypes.ObjectInclude,
 	>(
@@ -488,7 +452,10 @@ class TestClient extends CoreClient {
 		const lookup = this.mockDynamicFieldLookups.find(
 			(entry) =>
 				entry.parentId === options.parentId &&
-				entry.nameType === options.name.type,
+				[
+					entry.nameType,
+					`0x2::dynamic_object_field::Wrapper<${entry.nameType}>`,
+				].includes(options.name.type),
 		);
 
 		if (!lookup) {
@@ -672,15 +639,18 @@ describe('SuigarClient', () => {
 
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(client.getDynamicObjectFieldCalls[0]?.name).toEqual({
+			type: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+			bcs: COINFLIP_SETTINGS_FIELD_BCS,
+		});
+		expect(client.getDynamicObjectFieldCalls[1]?.name).toEqual({
 			type: TypeName.name,
 			bcs: SUI_TYPE_NAME_FIELD_BCS,
 		});
 		expect(
-			TypeName.parse(client.getDynamicObjectFieldCalls[0]!.name.bcs).name,
+			TypeName.parse(client.getDynamicObjectFieldCalls[1]!.name.bcs).name,
 		).toBe(normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''));
-		expect(client.getDynamicFieldCalls).toHaveLength(1);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
@@ -770,8 +740,7 @@ describe('SuigarClient', () => {
 		await client.suigar.getGameParameters('coinflip');
 		await client.suigar.getGameParameters('coinflip');
 
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
-		expect(client.getDynamicFieldCalls).toHaveLength(1);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 
@@ -784,8 +753,7 @@ describe('SuigarClient', () => {
 		});
 
 		expect(refreshed.min_stake).toBe('50');
-		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
-		expect(client.getDynamicFieldCalls).toHaveLength(2);
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(4);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
@@ -829,8 +797,7 @@ describe('SuigarClient', () => {
 		await first.shared.getGameParameters('coinflip');
 		await second.shared.getGameParameters('coinflip');
 
-		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(1);
-		expect(baseClient.getDynamicFieldCalls).toHaveLength(1);
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);
 		expect(baseClient.getObjectsCalls).toHaveLength(0);
 	});

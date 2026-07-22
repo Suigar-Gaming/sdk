@@ -428,14 +428,14 @@ export class SuigarClient {
 		const gameDefinition = GAME_SETTINGS[game];
 		const { signal } = options;
 
-		const { dynamicField } = await this.#client.core.getDynamicField({
+		const {
+			object: { objectId },
+		} = await this.#client.core.getDynamicObjectField({
 			parentId: this.#config.objectIds.sweetHouse,
 			name: {
-				type: `0x2::dynamic_object_field::Wrapper<${gameDefinition.settingsKey.typeTag(
-					{
-						package: resolveGamePackageId(this.#config, game),
-					},
-				)}>`,
+				type: gameDefinition.settingsKey.typeTag({
+					package: resolveGamePackageId(this.#config, game),
+				}),
 				bcs: gameDefinition.settingsKey
 					.serialize({ dummy_field: false })
 					.toBytes(),
@@ -444,7 +444,7 @@ export class SuigarClient {
 		});
 
 		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: dynamicField.childId!,
+			parentId: objectId,
 			name: {
 				type: TypeName.name,
 				bcs: TypeName.serialize({
