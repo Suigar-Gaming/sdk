@@ -103,6 +103,9 @@ const BET_COUNT_LIMITS: Partial<
 	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
 };
 
+const POSITIVE_INTEGER_PATTERN = /^[1-9]\d*$/u;
+const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/u;
+
 const json = (value: unknown) =>
 	JSON.stringify(
 		value,
@@ -146,7 +149,7 @@ const toPositiveInteger = (
 	if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
 		return value;
 	}
-	if (typeof value === 'string' && /^[1-9]\d*$/u.test(value)) {
+	if (typeof value === 'string' && POSITIVE_INTEGER_PATTERN.test(value)) {
 		return BigInt(value);
 	}
 	throw new TypeError(
@@ -318,7 +321,7 @@ const enforceBetCountLimit = async (
 		(typeof max !== 'bigint' &&
 			typeof max !== 'number' &&
 			typeof max !== 'string') ||
-		!/^\d+$/u.test(String(max))
+		!NON_NEGATIVE_INTEGER_PATTERN.test(String(max))
 	) {
 		throw new Error(
 			`Unable to read ${limit.parameter} from on-chain ${GAME_LABELS[game]} parameters.`,
