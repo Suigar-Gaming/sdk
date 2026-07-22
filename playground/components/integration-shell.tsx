@@ -111,6 +111,7 @@ import {
 	PREVIEW_PLAYER_ADDRESS,
 } from '@/lib/transaction-builders';
 import { cn } from '@/lib/utils';
+import { NON_NEGATIVE_INTEGER_PATTERN } from '@/lib/validation';
 
 type Mode = 'standard' | 'pvp';
 type UiState = {
@@ -125,8 +126,6 @@ type CoinBalancesState = {
 	coinBalances: Record<SupportedCoinKey, CoinBalanceState>;
 	balanceOwner: string | null;
 };
-
-const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/u;
 
 function clampBetCount<T extends StandardSharedFields>(
 	form: T,

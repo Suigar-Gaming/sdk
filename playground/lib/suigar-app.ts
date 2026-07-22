@@ -5,8 +5,7 @@ import type {
 	SharedFields,
 	StandardForms,
 } from '@/lib/suigar-types';
-
-const DECIMAL_AMOUNT_PATTERN = /^\d+(\.\d+)?$/;
+import { DECIMAL_AMOUNT_PATTERN } from '@/lib/validation';
 
 const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',

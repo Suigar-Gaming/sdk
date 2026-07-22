@@ -17,10 +17,9 @@ import type {
 	StandardSharedFields,
 	WheelFormValues,
 } from '@/lib/suigar-types';
+import { NON_NEGATIVE_INTEGER_PATTERN } from '@/lib/validation';
 
 type TxApi = SuigarClient['tx'];
-
-const NON_NEGATIVE_INTEGER_PATTERN = /^\d+$/;
 
 export const PREVIEW_PLAYER_ADDRESS = `0x${'0'.repeat(64)}`;
 
