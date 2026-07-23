@@ -69,12 +69,12 @@ function toStakeMinimum(minStake: bigint, decimals: number): StakeRangeSummary {
 }
 
 function toConfigOptions<TEntry extends ConfigEntry>(
-	entries: TEntry[],
+	entries: Array<TEntry>,
 	decimals: number,
 	buildConfig: (
 		entry: TEntry,
 	) => Pick<GameConfigOption, 'label' | 'details' | 'multiplierValues'>,
-): GameConfigOption[] {
+): Array<GameConfigOption> {
 	return entries.map((entry) => {
 		const stakeRange = toStakeRange(
 			toBigInt(entry.value.min_stake),
@@ -168,7 +168,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_rows: number;
-								multipliers: number[];
+								multipliers: Array<number>;
 							};
 						}
 					>;
@@ -212,7 +212,7 @@ export function summarizeStandardGameParameters(
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
 								num_cases: number;
-								multipliers: number[];
+								multipliers: Array<number>;
 							};
 						}
 					>;
@@ -258,8 +258,8 @@ export function summarizeStandardGameParameters(
 					contents: Array<
 						ConfigEntry & {
 							value: ConfigEntry['value'] & {
-								shot_zone_ids: number[];
-								shot_zone_multipliers: number[];
+								shot_zone_ids: Array<number>;
+								shot_zone_multipliers: Array<number>;
 							};
 						}
 					>;

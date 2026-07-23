@@ -86,9 +86,9 @@ export function getPureBcsSchema(
 }
 
 export function normalizeMoveArguments(
-	args: unknown[] | object,
-	argTypes: readonly (string | null)[],
-	parameterNames?: string[],
+	args: Array<unknown> | object,
+	argTypes: ReadonlyArray<string | null>,
+	parameterNames?: Array<string>,
 ) {
 	const argLen = Array.isArray(args) ? args.length : Object.keys(args).length;
 	if (parameterNames && argLen !== parameterNames.length) {
@@ -97,7 +97,7 @@ export function normalizeMoveArguments(
 		);
 	}
 
-	const normalizedArgs: TransactionArgument[] = [];
+	const normalizedArgs: Array<TransactionArgument> = [];
 
 	let index = 0;
 	for (const argType of argTypes) {
@@ -174,7 +174,7 @@ export type TypeArgument = string | BcsType<any>;
 
 export interface TypeTagOptions {
 	package?: string;
-	typeArguments?: readonly TypeArgument[];
+	typeArguments?: ReadonlyArray<TypeArgument>;
 }
 
 /**
@@ -184,19 +184,19 @@ export interface TypeTagOptions {
  */
 type TypeTagParams<Name extends string> =
 	Name extends `${string}phantom ${string}`
-		? [options: TypeTagOptions & { typeArguments: readonly TypeArgument[] }]
+		? [options: TypeTagOptions & { typeArguments: ReadonlyArray<TypeArgument> }]
 		: [options?: TypeTagOptions];
 
 type ResolveTypeTagOptions<Name extends string> = {
 	client: ClientWithCoreApi;
 } & (Name extends `${string}phantom ${string}`
-	? TypeTagOptions & { typeArguments: readonly TypeArgument[] }
+	? TypeTagOptions & { typeArguments: ReadonlyArray<TypeArgument> }
 	: TypeTagOptions);
 
 const HAS_PHANTOM_REGEX = /phantom [A-Za-z_$][A-Za-z0-9_$]*/;
 
-function splitTopLevelTypeArgs(inner: string): string[] {
-	const parts: string[] = [];
+function splitTopLevelTypeArgs(inner: string): Array<string> {
+	const parts: Array<string> = [];
 	let depth = 0;
 	let current = '';
 	for (const char of inner) {
@@ -387,7 +387,7 @@ export class MoveEnum<
 }
 
 export class MoveTuple<
-	const T extends readonly BcsType<any>[],
+	const T extends ReadonlyArray<BcsType<any>>,
 	const Name extends string,
 > extends BcsTuple<T, Name> {
 	/** Build the type tag for this struct. See `MoveStruct.typeTag` for semantics. */

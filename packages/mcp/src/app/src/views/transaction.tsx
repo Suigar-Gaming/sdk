@@ -14,7 +14,7 @@ export function TransactionView({
 	errors,
 }: {
 	payload: unknown;
-	errors: string[];
+	errors: Array<string>;
 }) {
 	const viewModel = createInspectorViewModel(payload, errors);
 

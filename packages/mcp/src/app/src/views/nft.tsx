@@ -1,17 +1,18 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { formatAddress } from '@mysten/sui/utils';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
-import { asRecord, shortId } from '../lib/format.js';
+import { asRecord } from '../lib/format.js';
 
 function NftTable({
 	children,
 	headers,
 }: {
 	children: ReactNode;
-	headers: string[];
+	headers: Array<string>;
 }) {
 	return (
 		<div className="overflow-x-auto rounded-md border border-border/70">
@@ -105,7 +106,7 @@ export function NftView({ payload }: { payload: unknown }) {
 										className="font-mono text-muted-foreground"
 										title={String(nft.id)}
 									>
-										{shortId(nft.id)}
+										{formatAddress(String(nft.id))}
 									</div>
 								</td>
 								<td className="px-3 py-2 font-mono">{String(nft.available)}</td>
@@ -137,13 +138,13 @@ export function NftView({ payload }: { payload: unknown }) {
 									</td>
 									<td className="px-3 py-2 font-bold">{String(nft.name)}</td>
 									<td className="px-3 py-2 font-mono" title={String(nft.id)}>
-										{shortId(nft.id)}
+										{formatAddress(String(nft.id))}
 									</td>
 									<td
 										className="px-3 py-2 font-mono"
 										title={String(nft.specId)}
 									>
-										{shortId(nft.specId)}
+										{formatAddress(String(nft.specId))}
 									</td>
 								</tr>
 							);

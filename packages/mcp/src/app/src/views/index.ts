@@ -11,7 +11,7 @@ import { TransactionView } from './transaction.js';
 
 export type AppViewProps = {
 	payload: unknown;
-	errors: string[];
+	errors: Array<string>;
 };
 
 export type ResolvedAppView = {

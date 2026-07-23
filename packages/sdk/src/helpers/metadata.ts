@@ -37,8 +37,8 @@ export function encodeBetMetadata(
 	metadata?: BetMetadataInput,
 	partner?: string,
 ): EncodedBetMetadata {
-	const keys: string[] = [];
-	const values: number[][] = [];
+	const keys: Array<string> = [];
+	const values: Array<Array<number>> = [];
 
 	for (const [key, value] of Object.entries(metadata ?? {})) {
 		if (RESERVED_METADATA_KEYS.has(key)) {

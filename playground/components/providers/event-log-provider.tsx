@@ -13,8 +13,8 @@ import type { EventLogRow } from '@/lib/suigar-types';
 const STORAGE_KEY = 'suigar-playground:event:logs';
 
 type EventLogStore = {
-	rows: EventLogRow[];
-	addRows: (rows: EventLogRow[]) => void;
+	rows: Array<EventLogRow>;
+	addRows: (rows: Array<EventLogRow>) => void;
 	clearRows: () => void;
 };
 

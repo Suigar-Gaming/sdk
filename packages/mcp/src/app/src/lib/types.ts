@@ -6,7 +6,7 @@ export type AnyRecord = Record<string, unknown>;
 export type InspectorState = {
 	status: string;
 	payload: unknown;
-	errors: string[];
+	errors: Array<string>;
 };
 
 export type DefinitionEntry = [label: string, value: unknown];

@@ -4,6 +4,10 @@
 import { z } from 'zod/v4';
 import { SUPPORTED_SUI_NETWORKS } from '@suigar/sdk';
 import { GAMES } from '@suigar/sdk/games';
+import {
+	CURRENCY_AMOUNT_PATTERN,
+	POSITIVE_INTEGER_PATTERN,
+} from '../utils/index.js';
 
 const builderModes = ['build', 'dry-run', 'read-only'] as const;
 
@@ -15,7 +19,7 @@ const currencyAmountDescription =
 	'Currency amount in the chosen coin, converted to base units using the configured coin decimals.';
 const currencyAmountSchema = z.union([
 	z.number().nonnegative(),
-	z.string().regex(/^(?:\d+|\d+\.\d+|\.\d+)$/u),
+	z.string().regex(CURRENCY_AMOUNT_PATTERN),
 ]);
 
 const coinMetadataSchema = z
@@ -151,7 +155,10 @@ const stakeBuildInputSchema = commonBuildInputSchema
 			.optional()
 			.describe(`Optional withdrawn amount. ${currencyAmountDescription}`),
 		betCount: z
-			.union([z.number().int().positive(), z.string().regex(/^[1-9]\d*$/u)])
+			.union([
+				z.number().int().positive(),
+				z.string().regex(POSITIVE_INTEGER_PATTERN),
+			])
 			.optional()
 			.describe('Optional bet count.'),
 	})

@@ -77,20 +77,25 @@ export function NftPage() {
 	const client = useCurrentClient();
 	const account = useCurrentAccount();
 	const accountAddress = account?.address;
-	const [specs, setSpecs] = React.useState<NftSpec[]>([]);
+	const [specs, setSpecs] = React.useState<Array<NftSpec>>([]);
 	const [ownedNftsBySpec, setOwnedNftsBySpec] = React.useState<
 		Map<string, OwnedNftDisplay>
 	>(new Map());
 	const [error, setError] = React.useState<string | null>(null);
-	const [isLoading, setIsLoading] = React.useState(true);
+	const [activeRequestId, setActiveRequestId] = React.useState<number | null>(
+		0,
+	);
+	const requestIdRef = React.useRef(0);
+	const isLoading = activeRequestId !== null;
 
 	React.useEffect(() => {
 		let cancelled = false;
+		const requestId = ++requestIdRef.current;
 		const { nftV1: nftPackageId } = client.suigar.getConfig().packageIds;
 		const { nftV1Factory: nftFactoryId } = client.suigar.getConfig().objectIds;
 
 		async function load() {
-			setIsLoading(true);
+			setActiveRequestId(requestId);
 			setError(null);
 			try {
 				const { object } = await client.core.getObject({
@@ -133,7 +138,11 @@ export function NftPage() {
 					);
 				}
 			} finally {
-				if (!cancelled) setIsLoading(false);
+				if (!cancelled) {
+					setActiveRequestId((activeRequestId) =>
+						activeRequestId === requestId ? null : activeRequestId,
+					);
+				}
 			}
 		}
 
@@ -144,7 +153,7 @@ export function NftPage() {
 	}, [accountAddress, client]);
 
 	return (
-		<div className="min-h-screen">
+		<div className="min-h-dvh">
 			<div className="fixed inset-x-0 top-0 z-40 px-3 pt-3 md:px-5 md:pt-4 lg:px-8">
 				<div className="mx-auto max-w-[1500px]">
 					<AppHeader />

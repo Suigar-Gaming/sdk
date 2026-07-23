@@ -24,7 +24,7 @@ export class TtlClientCache extends ClientCache {
 	}
 
 	override read<T>(
-		key: [string, ...string[]],
+		key: [string, ...Array<string>],
 		load: () => T | Promise<T>,
 		options?: TtlClientCacheReadOptions,
 	): T | Promise<T> {
@@ -53,7 +53,7 @@ export class TtlClientCache extends ClientCache {
 	}
 
 	override readSync<T>(
-		key: [string, ...string[]],
+		key: [string, ...Array<string>],
 		load: () => T,
 		options?: TtlClientCacheReadOptions,
 	): T {
@@ -79,7 +79,7 @@ export class TtlClientCache extends ClientCache {
 	}
 
 	#loadEntry<T>(
-		key: [string, ...string[]],
+		key: [string, ...Array<string>],
 		load: () => T | Promise<T>,
 	): CacheEntry<T | Promise<T>> {
 		const value = load();

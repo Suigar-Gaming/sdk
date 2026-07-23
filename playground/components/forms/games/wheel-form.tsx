@@ -26,7 +26,7 @@ export function WheelForm({
 	value: WheelFormValues;
 	onChange: (patch: Partial<WheelFormValues>) => void;
 	onStakeBlur?: () => void;
-	configOptions?: GameConfigOption[];
+	configOptions?: Array<GameConfigOption>;
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;

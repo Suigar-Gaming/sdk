@@ -6,8 +6,8 @@ import { PACKAGE_IDS as TESTNET_PACKAGE_IDS } from './src/configs/testnet/packag
 export interface PackageInfo {
 	package: string;
 	packageName: string;
-	types?: boolean | string[];
-	functions?: boolean | string[];
+	types?: boolean | Array<string>;
+	functions?: boolean | Array<string>;
 }
 
 export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {

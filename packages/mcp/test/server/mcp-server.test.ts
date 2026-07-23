@@ -26,7 +26,7 @@ const publicToolNames = [
 	'list_nfts',
 ];
 
-const sorted = (values: string[]) => [...values].sort();
+const sorted = (values: Array<string>) => [...values].sort();
 
 describe('MCP server registration', () => {
 	it('wires the root config tool, inspector tools, and app resource', () => {

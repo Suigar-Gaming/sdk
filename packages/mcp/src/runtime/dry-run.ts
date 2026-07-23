@@ -4,8 +4,8 @@
 import { SUI_DECIMALS } from '@mysten/sui/utils';
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { formatAmount } from '../utils/index.js';
 import type { SuigarClientBundle } from './client.js';
-import { formatAmount } from './format.js';
 import type {
 	DryRunEventSummary,
 	DryRunSummary,
@@ -49,7 +49,7 @@ export const toJsonValue = (value: unknown): JsonValue | undefined => {
 		return Array.from(value);
 	}
 	if (Array.isArray(value)) {
-		const jsonValues: JsonValue[] = [];
+		const jsonValues: Array<JsonValue> = [];
 		for (const item of value) {
 			const jsonValue = toJsonValue(item);
 			if (jsonValue !== undefined) {
@@ -73,7 +73,7 @@ export const toJsonValue = (value: unknown): JsonValue | undefined => {
 	return undefined;
 };
 
-const collectStrings = (value: unknown, path: string[]): string[] => {
+const collectStrings = (value: unknown, path: Array<string>): Array<string> => {
 	if (!isRecord(value)) {
 		return [];
 	}
@@ -93,7 +93,7 @@ const collectStrings = (value: unknown, path: string[]): string[] => {
 	});
 };
 
-export const extractDryRunErrors = (dryRun: RawDryRunResult): string[] => {
+export const extractDryRunErrors = (dryRun: RawDryRunResult): Array<string> => {
 	const source: unknown = getDryRunTransaction(dryRun) ?? dryRun;
 	const effects = isRecord(source) ? source.effects : undefined;
 	const status = isRecord(effects) ? effects.status : undefined;
@@ -331,7 +331,7 @@ export const summarizeDryRun = (
 			)
 		: [];
 	const events = Array.isArray(transactionRecord.events)
-		? transactionRecord.events.reduce<DryRunEventSummary[]>(
+		? transactionRecord.events.reduce<Array<DryRunEventSummary>>(
 				(summaries, event) => {
 					const summary = summarizeDryRunEvent(
 						event,

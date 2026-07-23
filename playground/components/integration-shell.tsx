@@ -111,6 +111,7 @@ import {
 	PREVIEW_PLAYER_ADDRESS,
 } from '@/lib/transaction-builders';
 import { cn } from '@/lib/utils';
+import { NON_NEGATIVE_INTEGER_PATTERN } from '@/lib/validation';
 
 type Mode = 'standard' | 'pvp';
 type UiState = {
@@ -134,7 +135,7 @@ function clampBetCount<T extends StandardSharedFields>(
 	const nextBetCount =
 		max === BigInt(1)
 			? '1'
-			: /^\d+$/u.test(betCount) && BigInt(betCount) > max
+			: NON_NEGATIVE_INTEGER_PATTERN.test(betCount) && BigInt(betCount) > max
 				? max.toString()
 				: form.betCount;
 
@@ -143,7 +144,7 @@ function clampBetCount<T extends StandardSharedFields>(
 		: { ...form, betCount: nextBetCount };
 }
 type LobbyState = {
-	games: PvPCoinflipLobbyGame[];
+	games: Array<PvPCoinflipLobbyGame>;
 	error: string | null;
 	isLoading: boolean;
 };
@@ -204,7 +205,7 @@ type UiAction =
 	| { type: 'clear-feedback' };
 type CoinBalancesAction =
 	| { type: 'reset' }
-	| { type: 'loading'; coinKeys: SupportedCoinKey[] }
+	| { type: 'loading'; coinKeys: Array<SupportedCoinKey> }
 	| {
 			type: 'loaded';
 			owner: string;
@@ -212,7 +213,7 @@ type CoinBalancesAction =
 	  };
 type LobbyAction =
 	| { type: 'loading' }
-	| { type: 'loaded'; games: PvPCoinflipLobbyGame[] }
+	| { type: 'loaded'; games: Array<PvPCoinflipLobbyGame> }
 	| { type: 'error'; error: string };
 type StandardParametersAction =
 	| { type: 'loading'; preservePrevious?: boolean }
@@ -617,8 +618,8 @@ function IntegrationControls({
 	pvpStakeDescription: React.ReactNode;
 	showPrivateJoinLobbies: boolean;
 	setShowPrivateJoinLobbies: (value: boolean) => void;
-	joinLobbyGames: PvPCoinflipLobbyGame[];
-	cancelLobbyGames: PvPCoinflipLobbyGame[];
+	joinLobbyGames: Array<PvPCoinflipLobbyGame>;
+	cancelLobbyGames: Array<PvPCoinflipLobbyGame>;
 	pvpLobbyError: string | null;
 	isPvPLobbyLoading: boolean;
 	pvpForms: PvPCoinflipForms;

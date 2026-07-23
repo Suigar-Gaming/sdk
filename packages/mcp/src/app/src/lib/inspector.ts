@@ -7,13 +7,13 @@ import type { AnyRecord, DefinitionEntry } from './types.js';
 
 export type InspectorViewModel = {
 	coinBadge: string | null;
-	contextEntries: DefinitionEntry[];
-	transactionEntries: DefinitionEntry[];
-	gasEntries: DefinitionEntry[];
-	dryRunEntries: DefinitionEntry[];
-	targets: string[];
-	notes: string[];
-	errors: string[];
+	contextEntries: Array<DefinitionEntry>;
+	transactionEntries: Array<DefinitionEntry>;
+	gasEntries: Array<DefinitionEntry>;
+	dryRunEntries: Array<DefinitionEntry>;
+	targets: Array<string>;
+	notes: Array<string>;
+	errors: Array<string>;
 };
 
 const resultEventFields = (structuredContent: AnyRecord) => {
@@ -89,7 +89,7 @@ const scalarText = (value: unknown) =>
 
 export const createInspectorViewModel = (
 	payload: unknown,
-	explicitErrors: string[],
+	explicitErrors: Array<string>,
 ): InspectorViewModel => {
 	const record = asRecord(payload);
 	const config = asRecord(record.config);

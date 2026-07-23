@@ -75,7 +75,7 @@ export function parseGameEvent(
 	} as SuigarGameEvent;
 }
 
-function parseStringGameDetail(value: number[]): string {
+function parseStringGameDetail(value: Array<number>): string {
 	const bytes = Uint8Array.from(value);
 
 	try {
@@ -87,7 +87,7 @@ function parseStringGameDetail(value: number[]): string {
 
 function parseGameDetail<TValueType extends GameDetailValueType>(
 	valueType: TValueType,
-	value: number[],
+	value: Array<number>,
 ): GameDetail<TValueType> {
 	if (valueType === 'string') {
 		return parseStringGameDetail(value) as GameDetail<TValueType>;

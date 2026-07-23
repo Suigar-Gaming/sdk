@@ -205,7 +205,7 @@ const appTools = [
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,
 	},
-] satisfies ToolDefinition[];
+] satisfies Array<ToolDefinition>;
 
 const registerTool = <TInput>(
 	server: McpServer,

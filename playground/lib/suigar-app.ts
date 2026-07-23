@@ -1,9 +1,11 @@
+import { formatAddress, parseToUnits } from '@mysten/sui/utils';
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
 import type {
 	PvPCoinflipForms,
 	SharedFields,
 	StandardForms,
 } from '@/lib/suigar-types';
+import { DECIMAL_AMOUNT_PATTERN } from '@/lib/validation';
 
 const DEFAULT_SHARED_FIELDS: SharedFields = {
 	stake: '1',
@@ -78,19 +80,23 @@ export function toAtomicAmount(value: string | undefined, decimals: number) {
 		throw new Error('Stake is required.');
 	}
 
-	if (!/^\d+(\.\d+)?$/.test(trimmed)) {
+	if (!DECIMAL_AMOUNT_PATTERN.test(trimmed)) {
 		throw new Error('Stake must be a positive number.');
 	}
 
-	const [whole, fraction = ''] = trimmed.split('.');
-	if (fraction.length > decimals) {
-		throw new Error(
-			`Stake supports up to ${decimals} decimal places for this coin.`,
-		);
+	try {
+		return parseToUnits(trimmed, decimals);
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			error.message.startsWith('Too many decimal')
+		) {
+			throw new Error(
+				`Stake supports up to ${decimals} decimal places for this coin.`,
+			);
+		}
+		throw error;
 	}
-
-	const paddedFraction = fraction.padEnd(decimals, '0');
-	return BigInt(`${whole}${paddedFraction}`);
 }
 
 export function compactAddress(value?: string) {
@@ -98,11 +104,7 @@ export function compactAddress(value?: string) {
 		return 'N/A';
 	}
 
-	if (value.length <= 18) {
-		return value;
-	}
-
-	return `${value.slice(0, 8)}...${value.slice(-6)}`;
+	return formatAddress(value);
 }
 
 export function bigintToString(value: unknown) {

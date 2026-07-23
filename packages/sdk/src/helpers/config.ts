@@ -93,8 +93,8 @@ export function resolvePriceInfoObjectId(
 	return objectId;
 }
 
-function getSupportedCoins(coins: SuigarConfig['coins']): SuigarCoin[] {
-	return Object.keys(coins) as SuigarCoin[];
+function getSupportedCoins(coins: SuigarConfig['coins']): Array<SuigarCoin> {
+	return Object.keys(coins) as Array<SuigarCoin>;
 }
 
 function resolveCoinMetadata(

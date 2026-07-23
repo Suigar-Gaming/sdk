@@ -107,7 +107,7 @@ export function createGame(options: CreateGameOptions) {
 		'bool',
 		'vector<0x1::string::String>',
 		'vector<vector<u8>>',
-	] satisfies (string | null)[];
+	] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,
@@ -142,7 +142,7 @@ export function joinGame(options: JoinGameOptions) {
 		null,
 		'0x2::clock::Clock',
 		'0x2::random::Random',
-	] satisfies (string | null)[];
+	] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,
@@ -161,7 +161,9 @@ export function cancelGame(options: CancelGameOptions) {
 	const packageAddress =
 		options.package ??
 		'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
-	const argumentsTypes = ['0x2::object::ID', null] satisfies (string | null)[];
+	const argumentsTypes = ['0x2::object::ID', null] satisfies Array<
+		string | null
+	>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,

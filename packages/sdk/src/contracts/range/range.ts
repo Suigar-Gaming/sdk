@@ -64,7 +64,7 @@ export function play(options: PlayOptions) {
 		null,
 		'0x2::clock::Clock',
 		'0x2::random::Random',
-	] satisfies (string | null)[];
+	] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,
