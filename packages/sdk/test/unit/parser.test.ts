@@ -14,7 +14,7 @@ import {
 import { encodeFloat, encodeString, writeU64 } from './utils.js';
 
 function gameDetails(
-	contents: Array<{ key: string; value: number[] }>,
+	contents: Array<{ key: string; value: Array<number> }>,
 ): BetResultGameDetails {
 	return { contents };
 }

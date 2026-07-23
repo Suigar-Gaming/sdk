@@ -262,7 +262,7 @@ class TestClient extends CoreClient {
 		Error | SuiClientTypes.Object | SuiClientTypes.Object<{ content: true }>
 	> = [];
 
-	mockDynamicFields: SuiClientTypes.DynamicFieldEntry[] = [];
+	mockDynamicFields: Array<SuiClientTypes.DynamicFieldEntry> = [];
 
 	mockDynamicFieldLookups: Array<{
 		childId: string;
@@ -271,12 +271,12 @@ class TestClient extends CoreClient {
 		parentId: string;
 	}> = [];
 
-	getDynamicObjectFieldCalls: SuiClientTypes.GetDynamicObjectFieldOptions[] =
+	getDynamicObjectFieldCalls: Array<SuiClientTypes.GetDynamicObjectFieldOptions> =
 		[];
 
-	listDynamicFieldsCalls: SuiClientTypes.ListDynamicFieldsOptions[] = [];
+	listDynamicFieldsCalls: Array<SuiClientTypes.ListDynamicFieldsOptions> = [];
 
-	getObjectsCalls: SuiClientTypes.GetObjectsOptions[] = [];
+	getObjectsCalls: Array<SuiClientTypes.GetObjectsOptions> = [];
 
 	dynamicFieldObjectReads = 0;
 
@@ -350,7 +350,7 @@ class TestClient extends CoreClient {
 	listOwnedObjects: CoreClient['listOwnedObjects'] = async <
 		Include extends SuiClientTypes.ObjectInclude,
 	>() => ({
-		objects: [] as SuiClientTypes.Object<Include>[],
+		objects: [] as Array<SuiClientTypes.Object<Include>>,
 		hasNextPage: false,
 		cursor: null,
 	});
@@ -516,7 +516,7 @@ function createSuigarTestClient({
 	cacheTtl,
 }: {
 	objects?: SuigarTestClient['mockObjects'];
-	dynamicFields?: SuiClientTypes.DynamicFieldEntry[];
+	dynamicFields?: Array<SuiClientTypes.DynamicFieldEntry>;
 	dynamicFieldLookups?: TestClient['mockDynamicFieldLookups'];
 	partner?: string;
 	cacheTtl?: number;
@@ -582,7 +582,7 @@ describe('SuigarClient', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[5]).toEqual(['partner']);
 		expect(options.arguments[6]).toEqual([

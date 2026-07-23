@@ -310,8 +310,8 @@ describe('coinflip transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			package: string;
-			typeArguments: string[];
-			arguments: unknown[];
+			typeArguments: Array<string>;
+			arguments: Array<unknown>;
 		}>(play);
 
 		expect(options.package).toBe(TEST_CONFIG.packageIds.coinflip);
@@ -353,7 +353,7 @@ describe('limbo transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[4]).toBe(250n);
 		expect(options.arguments[5]).toBe(100n);
@@ -381,7 +381,7 @@ describe('limbo transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[4]).toBe(2500n);
 		expect(options.arguments[5]).toBe(1000n);
@@ -410,7 +410,7 @@ describe('plinko transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[4]).toBe(7);
 	});
@@ -455,7 +455,7 @@ describe('range transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[4]).toBe(950000n);
 		expect(options.arguments[5]).toBe(1050000n);
@@ -485,7 +485,7 @@ describe('wheel transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[4]).toBe(9);
 	});
@@ -530,7 +530,7 @@ describe('soccer transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			package: string;
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(play);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.soccer);
 		expect(options.arguments.slice(4, 7)).toEqual([9, 250, 4]);
@@ -581,8 +581,8 @@ describe('pvp coinflip transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			package: string;
-			typeArguments: string[];
-			arguments: unknown[];
+			typeArguments: Array<string>;
+			arguments: Array<unknown>;
 		}>(createGame);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.typeArguments).toEqual([
@@ -626,7 +626,7 @@ describe('pvp coinflip transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			package: string;
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(joinGame);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments[0]).toBe('0x999');
@@ -662,7 +662,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			arguments: unknown[];
+			arguments: Array<unknown>;
 		}>(cancelGame);
 		expect(options.arguments).toEqual([
 			'0x999',

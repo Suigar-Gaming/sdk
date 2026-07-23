@@ -42,7 +42,7 @@ export const TEST_CONFIG = {
 	},
 } as const;
 
-export function writeU64(value: bigint): number[] {
+export function writeU64(value: bigint): Array<number> {
 	const bytes = Array.from({ length: 8 }, () => 0);
 	for (let index = 0; index < 8; index += 1) {
 		bytes[index] = Number((value >> BigInt(8 * index)) & 0xffn);
@@ -50,7 +50,7 @@ export function writeU64(value: bigint): number[] {
 	return bytes;
 }
 
-export function encodeFloat(value: number): number[] {
+export function encodeFloat(value: number): Array<number> {
 	if (value === 0) {
 		return [0, ...writeU64(0n), ...writeU64(0n)];
 	}
@@ -67,11 +67,11 @@ export function encodeFloat(value: number): number[] {
 	];
 }
 
-export function encodeString(value: string): number[] {
+export function encodeString(value: string): Array<number> {
 	return Array.from(bcs.string().serialize(value).toBytes());
 }
 
-export function encodeUtf8(value: string): number[] {
+export function encodeUtf8(value: string): Array<number> {
 	return Array.from(textEncoder.encode(value));
 }
 
@@ -79,6 +79,8 @@ export function createContractCallMock() {
 	return vi.fn<ContractCallMock>(() => (tx: Transaction) => tx.object('0x777'));
 }
 
-export function getFirstMockArg<T>(mock: { mock: { calls: unknown[][] } }): T {
+export function getFirstMockArg<T>(mock: {
+	mock: { calls: Array<Array<unknown>> };
+}): T {
 	return mock.mock.calls[0]?.[0] as T;
 }
