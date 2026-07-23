@@ -7,8 +7,8 @@ packages:
 catalogs:
   frontend:
     'clsx': ^2.1.1
-    'react': ^19.2.7
-    'react-dom': ^19.2.7
+    'react': ^19.2.8
+    'react-dom': ^19.2.8
     'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.0
@@ -22,7 +22,7 @@ catalogs:
     'prettier': ^3.9.6
     'react-doctor': ^0.8.3
     'tailwindcss': ^4.3.3
-    'tsdown': ^0.22.12
+    'tsdown': ^0.22.13
   typescript:
     '@types/node': ^24.0.0
     '@types/react': ^19.2.17
@@ -44,9 +44,9 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@mysten/*'
 
-auditConfig:
-  ignoreGhsas:
-    - GHSA-f88m-g3jw-g9cj
+overrides:
+  'postcss': 8.5.21
+  'sharp': 0.35.3
 
 peerDependencyRules:
   ignoreMissing:
