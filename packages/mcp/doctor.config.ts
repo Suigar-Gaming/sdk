@@ -10,4 +10,7 @@ export default defineConfig({
 	rootDir: 'src/app',
 	share: false,
 	noScore: true,
+	rules: {
+		'import/extensions': 'off',
+	},
 });
