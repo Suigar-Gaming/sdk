@@ -17,7 +17,12 @@ export type RawDryRunResult = SuiClientTypes.SimulateTransactionResult<{
 }>;
 
 export type JsonValue =
-	string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+	| string
+	| number
+	| boolean
+	| null
+	| Array<JsonValue>
+	| { [key: string]: JsonValue };
 
 export type DryRunResult = Record<string, JsonValue>;
 
@@ -39,7 +44,7 @@ export type ResolvedMcpConfig = {
 export type TransactionCommandSummary = {
 	kind: string;
 	target?: string;
-	typeArguments?: string[];
+	typeArguments?: Array<string>;
 };
 
 export type TransactionSummaryDetails = {
@@ -70,9 +75,9 @@ export type TransactionSummary = {
 	gasBudgetDisplay: string | null;
 	gasPrice: string | null;
 	commandCount: number;
-	commands: TransactionCommandSummary[];
+	commands: Array<TransactionCommandSummary>;
 	inputs: number;
-	objectInputs: string[];
+	objectInputs: Array<string>;
 } & TransactionSummaryDetails;
 
 export type DryRunEventSummary = {
@@ -97,7 +102,7 @@ export type DryRunSummary = {
 		coinType: string;
 		amount: FormattedAmount;
 	}>;
-	events: DryRunEventSummary[];
+	events: Array<DryRunEventSummary>;
 };
 
 export type ReadOnlyPlan = {
@@ -108,9 +113,9 @@ export type ReadOnlyPlan = {
 	config: ResolvedMcpConfig;
 	plan: {
 		target: string | null;
-		typeArguments: string[];
-		requiredInputs: string[];
-		notes: string[];
+		typeArguments: Array<string>;
+		requiredInputs: Array<string>;
+		notes: Array<string>;
 	};
 };
 
@@ -122,7 +127,7 @@ export type BuildTransactionResult = {
 	transactionBytesBase64?: string;
 	dryRun?: DryRunResult;
 	dryRunSummary?: DryRunSummary;
-	errors?: string[];
+	errors?: Array<string>;
 };
 
 export type ReadConfigResult = {
@@ -131,7 +136,7 @@ export type ReadConfigResult = {
 	supportedGames: Array<{
 		id: Game;
 		label: string;
-		tools: string[];
+		tools: Array<string>;
 	}>;
 };
 
@@ -143,7 +148,7 @@ export type ReadGameMetadataResult = ReadConfigResult & {
 		coinType: string;
 		parameters: JsonValue;
 		ignoreCache: boolean;
-		notes: string[];
+		notes: Array<string>;
 	};
 };
 
@@ -172,8 +177,8 @@ export type ListNftsResult = {
 	config: ResolvedMcpConfig;
 	owner: string;
 	nftType: string;
-	nftCatalog: NftSpec[];
-	ownedNfts: Nft[];
+	nftCatalog: Array<NftSpec>;
+	ownedNfts: Array<Nft>;
 };
 
 export type ToolStructuredResult =

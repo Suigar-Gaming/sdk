@@ -261,8 +261,8 @@ const readOnlyPlan = ({
 	input: TransactionToolInput;
 	game: Game;
 	action?: PvPCoinflipAction;
-	requiredInputs: string[];
-	notes: string[];
+	requiredInputs: Array<string>;
+	notes: Array<string>;
 }): ReadOnlyPlan => {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const coinType = resolveDefaultCoinType(config, input.coinType);

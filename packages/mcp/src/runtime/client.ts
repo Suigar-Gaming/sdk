@@ -164,7 +164,7 @@ const summarizeTransaction = (
 		};
 	});
 
-	const objectInputs: string[] = [];
+	const objectInputs: Array<string> = [];
 	for (const input of data.inputs ?? []) {
 		if (
 			input.$kind === 'UnresolvedObject' &&
