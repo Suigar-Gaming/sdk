@@ -248,6 +248,7 @@ export function AppHeader({
 						</PopoverTrigger>
 						<PopoverContent
 							align="end"
+							collisionPadding={12}
 							className="w-56 rounded-2xl border border-border/70 p-2"
 						>
 							<div className="flex flex-col gap-1">
@@ -264,7 +265,9 @@ export function AppHeader({
 									</Link>
 								))}
 								<div className="flex items-center justify-between border-t border-border/70 px-2 pt-2">
-									<span className="text-sm text-muted-foreground">Theme</span>
+									<span className="text-sm font-medium text-foreground">
+										Theme
+									</span>
 									<ThemeToggle className="size-9" />
 								</div>
 							</div>
@@ -272,7 +275,7 @@ export function AppHeader({
 					</Popover>
 				</div>
 
-				<ThemeToggle className="size-9 shrink-0 sm:size-10" />
+				<ThemeToggle className="hidden size-9 shrink-0 md:inline-flex md:size-10" />
 				{balanceNode}
 				<div className="min-w-0 shrink-0">
 					<ConnectButton className="wallet-connect" />
