@@ -39,24 +39,27 @@ export const labelFor = (key: string) =>
 		.replace(/_/gu, ' ')
 		.replace(/\b\w/gu, (character) => character.toUpperCase());
 
-export const dynamicEntries = (record: AnyRecord): DefinitionEntry[] =>
-	Object.entries(record).reduce<DefinitionEntry[]>((entries, [key, value]) => {
-		if (
-			key.endsWith('_display') ||
-			[
-				'game_details',
-				'metadata',
-				'player',
-				'coin_type',
-				'unsafe_oracle_usd_coin_price',
-				'adjusted_oracle_usd_coin_price',
-			].includes(key)
-		) {
+export const dynamicEntries = (record: AnyRecord): Array<DefinitionEntry> =>
+	Object.entries(record).reduce<Array<DefinitionEntry>>(
+		(entries, [key, value]) => {
+			if (
+				key.endsWith('_display') ||
+				[
+					'game_details',
+					'metadata',
+					'player',
+					'coin_type',
+					'unsafe_oracle_usd_coin_price',
+					'adjusted_oracle_usd_coin_price',
+				].includes(key)
+			) {
+				return entries;
+			}
+			entries.push([labelFor(key), record[`${key}_display`] ?? value]);
 			return entries;
-		}
-		entries.push([labelFor(key), record[`${key}_display`] ?? value]);
-		return entries;
-	}, []);
+		},
+		[],
+	);
 
 export const amountText = (value: unknown) => {
 	const amount = asRecord(value);
@@ -66,8 +69,8 @@ export const amountText = (value: unknown) => {
 	return value;
 };
 
-export const visibleDefinitionEntries = (entries: DefinitionEntry[]) =>
-	entries.reduce<DefinitionEntry[]>((visibleEntries, [label, value]) => {
+export const visibleDefinitionEntries = (entries: Array<DefinitionEntry>) =>
+	entries.reduce<Array<DefinitionEntry>>((visibleEntries, [label, value]) => {
 		const formattedValue = formatValue(value);
 		if (formattedValue != null && formattedValue !== '') {
 			visibleEntries.push([label, formattedValue]);

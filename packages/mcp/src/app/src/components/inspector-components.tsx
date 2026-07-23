@@ -88,7 +88,11 @@ export function Panel({
 	);
 }
 
-export function DefinitionList({ entries }: { entries: DefinitionEntry[] }) {
+export function DefinitionList({
+	entries,
+}: {
+	entries: Array<DefinitionEntry>;
+}) {
 	const visibleEntries = visibleDefinitionEntries(entries);
 	if (visibleEntries.length === 0) {
 		return null;
@@ -129,7 +133,7 @@ export function ListPanel({
 	title,
 }: {
 	className: keyof typeof listItemClassNames;
-	items: string[];
+	items: Array<string>;
 	title: string;
 }) {
 	return (

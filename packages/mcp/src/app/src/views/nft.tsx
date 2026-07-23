@@ -12,7 +12,7 @@ function NftTable({
 	headers,
 }: {
 	children: ReactNode;
-	headers: string[];
+	headers: Array<string>;
 }) {
 	return (
 		<div className="overflow-x-auto rounded-md border border-border/70">

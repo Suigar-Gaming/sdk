@@ -69,7 +69,7 @@ type AppViewAction =
 	  }
 	| {
 			type: 'tool-error';
-			errors: string[];
+			errors: Array<string>;
 			payload: unknown;
 	  };
 
