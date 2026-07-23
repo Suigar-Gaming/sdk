@@ -50,7 +50,6 @@
 		{
 			"files": ["packages/*/src/contracts/**/*.ts"],
 			"rules": {
-				"typescript/array-type": "off",
 				"typescript/no-base-to-string": "off",
 				"typescript/restrict-template-expressions": "off"
 			}
