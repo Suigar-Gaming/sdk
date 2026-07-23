@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils';
 type Props = {
 	title: string;
 	description: string;
-	games: PvPCoinflipLobbyGame[];
+	games: Array<PvPCoinflipLobbyGame>;
 	selectedGameId: string;
 	isLoading: boolean;
 	error: string | null;

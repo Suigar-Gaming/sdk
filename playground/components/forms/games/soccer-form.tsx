@@ -31,8 +31,8 @@ export function SoccerForm({
 	value: SoccerFormValues;
 	onChange: (patch: Partial<SoccerFormValues>) => void;
 	onStakeBlur?: () => void;
-	configOptions?: GameConfigOption[];
-	countryOptions?: GameSelectionOption[];
+	configOptions?: Array<GameConfigOption>;
+	countryOptions?: Array<GameSelectionOption>;
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;

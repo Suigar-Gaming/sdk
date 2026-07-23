@@ -72,16 +72,16 @@ export type BetCountLimitSummary = {
 export type StandardGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
 	betCountLimit?: BetCountLimitSummary;
-	configOptions?: GameConfigOption[];
-	countryOptions?: GameSelectionOption[];
-	topLevelDetails?: GameSettingsDetail[];
+	configOptions?: Array<GameConfigOption>;
+	countryOptions?: Array<GameSelectionOption>;
+	topLevelDetails?: Array<GameSettingsDetail>;
 	targetMultiplierRange?: NumberRangeSummary;
 	rangeBounds?: RangeBoundsSummary;
 };
 
 export type PvPGameParametersSummary = {
 	stakeRange: StakeRangeSummary;
-	topLevelDetails?: GameSettingsDetail[];
+	topLevelDetails?: Array<GameSettingsDetail>;
 };
 
 export type CoinflipFormValues = StandardSharedFields & {

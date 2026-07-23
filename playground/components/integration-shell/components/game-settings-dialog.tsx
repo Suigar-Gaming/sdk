@@ -179,11 +179,11 @@ function GameSettingsOverview({
 	activeStakeRange: StakeRangeSummary | null;
 	coinKey: SupportedCoinKey;
 	coinLabel: string;
-	configOptions?: GameConfigOption[];
+	configOptions?: Array<GameConfigOption>;
 	hasConfigOptions: boolean;
 	isStakeMinimum: boolean;
 	playableConfigCount: number;
-	summarizedTopLevelDetails: GameSettingsDetail[];
+	summarizedTopLevelDetails: Array<GameSettingsDetail>;
 	stakeTitle: string;
 	isLoading: boolean;
 }) {
@@ -345,7 +345,7 @@ function GameSettingsPanels({
 }: {
 	activeConfigOption: GameConfigOption | null;
 	coinKey: SupportedCoinKey;
-	configOptions?: GameConfigOption[];
+	configOptions?: Array<GameConfigOption>;
 	error: string | null;
 	isLoading: boolean;
 	serializedGameSettings: string | null;
@@ -452,7 +452,7 @@ export function GameSettingsDialog({
 	activeStakeRange: StakeRangeSummary | null;
 	coinKey: SupportedCoinKey;
 	coinLabel: string;
-	configOptions?: GameConfigOption[];
+	configOptions?: Array<GameConfigOption>;
 	error: string | null;
 	gameLabel: string;
 	isLoading: boolean;
@@ -461,7 +461,7 @@ export function GameSettingsDialog({
 	onRefresh?: () => void;
 	serializedGameSettings: string | null;
 	settingsCallPreview: string;
-	topLevelDetails?: GameSettingsDetail[];
+	topLevelDetails?: Array<GameSettingsDetail>;
 }) {
 	const playableConfigCount =
 		configOptions?.filter((option) => option.isPlayable).length ?? 0;

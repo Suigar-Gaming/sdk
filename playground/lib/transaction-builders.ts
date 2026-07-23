@@ -89,7 +89,7 @@ function buildStandardSharedOptions(
 	};
 }
 
-function toCodeBlock(factoryLine: string, codeLines: string[]) {
+function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
 	return `${factoryLine} {\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
@@ -204,7 +204,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 ) {
 	const txApi: TxApi = client.suigar.tx;
 	let baseOptions: Record<string, unknown> = {};
-	let codeLines: string[] = [];
+	let codeLines: Array<string> = [];
 
 	switch (action) {
 		case 'create': {

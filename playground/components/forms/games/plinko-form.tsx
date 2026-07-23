@@ -26,7 +26,7 @@ export function PlinkoForm({
 	value: PlinkoFormValues;
 	onChange: (patch: Partial<PlinkoFormValues>) => void;
 	onStakeBlur?: () => void;
-	configOptions?: GameConfigOption[];
+	configOptions?: Array<GameConfigOption>;
 	isConfigLoading?: boolean;
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;

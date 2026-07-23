@@ -77,7 +77,7 @@ export function NftPage() {
 	const client = useCurrentClient();
 	const account = useCurrentAccount();
 	const accountAddress = account?.address;
-	const [specs, setSpecs] = React.useState<NftSpec[]>([]);
+	const [specs, setSpecs] = React.useState<Array<NftSpec>>([]);
 	const [ownedNftsBySpec, setOwnedNftsBySpec] = React.useState<
 		Map<string, OwnedNftDisplay>
 	>(new Map());

@@ -1,5 +1,6 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"extends": ["../.oxlintrc.json"],
 	"plugins": [
 		"eslint",
 		"typescript",
@@ -14,6 +15,7 @@
 	],
 	"ignorePatterns": [".next", "out", "build", "next-env.d.ts"],
 	"rules": {
+		"import/extensions": "off",
 		"typescript/no-explicit-any": "warn"
 	}
 }

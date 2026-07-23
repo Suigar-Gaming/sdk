@@ -18,7 +18,7 @@ export function GameSettingsConfigList({
 }: {
 	activeConfigId?: string | null;
 	coinKey: SupportedCoinKey;
-	configOptions: GameConfigOption[];
+	configOptions: Array<GameConfigOption>;
 }) {
 	if (!configOptions.length) {
 		return null;

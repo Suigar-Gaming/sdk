@@ -13,7 +13,7 @@ import type { EventLogRow } from '@/lib/suigar-types';
 type ParsedEvent = {
 	bcs?: string | Uint8Array;
 	contents?: {
-		value?: string | Uint8Array | number[];
+		value?: string | Uint8Array | Array<number>;
 	};
 };
 
@@ -45,7 +45,7 @@ function decodeByteArray(value: unknown) {
 	}
 
 	try {
-		return textDecoder.decode(new Uint8Array(value as number[]));
+		return textDecoder.decode(new Uint8Array(value as Array<number>));
 	} catch {
 		return JSON.stringify(value);
 	}
@@ -229,7 +229,7 @@ function createEventRow(
 export function parseSuigarEvents(
 	client: { suigar: SuigarClient },
 	digest: string,
-	events: SuiClientTypes.Event[] | undefined,
+	events: Array<SuiClientTypes.Event> | undefined,
 ) {
 	const rows = (events ?? [])
 		.map((event) => createEventRow(client.suigar.bcs, digest, event))
