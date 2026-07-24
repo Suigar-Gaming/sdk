@@ -40,8 +40,8 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^17.1.1",
 		"oxlint": "^1.75.0",
-		"oxlint-tsgolint": "^0.25.0",
+		"oxlint-tsgolint": "^7.0.0021",
 		"prettier": "catalog:tooling",
-		"turbo": "^2.10.5"
+		"turbo": "^2.10.6"
 	}
 }
