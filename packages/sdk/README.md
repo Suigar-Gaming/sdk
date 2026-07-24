@@ -404,9 +404,9 @@ const rangeTx = client.suigar.tx.createGameBet('range', {
 
 Use the action-specific `pvpCoinflip` builders for PvP coinflip flows:
 
-- `create`
-- `join`
-- `cancel`
+- `createGame`
+- `joinGame`
+- `cancelGame`
 
 Create:
 
@@ -452,13 +452,12 @@ PvP shared options:
 
 Action-specific options:
 
-- `create`: `stake`, `side`, `isPrivate?`
-- `join`: `gameId`
-- `cancel`: `gameId`
+- `createGame`: `stake`, `side`, `isPrivate?`
+- `joinGame`: `gameId`
+- `cancelGame`: `gameId`
 
 Error behavior:
 
-- `RangeError` when `action` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
 
 ## `bcs`
