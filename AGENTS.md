@@ -110,7 +110,7 @@ pnpm run release
    - `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range. It throws `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values.
    - `toU16()` accepts a finite integer `number` or plain integer `string` in the `0..65535` range. It uses the same `TypeError` and `RangeError` split as `toU8()`.
    - `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
-3. **Transaction builders by game family**: Standard games use `createBetTransaction`; PvP games use dedicated PvP transaction builders. Unsupported game ids, PvP actions, and unsupported configured coin types surface as `RangeError`s.
+3. **Transaction builders by game family**: Standard games use `createGameBet`; PvP games use dedicated game properties such as `pvpCoinflip`, each with its own action builders. Unsupported game ids and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
 5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
 6. **MCP uses public SDK APIs**: `@suigar/mcp` should build transactions through `client.suigar.tx`, inspect config through `client.suigar.getConfig()`, and avoid imports from private Suigar workspace packages.
@@ -142,8 +142,8 @@ Key files:
 
 There are two transaction families and they must not be mixed:
 
-- **Standard games** use `client.suigar.tx.createBetTransaction(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
-- **PvP games** use dedicated PvP transaction builders and should keep PvP game rules separate from standard game flows.
+- **Standard games** use `client.suigar.tx.createGameBet(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
+- **PvP games** use dedicated per-game transaction properties, such as `client.suigar.tx.pvpCoinflip`, and should keep PvP game rules separate from standard game flows.
 - **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
   - Bulk-load lobby objects with `client.core.getObjects()`.
   - Skip per-object fetch or parse failures by default.

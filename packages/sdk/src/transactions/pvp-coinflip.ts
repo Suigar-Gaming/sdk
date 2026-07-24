@@ -1,12 +1,18 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
+import type { ClientWithCoreApi } from '@mysten/sui/client';
+import {
+	coinWithBalance,
+	Transaction,
+	type TransactionArgument,
+} from '@mysten/sui/transactions';
 import { normalizeStructTag } from '@mysten/sui/utils';
 import {
 	cancelGame,
 	createGame,
 	joinGame,
+	Game as PvPCoinflipGame,
 } from '../contracts/pvp-coinflip/pvp_coinflip.js';
 import { resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
@@ -26,6 +32,33 @@ type PvPCoinflipTransactionOptionsWithPartner<
 > = Action extends 'join'
 	? WithPartner<ResolvedJoinPvPCoinflipTransactionOptions>
 	: WithPartner<BuildPvPCoinflipTransactionOptions<Action>>;
+
+/**
+ * Creates the asynchronous coin-selection thunk used when joining a PvP game.
+ *
+ * The stake is read from the on-chain game when the transaction is built, which
+ * keeps transaction construction compatible with wallet interaction flows.
+ */
+export function buildPvPCoinflipJoinBetCoin(
+	client: ClientWithCoreApi,
+	options: Pick<
+		BuildPvPCoinflipTransactionOptions<'join'>,
+		'gameId' | 'coinType' | 'useGasCoin'
+	>,
+): TransactionArgument {
+	return async (tx: Transaction) => {
+		const { json } = await PvPCoinflipGame.get({
+			client,
+			objectId: options.gameId,
+		});
+
+		return tx.coin({
+			type: options.coinType,
+			balance: BigInt(json.stake_per_player),
+			useGasCoin: options.useGasCoin,
+		});
+	};
+}
 
 export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 	action: Action,

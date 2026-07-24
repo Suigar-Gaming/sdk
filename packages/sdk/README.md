@@ -104,8 +104,8 @@ const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 client.suigar.serializeTransactionToBase64(...);
 client.suigar.getConfig();
 client.suigar.getPvPCoinflipGames(...);
-client.suigar.bcs;
 client.suigar.tx;
+client.suigar.bcs;
 ```
 
 ## Quick Start
@@ -119,7 +119,7 @@ const client = new SuiGrpcClient({
 	network: 'testnet',
 }).$extend(suigar());
 
-const tx = client.suigar.tx.createBetTransaction('coinflip', {
+const tx = client.suigar.tx.createGameBet('coinflip', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -308,7 +308,7 @@ Transaction builders live under `client.suigar.tx`.
 
 ### Standard Games
 
-Use `createBetTransaction(gameId, options)` for:
+Use `createGameBet(gameId, options)` for:
 
 - `coinflip`
 - `limbo`
@@ -318,7 +318,7 @@ Use `createBetTransaction(gameId, options)` for:
 - `wheel`
 
 ```ts
-const tx = client.suigar.tx.createBetTransaction('coinflip', {
+const tx = client.suigar.tx.createGameBet('coinflip', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -369,14 +369,14 @@ Per-game options:
 Examples:
 
 ```ts
-const limboTx = client.suigar.tx.createBetTransaction('limbo', {
+const limboTx = client.suigar.tx.createGameBet('limbo', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	targetMultiplier: 2.5,
 });
 
-const rangeTx = client.suigar.tx.createBetTransaction('range', {
+const rangeTx = client.suigar.tx.createGameBet('range', {
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -402,7 +402,7 @@ const rangeTx = client.suigar.tx.createBetTransaction('range', {
 
 ### PvP Coinflip
 
-Use `createPvPCoinflipTransaction(action, options)` for PvP coinflip flows:
+Use the action-specific `pvpCoinflip` builders for PvP coinflip flows:
 
 - `create`
 - `join`
@@ -411,7 +411,7 @@ Use `createPvPCoinflipTransaction(action, options)` for PvP coinflip flows:
 Create:
 
 ```ts
-const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
+const tx = client.suigar.tx.pvpCoinflip.createGame({
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -423,7 +423,7 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('create', {
 Join:
 
 ```ts
-const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
+const tx = client.suigar.tx.pvpCoinflip.joinGame({
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',
@@ -433,7 +433,7 @@ const tx = client.suigar.tx.createPvPCoinflipTransaction('join', {
 Cancel:
 
 ```ts
-const tx = client.suigar.tx.createPvPCoinflipTransaction('cancel', {
+const tx = client.suigar.tx.pvpCoinflip.cancelGame({
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	gameId: '0xGAME_ID',

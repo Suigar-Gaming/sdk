@@ -574,7 +574,7 @@ describe('SuigarClient', () => {
 			mockedSuigar({ partner }),
 		) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coins.sui.coinType;
-		client.suigar.tx.createBetTransaction('coinflip', {
+		client.suigar.tx.createGameBet('coinflip', {
 			owner: '0x123',
 			coinType,
 			stake: 1000,
@@ -591,19 +591,51 @@ describe('SuigarClient', () => {
 	});
 
 	it('exposes both standard and pvp transaction factories', () => {
-		const client = createSuigarTestClient();
+		const client = createSuigarTestClient({
+			objects: [
+				{
+					...createPvPCoinflipGameObject('0x456'),
+					content: GeneratedPvPCoinflipGame.serialize({
+						id: '0x456',
+						creator: '0x1',
+						creator_is_tails: false,
+						is_private: false,
+						creator_metadata: { contents: [] },
+						joiner: '0x0',
+						winner: '0x0',
+						stake_per_player: '1',
+						house_edge_bps: '100',
+						stake_pot: { value: '2' },
+					}).toBytes(),
+				},
+			],
+		});
 		const coinType = client.suigar.getConfig().coins.sui.coinType;
 
-		expect(client.suigar.tx.createBetTransaction).toBeTypeOf('function');
-		expect(client.suigar.tx.createPvPCoinflipTransaction).toBeTypeOf(
-			'function',
-		);
+		expect(client.suigar.tx.createGameBet).toBeTypeOf('function');
+		expect(client.suigar.tx.pvpCoinflip.createGame).toBeTypeOf('function');
+		expect(client.suigar.tx.pvpCoinflip.joinGame).toBeTypeOf('function');
+		expect(client.suigar.tx.pvpCoinflip.cancelGame).toBeTypeOf('function');
 		expect(
-			client.suigar.tx.createPvPCoinflipTransaction('create', {
+			client.suigar.tx.pvpCoinflip.createGame({
 				owner: '0x123',
 				coinType,
 				stake: 1000,
 				side: 'heads',
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.pvpCoinflip.joinGame({
+				owner: '0x123',
+				coinType,
+				gameId: '0x456',
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.pvpCoinflip.cancelGame({
+				owner: '0x123',
+				coinType,
+				gameId: '0x456',
 			}),
 		).toBeInstanceOf(Transaction);
 	});
