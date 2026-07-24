@@ -81,7 +81,7 @@
 		"@types/node": "catalog:typescript",
 		"@types/react": "catalog:typescript",
 		"@types/react-dom": "catalog:typescript",
-		"@vitejs/plugin-react": "^6.0.3",
+		"@vitejs/plugin-react": "^6.0.4",
 		"react-doctor": "catalog:tooling",
 		"tailwindcss": "catalog:tooling",
 		"tsdown": "catalog:tooling",
