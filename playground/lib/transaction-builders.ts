@@ -104,7 +104,7 @@ export function buildPvPPreviewFallback(
 	},
 ) {
 	return toCodeBlock(
-		`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
+		`const tx = client.suigar.tx.pvpCoinflip.${action}Game}(`,
 		[`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '0xGAME_ID',`],
 	);
 }
@@ -185,10 +185,9 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	}
 
 	return {
-		// oxlint-disable-next-line typescript/no-explicit-any
-		transaction: txApi.createBetTransaction(gameId, baseOptions as any),
+		transaction: txApi.createGameBet(gameId, baseOptions as never),
 		code: toCodeBlock(
-			`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
+			`const tx = client.suigar.tx.createGameBet('${gameId}',`,
 			codeLines,
 		),
 	};
@@ -203,6 +202,8 @@ export function buildPvPTransaction<K extends PvPAction>(
 	coinType: string,
 ) {
 	const txApi: TxApi = client.suigar.tx;
+	const method: keyof TxApi['pvpCoinflip'] = `${action}Game`;
+
 	let baseOptions: Record<string, unknown> = {};
 	let codeLines: Array<string> = [];
 
@@ -254,10 +255,9 @@ export function buildPvPTransaction<K extends PvPAction>(
 	}
 
 	return {
-		// oxlint-disable-next-line typescript/no-explicit-any
-		transaction: txApi.createPvPCoinflipTransaction(action, baseOptions as any),
+		transaction: txApi.pvpCoinflip[method](baseOptions as never),
 		code: toCodeBlock(
-			`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
+			`const tx = client.suigar.tx.pvpCoinflip.${method}(`,
 			codeLines,
 		),
 	};
