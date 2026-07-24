@@ -90,7 +90,8 @@ function buildStandardSharedOptions(
 }
 
 function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
-	return `${factoryLine} {\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
+	const objectPrefix = factoryLine.endsWith(',') ? ' {' : '{';
+	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
 export function buildPvPPreviewFallback(
@@ -103,10 +104,11 @@ export function buildPvPPreviewFallback(
 		coinType: string;
 	},
 ) {
-	return toCodeBlock(
-		`const tx = client.suigar.tx.pvpCoinflip.${action}Game}(`,
-		[`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '0xGAME_ID',`],
-	);
+	return toCodeBlock(`const tx = client.suigar.tx.pvpCoinflip.${action}Game(`, [
+		`owner: '${owner}',`,
+		`coinType: '${coinType}',`,
+		`gameId: '0xGAME_ID',`,
+	]);
 }
 
 export function buildStandardTransaction<K extends StandardGameId>(
