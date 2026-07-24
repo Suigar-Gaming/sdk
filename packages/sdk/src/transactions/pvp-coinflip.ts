@@ -52,11 +52,13 @@ export function buildPvPCoinflipJoinBetCoin(
 			objectId: options.gameId,
 		});
 
-		return tx.coin({
-			type: options.coinType,
-			balance: BigInt(json.stake_per_player),
-			useGasCoin: options.useGasCoin,
-		});
+		return tx.add(
+			coinWithBalance({
+				type: options.coinType,
+				balance: BigInt(json.stake_per_player),
+				useGasCoin: options.useGasCoin,
+			}),
+		);
 	};
 }
 
