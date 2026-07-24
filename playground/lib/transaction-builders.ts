@@ -202,7 +202,6 @@ export function buildPvPTransaction<K extends PvPAction>(
 	coinType: string,
 ) {
 	const txApi: TxApi = client.suigar.tx;
-	const method: keyof TxApi['pvpCoinflip'] = `${action}Game`;
 
 	let baseOptions: Record<string, unknown> = {};
 	let codeLines: Array<string> = [];
@@ -254,11 +253,30 @@ export function buildPvPTransaction<K extends PvPAction>(
 		}
 	}
 
-	return {
-		transaction: txApi.pvpCoinflip[method](baseOptions as never),
-		code: toCodeBlock(
-			`const tx = client.suigar.tx.pvpCoinflip.${method}(`,
-			codeLines,
-		),
-	};
+	switch (action) {
+		case 'create':
+			return {
+				transaction: txApi.pvpCoinflip.createGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.createGame(',
+					codeLines,
+				),
+			};
+		case 'join':
+			return {
+				transaction: txApi.pvpCoinflip.joinGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.joinGame(',
+					codeLines,
+				),
+			};
+		case 'cancel':
+			return {
+				transaction: txApi.pvpCoinflip.cancelGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.cancelGame(',
+					codeLines,
+				),
+			};
+	}
 }
