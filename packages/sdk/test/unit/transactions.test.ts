@@ -4,6 +4,7 @@
 import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { moveCoinWithBalanceCleanupBeforeRandom } from '../../src/transactions/coin-with-balance-random.js';
 import {
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
@@ -98,6 +99,143 @@ describe('transaction builders', () => {
 });
 
 describe('shared transaction helpers', () => {
+	it('fixes CoinWithBalance cleanup after a Random-consuming MoveCall', async () => {
+		const tx = new Transaction();
+		tx.setSender(normalizeSuiAddress('0x123'));
+		const wager = tx.add(
+			coinWithBalance({
+				type: '0x2::sui::SUI',
+				balance: 1n,
+				useGasCoin: false,
+			}),
+		);
+		const returnedCoin = tx.moveCall({
+			target: '0xabc::random_test::play',
+			typeArguments: ['0x2::sui::SUI'],
+			arguments: [
+				wager,
+				tx.sharedObjectRef({
+					objectId:
+						'0x0000000000000000000000000000000000000000000000000000000000000008',
+					initialSharedVersion: 1,
+					mutable: false,
+				}),
+			],
+		});
+		tx.transferObjects([returnedCoin], tx.pure.address('0x123'));
+
+		await tx.build({
+			onlyTransactionKind: true,
+			client: {
+				core: {
+					getBalance: async () => ({
+						balance: { addressBalance: '0', balance: '1', coinBalance: '1' },
+					}),
+					listCoins: async () => ({
+						objects: [
+							{
+								balance: '1',
+								digest: '11111111111111111111111111111111',
+								objectId: normalizeSuiAddress('0x456'),
+								version: '1',
+							},
+						],
+						cursor: null,
+						hasNextPage: false,
+					}),
+				},
+			} as never,
+		});
+
+		const commandsWithoutWorkaround = tx.getData().commands;
+		expect(commandsWithoutWorkaround.map((command) => command.$kind)).toEqual([
+			'SplitCoins',
+			'MoveCall',
+			'TransferObjects',
+			'MoveCall',
+		]);
+		expect(commandsWithoutWorkaround[1].MoveCall).toMatchObject({
+			function: 'play',
+			module: 'random_test',
+		});
+		expect(commandsWithoutWorkaround[3].MoveCall).toMatchObject({
+			function: 'destroy_zero',
+			module: 'coin',
+		});
+
+		moveCoinWithBalanceCleanupBeforeRandom(tx);
+		await tx.build({ onlyTransactionKind: true });
+
+		const commandsWithWorkaround = tx.getData().commands;
+		expect(commandsWithWorkaround.map((command) => command.$kind)).toEqual([
+			'SplitCoins',
+			'MoveCall',
+			'MoveCall',
+			'TransferObjects',
+		]);
+		expect(commandsWithWorkaround[1].MoveCall).toMatchObject({
+			function: 'destroy_zero',
+			module: 'coin',
+		});
+		expect(commandsWithWorkaround[2].MoveCall).toMatchObject({
+			function: 'play',
+			module: 'random_test',
+		});
+	});
+
+	it('moves address-balance cleanup before a Random-consuming MoveCall', async () => {
+		const tx = new Transaction();
+		tx.setSender(normalizeSuiAddress('0x123'));
+		const wager = tx.add(
+			coinWithBalance({
+				type: '0x2::sui::SUI',
+				balance: 1n,
+				useGasCoin: false,
+			}),
+		);
+		const returnedCoin = tx.moveCall({
+			target: '0xabc::random_test::play',
+			typeArguments: ['0x2::sui::SUI'],
+			arguments: [
+				wager,
+				tx.sharedObjectRef({
+					objectId:
+						'0x0000000000000000000000000000000000000000000000000000000000000008',
+					initialSharedVersion: 1,
+					mutable: false,
+				}),
+			],
+		});
+		tx.transferObjects([returnedCoin], tx.pure.address('0x123'));
+		moveCoinWithBalanceCleanupBeforeRandom(tx);
+
+		await tx.build({
+			onlyTransactionKind: true,
+			client: {
+				core: {
+					getBalance: async () => ({
+						balance: { addressBalance: '1', balance: '1', coinBalance: '0' },
+					}),
+					listCoins: async () => ({
+						objects: [],
+						cursor: null,
+						hasNextPage: false,
+					}),
+				},
+			} as never,
+		});
+
+		const commands = tx.getData().commands;
+		const randomCallIndex = commands.findIndex(
+			(command) => command.MoveCall?.function === 'play',
+		);
+		const sendFundsIndex = commands.findIndex(
+			(command) => command.MoveCall?.function === 'send_funds',
+		);
+		expect(sendFundsIndex).toBeGreaterThanOrEqual(0);
+		expect(sendFundsIndex).toBeLessThan(randomCallIndex);
+	});
+
 	it('creates a base transaction with normalized owner address and configured gas budget', async () => {
 		const { createBaseGameTransaction } =
 			await import('../../src/transactions/shared.js');
