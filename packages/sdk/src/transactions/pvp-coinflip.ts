@@ -25,6 +25,7 @@ import type {
 	WithPartner,
 } from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
+import { moveCoinWithBalanceCleanupBeforeRandom } from './coin-with-balance-random.js';
 import { createBaseGameTransaction } from './shared.js';
 
 type PvPCoinflipTransactionOptionsWithPartner<
@@ -52,13 +53,11 @@ export function buildPvPCoinflipJoinBetCoin(
 			objectId: options.gameId,
 		});
 
-		return tx.add(
-			coinWithBalance({
-				type: options.coinType,
-				balance: BigInt(json.stake_per_player),
-				useGasCoin: options.useGasCoin,
-			}),
-		);
+		return tx.coin({
+			type: options.coinType,
+			balance: BigInt(json.stake_per_player),
+			useGasCoin: options.useGasCoin,
+		});
 	};
 }
 
@@ -120,6 +119,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					],
 				}),
 			);
+			moveCoinWithBalanceCleanupBeforeRandom(tx);
 			return tx;
 		}
 
