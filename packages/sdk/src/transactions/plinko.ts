@@ -3,15 +3,12 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/plinko/plinko.js';
-import type {
-	BuildPlinkoTransactionOptions,
-	WithPartner,
-} from '../types/index.js';
+import type { PlinkoTransactionOptions, WithPartner } from '../types/index.js';
 import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildPlinkoTransaction(
-	options: WithPartner<BuildPlinkoTransactionOptions>,
+	options: WithPartner<PlinkoTransactionOptions>,
 ): Transaction {
 	const configId = toU8(options.configId);
 

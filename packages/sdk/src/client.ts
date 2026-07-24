@@ -36,22 +36,22 @@ import {
 import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
-	BuildCoinflipTransactionOptions,
-	BuildGameOptions,
-	BuildLimboTransactionOptions,
-	BuildPlinkoTransactionOptions,
-	BuildPvPCoinflipGameOptions,
-	BuildRangeTransactionOptions,
-	BuildSoccerTransactionOptions,
-	BuildWheelTransactionOptions,
+	CoinflipTransactionOptions,
+	CreateGameBetOptions,
 	Game,
 	GameParameters,
 	GetGameParametersOptions,
+	LimboTransactionOptions,
 	OnChainGameParameters,
+	PlinkoTransactionOptions,
+	PvPCoinflipGameOptions,
+	RangeTransactionOptions,
+	SoccerTransactionOptions,
 	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
+	WheelTransactionOptions,
 	WithPartner,
 	WithThrowOnError,
 } from './types/index.js';
@@ -270,7 +270,7 @@ export class SuigarClient {
 		 */
 		createGameBet: <GameId extends StandardGame>(
 			gameId: GameId,
-			options: BuildGameOptions<GameId>,
+			options: CreateGameBetOptions<GameId>,
 		): Transaction => {
 			switch (gameId) {
 				case 'coinflip':
@@ -278,53 +278,51 @@ export class SuigarClient {
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildCoinflipTransactionOptions>);
+					} as WithPartner<CoinflipTransactionOptions>);
 				case 'limbo':
 					return buildLimboTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildLimboTransactionOptions>);
+					} as WithPartner<LimboTransactionOptions>);
 				case 'plinko':
 					return buildPlinkoTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildPlinkoTransactionOptions>);
+					} as WithPartner<PlinkoTransactionOptions>);
 				case 'range':
 					return buildRangeTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildRangeTransactionOptions>);
+					} as WithPartner<RangeTransactionOptions>);
 				case 'soccer':
 					return buildSoccerTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildSoccerTransactionOptions>);
+					} as WithPartner<SoccerTransactionOptions>);
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<BuildWheelTransactionOptions>);
+					} as WithPartner<WheelTransactionOptions>);
 				default:
 					throw new RangeError(`Unsupported game: ${gameId}`);
 			}
 		},
 		/** PvP coinflip transaction builders, grouped by game action. */
 		pvpCoinflip: {
-			createGame: (
-				options: BuildPvPCoinflipGameOptions<'create'>,
-			): Transaction => {
+			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
 				return buildPvPCoinflipTransaction('create', {
 					...options,
 					config: this.#config,
 					partner: this.#partner,
 				});
 			},
-			joinGame: (options: BuildPvPCoinflipGameOptions<'join'>): Transaction => {
+			joinGame: (options: PvPCoinflipGameOptions<'join'>): Transaction => {
 				return buildPvPCoinflipTransaction('join', {
 					...options,
 					betCoin: buildPvPCoinflipJoinBetCoin(this.#client, options),
@@ -332,9 +330,7 @@ export class SuigarClient {
 					partner: this.#partner,
 				});
 			},
-			cancelGame: (
-				options: BuildPvPCoinflipGameOptions<'cancel'>,
-			): Transaction => {
+			cancelGame: (options: PvPCoinflipGameOptions<'cancel'>): Transaction => {
 				return buildPvPCoinflipTransaction('cancel', {
 					...options,
 					config: this.#config,

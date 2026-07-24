@@ -9,3 +9,6 @@ Reorganize the client extension transaction API. Rename
 `createPvPCoinflipTransaction(action, options)` with action-specific
 `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and
 `.cancelGame(options)` builders.
+Rename public transaction option types to reflect their game or action inputs,
+including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP
+coinflip transaction option types.

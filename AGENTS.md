@@ -112,7 +112,7 @@ pnpm run release
    - `parseCoinType()` throws `TypeError` when the first generic coin type cannot be parsed from the Move type string.
 3. **Transaction builders by game family**: Standard games use `createGameBet`; PvP games use dedicated game properties such as `pvpCoinflip`, each with its own action builders. Unsupported game ids and unsupported configured coin types surface as `RangeError`s.
 4. **Generated contract wrappers**: `packages/sdk/src/transactions/` adapts app-facing options into generated Move calls from `packages/sdk/src/contracts/`.
-5. **Type safety**: All game flows are strongly typed through `BuildGameOptions`, action-specific PvP options, and normalized config helpers.
+5. **Type safety**: All game flows are strongly typed through `CreateGameBetOptions`, action-specific PvP options, and normalized config helpers.
 6. **MCP uses public SDK APIs**: `@suigar/mcp` should build transactions through `client.suigar.tx`, inspect config through `client.suigar.getConfig()`, and avoid imports from private Suigar workspace packages.
 
 ### Suigar Client Architecture

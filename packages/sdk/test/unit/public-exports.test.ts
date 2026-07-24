@@ -4,21 +4,23 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import packageJson from '../../package.json' with { type: 'json' };
 import type {
-	BuildCancelPvPCoinflipTransactionOptions,
-	BuildCoinflipTransactionOptions,
-	BuildCreatePvPCoinflipTransactionOptions,
-	BuildJoinPvPCoinflipTransactionOptions,
-	BuildLimboTransactionOptions,
-	BuildPlinkoTransactionOptions,
-	BuildRangeTransactionOptions,
-	BuildSoccerTransactionOptions,
-	BuildWheelTransactionOptions,
+	CancelPvPCoinflipTransactionOptions,
+	CoinflipTransactionOptions,
 	CoinSide,
+	CreateGameBetOptions,
+	CreatePvPCoinflipTransactionOptions,
 	Game,
+	JoinPvPCoinflipTransactionOptions,
+	LimboTransactionOptions,
+	PlinkoTransactionOptions,
 	PvPCoinflipAction,
 	PvPGame,
+	RangeTransactionOptions,
+	SoccerTransactionOptions,
 	StandardGame,
+	WheelTransactionOptions,
 } from '../../src/games.js';
+import type { CreateGameBetOptions as InternalCreateGameBetOptions } from '../../src/types/game-options.type.js';
 import type {
 	CoinSide as InternalCoinSide,
 	Game as InternalGame,
@@ -27,15 +29,15 @@ import type {
 	StandardGame as InternalStandardGame,
 } from '../../src/types/game.type.js';
 import type {
-	BuildCancelPvPCoinflipTransactionOptions as InternalBuildCancelPvPCoinflipTransactionOptions,
-	BuildCoinflipTransactionOptions as InternalBuildCoinflipTransactionOptions,
-	BuildCreatePvPCoinflipTransactionOptions as InternalBuildCreatePvPCoinflipTransactionOptions,
-	BuildJoinPvPCoinflipTransactionOptions as InternalBuildJoinPvPCoinflipTransactionOptions,
-	BuildLimboTransactionOptions as InternalBuildLimboTransactionOptions,
-	BuildPlinkoTransactionOptions as InternalBuildPlinkoTransactionOptions,
-	BuildRangeTransactionOptions as InternalBuildRangeTransactionOptions,
-	BuildSoccerTransactionOptions as InternalBuildSoccerTransactionOptions,
-	BuildWheelTransactionOptions as InternalBuildWheelTransactionOptions,
+	CancelPvPCoinflipTransactionOptions as InternalCancelPvPCoinflipTransactionOptions,
+	CoinflipTransactionOptions as InternalCoinflipTransactionOptions,
+	CreatePvPCoinflipTransactionOptions as InternalCreatePvPCoinflipTransactionOptions,
+	JoinPvPCoinflipTransactionOptions as InternalJoinPvPCoinflipTransactionOptions,
+	LimboTransactionOptions as InternalLimboTransactionOptions,
+	PlinkoTransactionOptions as InternalPlinkoTransactionOptions,
+	RangeTransactionOptions as InternalRangeTransactionOptions,
+	SoccerTransactionOptions as InternalSoccerTransactionOptions,
+	WheelTransactionOptions as InternalWheelTransactionOptions,
 } from '../../src/types/transaction-options.type.js';
 import {
 	DEFAULT_GAS_BUDGET_MIST,
@@ -131,14 +133,17 @@ describe('public source subpath modules', () => {
 		expectTypeOf<StandardGame>().toEqualTypeOf<InternalStandardGame>();
 		expectTypeOf<PvPGame>().toEqualTypeOf<InternalPvPGame>();
 		expectTypeOf<PvPCoinflipAction>().toEqualTypeOf<InternalPvPCoinflipAction>();
-		expectTypeOf<BuildCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildCoinflipTransactionOptions>();
-		expectTypeOf<BuildLimboTransactionOptions>().toEqualTypeOf<InternalBuildLimboTransactionOptions>();
-		expectTypeOf<BuildPlinkoTransactionOptions>().toEqualTypeOf<InternalBuildPlinkoTransactionOptions>();
-		expectTypeOf<BuildRangeTransactionOptions>().toEqualTypeOf<InternalBuildRangeTransactionOptions>();
-		expectTypeOf<BuildSoccerTransactionOptions>().toEqualTypeOf<InternalBuildSoccerTransactionOptions>();
-		expectTypeOf<BuildWheelTransactionOptions>().toEqualTypeOf<InternalBuildWheelTransactionOptions>();
-		expectTypeOf<BuildCreatePvPCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildCreatePvPCoinflipTransactionOptions>();
-		expectTypeOf<BuildJoinPvPCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildJoinPvPCoinflipTransactionOptions>();
-		expectTypeOf<BuildCancelPvPCoinflipTransactionOptions>().toEqualTypeOf<InternalBuildCancelPvPCoinflipTransactionOptions>();
+		expectTypeOf<CreateGameBetOptions<'coinflip'>>().toEqualTypeOf<
+			InternalCreateGameBetOptions<'coinflip'>
+		>();
+		expectTypeOf<CoinflipTransactionOptions>().toEqualTypeOf<InternalCoinflipTransactionOptions>();
+		expectTypeOf<LimboTransactionOptions>().toEqualTypeOf<InternalLimboTransactionOptions>();
+		expectTypeOf<PlinkoTransactionOptions>().toEqualTypeOf<InternalPlinkoTransactionOptions>();
+		expectTypeOf<RangeTransactionOptions>().toEqualTypeOf<InternalRangeTransactionOptions>();
+		expectTypeOf<SoccerTransactionOptions>().toEqualTypeOf<InternalSoccerTransactionOptions>();
+		expectTypeOf<WheelTransactionOptions>().toEqualTypeOf<InternalWheelTransactionOptions>();
+		expectTypeOf<CreatePvPCoinflipTransactionOptions>().toEqualTypeOf<InternalCreatePvPCoinflipTransactionOptions>();
+		expectTypeOf<JoinPvPCoinflipTransactionOptions>().toEqualTypeOf<InternalJoinPvPCoinflipTransactionOptions>();
+		expectTypeOf<CancelPvPCoinflipTransactionOptions>().toEqualTypeOf<InternalCancelPvPCoinflipTransactionOptions>();
 	});
 });

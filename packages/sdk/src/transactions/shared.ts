@@ -32,7 +32,7 @@ type StrictStakeTransactionOptions = {
 	>;
 };
 
-export type BuildSharedBetTransactionContext = Pick<
+export type SharedBetTransactionContext = Pick<
 	BaseTransactionOptions,
 	'config' | 'owner'
 > &
@@ -47,11 +47,11 @@ export type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
 	game: Game;
 };
 
-export type BuildSharedBetTransactionOptions = WithPartner<
+export type StandardGameBetTransactionOptions = WithPartner<
 	SharedBetTransactionOptions & {
 		game: Game;
 		buildRewardCoin: (
-			context: BuildSharedBetTransactionContext,
+			context: SharedBetTransactionContext,
 		) => (tx: Transaction) => TransactionResult;
 	}
 >;
@@ -84,7 +84,7 @@ export function buildSharedStandardGameBetTransaction({
 	partner,
 	useGasCoin,
 	buildRewardCoin,
-}: BuildSharedBetTransactionOptions): Transaction {
+}: StandardGameBetTransactionOptions): Transaction {
 	const tx = createBaseGameTransaction({ config, game, owner, gasBudget });
 	const normalizedOwner = normalizeSuiAddress(owner);
 	const normalizedCoinType = normalizeStructTag(coinType);

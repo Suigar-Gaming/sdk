@@ -17,10 +17,10 @@ import {
 import { resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
-	BuildCancelPvPCoinflipTransactionOptions,
-	BuildCreatePvPCoinflipTransactionOptions,
-	BuildPvPCoinflipTransactionOptions,
+	CancelPvPCoinflipTransactionOptions,
+	CreatePvPCoinflipTransactionOptions,
 	PvPCoinflipAction,
+	PvPCoinflipTransactionOptions,
 	ResolvedJoinPvPCoinflipTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
@@ -31,7 +31,7 @@ type PvPCoinflipTransactionOptionsWithPartner<
 	Action extends PvPCoinflipAction,
 > = Action extends 'join'
 	? WithPartner<ResolvedJoinPvPCoinflipTransactionOptions>
-	: WithPartner<BuildPvPCoinflipTransactionOptions<Action>>;
+	: WithPartner<PvPCoinflipTransactionOptions<Action>>;
 
 /**
  * Creates the asynchronous coin-selection thunk used when joining a PvP game.
@@ -42,7 +42,7 @@ type PvPCoinflipTransactionOptionsWithPartner<
 export function buildPvPCoinflipJoinBetCoin(
 	client: ClientWithCoreApi,
 	options: Pick<
-		BuildPvPCoinflipTransactionOptions<'join'>,
+		PvPCoinflipTransactionOptions<'join'>,
 		'gameId' | 'coinType' | 'useGasCoin'
 	>,
 ): TransactionArgument {
@@ -73,7 +73,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 	switch (action) {
 		case 'create': {
-			const createOptions = options as BuildCreatePvPCoinflipTransactionOptions;
+			const createOptions = options as CreatePvPCoinflipTransactionOptions;
 			const stake = toBigInt(createOptions.stake);
 
 			tx.add(
@@ -122,7 +122,7 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'cancel': {
-			const cancelOptions = options as BuildCancelPvPCoinflipTransactionOptions;
+			const cancelOptions = options as CancelPvPCoinflipTransactionOptions;
 
 			tx.add(
 				cancelGame({
