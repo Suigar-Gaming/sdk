@@ -172,8 +172,50 @@ export class SuigarClient {
 			options.coinType ?? this.#config.coins.sui.coinType,
 		);
 		return this.#cache.read(
-			['parameters', this.#client.network, game, coinType],
-			() => this.#fetchGameParameters(game, coinType, options),
+			['getGameParameters', game, coinType],
+			async () => {
+				const gameDefinition = GAME_SETTINGS[game];
+				const { signal } = options;
+
+				const {
+					object: { objectId },
+				} = await this.#client.core.getDynamicObjectField({
+					parentId: this.#config.objectIds.sweetHouse,
+					name: {
+						type: gameDefinition.settingsKey.typeTag({
+							package: resolveGamePackageId(this.#config, game),
+						}),
+						bcs: gameDefinition.settingsKey
+							.serialize({ dummy_field: false })
+							.toBytes(),
+					},
+					signal,
+				});
+
+				const { object } = await this.#client.core.getDynamicObjectField({
+					parentId: objectId,
+					name: {
+						type: TypeName.name,
+						bcs: TypeName.serialize({
+							name: coinType.replace(/^0x/u, ''),
+						}).toBytes(),
+					},
+					include: { content: true },
+					signal,
+				});
+
+				if (!object?.content) {
+					throw new Error(
+						`Missing parameters object content for ${game} and coin type ${coinType}`,
+					);
+				}
+
+				return normalizeGameParameterValues(
+					gameDefinition.parameters.parse(
+						object.content,
+					) as OnChainGameParameters<TGame>,
+				);
+			},
 			{ ignoreCache: options.ignoreCache },
 		) as Promise<GameParameters<TGame>>;
 	}
@@ -382,52 +424,4 @@ export class SuigarClient {
 		 */
 		PvPCoinflipGameCancelledEvent,
 	};
-
-	async #fetchGameParameters<TGame extends Game>(
-		game: TGame,
-		coinType: string,
-		options: Omit<GetGameParametersOptions, 'coinType' | 'ignoreCache'>,
-	): Promise<GameParameters<TGame>> {
-		const gameDefinition = GAME_SETTINGS[game];
-		const { signal } = options;
-
-		const {
-			object: { objectId },
-		} = await this.#client.core.getDynamicObjectField({
-			parentId: this.#config.objectIds.sweetHouse,
-			name: {
-				type: gameDefinition.settingsKey.typeTag({
-					package: resolveGamePackageId(this.#config, game),
-				}),
-				bcs: gameDefinition.settingsKey
-					.serialize({ dummy_field: false })
-					.toBytes(),
-			},
-			signal,
-		});
-
-		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: objectId,
-			name: {
-				type: TypeName.name,
-				bcs: TypeName.serialize({
-					name: coinType.replace(/^0x/u, ''),
-				}).toBytes(),
-			},
-			include: { content: true },
-			signal,
-		});
-
-		if (!object?.content) {
-			throw new Error(
-				`Missing parameters object content for ${game} and coin type ${coinType}`,
-			);
-		}
-
-		return normalizeGameParameterValues(
-			gameDefinition.parameters.parse(
-				object.content,
-			) as OnChainGameParameters<TGame>,
-		);
-	}
 }
