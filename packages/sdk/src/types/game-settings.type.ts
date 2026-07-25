@@ -91,6 +91,6 @@ export type GameParameters<TGame extends Game> = GameParameterValue<
 
 export type GetGameParametersOptions =
 	SuiClientTypes.CoreClientMethodOptions & {
-		coinType?: string;
+		coinType: string;
 		ignoreCache?: boolean;
 	};

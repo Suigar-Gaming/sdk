@@ -166,11 +166,9 @@ export class SuigarClient {
 	 */
 	async getGameParameters<TGame extends Game>(
 		game: TGame,
-		options: GetGameParametersOptions = {},
+		options: GetGameParametersOptions,
 	): Promise<GameParameters<TGame>> {
-		const coinType = normalizeStructTag(
-			options.coinType ?? this.#config.coins.sui.coinType,
-		);
+		const coinType = normalizeStructTag(options.coinType);
 		return this.#cache.read(
 			['getGameParameters', game, coinType],
 			async () => {
