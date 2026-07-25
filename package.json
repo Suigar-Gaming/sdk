@@ -38,7 +38,7 @@
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@manypkg/cli": "^0.25.1",
 		"husky": "^9.1.7",
-		"lint-staged": "^17.1.1",
+		"lint-staged": "^17.2.0",
 		"oxlint": "^1.75.0",
 		"oxlint-tsgolint": "^7.0.0021",
 		"prettier": "catalog:tooling",

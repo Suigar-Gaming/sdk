@@ -66,15 +66,15 @@
 	},
 	"homepage": "https://suigar.com/docs/mcp",
 	"dependencies": {
-		"@modelcontextprotocol/ext-apps": "1.7.4",
-		"@modelcontextprotocol/sdk": "1.29.0",
+		"@modelcontextprotocol/ext-apps": "^1.7.5",
+		"@modelcontextprotocol/sdk": "^1.29.0",
 		"@mysten/sui": "catalog:mysten",
 		"@suigar/sdk": "workspace:^",
 		"clsx": "catalog:frontend",
 		"react": "catalog:frontend",
 		"react-dom": "catalog:frontend",
 		"tailwind-merge": "catalog:frontend",
-		"zod": "4.4.3"
+		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@tailwindcss/vite": "catalog:tooling",
