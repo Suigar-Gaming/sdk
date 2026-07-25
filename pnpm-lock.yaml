@@ -248,8 +248,8 @@ catalogs:
       specifier: ^4.3.3
       version: 4.3.3
     tsdown:
-      specifier: ^0.22.13
-      version: 0.22.13
+      specifier: ^0.22.14
+      version: 0.22.14
   typescript:
     '@types/node':
       specifier: ^24.0.0
@@ -353,7 +353,7 @@ importers:
         version: 4.3.3
       tsdown:
         specifier: catalog:tooling
-        version: 0.22.13(oxc-resolver@11.24.2)(typescript@6.0.3)
+        version: 0.22.14(oxc-resolver@11.24.2)(typescript@6.0.3)
       typescript:
         specifier: catalog:typescript
         version: 6.0.3
@@ -383,7 +383,7 @@ importers:
         version: 24.13.3
       tsdown:
         specifier: catalog:tooling
-        version: 0.22.13(oxc-resolver@11.24.2)(typescript@6.0.3)
+        version: 0.22.14(oxc-resolver@11.24.2)(typescript@6.0.3)
       typescript:
         specifier: catalog:typescript
         version: 6.0.3
@@ -513,8 +513,8 @@ packages:
     resolution: {integrity: sha512-GvpKWDmzBFzbtVElU+tEDMDYyMY8SnMH4NNwwlUQioNHZvE6sSuHEqNkfU3iYhWL+/XO5Ej+MzhVJoqM10NYCQ==}
     engines: {node: '>=18.0.0'}
 
-  '@apm-js-collab/code-transformer@0.18.0':
-    resolution: {integrity: sha512-aN3Oq8r1J3gPJtCwErP664gM0+HhM1I1lujPr9TMTCcEl/joQQbpGpeMdts9B1+W2wHMsvioDMv5F4PvMWE6gw==}
+  '@apm-js-collab/code-transformer@0.18.1':
+    resolution: {integrity: sha512-u1Hb6bHjWtkSpiprwVP6YaHC1DTN4RAU3zYkUDUe7WMnJwdyU1pwTL9dFKiSJB9IiLue/EQovmyx6xhU7FFtAQ==}
     hasBin: true
 
   '@apm-js-collab/tracing-hooks@0.13.0':
@@ -3599,8 +3599,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  media-typer@1.1.0:
-    resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
+  media-typer@1.1.1:
+    resolution: {integrity: sha512-yz3xRaG20c6/BOzvYoDaGtPmGscs7YivItZEEqe6GbwNfHuxu9YNmvnEkMzKldAGY4/80pRcQRZSEnhquk9XuQ==}
     engines: {node: '>= 0.8'}
 
   merge-descriptors@2.0.0:
@@ -4254,14 +4254,14 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
-  tsdown@0.22.13:
-    resolution: {integrity: sha512-XaYFhtiKRUvTpXv/YAehsHdbEb3LN/iMlzjSINbjlaATtXN2zVPKox2STKhcyFPlh++8Zg7suNN27E679IfAUA==}
+  tsdown@0.22.14:
+    resolution: {integrity: sha512-ule7Y+fsAN2iZbLDoo7C4KYljFJNJJ+fLshyn+9gozeTspVersWHxwdGB+Dm2hzA38s6muFnUTl0jK3vJm9ifQ==}
     engines: {node: ^22.18.0 || >=24.11.0}
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
-      '@tsdown/css': 0.22.13
-      '@tsdown/exe': 0.22.13
+      '@tsdown/css': 0.22.14
+      '@tsdown/exe': 0.22.14
       '@vitejs/devtools': '*'
       publint: ^0.3.8
       tsx: '*'
@@ -4376,8 +4376,8 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  verkit@0.1.2:
-    resolution: {integrity: sha512-WqkT8n3hqizuCu71W3bUzf5fjBmkbXcudsehe/NbxA8PgqoKnSOY5K0Ba2ckg1qaRaSpSz7as/n9K1R9JXjQKg==}
+  verkit@0.3.0:
+    resolution: {integrity: sha512-Njrh4U8UODGajoZ44QS2C/BsoEM9DTI/aCqY5swsizb+/ap0FamvnCMcZAxrR5+aoC0ZqkawEfpC/N2SBc+xeA==}
     engines: {node: '>=18.12.0'}
 
   vite-plugin-singlefile@2.3.3:
@@ -4607,12 +4607,12 @@ snapshots:
 
   '@apm-js-collab/code-transformer-bundler-plugins@0.7.2':
     dependencies:
-      '@apm-js-collab/code-transformer': 0.18.0
+      '@apm-js-collab/code-transformer': 0.18.1
       es-module-lexer: 2.3.1
       magic-string: 0.30.21
       module-details-from-path: 1.0.4
 
-  '@apm-js-collab/code-transformer@0.18.0':
+  '@apm-js-collab/code-transformer@0.18.1':
     dependencies:
       '@types/estree': 1.0.9
       astring: 1.9.0
@@ -4623,7 +4623,7 @@ snapshots:
 
   '@apm-js-collab/tracing-hooks@0.13.0':
     dependencies:
-      '@apm-js-collab/code-transformer': 0.18.0
+      '@apm-js-collab/code-transformer': 0.18.1
       debug: 4.4.3
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
@@ -7335,7 +7335,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  media-typer@1.1.0: {}
+  media-typer@1.1.1: {}
 
   merge-descriptors@2.0.0: {}
 
@@ -8057,7 +8057,7 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  tsdown@0.22.13(oxc-resolver@11.24.2)(typescript@6.0.3):
+  tsdown@0.22.14(oxc-resolver@11.24.2)(typescript@6.0.3):
     dependencies:
       ansis: 4.3.1
       cac: 7.0.0
@@ -8073,7 +8073,7 @@ snapshots:
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
-      verkit: 0.1.2
+      verkit: 0.3.0
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -8100,7 +8100,7 @@ snapshots:
   type-is@2.1.0:
     dependencies:
       content-type: 2.0.0
-      media-typer: 1.1.0
+      media-typer: 1.1.1
       mime-types: 3.0.2
 
   typescript@5.9.3: {}
@@ -8151,7 +8151,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  verkit@0.1.2: {}
+  verkit@0.3.0: {}
 
   vite-plugin-singlefile@2.3.3(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0)):
     dependencies:
