@@ -24,7 +24,6 @@ import type {
 } from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
 import { toBigInt } from '../utils/numeric.js';
-import { moveCoinWithBalanceCleanupBeforeRandom } from './coin-with-balance-random.js';
 
 type StrictStakeTransactionOptions = {
 	[K in keyof StakeTransactionOptions]-?: Exclude<
@@ -117,6 +116,5 @@ export function buildSharedStandardGameBetTransaction({
 	);
 
 	tx.transferObjects([rewardCoin], tx.pure.address(normalizedOwner));
-	moveCoinWithBalanceCleanupBeforeRandom(tx);
 	return tx;
 }

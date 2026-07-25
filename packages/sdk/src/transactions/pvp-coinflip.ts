@@ -25,7 +25,6 @@ import type {
 	WithPartner,
 } from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
-import { moveCoinWithBalanceCleanupBeforeRandom } from './coin-with-balance-random.js';
 import { createBaseGameTransaction } from './shared.js';
 
 type PvPCoinflipTransactionOptionsWithPartner<
@@ -119,7 +118,6 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 					],
 				}),
 			);
-			moveCoinWithBalanceCleanupBeforeRandom(tx);
 			return tx;
 		}
 
