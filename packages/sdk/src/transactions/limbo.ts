@@ -3,15 +3,12 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/limbo/limbo.js';
-import type {
-	BuildLimboTransactionOptions,
-	WithPartner,
-} from '../types/index.js';
+import type { LimboTransactionOptions, WithPartner } from '../types/index.js';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildLimboTransaction(
-	options: WithPartner<BuildLimboTransactionOptions>,
+	options: WithPartner<LimboTransactionOptions>,
 ): Transaction {
 	const scale = options.scale ?? DEFAULT_LIMBO_MULTIPLIER_SCALE;
 	const numerator = Math.round(options.targetMultiplier * scale);

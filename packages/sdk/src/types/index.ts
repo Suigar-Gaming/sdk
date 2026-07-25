@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './bet-metadata.type.js';
-export * from './build-game-transaction-options.type.js';
+export * from './game-options.type.js';
 export * from './game-details.type.js';
 export * from './game-settings.type.js';
 export * from './game.type.js';

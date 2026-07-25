@@ -90,7 +90,8 @@ function buildStandardSharedOptions(
 }
 
 function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
-	return `${factoryLine} {\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
+	const objectPrefix = factoryLine.endsWith(',') ? ' {' : '{';
+	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
 export function buildPvPPreviewFallback(
@@ -103,10 +104,11 @@ export function buildPvPPreviewFallback(
 		coinType: string;
 	},
 ) {
-	return toCodeBlock(
-		`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
-		[`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '0xGAME_ID',`],
-	);
+	return toCodeBlock(`const tx = client.suigar.tx.pvpCoinflip.${action}Game(`, [
+		`owner: '${owner}',`,
+		`coinType: '${coinType}',`,
+		`gameId: '0xGAME_ID',`,
+	]);
 }
 
 export function buildStandardTransaction<K extends StandardGameId>(
@@ -185,10 +187,9 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	}
 
 	return {
-		// oxlint-disable-next-line typescript/no-explicit-any
-		transaction: txApi.createBetTransaction(gameId, baseOptions as any),
+		transaction: txApi.createGameBet(gameId, baseOptions as never),
 		code: toCodeBlock(
-			`const tx = client.suigar.tx.createBetTransaction('${gameId}',`,
+			`const tx = client.suigar.tx.createGameBet('${gameId}',`,
 			codeLines,
 		),
 	};
@@ -203,6 +204,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 	coinType: string,
 ) {
 	const txApi: TxApi = client.suigar.tx;
+
 	let baseOptions: Record<string, unknown> = {};
 	let codeLines: Array<string> = [];
 
@@ -253,12 +255,30 @@ export function buildPvPTransaction<K extends PvPAction>(
 		}
 	}
 
-	return {
-		// oxlint-disable-next-line typescript/no-explicit-any
-		transaction: txApi.createPvPCoinflipTransaction(action, baseOptions as any),
-		code: toCodeBlock(
-			`const tx = client.suigar.tx.createPvPCoinflipTransaction('${action}',`,
-			codeLines,
-		),
-	};
+	switch (action) {
+		case 'create':
+			return {
+				transaction: txApi.pvpCoinflip.createGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.createGame(',
+					codeLines,
+				),
+			};
+		case 'join':
+			return {
+				transaction: txApi.pvpCoinflip.joinGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.joinGame(',
+					codeLines,
+				),
+			};
+		case 'cancel':
+			return {
+				transaction: txApi.pvpCoinflip.cancelGame(baseOptions as never),
+				code: toCodeBlock(
+					'const tx = client.suigar.tx.pvpCoinflip.cancelGame(',
+					codeLines,
+				),
+			};
+	}
 }

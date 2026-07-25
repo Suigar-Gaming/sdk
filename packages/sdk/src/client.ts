@@ -3,11 +3,7 @@
 
 import type { InferBcsType } from '@mysten/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
-import {
-	BuildTransactionOptions,
-	Transaction,
-	type TransactionArgument,
-} from '@mysten/sui/transactions';
+import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
@@ -31,6 +27,7 @@ import {
 	buildCoinflipTransaction,
 	buildLimboTransaction,
 	buildPlinkoTransaction,
+	buildPvPCoinflipJoinBetCoin,
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
 	buildSoccerTransaction,
@@ -39,23 +36,22 @@ import {
 import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
-	BuildCoinflipTransactionOptions,
-	BuildGameOptions,
-	BuildLimboTransactionOptions,
-	BuildPlinkoTransactionOptions,
-	BuildPvPCoinflipGameOptions,
-	BuildRangeTransactionOptions,
-	BuildSoccerTransactionOptions,
-	BuildWheelTransactionOptions,
+	CoinflipTransactionOptions,
+	CreateGameBetOptions,
 	Game,
 	GameParameters,
 	GetGameParametersOptions,
+	LimboTransactionOptions,
 	OnChainGameParameters,
-	PvPCoinflipAction,
+	PlinkoTransactionOptions,
+	PvPCoinflipGameOptions,
+	RangeTransactionOptions,
+	SoccerTransactionOptions,
 	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
+	WheelTransactionOptions,
 	WithPartner,
 	WithThrowOnError,
 } from './types/index.js';
@@ -262,6 +258,89 @@ export class SuigarClient {
 	}
 
 	/**
+	 * Transaction builders for Suigar games.
+	 */
+	tx = {
+		/**
+		 * Creates a standard game transaction for the provided game id.
+		 *
+		 * @param gameId Supported standard game identifier.
+		 * @param options Transaction builder options for the selected game.
+		 * @returns Prepared transaction for the selected game.
+		 */
+		createGameBet: <GameId extends StandardGame>(
+			gameId: GameId,
+			options: CreateGameBetOptions<GameId>,
+		): Transaction => {
+			switch (gameId) {
+				case 'coinflip':
+					return buildCoinflipTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<CoinflipTransactionOptions>);
+				case 'limbo':
+					return buildLimboTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<LimboTransactionOptions>);
+				case 'plinko':
+					return buildPlinkoTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<PlinkoTransactionOptions>);
+				case 'range':
+					return buildRangeTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<RangeTransactionOptions>);
+				case 'soccer':
+					return buildSoccerTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<SoccerTransactionOptions>);
+				case 'wheel':
+					return buildWheelTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					} as WithPartner<WheelTransactionOptions>);
+				default:
+					throw new RangeError(`Unsupported game: ${gameId}`);
+			}
+		},
+		/** PvP coinflip transaction builders, grouped by game action. */
+		pvpCoinflip: {
+			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
+				return buildPvPCoinflipTransaction('create', {
+					...options,
+					config: this.#config,
+					partner: this.#partner,
+				});
+			},
+			joinGame: (options: PvPCoinflipGameOptions<'join'>): Transaction => {
+				return buildPvPCoinflipTransaction('join', {
+					...options,
+					betCoin: buildPvPCoinflipJoinBetCoin(this.#client, options),
+					config: this.#config,
+					partner: this.#partner,
+				});
+			},
+			cancelGame: (options: PvPCoinflipGameOptions<'cancel'>): Transaction => {
+				return buildPvPCoinflipTransaction('cancel', {
+					...options,
+					config: this.#config,
+					partner: this.#partner,
+				});
+			},
+		},
+	};
+
+	/**
 	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
 	 *
 	 * These can be used to parse the `content` field of on-chain objects and events into structured data with the
@@ -303,124 +382,6 @@ export class SuigarClient {
 		 */
 		PvPCoinflipGameCancelledEvent,
 	};
-
-	/**
-	 * Transaction builders for Suigar games.
-	 */
-	tx = {
-		/**
-		 * Creates a standard game transaction for the provided game id.
-		 *
-		 * @param gameId Supported standard game identifier.
-		 * @param options Transaction builder options for the selected game.
-		 * @returns Prepared transaction for the selected game.
-		 */
-		createBetTransaction: <GameId extends StandardGame>(
-			gameId: GameId,
-			options: BuildGameOptions<GameId>,
-		): Transaction => {
-			switch (gameId) {
-				case 'coinflip':
-					return buildCoinflipTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildCoinflipTransactionOptions>);
-				case 'limbo':
-					return buildLimboTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildLimboTransactionOptions>);
-				case 'plinko':
-					return buildPlinkoTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildPlinkoTransactionOptions>);
-				case 'range':
-					return buildRangeTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildRangeTransactionOptions>);
-				case 'soccer':
-					return buildSoccerTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildSoccerTransactionOptions>);
-				case 'wheel':
-					return buildWheelTransaction({
-						...options,
-						config: this.#config,
-						partner: this.#partner,
-					} as WithPartner<BuildWheelTransactionOptions>);
-				default:
-					throw new RangeError(`Unsupported game: ${gameId}`);
-			}
-		},
-		/**
-		 * Creates a PvP coinflip transaction for the requested action.
-		 *
-		 * @param action PvP coinflip action to perform.
-		 * @param options Transaction builder options for the selected action.
-		 * @returns Prepared PvP coinflip transaction.
-		 */
-		createPvPCoinflipTransaction: <Action extends PvPCoinflipAction>(
-			action: Action,
-			options: BuildPvPCoinflipGameOptions<Action>,
-		): Transaction => {
-			switch (action) {
-				case 'create': {
-					const createOptions =
-						options as BuildPvPCoinflipGameOptions<'create'>;
-					return buildPvPCoinflipTransaction('create', {
-						...createOptions,
-						config: this.#config,
-						partner: this.#partner,
-					});
-				}
-				case 'join': {
-					const joinOptions = options as BuildPvPCoinflipGameOptions<'join'>;
-					return buildPvPCoinflipTransaction('join', {
-						...joinOptions,
-						betCoin: this.#createPvPCoinflipBetCoin(joinOptions),
-						config: this.#config,
-						partner: this.#partner,
-					});
-				}
-				case 'cancel': {
-					const cancelOptions =
-						options as BuildPvPCoinflipGameOptions<'cancel'>;
-					return buildPvPCoinflipTransaction('cancel', {
-						...cancelOptions,
-						config: this.#config,
-						partner: this.#partner,
-					});
-				}
-				default:
-					throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
-			}
-		},
-	};
-
-	#createPvPCoinflipBetCoin(
-		options: BuildPvPCoinflipGameOptions<'join'>,
-	): TransactionArgument {
-		return async (tx: Transaction) => {
-			const { json } = await PvPCoinflipGame.get({
-				client: this.#client,
-				objectId: options.gameId,
-			});
-
-			return tx.coin({
-				type: options.coinType,
-				balance: BigInt(json.stake_per_player),
-				useGasCoin: options.useGasCoin,
-			});
-		};
-	}
 
 	async #fetchGameParameters<TGame extends Game>(
 		game: TGame,

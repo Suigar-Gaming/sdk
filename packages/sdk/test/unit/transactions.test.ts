@@ -118,12 +118,12 @@ describe('shared transaction helpers', () => {
 		const { buildSharedStandardGameBetTransaction } =
 			await import('../../src/transactions/shared.js');
 
-		type BuildRewardContext = Parameters<
+		type RewardContext = Parameters<
 			Parameters<
 				typeof buildSharedStandardGameBetTransaction
 			>[0]['buildRewardCoin']
 		>[0];
-		let context: BuildRewardContext | undefined;
+		let context: RewardContext | undefined;
 
 		const partner = normalizeSuiAddress('0x123');
 		const tx = buildSharedStandardGameBetTransaction({

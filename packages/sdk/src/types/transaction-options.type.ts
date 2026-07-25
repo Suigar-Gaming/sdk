@@ -42,40 +42,40 @@ export type SharedBetTransactionOptions = BaseTransactionOptions &
 	CoinTransactionOptions &
 	StakeTransactionOptions;
 
-export type BuildCoinflipTransactionOptions = SharedBetTransactionOptions & {
+export type CoinflipTransactionOptions = SharedBetTransactionOptions & {
 	side: CoinSide;
 };
 
-export type BuildLimboTransactionOptions = SharedBetTransactionOptions & {
+export type LimboTransactionOptions = SharedBetTransactionOptions & {
 	targetMultiplier: number;
 	scale?: number;
 };
 
-export type BuildPlinkoTransactionOptions = SharedBetTransactionOptions & {
+export type PlinkoTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };
 
-export type BuildRangeTransactionOptions = SharedBetTransactionOptions & {
+export type RangeTransactionOptions = SharedBetTransactionOptions & {
 	leftPoint: number;
 	rightPoint: number;
 	outOfRange?: boolean;
 	scale?: number;
 };
 
-export type BuildSoccerTransactionOptions = SharedBetTransactionOptions & {
+export type SoccerTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 	countryId: number;
 	shotZoneId: number;
 };
 
-export type BuildWheelTransactionOptions = SharedBetTransactionOptions & {
+export type WheelTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };
 
-export type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions &
+type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions &
 	CoinTransactionOptions;
 
-export type BuildCreatePvPCoinflipTransactionOptions = Pick<
+export type CreatePvPCoinflipTransactionOptions = Pick<
 	StakeTransactionOptions,
 	'stake'
 > &
@@ -84,27 +84,27 @@ export type BuildCreatePvPCoinflipTransactionOptions = Pick<
 		isPrivate?: boolean;
 	};
 
-export type BuildJoinPvPCoinflipTransactionOptions =
+export type JoinPvPCoinflipTransactionOptions =
 	SharedPvPCoinflipTransactionOptions & {
 		gameId: string;
 	};
 
 export type ResolvedJoinPvPCoinflipTransactionOptions =
-	BuildJoinPvPCoinflipTransactionOptions & {
+	JoinPvPCoinflipTransactionOptions & {
 		betCoin: TransactionArgument;
 	};
 
-export type BuildCancelPvPCoinflipTransactionOptions =
+export type CancelPvPCoinflipTransactionOptions =
 	SharedPvPCoinflipTransactionOptions & {
 		gameId: string;
 	};
 
-export type BuildPvPCoinflipTransactionOptions<
+export type PvPCoinflipTransactionOptions<
 	Action extends PvPCoinflipAction = PvPCoinflipAction,
 > = Action extends 'create'
-	? BuildCreatePvPCoinflipTransactionOptions
+	? CreatePvPCoinflipTransactionOptions
 	: Action extends 'join'
-		? BuildJoinPvPCoinflipTransactionOptions
+		? JoinPvPCoinflipTransactionOptions
 		: Action extends 'cancel'
-			? BuildCancelPvPCoinflipTransactionOptions
+			? CancelPvPCoinflipTransactionOptions
 			: never;
