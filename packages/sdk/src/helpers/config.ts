@@ -103,7 +103,11 @@ function resolveCoinMetadata(
 	override?: Partial<SuigarCoinMetadata>,
 ): SuigarCoinMetadata {
 	const coin = { ...defaultCoin, ...override };
-	if (!coin.coinType || coin.decimals == null || !coin.priceInfoObjectId) {
+	if (
+		!coin.coinType ||
+		!Number.isSafeInteger(coin.decimals) ||
+		!coin.priceInfoObjectId
+	) {
 		throw new Error(
 			`Missing coin metadata configuration for supported coin ${supportedCoin}`,
 		);
