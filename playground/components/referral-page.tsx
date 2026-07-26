@@ -58,30 +58,40 @@ export function ReferralPage() {
 
 		setIsLoading(true);
 		setStatus(null);
-		const { sui, usdc } = client.suigar.getConfig().coins;
-		const results = await Promise.allSettled([
-			client.suigar.view.referral.getCommission({
-				owner,
-				coinType: sui.coinType,
-			}),
-			client.suigar.view.referral.getCommission({
-				owner,
-				coinType: usdc.coinType,
-			}),
-			client.suigar.view.referral.getLevelUpUsdRewards({ owner }),
-		]);
+		try {
+			const { sui, usdc } = client.suigar.getConfig().coins;
+			const results = await Promise.allSettled([
+				client.suigar.view.referral.getCommission({
+					owner,
+					coinType: sui.coinType,
+				}),
+				client.suigar.view.referral.getCommission({
+					owner,
+					coinType: usdc.coinType,
+				}),
+				client.suigar.view.referral.getLevelUpUsdRewards({ owner }),
+			]);
 
-		const toClaimState = (result: (typeof results)[number]): ClaimState =>
-			result.status === 'fulfilled'
-				? { amount: result.value, error: null }
-				: { amount: null, error: getErrorMessage(result.reason) };
+			const toClaimState = (result: (typeof results)[number]): ClaimState =>
+				result.status === 'fulfilled'
+					? { amount: result.value, error: null }
+					: { amount: null, error: getErrorMessage(result.reason) };
 
-		setClaims({
-			'commission-sui': toClaimState(results[0]),
-			'commission-usdc': toClaimState(results[1]),
-			'level-up': toClaimState(results[2]),
-		});
-		setIsLoading(false);
+			setClaims({
+				'commission-sui': toClaimState(results[0]),
+				'commission-usdc': toClaimState(results[1]),
+				'level-up': toClaimState(results[2]),
+			});
+		} catch (error) {
+			const message = getErrorMessage(error);
+			setClaims({
+				'commission-sui': { amount: null, error: message },
+				'commission-usdc': { amount: null, error: message },
+				'level-up': { amount: null, error: message },
+			});
+		} finally {
+			setIsLoading(false);
+		}
 	}, [client, owner]);
 
 	React.useEffect(() => {
