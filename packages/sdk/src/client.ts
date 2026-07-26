@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InferBcsType } from '@mysten/bcs';
-import { bcs } from '@mysten/sui/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
+import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
@@ -66,13 +66,6 @@ import type {
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
 import { parseCoinType } from './utils/index.js';
-
-// `Coin<T>` is a Sui framework type, not a Suigar Move struct, so it is not
-// emitted by this package's Suigar codegen configuration.
-const SuiCoin = bcs.struct('Coin', {
-	id: bcs.Address,
-	balance: bcs.u64(),
-});
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -452,7 +445,7 @@ export class SuigarClient {
 							coinType,
 						}),
 					);
-					return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;
 				}
@@ -466,7 +459,7 @@ export class SuigarClient {
 							owner,
 						}),
 					);
-					return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;
 				}
