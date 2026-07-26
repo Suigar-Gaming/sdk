@@ -437,7 +437,7 @@ export class SuigarClient {
 			getCommission: async ({
 				owner,
 				coinType,
-			}: Pick<ClaimReferralCommissionOptions, 'owner' | 'coinType'>) => {
+			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>) => {
 				try {
 					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
 						this.tx.referral.claimCommission({
@@ -452,7 +452,7 @@ export class SuigarClient {
 			},
 			getLevelUpUsdRewards: async ({
 				owner,
-			}: Pick<ClaimReferralLevelUpUsdRewardsOptions, 'owner'>) => {
+			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>) => {
 				try {
 					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
 						this.tx.referral.claimLevelUpUsdRewards({
