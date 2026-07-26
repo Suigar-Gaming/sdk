@@ -17,6 +17,8 @@ export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
+export type WithConfig<T> = T & Pick<BaseTransactionOptions, 'config'>;
+
 /** Common sender and gas settings for every SDK-built transaction. */
 export type TransactionSenderOptions = {
 	owner: string;
@@ -27,14 +29,6 @@ export type BaseTransactionOptions = TransactionSenderOptions & {
 	config: SuigarConfig;
 	metadata?: BetMetadataInput;
 };
-
-/** Options for a referrer claim transaction paid to the referrer wallet. */
-
-export type ClaimReferralCommissionOptions = TransactionSenderOptions &
-	Pick<CoinTransactionOptions, 'coinType'>;
-
-/** Options for a referrer level-up USD reward claim paid to the referrer wallet. */
-export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
 
 export type CoinTransactionOptions = {
 	coinType: string;
@@ -117,3 +111,8 @@ export type PvPCoinflipTransactionOptions<
 		: Action extends 'cancel'
 			? CancelPvPCoinflipTransactionOptions
 			: never;
+
+export type ClaimReferralCommissionOptions = TransactionSenderOptions &
+	Pick<CoinTransactionOptions, 'coinType'>;
+
+export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;

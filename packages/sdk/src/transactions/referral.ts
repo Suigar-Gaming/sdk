@@ -10,7 +10,7 @@ import {
 import type {
 	ClaimReferralCommissionOptions,
 	ClaimReferralLevelUpUsdRewardsOptions,
-	SuigarConfig,
+	WithConfig,
 } from '../types/index.js';
 import { createBaseTransaction } from './shared.js';
 
@@ -22,9 +22,7 @@ import { createBaseTransaction } from './shared.js';
 function claimReferralCommissionCall({
 	config,
 	coinType,
-}: Pick<ClaimReferralCommissionOptions, 'coinType'> & {
-	config: SuigarConfig;
-}) {
+}: WithConfig<Pick<ClaimReferralCommissionOptions, 'coinType'>>) {
 	return claimCommissionBalance({
 		package: config.packageIds.referral,
 		typeArguments: [normalizeStructTag(coinType)],
@@ -37,11 +35,7 @@ function claimReferralCommissionCall({
  * The configured `usdc` metadata supplies both the dollar coin type and Pyth
  * price-info object required by the referral contract.
  */
-function claimReferralLevelUpUsdRewardsCall({
-	config,
-}: {
-	config: SuigarConfig;
-}) {
+function claimReferralLevelUpUsdRewardsCall({ config }: WithConfig<{}>) {
 	return claimReferrerLevelUpUsdRewards({
 		package: config.packageIds.referral,
 		typeArguments: [normalizeStructTag(config.coins.usdc.coinType)],
@@ -58,7 +52,7 @@ export function buildClaimReferralCommissionTransaction({
 	owner,
 	gasBudget,
 	coinType,
-}: ClaimReferralCommissionOptions & { config: SuigarConfig }): Transaction {
+}: WithConfig<ClaimReferralCommissionOptions>): Transaction {
 	const tx = createBaseTransaction({ owner, gasBudget });
 	const claimedCoin = tx.add(claimReferralCommissionCall({ config, coinType }));
 	tx.transferObjects(
@@ -73,9 +67,7 @@ export function buildClaimReferralLevelUpUsdRewardsTransaction({
 	config,
 	owner,
 	gasBudget,
-}: ClaimReferralLevelUpUsdRewardsOptions & {
-	config: SuigarConfig;
-}): Transaction {
+}: WithConfig<ClaimReferralLevelUpUsdRewardsOptions>): Transaction {
 	const tx = createBaseTransaction({ owner, gasBudget });
 	const claimedCoin = tx.add(claimReferralLevelUpUsdRewardsCall({ config }));
 	tx.transferObjects(
