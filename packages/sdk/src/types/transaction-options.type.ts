@@ -9,26 +9,23 @@ import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
 
-export type WithGasBudget = {
-	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
-};
-
 export type WithPartner<T> = T & {
 	partner?: string;
 };
 
-export type WithThrowOnError<T = object> = T & {
+export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
-export type BaseTransactionOptions = WithGasBudget & {
+export type BaseTransactionOptions = {
 	config: SuigarConfig;
 	owner: string;
+	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
+	metadata?: BetMetadataInput;
 };
 
 export type CoinTransactionOptions = {
 	coinType: string;
-	metadata?: BetMetadataInput;
 	useGasCoin?: boolean;
 };
 

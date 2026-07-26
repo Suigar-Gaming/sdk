@@ -93,13 +93,15 @@ export class SuigarClient {
 		config,
 		partner,
 		cacheTtl,
-	}: {
+	}: Omit<SuigarExtensionOptions, 'name'> & {
 		client: ClientWithCoreApi;
 		name: string;
-		config?: SuigarExtensionOptions['config'];
-		partner?: string;
-		cacheTtl?: number;
 	}) {
+		const network = client.network as SuigarNetwork;
+		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
+			throw new RangeError(`Unsupported network: ${network}`);
+		}
+
 		this.#client = client;
 		this.#partner = partner;
 		this.#cache = client.cache
@@ -109,11 +111,6 @@ export class SuigarClient {
 					ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
 				});
 			});
-
-		const network = this.#client.network as SuigarNetwork;
-		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
-			throw new RangeError(`Unsupported network: ${network}`);
-		}
 
 		this.#config = resolveSuigarConfig(network, config);
 	}
