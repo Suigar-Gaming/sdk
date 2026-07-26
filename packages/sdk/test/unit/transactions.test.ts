@@ -5,6 +5,8 @@ import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+	buildClaimReferralCommissionTransaction,
+	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
 	buildPvPCoinflipTransaction,
 	buildSoccerTransaction,
@@ -95,16 +97,46 @@ describe('transaction builders', () => {
 			normalizeSuiAddress(TEST_CONFIG.packageIds.pvpCoinflip),
 		);
 	});
+
+	it('builds referral commission and level-up claims with configured dependencies', () => {
+		const commissionTx = buildClaimReferralCommissionTransaction({
+			owner: '0x123',
+			coinType: '0x2::sui::SUI',
+			config: TEST_CONFIG,
+		});
+		const levelUpTx = buildClaimReferralLevelUpUsdRewardsTransaction({
+			owner: '0x123',
+			config: TEST_CONFIG,
+		});
+
+		const commissionCall = commissionTx.getData().commands[0].MoveCall!;
+		const levelUpCall = levelUpTx.getData().commands[0].MoveCall!;
+
+		expect(commissionTx.getData().sender).toBe(normalizeSuiAddress('0x123'));
+		expect(commissionCall.package).toBe(
+			normalizeSuiAddress(TEST_CONFIG.packageIds.referral),
+		);
+		expect(commissionCall.function).toBe('claim_commission_balance');
+		expect(commissionCall.typeArguments).toEqual([
+			normalizeStructTag('0x2::sui::SUI'),
+		]);
+		expect(levelUpCall.package).toBe(
+			normalizeSuiAddress(TEST_CONFIG.packageIds.referral),
+		);
+		expect(levelUpCall.function).toBe('claim_referrer_level_up_usd_rewards');
+		expect(levelUpCall.typeArguments).toEqual([
+			TEST_CONFIG.coins.usdc.coinType,
+		]);
+		expect(levelUpCall.arguments).toHaveLength(3);
+	});
 });
 
 describe('shared transaction helpers', () => {
 	it('creates a base transaction with normalized owner address and configured gas budget', async () => {
-		const { createBaseGameTransaction } =
+		const { createBaseTransaction } =
 			await import('../../src/transactions/shared.js');
 
-		const tx = createBaseGameTransaction({
-			config: TEST_CONFIG,
-			game: 'coinflip',
+		const tx = createBaseTransaction({
 			owner: '0xabc',
 			gasBudget: 999,
 		});

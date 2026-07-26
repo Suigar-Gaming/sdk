@@ -18,12 +18,18 @@ import {
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
+	ReferrerClaimCommissionBalanceEvent,
+	ReferrerClaimLevelUpUsdRewardsEvent,
+} from './contracts/referral/referral.js';
+import {
 	DEFAULT_CACHE_TTL_MS,
 	normalizeGameParameterValues,
 	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
+	buildClaimReferralCommissionTransaction,
+	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
 	buildLimboTransaction,
 	buildPlinkoTransaction,
@@ -36,6 +42,8 @@ import {
 import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
+	ClaimReferralCommissionOptions,
+	ClaimReferralLevelUpUsdRewardsOptions,
 	CoinflipTransactionOptions,
 	CreateGameBetOptions,
 	Game,
@@ -295,7 +303,7 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Transaction builders for Suigar games.
+	 * Transaction builders for Suigar games and referrals.
 	 */
 	tx = {
 		/**
@@ -375,6 +383,25 @@ export class SuigarClient {
 				});
 			},
 		},
+		/** Referral transaction builders. Each transaction returns its claimed coin to `owner`. */
+		referral: {
+			claimCommission: (
+				options: ClaimReferralCommissionOptions,
+			): Transaction => {
+				return buildClaimReferralCommissionTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+			claimLevelUpUsdRewards: (
+				options: ClaimReferralLevelUpUsdRewardsOptions,
+			): Transaction => {
+				return buildClaimReferralLevelUpUsdRewardsTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+		},
 	};
 
 	/**
@@ -418,5 +445,9 @@ export class SuigarClient {
 		 * Event emitted when a PvP Coinflip game is cancelled.
 		 */
 		PvPCoinflipGameCancelledEvent,
+		/** Event emitted when a referrer claims commission for a wager coin. */
+		ReferrerClaimCommissionBalanceEvent,
+		/** Event emitted when a referrer claims a USD-denominated level-up reward. */
+		ReferrerClaimLevelUpUsdRewardsEvent,
 	};
 }

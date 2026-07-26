@@ -18,6 +18,7 @@ type Network = (typeof NETWORKS)[number];
 
 const REGISTRY_PACKAGE_NAMES = {
 	core: '@suigar/core',
+	referral: '@suigar/referral',
 	coinflip: '@suigar/coinflip',
 	limbo: '@suigar/limbo',
 	plinko: '@suigar/plinko',
@@ -143,6 +144,8 @@ import type { SuigarPackageIds } from '../../types/index.js';
 // \`nftV1\` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 \tcore: '${packageIds.core}',
+\treferral:
+\t\t'${packageIds.referral}',
 \tnftV1:
 \t\t'${packageIds.nftV1}',
 \tcoinflip:
@@ -205,6 +208,7 @@ async function updateNetworkConfig(network: Network) {
 	const packageIds: PackageIds = {
 		nftV1: extractObjectValue(packageSource, currentPackageObjectName, 'nftV1'),
 		core: '',
+		referral: '',
 		coinflip: '',
 		limbo: '',
 		plinko: '',

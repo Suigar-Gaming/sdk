@@ -17,12 +17,24 @@ export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
-export type BaseTransactionOptions = {
-	config: SuigarConfig;
+/** Common sender and gas settings for every SDK-built transaction. */
+export type TransactionSenderOptions = {
 	owner: string;
 	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
+};
+
+export type BaseTransactionOptions = TransactionSenderOptions & {
+	config: SuigarConfig;
 	metadata?: BetMetadataInput;
 };
+
+/** Options for a referrer claim transaction paid to the referrer wallet. */
+
+export type ClaimReferralCommissionOptions = TransactionSenderOptions &
+	Pick<CoinTransactionOptions, 'coinType'>;
+
+/** Options for a referrer level-up USD reward claim paid to the referrer wallet. */
+export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
 
 export type CoinTransactionOptions = {
 	coinType: string;

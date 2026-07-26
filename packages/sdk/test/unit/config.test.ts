@@ -39,6 +39,7 @@ describe('resolveSuigarConfig', () => {
 			priceInfoObjectId: COINS.testnet.usdc.priceInfoObjectId,
 		});
 		expect(config.packageIds.coinflip).toBe(PACKAGE_IDS.testnet.coinflip);
+		expect(config.packageIds.referral).toBe(PACKAGE_IDS.testnet.referral);
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
 		expect(config.packageIds.plinko).toBe(PACKAGE_IDS.testnet.plinko);
 		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.testnet.soccer);
@@ -53,6 +54,7 @@ describe('resolveSuigarConfig', () => {
 		expect(config.objectIds.sweetHouse).toBe(OBJECT_IDS.mainnet.sweetHouse);
 		expect(config.objectIds.nftV1Factory).toBe(OBJECT_IDS.mainnet.nftV1Factory);
 		expect(config.packageIds.range).toBe(PACKAGE_IDS.mainnet.range);
+		expect(config.packageIds.referral).toBe(PACKAGE_IDS.mainnet.referral);
 		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.mainnet.soccer);
 		expect(config.registryIds).toEqual(REGISTRY_IDS.mainnet);
 		expect(config.coins.sui).toEqual({

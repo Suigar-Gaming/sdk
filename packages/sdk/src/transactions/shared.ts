@@ -20,6 +20,7 @@ import type {
 	Game,
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
+	TransactionSenderOptions,
 	WithPartner,
 } from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
@@ -32,7 +33,7 @@ type StrictStakeTransactionOptions = {
 	>;
 };
 
-export type SharedBetTransactionContext = Pick<
+type SharedBetTransactionContext = Pick<
 	BaseTransactionOptions,
 	'config' | 'owner'
 > &
@@ -43,11 +44,11 @@ export type SharedBetTransactionContext = Pick<
 		betCoin: TransactionArgument;
 	};
 
-export type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
+type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
 	game: Game;
 };
 
-export type StandardGameBetTransactionOptions = WithPartner<
+type StandardGameBetTransactionOptions = WithPartner<
 	SharedBetTransactionOptions & {
 		game: Game;
 		buildRewardCoin: (
@@ -56,6 +57,17 @@ export type StandardGameBetTransactionOptions = WithPartner<
 	}
 >;
 
+/** Creates a transaction with its sender and default gas budget configured. */
+export function createBaseTransaction({
+	owner,
+	gasBudget,
+}: TransactionSenderOptions): Transaction {
+	const tx = new Transaction();
+	tx.setSenderIfNotSet(normalizeSuiAddress(owner));
+	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);
+	return tx;
+}
+
 export function createBaseGameTransaction({
 	config,
 	game,
@@ -63,12 +75,7 @@ export function createBaseGameTransaction({
 	gasBudget,
 }: CreateBaseGameTransactionOptions): Transaction {
 	assertConfiguredBetGame(config, game);
-
-	const tx = new Transaction();
-	tx.setSenderIfNotSet(normalizeSuiAddress(owner));
-	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);
-
-	return tx;
+	return createBaseTransaction({ owner, gasBudget });
 }
 
 export function buildSharedStandardGameBetTransaction({
