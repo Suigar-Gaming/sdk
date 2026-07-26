@@ -439,7 +439,7 @@ export const readGameMetadataTool = async (
 				toJsonValue(formatGameParameters(parameters, coin.decimals)) ?? null,
 			ignoreCache,
 			notes: [
-				'Parameters are loaded from the on-chain game settings objects through client.suigar.getGameParameters().',
+				'Parameters are loaded for the requested coin type from the on-chain game settings objects through client.suigar.getGameParameters().',
 				ignoreCache
 					? 'SDK parameter cache was ignored for this read.'
 					: 'SDK parameter cache was allowed for this read.',
