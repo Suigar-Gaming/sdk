@@ -21,6 +21,7 @@ The example reflects the current package export split:
 - Standard game route: `/standard?game=coinflip`
 - PvP route: `/pvp?game=pvp-coinflip&action=create`
 - NFT route: `/nft`, which reads the configured NFT factory and marks each NFT spec as directly possessed or not possessed by the connected wallet
+- Referral route: `/referral`, which simulates and submits commission and level-up USD reward claims for the connected referrer wallet
 - Query-param game selection
 - Shared supported-coin selector using `client.suigar.getConfig().coins`
 - Connected-wallet balance cards for every supported coin type
@@ -67,6 +68,7 @@ pnpm --dir playground run typecheck
 - The app is fixed to `testnet`.
 - Connected balances are fetched from the active wallet for each SDK-supported coin type and refresh after transaction execution.
 - The NFT page uses `client.core.listOwnedObjects()` with the SDK-configured NFT type, decodes objects with the SDK's NFT BCS helpers, and does not include NFTs held in a Kiosk.
+- The referral page uses `client.suigar.view.referral` to simulate claimable amounts. A zero or unavailable amount disables its claim action; submitted claims are built through `client.suigar.tx.referral` and refresh afterward.
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation where the selected action requires a stake.
 - Standard game stake fields show the current on-chain min and max range for the selected coin, and the form clamps stake back into the allowed range when live parameters load or change.
 - Standard games expose optional bet count; leave it empty to use the SDK default of `1`.

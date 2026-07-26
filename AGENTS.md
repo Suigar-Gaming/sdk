@@ -166,6 +166,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
+- exposing `packageIds.referral` for applications that build referral commission and level-up USD reward claims or simulate their claimable amounts through `client.suigar.tx.referral` and `client.suigar.view.referral`
 - exposing `packageIds.nftV1` and `objectIds.nftV1Factory` for applications that need NFT V1 lookups without adding an NFT client surface to this SDK; derive the owned-NFT query type with `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.NftV1.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.NftV1Factory.parse(object.content)`, while leaving NFT V1 minting outside this SDK
 - treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 

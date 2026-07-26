@@ -106,13 +106,13 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_pvp_coinflip_join_transaction`
 - `build_pvp_coinflip_cancel_transaction`
 
-All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, or transaction inspection.
+All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, referral rewards, or transaction inspection.
 
 ### Read tools
 
 `read_config`, `read_game_metadata`, `list_nfts`, and the referral amount reads are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name. Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated. `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
 
-In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text.
+In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text. Referral reads render a dedicated Referral Rewards view with the referrer, reward type, coin type, and simulated claimable amount.
 
 ### Transaction tools
 
