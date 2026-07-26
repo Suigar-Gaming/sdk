@@ -164,9 +164,7 @@ export function NftPage() {
 				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<h1 className="text-3xl leading-none md:text-5xl">
-								Your Suigar NFTs
-							</h1>
+							<h1 className="text-3xl leading-none md:text-5xl">Suigar NFTs</h1>
 						</div>
 					</div>
 				</section>

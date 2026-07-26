@@ -1,14 +1,10 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
-import {
-	CircleDollarSign,
-	Gift,
-	RefreshCw,
-	SendHorizontal,
-} from 'lucide-react';
+import { RefreshCw, SendHorizontal } from 'lucide-react';
 import * as React from 'react';
 import { AppHeader } from '@/components/app-header';
+import { CoinIcon } from '@/components/coins';
 import { formatBalance } from '@/components/integration-shell/helpers/coin';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +18,7 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { dAppKit } from '@/lib/dapp-kit';
+import type { SupportedCoinKey } from '@/lib/suigar-types';
 
 type ClaimKind = 'commission-sui' | 'commission-usdc' | 'level-up';
 
@@ -136,6 +133,7 @@ export function ReferralPage() {
 		title: string;
 		description: string;
 		coin: string;
+		coinKey: SupportedCoinKey;
 		decimals: number;
 	}> = [
 		{
@@ -143,6 +141,7 @@ export function ReferralPage() {
 			title: 'SUI commission',
 			description: 'Referral commission earned from SUI wagers.',
 			coin: 'SUI',
+			coinKey: 'sui',
 			decimals: sui.decimals,
 		},
 		{
@@ -150,6 +149,7 @@ export function ReferralPage() {
 			title: 'USDC commission',
 			description: 'Referral commission earned from USDC wagers.',
 			coin: 'USDC',
+			coinKey: 'usdc',
 			decimals: usdc.decimals,
 		},
 		{
@@ -157,6 +157,7 @@ export function ReferralPage() {
 			title: 'Level-up rewards',
 			description: 'USD referral level-up rewards paid in USDC.',
 			coin: 'USDC',
+			coinKey: 'usdc',
 			decimals: usdc.decimals,
 		},
 	];
@@ -173,12 +174,8 @@ export function ReferralPage() {
 				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<div className="mb-3 flex items-center gap-2 text-primary">
-								<Gift className="size-5" />
-								<span className="text-sm font-medium">Referral rewards</span>
-							</div>
 							<h1 className="text-3xl leading-none md:text-5xl">
-								Claim your rewards
+								Rewards claim
 							</h1>
 							<p className="mt-3 max-w-2xl text-muted-foreground">
 								Amounts are simulated from the current on-chain referral state
@@ -195,16 +192,6 @@ export function ReferralPage() {
 						</Button>
 					</div>
 				</section>
-
-				{!owner ? (
-					<Alert className="mb-6">
-						<CircleDollarSign />
-						<AlertTitle>Connect your wallet</AlertTitle>
-						<AlertDescription>
-							Connect the referrer wallet to simulate and claim its rewards.
-						</AlertDescription>
-					</Alert>
-				) : null}
 
 				{status ? (
 					<Alert variant="success" className="mb-6">
@@ -228,7 +215,10 @@ export function ReferralPage() {
 								<CardHeader>
 									<div className="flex items-center justify-between gap-3">
 										<CardTitle>{card.title}</CardTitle>
-										<Badge variant="outline">{card.coin}</Badge>
+										<Badge variant="outline" className="gap-1.5">
+											<CoinIcon coinKey={card.coinKey} className="size-4" />
+											{card.coin}
+										</Badge>
 									</div>
 									<CardDescription>{card.description}</CardDescription>
 								</CardHeader>
