@@ -579,6 +579,18 @@ describe('SuigarClient', () => {
 		).resolves.toBe(123n);
 
 		expect(client.simulateTransactionCalls).toHaveLength(2);
+
+		client.mockSimulationResult = {
+			$kind: 'FailedTransaction',
+			FailedTransaction: {},
+			commandResults: undefined,
+		};
+		await expect(
+			client.suigar.view.referral.getCommission({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+			}),
+		).resolves.toBe(0n);
 	});
 
 	it('injects the configured partner into standard-game metadata', async () => {

@@ -445,23 +445,31 @@ export class SuigarClient {
 				owner,
 				coinType,
 			}: Pick<ClaimReferralCommissionOptions, 'owner' | 'coinType'>) => {
-				const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-					this.tx.referral.claimCommission({
-						owner,
-						coinType,
-					}),
-				);
-				return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+				try {
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
+						this.tx.referral.claimCommission({
+							owner,
+							coinType,
+						}),
+					);
+					return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+				} catch {
+					return 0n;
+				}
 			},
 			getLevelUpUsdRewards: async ({
 				owner,
 			}: Pick<ClaimReferralLevelUpUsdRewardsOptions, 'owner'>) => {
-				const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-					this.tx.referral.claimLevelUpUsdRewards({
-						owner,
-					}),
-				);
-				return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+				try {
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
+						this.tx.referral.claimLevelUpUsdRewards({
+							owner,
+						}),
+					);
+					return BigInt(SuiCoin.parse(claimCoinBcs).balance);
+				} catch {
+					return 0n;
+				}
 			},
 		},
 	};
