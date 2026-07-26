@@ -224,6 +224,7 @@ The registered extension instance exposes the main runtime surface:
 - `getPvPCoinflipGames(options?)`
 - `bcs`
 - `tx`
+- `view`
 
 ### `getConfig()`
 
@@ -460,6 +461,38 @@ Error behavior:
 
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
 
+### Referral claims
+
+Referrers can claim commission accrued for any supported wager coin, and separately claim their USD-denominated level-up reward in the configured dollar coin (`coins.usdc`). Each builder sets `owner` as the transaction sender and transfers the returned claim coin back to that same address.
+
+```ts
+const commissionClaim = client.suigar.tx.referral.claimCommission({
+	owner: '0xREFERRER',
+	coinType: '0x2::sui::SUI',
+});
+
+const levelUpClaim = client.suigar.tx.referral.claimLevelUpUsdRewards({
+	owner: '0xREFERRER',
+});
+```
+
+The owner must sign the transaction: the Move contract derives the referrer from the transaction sender. `claimLevelUpUsdRewards` supplies the configured USDC type and its Pyth price-info object automatically. A claim can still abort when no referrer or coin-specific balance exists, the rakeback pool lacks funds, or the oracle check fails.
+
+Use `view.referral` to simulate the complete claim transaction and return its atomic payout without changing chain state:
+
+```ts
+const commissionAmount = await client.suigar.view.referral.getCommission({
+	owner: '0xREFERRER',
+	coinType: '0x2::sui::SUI',
+});
+const levelUpUsdcAmount =
+	await client.suigar.view.referral.getLevelUpUsdRewards({
+		owner: '0xREFERRER',
+	});
+```
+
+The deployed referral contract does not expose public balance getters. These simulated reads execute the same pool and oracle checks as a real claim, so they can fail for the same reasons and can change before execution.
+
 ## `bcs`
 
 BCS helpers live under `client.suigar.bcs`.
@@ -471,6 +504,8 @@ Current exposed helpers:
 - `PvPCoinflipGameCreatedEvent`
 - `PvPCoinflipGameResolvedEvent`
 - `PvPCoinflipGameCancelledEvent`
+- `ReferrerClaimCommissionBalanceEvent`
+- `ReferrerClaimLevelUpUsdRewardsEvent`
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
