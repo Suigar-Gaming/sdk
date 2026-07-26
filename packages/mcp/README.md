@@ -5,6 +5,7 @@ MCP server and MCP App for Suigar transaction workflows on Sui.
 It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
+- referral claimable-amount reads and unsigned claim builders
 - unsigned transaction builders for standard Suigar games and PvP coinflip
 - `build`, `dry-run`, and `read-only` modes
 - a compact MCP App UI resource for compatible hosts
@@ -91,6 +92,10 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `read_config`
 - `read_game_metadata`
 - `list_nfts`
+- `get_referral_commission`
+- `get_referral_level_up_usd_rewards`
+- `build_referral_commission_claim_transaction`
+- `build_referral_level_up_usd_rewards_claim_transaction`
 - `build_coinflip_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
@@ -105,7 +110,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
 
 ### Read tools
 
-`read_config`, `read_game_metadata`, and `list_nfts` are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; `list_nfts` additionally requires an `owner` address or SuiNS name.
+`read_config`, `read_game_metadata`, `list_nfts`, and the referral amount reads are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name. Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated. `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
 
 In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text.
 
@@ -134,7 +139,7 @@ Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `u
 
 When `betCount` is provided for Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
-Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `configId`/`countryId`/`shotZoneId` for Soccer, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`.
+Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `configId`/`countryId`/`shotZoneId` for Soccer, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`. Referral claim builders require an `owner`; commission claims optionally accept `coinType`, while level-up USD reward claims use configured USDC.
 
 ## Config
 
@@ -146,6 +151,7 @@ Optional `config` input follows the public SDK extension override shape:
 {
 	packageIds?: {
 		nftV1?: string;
+		referral?: string;
 		core?: string;
 		coinflip?: string;
 		limbo?: string;

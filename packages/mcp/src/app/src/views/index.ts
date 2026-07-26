@@ -7,6 +7,7 @@ import { createInspectorViewModel } from '../lib/inspector.js';
 import { ConfigView } from './config.js';
 import { GameMetadataView } from './game-metadata.js';
 import { NftView } from './nft.js';
+import { ReferralView } from './referral.js';
 import { TransactionView } from './transaction.js';
 
 export type AppViewProps = {
@@ -22,6 +23,9 @@ export type ResolvedAppView = {
 
 export const resolveAppView = (payload: unknown): ResolvedAppView => {
 	const result = asRecord(payload);
+	if (result.referral && !result.summary) {
+		return { coinBadge: null, title: 'Referral Rewards', View: ReferralView };
+	}
 	const coinBadge = createInspectorViewModel(payload, []).coinBadge;
 	if (Array.isArray(result.ownedNfts)) {
 		return { coinBadge, title: 'NFT Collection', View: NftView };

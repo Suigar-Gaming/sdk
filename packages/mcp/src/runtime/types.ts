@@ -181,10 +181,39 @@ export type ListNftsResult = {
 	ownedNfts: Array<Nft>;
 };
 
+export type ReferralClaimKind = 'commission' | 'level-up-usd-rewards';
+
+export type ReferralClaimReadResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	owner: string;
+	referral: {
+		kind: ReferralClaimKind;
+		coinType: string;
+		amount: string;
+		amountDisplay: string;
+		notes: Array<string>;
+	};
+};
+
+export type ReferralClaimReadOnlyPlan = {
+	mode: 'read-only';
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	plan: ReadOnlyPlan['plan'];
+	referral: {
+		kind: ReferralClaimKind;
+		coinType: string;
+		packageId: string;
+	};
+};
+
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
 	| ListNftsResult
+	| ReferralClaimReadResult
+	| ReferralClaimReadOnlyPlan
 	| ReadOnlyPlan
 	| BuildTransactionResult;
 
