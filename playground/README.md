@@ -25,8 +25,8 @@ The example reflects the current package export split:
 - Shared supported-coin selector using `client.suigar.getConfig().coins`
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
-- Standard game forms backed by `client.suigar.getGameParameters()` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Soccer/Wheel config selection
-- A game-settings dialog in the controls card that shows the current typed `getGameParameters()` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP coinflip
+- Standard game forms backed by `client.suigar.getGameParameters(game, { coinType })` for live on-chain stake ranges, per-game parameter bounds, and Plinko/Soccer/Wheel config selection
+- A game-settings dialog in the controls card that shows the current typed `getGameParameters(game, { coinType })` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP coinflip
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, using each returned lobby's `coin_type` field for coin selection and display, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
@@ -70,7 +70,7 @@ pnpm --dir playground run typecheck
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation where the selected action requires a stake.
 - Standard game stake fields show the current on-chain min and max range for the selected coin, and the form clamps stake back into the allowed range when live parameters load or change.
 - Standard games expose optional bet count; leave it empty to use the SDK default of `1`.
-- Limbo clamps `targetMultiplier` to the on-chain `min_target_multiplier` and `max_target_multiplier` bounds. `getGameParameters()` returns those fields as JavaScript numbers.
+- Limbo clamps `targetMultiplier` to the on-chain `min_target_multiplier` and `max_target_multiplier` bounds. `getGameParameters(game, { coinType })` requires the selected coin type and returns those fields as JavaScript numbers.
 - Range also clamps the current inputs to the on-chain zone-size bounds for the active scale and surfaces the current RTP bounds in the field description.
 - Plinko, Soccer, and Wheel switch to live config options when those on-chain parameters are available. The form only offers playable configs in the selector and automatically moves away from missing or disabled selections.
 - The settings dialog is available from the top-right of both the standard and PvP controls cards and is useful for inspecting the live parsed parameter object without leaving the playground.
