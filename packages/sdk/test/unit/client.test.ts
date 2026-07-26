@@ -667,7 +667,9 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('coinflip');
+		const parameters = await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
@@ -706,7 +708,9 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('limbo');
+		const parameters = await client.suigar.getGameParameters('limbo', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expectTypeOf(parameters.min_target_multiplier).toEqualTypeOf<number>();
 		expectTypeOf(parameters.max_target_multiplier).toEqualTypeOf<number>();
@@ -735,7 +739,11 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		await expect(client.suigar.getGameParameters('coinflip')).rejects.toThrow(
+		await expect(
+			client.suigar.getGameParameters('coinflip', {
+				coinType: COINS.testnet.sui.coinType,
+			}),
+		).rejects.toThrow(
 			`Missing parameters object content for coinflip and coin type ${normalizeStructTag(
 				COINS.testnet.sui.coinType,
 			)}`,
@@ -769,8 +777,12 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		await client.suigar.getGameParameters('coinflip');
-		await client.suigar.getGameParameters('coinflip');
+		await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
@@ -781,6 +793,7 @@ describe('SuigarClient', () => {
 		];
 
 		const refreshed = await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
 			ignoreCache: true,
 		});
 
@@ -826,8 +839,12 @@ describe('SuigarClient', () => {
 			shared: SuigarClient;
 		};
 
-		await first.shared.getGameParameters('coinflip');
-		await second.shared.getGameParameters('coinflip');
+		await first.shared.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await second.shared.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);

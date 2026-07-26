@@ -219,7 +219,7 @@ If `partner` is configured, the SDK automatically writes that partner wallet add
 The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
-- `getGameParameters(game, options?)`
+- `getGameParameters(game, { coinType, ...options })`
 - `serializeTransactionToBase64(transaction, options?)`
 - `getPvPCoinflipGames(options?)`
 - `bcs`
@@ -244,9 +244,9 @@ console.log(config.packageIds);
 console.log(config.coins.sui.coinType);
 ```
 
-### `getGameParameters(game, options?)`
+### `getGameParameters(game, { coinType, ...options })`
 
-Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`.
+Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`. `coinType` is required because each game has a distinct parameters object for every supported coin.
 
 The SDK first reads the selected game's settings object from the configured SweetHouse object, then reads that game's coin-specific `Parameters<T>` object. This is useful for displaying or validating current limits such as min/max stake, house edge, or game-specific config bounds. The parsed result is cached using the extension `cacheTtl`.
 

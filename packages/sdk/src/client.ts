@@ -161,7 +161,7 @@ export class SuigarClient {
 	 * including floats nested in game configs.
 	 *
 	 * @param game Game whose parameters should be loaded.
-	 * @param options Optional coin type, cache override, and abort signal.
+	 * @param options Required coin type, plus optional cache override and abort signal.
 	 * @returns Parsed game parameters typed for the requested game.
 	 */
 	async getGameParameters<TGame extends Game>(

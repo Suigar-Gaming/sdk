@@ -89,6 +89,7 @@ export type GameParameters<TGame extends Game> = GameParameterValue<
 	OnChainGameParameters<TGame>
 >;
 
+/** Options for reading parameters. `coinType` is required because parameters are coin-specific. */
 export type GetGameParametersOptions =
 	SuiClientTypes.CoreClientMethodOptions & {
 		coinType: string;
