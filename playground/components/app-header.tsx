@@ -56,6 +56,11 @@ const links = [
 		label: 'NFTs',
 		isActive: (pathname: string) => pathname.endsWith('/nft'),
 	},
+	{
+		href: '/referral',
+		label: 'Referral',
+		isActive: (pathname: string) => pathname.endsWith('/referral'),
+	},
 ] as const;
 
 type HeaderProps = {
