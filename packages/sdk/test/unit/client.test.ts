@@ -278,6 +278,10 @@ class TestClient extends CoreClient {
 
 	getObjectsCalls: Array<SuiClientTypes.GetObjectsOptions> = [];
 
+	simulateTransactionCalls: Array<unknown> = [];
+
+	mockSimulationResult: unknown;
+
 	dynamicFieldObjectReads = 0;
 
 	constructor() {
@@ -382,8 +386,9 @@ class TestClient extends CoreClient {
 		throw new Error('Not implemented.');
 	};
 
-	simulateTransaction: CoreClient['simulateTransaction'] = async () => {
-		throw new Error('Not implemented.');
+	simulateTransaction: CoreClient['simulateTransaction'] = async (options) => {
+		this.simulateTransactionCalls.push(options);
+		return this.mockSimulationResult as never;
 	};
 
 	getReferenceGasPrice: CoreClient['getReferenceGasPrice'] = async () => ({
@@ -539,6 +544,41 @@ describe('SuigarClient', () => {
 
 		expect(client.suigar).toBeDefined();
 		expect(typeof client.suigar.serializeTransactionToBase64).toBe('function');
+	});
+
+	it('gets referral claim amounts by simulating the complete claim transaction', async () => {
+		const client = createSuigarTestClient();
+		const claimCoinBcs = bcs
+			.struct('Coin', {
+				id: bcs.Address,
+				balance: bcs.u64(),
+			})
+			.serialize({ id: '0x1', balance: 123n })
+			.toBytes();
+		client.mockSimulationResult = {
+			$kind: 'Transaction',
+			Transaction: {},
+			commandResults: [
+				{
+					returnValues: [{ bcs: claimCoinBcs }],
+					mutatedReferences: [],
+				},
+			],
+		};
+
+		await expect(
+			client.suigar.view.referral.getCommission({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+			}),
+		).resolves.toBe(123n);
+		await expect(
+			client.suigar.view.referral.getLevelUpUsdRewards({
+				owner: '0x123',
+			}),
+		).resolves.toBe(123n);
+
+		expect(client.simulateTransactionCalls).toHaveLength(2);
 	});
 
 	it('injects the configured partner into standard-game metadata', async () => {
