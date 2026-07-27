@@ -1,9 +1,10 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
-import { RefreshCw, SendHorizontal } from 'lucide-react';
+import { FileCode2, RefreshCw, SendHorizontal } from 'lucide-react';
 import * as React from 'react';
 import { AppHeader } from '@/components/app-header';
+import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { formatBalance } from '@/components/integration-shell/helpers/coin';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -16,6 +17,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { dAppKit } from '@/lib/dapp-kit';
 import type { SupportedCoinKey } from '@/lib/suigar-types';
@@ -138,6 +147,22 @@ export function ReferralPage() {
 	};
 
 	const { sui, usdc } = client.suigar.getConfig().coins;
+	const referralCode = `const { sui, usdc } = client.suigar.getConfig().coins;
+const owner = '${owner ?? '<wallet address>'}';
+
+const [suiCommission, usdcCommission, levelUpUsdRewards] = await Promise.all([
+  client.suigar.view.referral.getCommission({ owner, coinType: sui.coinType }),
+  client.suigar.view.referral.getCommission({ owner, coinType: usdc.coinType }),
+  client.suigar.view.referral.getLevelUpUsdRewards({ owner }),
+]);
+
+const commissionTx = client.suigar.tx.referral.claimCommission({
+  owner,
+  coinType: sui.coinType,
+});
+const levelUpTx = client.suigar.tx.referral.claimLevelUpUsdRewards({ owner });
+
+await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 	const claimCards: Array<{
 		kind: ClaimKind;
 		title: string;
@@ -192,14 +217,44 @@ export function ReferralPage() {
 								before you sign a claim.
 							</p>
 						</div>
-						<Button
-							variant="outline"
-							onClick={() => void refreshClaims()}
-							disabled={!owner || isLoading}
-						>
-							<RefreshCw className={isLoading ? 'animate-spin' : undefined} />
-							Refresh
-						</Button>
+						<div className="flex gap-2">
+							<Dialog>
+								<DialogTrigger asChild>
+									<Button variant="outline">
+										<FileCode2 />
+										View code
+									</Button>
+								</DialogTrigger>
+								<DialogContent
+									className="max-h-[calc(100dvh-2rem)] overflow-y-auto"
+									size="xl"
+								>
+									<DialogHeader>
+										<DialogTitle className="text-xl md:text-2xl">
+											Referral code
+										</DialogTitle>
+										<DialogDescription>
+											The preview shows the simulated reward reads and the
+											unsigned SDK claim builders used by this page.
+										</DialogDescription>
+									</DialogHeader>
+									<CodeBlock
+										code={referralCode}
+										copyDescription="The referral code was copied."
+										copyTitle="Copy referral code"
+										copyMode="icon"
+									/>
+								</DialogContent>
+							</Dialog>
+							<Button
+								variant="outline"
+								onClick={() => void refreshClaims()}
+								disabled={!owner || isLoading}
+							>
+								<RefreshCw className={isLoading ? 'animate-spin' : undefined} />
+								Refresh
+							</Button>
+						</div>
 					</div>
 				</section>
 

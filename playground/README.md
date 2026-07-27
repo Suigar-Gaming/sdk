@@ -31,6 +31,7 @@ The example reflects the current package export split:
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, using each returned lobby's `coin_type` field for coin selection and display, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview
+- Copyable NFT lookup and referral read/claim code previews that mirror the calls used by their respective routes
 - A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreatedEvent`, `PvPCoinflipGameResolvedEvent`, and `PvPCoinflipGameCancelledEvent`
 - Oracle price formatting with `fromMoveFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
@@ -68,7 +69,7 @@ pnpm --dir playground run typecheck
 - The app is fixed to `testnet`.
 - Connected balances are fetched from the active wallet for each SDK-supported coin type and refresh after transaction execution.
 - The NFT page uses `client.core.listOwnedObjects()` with the SDK-configured NFT type, decodes objects with the SDK's NFT BCS helpers, and does not include NFTs held in a Kiosk.
-- The referral page uses `client.suigar.view.referral` to simulate claimable amounts. A zero or unavailable amount disables its claim action; submitted claims are built through `client.suigar.tx.referral` and refresh afterward.
+- The referral page uses `client.suigar.view.referral` to simulate claimable amounts. A zero or unavailable amount disables its claim action; submitted claims are built through `client.suigar.tx.referral` and refresh afterward. Its copyable code preview includes both claimable-amount reads and unsigned claim builders.
 - Stake inputs use human values such as `1` or `2.5` and are converted to atomic on-chain units before transaction creation where the selected action requires a stake.
 - Standard game stake fields show the current on-chain min and max range for the selected coin, and the form clamps stake back into the allowed range when live parameters load or change.
 - Standard games expose optional bet count; leave it empty to use the SDK default of `1`.

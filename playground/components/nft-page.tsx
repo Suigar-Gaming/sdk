@@ -1,12 +1,14 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
-import { Check } from 'lucide-react';
+import { Check, FileCode2 } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 import type { SuigarClient } from '@suigar/sdk';
 import { AppHeader } from '@/components/app-header';
+import { CodeBlock } from '@/components/code-block';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
 	Card,
 	CardContent,
@@ -14,6 +16,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type NftSpec = {
@@ -87,6 +97,24 @@ export function NftPage() {
 	);
 	const requestIdRef = React.useRef(0);
 	const isLoading = activeRequestId !== null;
+	const nftCode = `const { nftV1: nftPackageId } = client.suigar.getConfig().packageIds;
+const { nftV1Factory: nftFactoryId } = client.suigar.getConfig().objectIds;
+
+const { object } = await client.core.getObject({
+  objectId: nftFactoryId,
+  include: { content: true },
+});
+const factory = client.suigar.bcs.NftV1Factory.parse(object.content);
+
+const nftType = client.suigar.bcs.NftV1.typeTag({ package: nftPackageId });
+const page = await client.core.listOwnedObjects({
+  owner: '${accountAddress ?? '<wallet address>'}',
+  type: nftType,
+  include: { content: true },
+});
+const ownedNfts = page.objects.map(({ content }) =>
+  client.suigar.bcs.NftV1.parse(content),
+);`;
 
 	React.useEffect(() => {
 		let cancelled = false;
@@ -166,6 +194,34 @@ export function NftPage() {
 						<div>
 							<h1 className="text-3xl leading-none md:text-5xl">Suigar NFTs</h1>
 						</div>
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button variant="outline">
+									<FileCode2 />
+									View code
+								</Button>
+							</DialogTrigger>
+							<DialogContent
+								className="max-h-[calc(100dvh-2rem)] overflow-y-auto"
+								size="xl"
+							>
+								<DialogHeader>
+									<DialogTitle className="text-xl md:text-2xl">
+										NFT lookup code
+									</DialogTitle>
+									<DialogDescription>
+										This mirrors the factory and ownership lookups used by this
+										page, including the SDK BCS decoders.
+									</DialogDescription>
+								</DialogHeader>
+								<CodeBlock
+									code={nftCode}
+									copyDescription="The NFT lookup code was copied."
+									copyTitle="Copy NFT lookup code"
+									copyMode="icon"
+								/>
+							</DialogContent>
+						</Dialog>
 					</div>
 				</section>
 
