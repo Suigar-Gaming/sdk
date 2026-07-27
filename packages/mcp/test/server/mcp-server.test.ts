@@ -131,8 +131,8 @@ describe('MCP server registration', () => {
 			);
 
 			expect(appResource).toMatchObject({
-				name: 'Suigar Transaction Inspector',
-				title: 'Suigar Transaction Inspector',
+				name: 'Suigar MCP Console',
+				title: 'Suigar MCP Console',
 				mimeType: 'text/html;profile=mcp-app',
 				_meta: {
 					ui: {

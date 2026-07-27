@@ -134,7 +134,7 @@ export function SuigarInspectorApp() {
 		() =>
 			new App(
 				{
-					name: 'suigar-transaction-inspector',
+					name: 'suigar-mcp-app',
 					version: __SUIGAR_MCP_APP_VERSION__,
 				},
 				{},

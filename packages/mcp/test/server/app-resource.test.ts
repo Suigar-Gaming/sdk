@@ -15,7 +15,7 @@ describe('MCP App resource', () => {
 
 		expect(content.uri).toBe(SUIGAR_MCP_APP_RESOURCE_URI);
 		expect(content.mimeType).toBe('text/html;profile=mcp-app');
-		expect(content.text).toContain('Suigar Transaction Inspector');
+		expect(content.text).toContain('Suigar MCP Console');
 		expect(content._meta.ui.csp).toEqual({
 			connectDomains: [],
 			resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],

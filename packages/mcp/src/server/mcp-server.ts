@@ -23,12 +23,12 @@ export const createSuigarMcpServer = () => {
 
 	registerAppResource(
 		server,
-		'Suigar Transaction Inspector',
+		'Suigar MCP Console',
 		SUIGAR_MCP_APP_RESOURCE_URI,
 		{
-			title: 'Suigar Transaction Inspector',
+			title: 'Suigar MCP Console',
 			description:
-				'Compact MCP App UI for inspecting Suigar config, transaction plans, summaries, dry-runs, and serialized bytes.',
+				'Compact MCP App UI for inspecting Suigar config, game metadata, NFT and referral data, and transaction plans, summaries, dry-runs, and serialized bytes.',
 			_meta: {
 				ui: {
 					csp: {
