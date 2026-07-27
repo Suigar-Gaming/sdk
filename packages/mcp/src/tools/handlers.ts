@@ -242,6 +242,24 @@ const supportedGames = () =>
 		tools: [...GAME_TO_TOOLS[id]],
 	}));
 
+const supportedFeatures = () => [
+	{
+		id: 'nfts' as const,
+		label: 'NFTs',
+		tools: ['list_nfts'],
+	},
+	{
+		id: 'referrals' as const,
+		label: 'Referrals',
+		tools: [
+			'get_referral_commission',
+			'get_referral_level_up_usd_rewards',
+			'build_referral_commission_claim_transaction',
+			'build_referral_level_up_usd_rewards_claim_transaction',
+		],
+	},
+];
+
 const getPackageId = (config: ResolvedMcpConfig, game: Game) =>
 	config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
 
@@ -428,6 +446,7 @@ export const readConfigTool = async (input: ReadConfigInput = {}) => {
 		network: config.network,
 		config,
 		supportedGames: supportedGames(),
+		supportedFeatures: supportedFeatures(),
 	} satisfies ReadConfigResult);
 };
 
@@ -447,6 +466,7 @@ export const readGameMetadataTool = async (
 		network: config.network,
 		config,
 		supportedGames: supportedGames(),
+		supportedFeatures: supportedFeatures(),
 		game: {
 			id: game,
 			label: GAME_LABELS[game],

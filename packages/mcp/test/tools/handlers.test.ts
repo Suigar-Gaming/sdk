@@ -34,6 +34,7 @@ describe('read tools', () => {
 			ReturnType<typeof readConfigTool>
 		>['structuredContent'] & {
 			supportedGames: Array<{ id: string }>;
+			supportedFeatures: Array<{ id: string; tools: Array<string> }>;
 		};
 
 		expect(content.network).toBe('testnet');
@@ -43,6 +44,18 @@ describe('read tools', () => {
 		expect(content.config.sdk.coins.sui.coinType).toMatch(/::/u);
 		expect(content.supportedGames.map((game) => game.id)).toContain(
 			'pvp-coinflip',
+		);
+		expect(content.supportedFeatures).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ id: 'nfts', tools: ['list_nfts'] }),
+				expect.objectContaining({
+					id: 'referrals',
+					tools: expect.arrayContaining([
+						'get_referral_commission',
+						'build_referral_commission_claim_transaction',
+					]),
+				}),
+			]),
 		);
 	});
 

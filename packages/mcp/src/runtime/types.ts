@@ -138,6 +138,11 @@ export type ReadConfigResult = {
 		label: string;
 		tools: Array<string>;
 	}>;
+	supportedFeatures: Array<{
+		id: 'nfts' | 'referrals';
+		label: string;
+		tools: Array<string>;
+	}>;
 };
 
 export type ReadGameMetadataResult = ReadConfigResult & {
