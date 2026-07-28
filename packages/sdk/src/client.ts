@@ -65,7 +65,7 @@ import type {
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
-import { parseCoinType } from './utils/index.js';
+import { DEFAULT_QUERY_LIMIT, parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -249,7 +249,7 @@ export class SuigarClient {
 		options: WithThrowOnError<
 			Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>
 		> = {
-			limit: 50,
+			limit: DEFAULT_QUERY_LIMIT,
 		},
 	): Promise<
 		Array<InferBcsType<typeof PvPCoinflipGame> & { coin_type: string }>

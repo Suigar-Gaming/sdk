@@ -1110,9 +1110,7 @@ function useIntegrationState({
 		dispatchLobby({ type: 'loading' });
 
 		try {
-			const games = await currentClient.suigar.getPvPCoinflipGames({
-				limit: 50,
-			});
+			const games = await currentClient.suigar.getPvPCoinflipGames();
 			dispatchLobby({ type: 'loaded', games });
 		} catch (lobbyError) {
 			dispatchLobby({ type: 'error', error: parseError(lobbyError) });
