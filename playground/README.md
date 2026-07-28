@@ -79,4 +79,5 @@ pnpm --dir playground run typecheck
 - The settings dialog is available from the top-right of both the standard and PvP controls cards and is useful for inspecting the live parsed parameter object without leaving the playground.
 - Limbo uses the exported SDK default multiplier scale, so the form shows how `targetMultiplier` is converted with `Math.round(targetMultiplier * scale)`.
 - Range point inputs are human values, not pre-scaled integers. The form derives the allowed max from the exported SDK constants `RANGE_POINT_LIMIT / scale`, so the default SDK scale allows `0` to `100`.
+- For SDK pagination outside the current UI, import `DEFAULT_QUERY_LIMIT` from `@suigar/sdk/utils` instead of hard-coding `50`; it is the reusable default query page size, currently used by a no-argument `client.suigar.getPvPCoinflipGames()` call.
 - Full decoded event payloads are also logged to the browser console.

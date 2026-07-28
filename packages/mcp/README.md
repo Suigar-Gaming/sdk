@@ -13,6 +13,8 @@ It provides:
 
 The package never signs or executes transactions.
 
+For SDK consumers that implement pagination alongside MCP usage, `DEFAULT_QUERY_LIMIT` is available from `@suigar/sdk/utils`. Its value is `50`, the reusable default page size for SDK queries, including the current no-argument `client.suigar.getPvPCoinflipGames()` call.
+
 The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
 ## Install

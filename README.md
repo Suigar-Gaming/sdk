@@ -54,6 +54,8 @@ npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 - `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar v2 Move contracts.
 - `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config, game metadata, NFTs, and referral claim amounts, plus building unsigned Suigar transactions through the SDK.
 
+The SDK's public `@suigar/sdk/utils` entrypoint includes `DEFAULT_QUERY_LIMIT` (`50`), the reusable default page size for SDK queries. Import it instead of duplicating that value whenever an application or a new paginated SDK call needs the standard limit.
+
 ## Development
 
 Any of the following commands can be run at the root of the project.

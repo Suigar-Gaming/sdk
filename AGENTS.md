@@ -105,7 +105,7 @@ pnpm run release
 ### Key Patterns
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
-2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`. The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`. Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. Utility function behavior:
+2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`. The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`. Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `DEFAULT_QUERY_LIMIT`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `DEFAULT_QUERY_LIMIT` is `50`, the reusable default page size for SDK queries; `getPvPCoinflipGames()` currently uses it when called without options. Utility function behavior:
    - `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values. It throws `TypeError` for invalid input shapes and `RangeError` for negatives.
    - `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range. It throws `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values.
    - `toU16()` accepts a finite integer `number` or plain integer `string` in the `0..65535` range. It uses the same `TypeError` and `RangeError` split as `toU8()`.
@@ -142,9 +142,10 @@ Key files:
 
 There are two transaction families and they must not be mixed:
 
-- **Standard games** use `client.suigar.tx.createGameBet(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
+- **Standard games** use `client.suigar.tx.createGameBet(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, `soccer`, and `wheel`.
 - **PvP games** use dedicated per-game transaction properties, such as `client.suigar.tx.pvpCoinflip`, and should keep PvP game rules separate from standard game flows.
 - **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
+  - Calling it without options uses `DEFAULT_QUERY_LIMIT` (`50`); supply `limit: DEFAULT_QUERY_LIMIT` when also passing `cursor` or another query option.
   - Bulk-load lobby objects with `client.core.getObjects()`.
   - Skip per-object fetch or parse failures by default.
   - Reject on per-object fetch or parse failures only when `throwOnError: true` is passed.

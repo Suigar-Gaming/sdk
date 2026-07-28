@@ -51,6 +51,7 @@ Utility exports are available from the utils subpath:
 import {
 	DEFAULT_GAS_BUDGET_MIST,
 	DEFAULT_LIMBO_MULTIPLIER_SCALE,
+	DEFAULT_QUERY_LIMIT,
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
@@ -67,6 +68,7 @@ import {
 
 Numeric helper behavior:
 
+- `DEFAULT_QUERY_LIMIT` is `50`, the reusable SDK default page size for paginated queries; `getPvPCoinflipGames()` currently uses it when called without options
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` inputs and returns a normalized non-negative `bigint` while throwing `TypeError` for invalid input shapes and `RangeError` for negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
@@ -285,10 +287,14 @@ By default, per-object fetch or parse failures are skipped so one broken or alre
 
 Each returned entry includes the parsed game fields plus a derived `coin_type` string from the underlying Move object type.
 
-Any supported `listDynamicFields()` options such as `limit`, `cursor`, or `signal` can be passed through `options`.
+When called without options, this returns the first `DEFAULT_QUERY_LIMIT` entries (`50`). Any supported `listDynamicFields()` options such as `limit`, `cursor`, or `signal` can be passed through `options`; provide `limit: DEFAULT_QUERY_LIMIT` explicitly when combining the SDK default page size with another option.
 
 ```ts
-const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
+import { DEFAULT_QUERY_LIMIT } from '@suigar/sdk/utils';
+
+const games = await client.suigar.getPvPCoinflipGames({
+	limit: DEFAULT_QUERY_LIMIT,
+});
 
 for (const game of games) {
 	console.log(game.id);
