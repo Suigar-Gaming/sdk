@@ -1,5 +1,24 @@
 # @suigar/sdk
 
+## 2.0.0-beta.32
+
+### Major Changes
+
+- 5f53b3f: Reorganize the client extension transaction API. Rename `client.suigar.tx.createBetTransaction(game, options)` to `client.suigar.tx.createGameBet(game, options)`, and replace `createPvPCoinflipTransaction(action, options)` with action-specific `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and `.cancelGame(options)` builders. Rename public transaction option types to reflect their game or action inputs, including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP coinflip transaction option types.
+
+### Minor Changes
+
+- 3335aa7: Add composable and complete referrer commission and level-up USD reward claim transactions.
+
+  Add referral commission and level-up USD reward reads plus unsigned claim transaction builders.
+
+- e029500: Refresh compatibility with the latest supported Mysten Sui libraries.
+
+### Patch Changes
+
+- 9a7d55f: Standardize internal array type annotations for TypeScript consistency.
+- 3335aa7: Clarify that `getGameParameters` requires a coin type when loading coin-specific game parameters.
+
 ## 2.0.0-beta.31
 
 ### Major Changes
