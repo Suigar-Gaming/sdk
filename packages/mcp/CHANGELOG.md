@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 1.0.0-beta.16
+
+### Patch Changes
+
+- d436728: Update `"@modelcontextprotocol/sdk` to `^1.3.0` to fix hono security issues
+
 ## 1.0.0-beta.15
 
 ### Major Changes
