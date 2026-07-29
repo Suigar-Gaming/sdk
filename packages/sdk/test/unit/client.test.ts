@@ -278,6 +278,10 @@ class TestClient extends CoreClient {
 
 	getObjectsCalls: Array<SuiClientTypes.GetObjectsOptions> = [];
 
+	simulateTransactionCalls: Array<unknown> = [];
+
+	mockSimulationResult: unknown;
+
 	dynamicFieldObjectReads = 0;
 
 	constructor() {
@@ -382,8 +386,9 @@ class TestClient extends CoreClient {
 		throw new Error('Not implemented.');
 	};
 
-	simulateTransaction: CoreClient['simulateTransaction'] = async () => {
-		throw new Error('Not implemented.');
+	simulateTransaction: CoreClient['simulateTransaction'] = async (options) => {
+		this.simulateTransactionCalls.push(options);
+		return this.mockSimulationResult as never;
 	};
 
 	getReferenceGasPrice: CoreClient['getReferenceGasPrice'] = async () => ({
@@ -541,6 +546,53 @@ describe('SuigarClient', () => {
 		expect(typeof client.suigar.serializeTransactionToBase64).toBe('function');
 	});
 
+	it('gets referral claim amounts by simulating the complete claim transaction', async () => {
+		const client = createSuigarTestClient();
+		const claimCoinBcs = bcs
+			.struct('Coin', {
+				id: bcs.Address,
+				balance: bcs.u64(),
+			})
+			.serialize({ id: '0x1', balance: 123n })
+			.toBytes();
+		client.mockSimulationResult = {
+			$kind: 'Transaction',
+			Transaction: {},
+			commandResults: [
+				{
+					returnValues: [{ bcs: claimCoinBcs }],
+					mutatedReferences: [],
+				},
+			],
+		};
+
+		await expect(
+			client.suigar.view.referral.getCommission({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+			}),
+		).resolves.toBe(123n);
+		await expect(
+			client.suigar.view.referral.getLevelUpUsdRewards({
+				owner: '0x123',
+			}),
+		).resolves.toBe(123n);
+
+		expect(client.simulateTransactionCalls).toHaveLength(2);
+
+		client.mockSimulationResult = {
+			$kind: 'FailedTransaction',
+			FailedTransaction: {},
+			commandResults: undefined,
+		};
+		await expect(
+			client.suigar.view.referral.getCommission({
+				owner: '0x123',
+				coinType: '0x2::sui::SUI',
+			}),
+		).resolves.toBe(0n);
+	});
+
 	it('injects the configured partner into standard-game metadata', async () => {
 		const play = createContractCallMock();
 
@@ -667,7 +719,9 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('coinflip');
+		const parameters = await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(parameters.min_stake).toBe('25');
 		expect(parameters.house_edge).toBe('100');
@@ -706,7 +760,9 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('limbo');
+		const parameters = await client.suigar.getGameParameters('limbo', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expectTypeOf(parameters.min_target_multiplier).toEqualTypeOf<number>();
 		expectTypeOf(parameters.max_target_multiplier).toEqualTypeOf<number>();
@@ -735,7 +791,11 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		await expect(client.suigar.getGameParameters('coinflip')).rejects.toThrow(
+		await expect(
+			client.suigar.getGameParameters('coinflip', {
+				coinType: COINS.testnet.sui.coinType,
+			}),
+		).rejects.toThrow(
 			`Missing parameters object content for coinflip and coin type ${normalizeStructTag(
 				COINS.testnet.sui.coinType,
 			)}`,
@@ -769,8 +829,12 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		await client.suigar.getGameParameters('coinflip');
-		await client.suigar.getGameParameters('coinflip');
+		await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
@@ -781,6 +845,7 @@ describe('SuigarClient', () => {
 		];
 
 		const refreshed = await client.suigar.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
 			ignoreCache: true,
 		});
 
@@ -826,8 +891,12 @@ describe('SuigarClient', () => {
 			shared: SuigarClient;
 		};
 
-		await first.shared.getGameParameters('coinflip');
-		await second.shared.getGameParameters('coinflip');
+		await first.shared.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await second.shared.getGameParameters('coinflip', {
+			coinType: COINS.testnet.sui.coinType,
+		});
 
 		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);

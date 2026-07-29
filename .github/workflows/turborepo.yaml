@@ -74,7 +74,7 @@ jobs:
 
       - name: Manypkg Check
         shell: bash
-        run: pnpm manypkg check
+        run: pnpm exec manypkg check
 
       - name: Lint packages
         shell: bash

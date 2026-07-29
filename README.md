@@ -35,7 +35,7 @@ To configure an MCP client manually, use:
 
 ## Agent Skills
 
-Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository. The MCP-focused skill teaches agents how to install, configure, and operate `@suigar/mcp` for Suigar config reads, game metadata, NFT lookups, unsigned transaction builders, and dry-runs.
+Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository. The MCP-focused skill teaches agents how to install, configure, and operate `@suigar/mcp` for Suigar config reads, game metadata, NFT lookups, referral claim reads, unsigned transaction builders, and dry-runs.
 
 Install all Suigar skills with:
 
@@ -52,7 +52,9 @@ npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 ## Packages
 
 - `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar v2 Move contracts.
-- `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config and game metadata, browsing NFTs, and building unsigned Suigar transactions through the SDK.
+- `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config, game metadata, NFTs, and referral claim amounts, plus building unsigned Suigar transactions through the SDK.
+
+The SDK's public `@suigar/sdk/utils` entrypoint includes `DEFAULT_QUERY_LIMIT` (`50`), the reusable default page size for SDK queries. Import it instead of duplicating that value whenever an application or a new paginated SDK call needs the standard limit.
 
 ## Development
 

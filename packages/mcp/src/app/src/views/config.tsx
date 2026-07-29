@@ -12,6 +12,9 @@ export function ConfigView({ payload }: { payload: unknown }) {
 	const supportedGames = Array.isArray(result.supportedGames)
 		? result.supportedGames.map((item) => asRecord(item))
 		: [];
+	const supportedFeatures = Array.isArray(result.supportedFeatures)
+		? result.supportedFeatures.map((item) => asRecord(item))
+		: [];
 
 	return (
 		<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
@@ -26,10 +29,13 @@ export function ConfigView({ payload }: { payload: unknown }) {
 					entries={[
 						['Configuration', 'read_config'],
 						['Game metadata', 'read_game_metadata'],
-						['NFTs', 'list_nfts'],
 						...supportedGames.map((game): DefinitionEntry => [
 							String(game.label ?? game.id),
 							Array.isArray(game.tools) ? game.tools.join(', ') : null,
+						]),
+						...supportedFeatures.map((feature): DefinitionEntry => [
+							String(feature.label ?? feature.id),
+							Array.isArray(feature.tools) ? feature.tools.join(', ') : null,
 						]),
 					]}
 				/>

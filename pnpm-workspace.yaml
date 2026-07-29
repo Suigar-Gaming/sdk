@@ -22,7 +22,7 @@ catalogs:
     'prettier': ^3.9.6
     'react-doctor': ^0.9.1
     'tailwindcss': ^4.3.3
-    'tsdown': ^0.22.13
+    'tsdown': ^0.22.14
   typescript:
     '@types/node': ^24.0.0
     '@types/react': ^19.2.17
@@ -43,10 +43,9 @@ minimumReleaseAge: 2880
 
 minimumReleaseAgeExclude:
   - '@mysten/*'
-  - '@radix-ui/react-slot@1.3.2'
 
 overrides:
-  'postcss': 8.5.22
+  'postcss': 8.5.23
   'sharp': 0.35.3
 
 peerDependencyRules:

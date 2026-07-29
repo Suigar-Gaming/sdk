@@ -35,6 +35,7 @@ const configOverridesSchema = z
 		packageIds: z
 			.object({
 				nftV1: z.string().min(1).optional(),
+				referral: z.string().min(1).optional(),
 				core: z.string().min(1).optional(),
 				coinflip: z.string().min(1).optional(),
 				limbo: z.string().min(1).optional(),
@@ -270,6 +271,45 @@ export const pvpCoinflipCancelInputSchema = commonBuildInputSchema
 	})
 	.strict();
 
+const referralClaimInputSchema = configInputSchema
+	.extend({
+		mode: z
+			.enum(builderModes)
+			.default('build')
+			.describe('Build, dry-run, or return a read-only plan.'),
+		owner: z.string().min(1).optional().describe(addressDescription),
+		gasBudget: z
+			.number()
+			.int()
+			.positive()
+			.optional()
+			.describe('Optional gas budget in MIST.'),
+	})
+	.strict();
+
+export const getReferralCommissionInputSchema = configInputSchema
+	.extend({
+		owner: z.string().min(1).describe(addressDescription),
+		coinType: z.string().min(1).optional().describe(coinTypeDescription),
+	})
+	.strict();
+
+export const getReferralLevelUpUsdRewardsInputSchema = configInputSchema
+	.extend({
+		owner: z.string().min(1).describe(addressDescription),
+	})
+	.strict();
+
+export const buildReferralCommissionClaimTransactionInputSchema =
+	referralClaimInputSchema
+		.extend({
+			coinType: z.string().min(1).optional().describe(coinTypeDescription),
+		})
+		.strict();
+
+export const buildReferralLevelUpUsdRewardsClaimTransactionInputSchema =
+	referralClaimInputSchema.strict();
+
 const unknownJsonSchema: z.ZodType<unknown> = z.lazy(() =>
 	z.union([
 		z.string(),
@@ -294,6 +334,7 @@ export const toolOutputSchema = z.looseObject({
 	dryRunSummary: unknownJsonSchema.optional(),
 	nftCatalog: unknownJsonSchema.optional(),
 	ownedNfts: unknownJsonSchema.optional(),
+	referral: unknownJsonSchema.optional(),
 	errors: z.array(z.string()).optional(),
 });
 
@@ -312,4 +353,16 @@ export type PvpCoinflipCreateInput = z.input<
 export type PvpCoinflipJoinInput = z.input<typeof pvpCoinflipJoinInputSchema>;
 export type PvpCoinflipCancelInput = z.input<
 	typeof pvpCoinflipCancelInputSchema
+>;
+export type GetReferralCommissionInput = z.input<
+	typeof getReferralCommissionInputSchema
+>;
+export type GetReferralLevelUpUsdRewardsInput = z.input<
+	typeof getReferralLevelUpUsdRewardsInputSchema
+>;
+export type BuildReferralCommissionClaimTransactionInput = z.input<
+	typeof buildReferralCommissionClaimTransactionInputSchema
+>;
+export type BuildReferralLevelUpUsdRewardsClaimTransactionInput = z.input<
+	typeof buildReferralLevelUpUsdRewardsClaimTransactionInputSchema
 >;

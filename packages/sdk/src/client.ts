@@ -5,6 +5,7 @@ import type { InferBcsType } from '@mysten/bcs';
 import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
+import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
@@ -18,12 +19,18 @@ import {
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
+	ReferrerClaimCommissionBalanceEvent,
+	ReferrerClaimLevelUpUsdRewardsEvent,
+} from './contracts/referral/referral.js';
+import {
 	DEFAULT_CACHE_TTL_MS,
 	normalizeGameParameterValues,
 	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
+	buildClaimReferralCommissionTransaction,
+	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
 	buildLimboTransaction,
 	buildPlinkoTransaction,
@@ -36,6 +43,8 @@ import {
 import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
+	ClaimReferralCommissionOptions,
+	ClaimReferralLevelUpUsdRewardsOptions,
 	CoinflipTransactionOptions,
 	CreateGameBetOptions,
 	Game,
@@ -56,7 +65,7 @@ import type {
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
-import { parseCoinType } from './utils/index.js';
+import { DEFAULT_QUERY_LIMIT, parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
 	name = 'suigar' as Name,
@@ -93,13 +102,15 @@ export class SuigarClient {
 		config,
 		partner,
 		cacheTtl,
-	}: {
+	}: Omit<SuigarExtensionOptions, 'name'> & {
 		client: ClientWithCoreApi;
 		name: string;
-		config?: SuigarExtensionOptions['config'];
-		partner?: string;
-		cacheTtl?: number;
 	}) {
+		const network = client.network as SuigarNetwork;
+		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
+			throw new RangeError(`Unsupported network: ${network}`);
+		}
+
 		this.#client = client;
 		this.#partner = partner;
 		this.#cache = client.cache
@@ -109,11 +120,6 @@ export class SuigarClient {
 					ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
 				});
 			});
-
-		const network = this.#client.network as SuigarNetwork;
-		if (!SUPPORTED_SUI_NETWORKS.includes(network)) {
-			throw new RangeError(`Unsupported network: ${network}`);
-		}
 
 		this.#config = resolveSuigarConfig(network, config);
 	}
@@ -161,19 +167,59 @@ export class SuigarClient {
 	 * including floats nested in game configs.
 	 *
 	 * @param game Game whose parameters should be loaded.
-	 * @param options Optional coin type, cache override, and abort signal.
+	 * @param options Required coin type, plus optional cache override and abort signal.
 	 * @returns Parsed game parameters typed for the requested game.
 	 */
 	async getGameParameters<TGame extends Game>(
 		game: TGame,
-		options: GetGameParametersOptions = {},
+		options: GetGameParametersOptions,
 	): Promise<GameParameters<TGame>> {
-		const coinType = normalizeStructTag(
-			options.coinType ?? this.#config.coins.sui.coinType,
-		);
+		const coinType = normalizeStructTag(options.coinType);
 		return this.#cache.read(
-			['parameters', this.#client.network, game, coinType],
-			() => this.#fetchGameParameters(game, coinType, options),
+			['getGameParameters', game, coinType],
+			async () => {
+				const gameDefinition = GAME_SETTINGS[game];
+				const { signal } = options;
+
+				const {
+					object: { objectId },
+				} = await this.#client.core.getDynamicObjectField({
+					parentId: this.#config.objectIds.sweetHouse,
+					name: {
+						type: gameDefinition.settingsKey.typeTag({
+							package: resolveGamePackageId(this.#config, game),
+						}),
+						bcs: gameDefinition.settingsKey
+							.serialize({ dummy_field: false })
+							.toBytes(),
+					},
+					signal,
+				});
+
+				const { object } = await this.#client.core.getDynamicObjectField({
+					parentId: objectId,
+					name: {
+						type: TypeName.name,
+						bcs: TypeName.serialize({
+							name: coinType.replace(/^0x/u, ''),
+						}).toBytes(),
+					},
+					include: { content: true },
+					signal,
+				});
+
+				if (!object?.content) {
+					throw new Error(
+						`Missing parameters object content for ${game} and coin type ${coinType}`,
+					);
+				}
+
+				return normalizeGameParameterValues(
+					gameDefinition.parameters.parse(
+						object.content,
+					) as OnChainGameParameters<TGame>,
+				);
+			},
 			{ ignoreCache: options.ignoreCache },
 		) as Promise<GameParameters<TGame>>;
 	}
@@ -203,7 +249,7 @@ export class SuigarClient {
 		options: WithThrowOnError<
 			Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>
 		> = {
-			limit: 50,
+			limit: DEFAULT_QUERY_LIMIT,
 		},
 	): Promise<
 		Array<InferBcsType<typeof PvPCoinflipGame> & { coin_type: string }>
@@ -257,8 +303,34 @@ export class SuigarClient {
 		);
 	}
 
+	async #getSimulatedCommandReturnValue(
+		transaction: Transaction,
+		commandIndex = 0,
+		returnValueIndex = 0,
+	): Promise<Uint8Array> {
+		const result = await this.#client.core.simulateTransaction({
+			transaction,
+			include: { commandResults: true },
+		});
+
+		if (result.$kind === 'FailedTransaction') {
+			throw new Error('Transaction simulation failed.');
+		}
+
+		const returnValue =
+			result.commandResults?.[commandIndex]?.returnValues[returnValueIndex]
+				?.bcs;
+		if (!returnValue) {
+			throw new Error(
+				`Transaction simulation did not return a value at command ${commandIndex}, return value ${returnValueIndex}.`,
+			);
+		}
+
+		return returnValue;
+	}
+
 	/**
-	 * Transaction builders for Suigar games.
+	 * Transaction builders for Suigar games and referrals.
 	 */
 	tx = {
 		/**
@@ -338,6 +410,61 @@ export class SuigarClient {
 				});
 			},
 		},
+		/** Referral transaction builders. Each transaction returns its claimed coin to `owner`. */
+		referral: {
+			claimCommission: (
+				options: ClaimReferralCommissionOptions,
+			): Transaction => {
+				return buildClaimReferralCommissionTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+			claimLevelUpUsdRewards: (
+				options: ClaimReferralLevelUpUsdRewardsOptions,
+			): Transaction => {
+				return buildClaimReferralLevelUpUsdRewardsTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+		},
+	};
+
+	/** Read-only referral claim amounts produced by simulating the real claim transaction. */
+	view = {
+		referral: {
+			getCommission: async ({
+				owner,
+				coinType,
+			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>) => {
+				try {
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
+						this.tx.referral.claimCommission({
+							owner,
+							coinType,
+						}),
+					);
+					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
+				} catch {
+					return 0n;
+				}
+			},
+			getLevelUpUsdRewards: async ({
+				owner,
+			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>) => {
+				try {
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
+						this.tx.referral.claimLevelUpUsdRewards({
+							owner,
+						}),
+					);
+					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
+				} catch {
+					return 0n;
+				}
+			},
+		},
 	};
 
 	/**
@@ -381,53 +508,9 @@ export class SuigarClient {
 		 * Event emitted when a PvP Coinflip game is cancelled.
 		 */
 		PvPCoinflipGameCancelledEvent,
+		/** Event emitted when a referrer claims commission for a wager coin. */
+		ReferrerClaimCommissionBalanceEvent,
+		/** Event emitted when a referrer claims a USD-denominated level-up reward. */
+		ReferrerClaimLevelUpUsdRewardsEvent,
 	};
-
-	async #fetchGameParameters<TGame extends Game>(
-		game: TGame,
-		coinType: string,
-		options: Omit<GetGameParametersOptions, 'coinType' | 'ignoreCache'>,
-	): Promise<GameParameters<TGame>> {
-		const gameDefinition = GAME_SETTINGS[game];
-		const { signal } = options;
-
-		const {
-			object: { objectId },
-		} = await this.#client.core.getDynamicObjectField({
-			parentId: this.#config.objectIds.sweetHouse,
-			name: {
-				type: gameDefinition.settingsKey.typeTag({
-					package: resolveGamePackageId(this.#config, game),
-				}),
-				bcs: gameDefinition.settingsKey
-					.serialize({ dummy_field: false })
-					.toBytes(),
-			},
-			signal,
-		});
-
-		const { object } = await this.#client.core.getDynamicObjectField({
-			parentId: objectId,
-			name: {
-				type: TypeName.name,
-				bcs: TypeName.serialize({
-					name: coinType.replace(/^0x/u, ''),
-				}).toBytes(),
-			},
-			include: { content: true },
-			signal,
-		});
-
-		if (!object?.content) {
-			throw new Error(
-				`Missing parameters object content for ${game} and coin type ${coinType}`,
-			);
-		}
-
-		return normalizeGameParameterValues(
-			gameDefinition.parameters.parse(
-				object.content,
-			) as OnChainGameParameters<TGame>,
-		);
-	}
 }

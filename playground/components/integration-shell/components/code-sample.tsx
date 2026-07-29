@@ -20,19 +20,24 @@ const SKELETON_LINE_WIDTHS = [
 	'72%',
 ] as const;
 
-function CodeSampleCard({ children }: { children: React.ReactNode }) {
+function CodeSampleCard({
+	children,
+	description = 'The code block updates live from the current form state and matches the builder call executed by the wallet.',
+	title = 'Transaction code',
+}: {
+	children: React.ReactNode;
+	description?: string;
+	title?: string;
+}) {
 	return (
 		<Card className="h-full">
 			<CardHeader>
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
 						<FileCode2 className="size-5 text-secondary dark:text-primary" />
-						Transaction code
+						{title}
 					</CardTitle>
-					<CardDescription>
-						The code block updates live from the current form state and matches
-						the builder call executed by the wallet.
-					</CardDescription>
+					<CardDescription>{description}</CardDescription>
 				</div>
 			</CardHeader>
 			<CardContent>{children}</CardContent>
@@ -40,14 +45,24 @@ function CodeSampleCard({ children }: { children: React.ReactNode }) {
 	);
 }
 
-export function CodeSample({ code }: { code: string }) {
+export function CodeSample({
+	code,
+	copyTitle = 'Copy transaction code',
+	description,
+	title,
+}: {
+	code: string;
+	copyTitle?: string;
+	description?: string;
+	title?: string;
+}) {
 	return (
-		<CodeSampleCard>
+		<CodeSampleCard description={description} title={title}>
 			<CodeBlock
 				code={code}
-				copyDescription="The transaction block code was copied."
+				copyDescription={`${title ?? 'Transaction'} block code was copied.`}
 				copyMode="icon"
-				copyTitle="Copy transaction code"
+				copyTitle={copyTitle}
 			/>
 		</CodeSampleCard>
 	);

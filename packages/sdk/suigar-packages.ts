@@ -23,6 +23,18 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		types: ['BetResultEvent'],
 		functions: false,
 	},
+	referral: {
+		package: TESTNET_PACKAGE_IDS.referral,
+		packageName: 'referral',
+		types: [
+			'ReferrerClaimCommissionBalanceEvent',
+			'ReferrerClaimLevelUpUsdRewardsEvent',
+		],
+		functions: [
+			'claim_commission_balance',
+			'claim_referrer_level_up_usd_rewards',
+		],
+	},
 	// Games packages
 	coinflip: {
 		package: TESTNET_PACKAGE_IDS.coinflip,

@@ -51,6 +51,7 @@ Utility exports are available from the utils subpath:
 import {
 	DEFAULT_GAS_BUDGET_MIST,
 	DEFAULT_LIMBO_MULTIPLIER_SCALE,
+	DEFAULT_QUERY_LIMIT,
 	DEFAULT_RANGE_SCALE,
 	fromMoveFloat,
 	fromMoveI64,
@@ -67,6 +68,7 @@ import {
 
 Numeric helper behavior:
 
+- `DEFAULT_QUERY_LIMIT` is `50`, the reusable SDK default page size for paginated queries; `getPvPCoinflipGames()` currently uses it when called without options
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` inputs and returns a normalized non-negative `bigint` while throwing `TypeError` for invalid input shapes and `RangeError` for negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
@@ -219,11 +221,12 @@ If `partner` is configured, the SDK automatically writes that partner wallet add
 The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
-- `getGameParameters(game, options?)`
+- `getGameParameters(game, { coinType, ...options })`
 - `serializeTransactionToBase64(transaction, options?)`
 - `getPvPCoinflipGames(options?)`
 - `bcs`
 - `tx`
+- `view`
 
 ### `getConfig()`
 
@@ -244,9 +247,9 @@ console.log(config.packageIds);
 console.log(config.coins.sui.coinType);
 ```
 
-### `getGameParameters(game, options?)`
+### `getGameParameters(game, { coinType, ...options })`
 
-Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`.
+Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`. `coinType` is required because each game has a distinct parameters object for every supported coin.
 
 The SDK first reads the selected game's settings object from the configured SweetHouse object, then reads that game's coin-specific `Parameters<T>` object. This is useful for displaying or validating current limits such as min/max stake, house edge, or game-specific config bounds. The parsed result is cached using the extension `cacheTtl`.
 
@@ -284,10 +287,14 @@ By default, per-object fetch or parse failures are skipped so one broken or alre
 
 Each returned entry includes the parsed game fields plus a derived `coin_type` string from the underlying Move object type.
 
-Any supported `listDynamicFields()` options such as `limit`, `cursor`, or `signal` can be passed through `options`.
+When called without options, this returns the first `DEFAULT_QUERY_LIMIT` entries (`50`). Any supported `listDynamicFields()` options such as `limit`, `cursor`, or `signal` can be passed through `options`; provide `limit: DEFAULT_QUERY_LIMIT` explicitly when combining the SDK default page size with another option.
 
 ```ts
-const games = await client.suigar.getPvPCoinflipGames({ limit: 20 });
+import { DEFAULT_QUERY_LIMIT } from '@suigar/sdk/utils';
+
+const games = await client.suigar.getPvPCoinflipGames({
+	limit: DEFAULT_QUERY_LIMIT,
+});
 
 for (const game of games) {
 	console.log(game.id);
@@ -460,6 +467,38 @@ Error behavior:
 
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
 
+### Referral claims
+
+Referrers can claim commission accrued for any supported wager coin, and separately claim their USD-denominated level-up reward in the configured dollar coin (`coins.usdc`). Each builder sets `owner` as the transaction sender and transfers the returned claim coin back to that same address.
+
+```ts
+const commissionClaim = client.suigar.tx.referral.claimCommission({
+	owner: '0xREFERRER',
+	coinType: '0x2::sui::SUI',
+});
+
+const levelUpClaim = client.suigar.tx.referral.claimLevelUpUsdRewards({
+	owner: '0xREFERRER',
+});
+```
+
+The owner must sign the transaction: the Move contract derives the referrer from the transaction sender. `claimLevelUpUsdRewards` supplies the configured USDC type and its Pyth price-info object automatically. A claim can still abort when no referrer or coin-specific balance exists, the rakeback pool lacks funds, or the oracle check fails.
+
+Use `view.referral` to simulate the complete claim transaction and return its atomic payout without changing chain state:
+
+```ts
+const commissionAmount = await client.suigar.view.referral.getCommission({
+	owner: '0xREFERRER',
+	coinType: '0x2::sui::SUI',
+});
+const levelUpUsdcAmount =
+	await client.suigar.view.referral.getLevelUpUsdRewards({
+		owner: '0xREFERRER',
+	});
+```
+
+The deployed referral contract does not expose public balance getters. These simulated reads execute the same pool and oracle checks as a real claim, so they can fail for the same reasons and can change before execution.
+
 ## `bcs`
 
 BCS helpers live under `client.suigar.bcs`.
@@ -471,6 +510,8 @@ Current exposed helpers:
 - `PvPCoinflipGameCreatedEvent`
 - `PvPCoinflipGameResolvedEvent`
 - `PvPCoinflipGameCancelledEvent`
+- `ReferrerClaimCommissionBalanceEvent`
+- `ReferrerClaimLevelUpUsdRewardsEvent`
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 

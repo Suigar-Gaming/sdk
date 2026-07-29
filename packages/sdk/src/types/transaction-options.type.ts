@@ -9,26 +9,29 @@ import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
 
-export type WithGasBudget = {
-	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
-};
-
 export type WithPartner<T> = T & {
 	partner?: string;
 };
 
-export type WithThrowOnError<T = object> = T & {
+export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
-export type BaseTransactionOptions = WithGasBudget & {
-	config: SuigarConfig;
+export type WithConfig<T> = T & Pick<BaseTransactionOptions, 'config'>;
+
+/** Common sender and gas settings for every SDK-built transaction. */
+export type TransactionSenderOptions = {
 	owner: string;
+	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
+};
+
+export type BaseTransactionOptions = TransactionSenderOptions & {
+	config: SuigarConfig;
+	metadata?: BetMetadataInput;
 };
 
 export type CoinTransactionOptions = {
 	coinType: string;
-	metadata?: BetMetadataInput;
 	useGasCoin?: boolean;
 };
 
@@ -108,3 +111,8 @@ export type PvPCoinflipTransactionOptions<
 		: Action extends 'cancel'
 			? CancelPvPCoinflipTransactionOptions
 			: never;
+
+export type ClaimReferralCommissionOptions = TransactionSenderOptions &
+	Pick<CoinTransactionOptions, 'coinType'>;
+
+export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;

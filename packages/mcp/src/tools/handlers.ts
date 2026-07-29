@@ -22,6 +22,9 @@ import {
 	type ReadConfigResult,
 	type ReadGameMetadataResult,
 	type ReadOnlyPlan,
+	type ReferralClaimKind,
+	type ReferralClaimReadOnlyPlan,
+	type ReferralClaimReadResult,
 	type ResolvedMcpConfig,
 	type SuigarClientBundle,
 	type ToolTextResult,
@@ -35,8 +38,12 @@ import {
 	toCurrencyAmountText,
 } from '../utils/index.js';
 import type {
+	BuildReferralCommissionClaimTransactionInput,
+	BuildReferralLevelUpUsdRewardsClaimTransactionInput,
 	CoinflipInput,
 	ConfigIdInput,
+	GetReferralCommissionInput,
+	GetReferralLevelUpUsdRewardsInput,
 	LimboInput,
 	ListNftsInput,
 	PvpCoinflipCancelInput,
@@ -235,6 +242,24 @@ const supportedGames = () =>
 		tools: [...GAME_TO_TOOLS[id]],
 	}));
 
+const supportedFeatures = () => [
+	{
+		id: 'nfts' as const,
+		label: 'NFTs',
+		tools: ['list_nfts'],
+	},
+	{
+		id: 'referrals' as const,
+		label: 'Referrals',
+		tools: [
+			'get_referral_commission',
+			'get_referral_level_up_usd_rewards',
+			'build_referral_commission_claim_transaction',
+			'build_referral_level_up_usd_rewards_claim_transaction',
+		],
+	},
+];
+
 const getPackageId = (config: ResolvedMcpConfig, game: Game) =>
 	config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
 
@@ -250,6 +275,16 @@ const getTarget = (
 	}
 	return `${packageId}::${game}::play`;
 };
+
+const referralClaimTarget = (
+	config: ResolvedMcpConfig,
+	kind: ReferralClaimKind,
+) =>
+	`${config.sdk.packageIds.referral}::referral::${
+		kind === 'commission'
+			? 'claim_commission_balance'
+			: 'claim_referrer_level_up_usd_rewards'
+	}`;
 
 const readOnlyPlan = ({
 	input,
@@ -411,6 +446,7 @@ export const readConfigTool = async (input: ReadConfigInput = {}) => {
 		network: config.network,
 		config,
 		supportedGames: supportedGames(),
+		supportedFeatures: supportedFeatures(),
 	} satisfies ReadConfigResult);
 };
 
@@ -430,6 +466,7 @@ export const readGameMetadataTool = async (
 		network: config.network,
 		config,
 		supportedGames: supportedGames(),
+		supportedFeatures: supportedFeatures(),
 		game: {
 			id: game,
 			label: GAME_LABELS[game],
@@ -439,7 +476,7 @@ export const readGameMetadataTool = async (
 				toJsonValue(formatGameParameters(parameters, coin.decimals)) ?? null,
 			ignoreCache,
 			notes: [
-				'Parameters are loaded from the on-chain game settings objects through client.suigar.getGameParameters().',
+				'Parameters are loaded for the requested coin type from the on-chain game settings objects through client.suigar.getGameParameters().',
 				ignoreCache
 					? 'SDK parameter cache was ignored for this read.'
 					: 'SDK parameter cache was allowed for this read.',
@@ -506,6 +543,150 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 		ownedNfts,
 	} satisfies ListNftsResult);
 };
+
+const referralClaimReadResult = async ({
+	input,
+	kind,
+}: {
+	input:
+		| Partial<GetReferralCommissionInput>
+		| Partial<GetReferralLevelUpUsdRewardsInput>;
+	kind: ReferralClaimKind;
+}) => {
+	const bundle = createSuigarClient(getConfigInput(input));
+	const owner = await resolveOwnerAddress(
+		requireString(input.owner, 'owner'),
+		bundle,
+	);
+	const coin =
+		kind === 'commission' && 'coinType' in input
+			? coinMetadataForAmount(bundle.config, input.coinType)
+			: bundle.config.sdk.coins.usdc;
+	const amount =
+		kind === 'commission'
+			? await bundle.client.suigar.view.referral.getCommission({
+					owner,
+					coinType: coin.coinType,
+				})
+			: await bundle.client.suigar.view.referral.getLevelUpUsdRewards({
+					owner,
+				});
+
+	return asTextResponse({
+		network: bundle.config.network,
+		config: bundle.config,
+		owner,
+		referral: {
+			kind,
+			coinType: coin.coinType,
+			amount: amount.toString(),
+			amountDisplay: formatBaseUnitAmount(amount, coin.decimals),
+			notes: [
+				'Amount is simulated with the SDK claim transaction and is not a signed or executed claim.',
+			],
+		},
+	} satisfies ReferralClaimReadResult);
+};
+
+export const getReferralCommissionTool = async (
+	input: Partial<GetReferralCommissionInput> = {},
+) => referralClaimReadResult({ input, kind: 'commission' });
+
+export const getReferralLevelUpUsdRewardsTool = async (
+	input: Partial<GetReferralLevelUpUsdRewardsInput> = {},
+) => referralClaimReadResult({ input, kind: 'level-up-usd-rewards' });
+
+const referralReadOnlyPlan = ({
+	input,
+	kind,
+}: {
+	input:
+		| BuildReferralCommissionClaimTransactionInput
+		| BuildReferralLevelUpUsdRewardsClaimTransactionInput;
+	kind: ReferralClaimKind;
+}) => {
+	const { config } = createSuigarClient(getConfigInput(input));
+	const coin =
+		kind === 'commission' && 'coinType' in input
+			? coinMetadataForAmount(config, input.coinType)
+			: config.sdk.coins.usdc;
+	const plan = {
+		target: referralClaimTarget(config, kind),
+		typeArguments: [coin.coinType],
+		requiredInputs: ['owner'],
+		notes: [
+			'Builds an unsigned referral claim transaction; the returned coin is transferred to the owner by the SDK.',
+		],
+	};
+	return asTextResponse({
+		mode: 'read-only',
+		network: config.network,
+		config,
+		plan,
+		referral: {
+			kind,
+			coinType: coin.coinType,
+			packageId: config.sdk.packageIds.referral,
+		},
+	} satisfies ReferralClaimReadOnlyPlan);
+};
+
+const buildReferralClaimTransactionTool = async ({
+	input,
+	kind,
+}: {
+	input:
+		| BuildReferralCommissionClaimTransactionInput
+		| BuildReferralLevelUpUsdRewardsClaimTransactionInput;
+	kind: ReferralClaimKind;
+}) => {
+	const mode = getMode(input.mode);
+	if (mode === 'read-only') {
+		return referralReadOnlyPlan({ input, kind });
+	}
+
+	const bundle = createSuigarClient(getConfigInput(input));
+	const owner = await resolveOwnerAddress(
+		requireString(input.owner, 'owner'),
+		bundle,
+	);
+	const coin =
+		kind === 'commission' && 'coinType' in input
+			? coinMetadataForAmount(bundle.config, input.coinType)
+			: bundle.config.sdk.coins.usdc;
+	const transaction =
+		kind === 'commission'
+			? bundle.client.suigar.tx.referral.claimCommission({
+					owner,
+					coinType: coin.coinType,
+					gasBudget: input.gasBudget,
+				})
+			: bundle.client.suigar.tx.referral.claimLevelUpUsdRewards({
+					owner,
+					gasBudget: input.gasBudget,
+				});
+
+	return asTextResponse(
+		await buildTransactionResult({
+			mode,
+			transaction,
+			config: bundle.config,
+			client: bundle.client,
+			context: {
+				coinType: coin.coinType,
+				gameInputs: { referralClaim: kind },
+			},
+		}),
+	);
+};
+
+export const buildReferralCommissionClaimTransactionTool = async (
+	input: BuildReferralCommissionClaimTransactionInput = {},
+) => buildReferralClaimTransactionTool({ input, kind: 'commission' });
+
+export const buildReferralLevelUpUsdRewardsClaimTransactionTool = async (
+	input: BuildReferralLevelUpUsdRewardsClaimTransactionInput = {},
+) => buildReferralClaimTransactionTool({ input, kind: 'level-up-usd-rewards' });
 
 export const buildCoinflipTransactionTool = async (
 	input: CoinflipInput = {},

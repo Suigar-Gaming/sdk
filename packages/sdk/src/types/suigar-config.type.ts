@@ -48,6 +48,7 @@ export type SuigarCoinRegistry = Record<SuigarCoin, SuigarCoinMetadata>;
 export type SuigarPackage =
 	| 'nftV1'
 	| 'core'
+	| 'referral'
 	| 'coinflip'
 	| 'limbo'
 	| 'plinko'

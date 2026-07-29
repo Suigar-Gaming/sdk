@@ -19,8 +19,12 @@ const publicToolNames = [
 	'build_pvp_coinflip_create_transaction',
 	'build_pvp_coinflip_join_transaction',
 	'build_range_transaction',
+	'build_referral_commission_claim_transaction',
+	'build_referral_level_up_usd_rewards_claim_transaction',
 	'build_soccer_transaction',
 	'build_wheel_transaction',
+	'get_referral_commission',
+	'get_referral_level_up_usd_rewards',
 	'read_config',
 	'read_game_metadata',
 	'list_nfts',
@@ -127,8 +131,8 @@ describe('MCP server registration', () => {
 			);
 
 			expect(appResource).toMatchObject({
-				name: 'Suigar Transaction Inspector',
-				title: 'Suigar Transaction Inspector',
+				name: 'Suigar MCP Console',
+				title: 'Suigar MCP Console',
 				mimeType: 'text/html;profile=mcp-app',
 				_meta: {
 					ui: {

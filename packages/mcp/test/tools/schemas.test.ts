@@ -3,8 +3,10 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+	buildReferralCommissionClaimTransactionInputSchema,
 	coinflipInputSchema,
 	configInputSchema,
+	getReferralCommissionInputSchema,
 	pvpCoinflipJoinInputSchema,
 	soccerInputSchema,
 	toolOutputSchema,
@@ -34,7 +36,7 @@ describe('config input schema', () => {
 		expect(
 			configInputSchema.parse({
 				config: {
-					packageIds: { soccer: '0xsoccer' },
+					packageIds: { referral: '0xreferral', soccer: '0xsoccer' },
 					objectIds: { sweetHouse: '0xsweet-house' },
 					registryIds: { pvpCoinflip: '0xpvp-registry' },
 				},
@@ -46,6 +48,14 @@ describe('config input schema', () => {
 				registryIds: { pvpCoinflip: '0xpvp-registry' },
 			},
 		});
+	});
+
+	it('accepts a referral package override', () => {
+		expect(
+			configInputSchema.parse({
+				config: { packageIds: { referral: '0xreferral' } },
+			}),
+		).toMatchObject({ config: { packageIds: { referral: '0xreferral' } } });
 	});
 });
 
@@ -69,6 +79,17 @@ describe('build input schemas', () => {
 		expect(pvpCoinflipJoinInputSchema.parse({ mode: 'read-only' }).mode).toBe(
 			'read-only',
 		);
+	});
+
+	it('requires a referrer owner for claim reads and permits read-only claim planning', () => {
+		expect(() => getReferralCommissionInputSchema.parse({})).toThrow(
+			/expected string/u,
+		);
+		expect(
+			buildReferralCommissionClaimTransactionInputSchema.parse({
+				mode: 'read-only',
+			}),
+		).toMatchObject({ mode: 'read-only' });
 	});
 
 	it('bounds Soccer ids to their Move integer widths', () => {

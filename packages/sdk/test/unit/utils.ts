@@ -13,6 +13,7 @@ export const TEST_CONFIG = {
 	packageIds: {
 		nftV1: '0xnft-v1',
 		core: '0xcore',
+		referral: '0x6',
 		coinflip: '0xabc',
 		limbo: '0x1',
 		plinko: '0x2',

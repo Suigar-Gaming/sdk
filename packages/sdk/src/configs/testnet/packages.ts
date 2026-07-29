@@ -6,6 +6,8 @@ import type { SuigarPackageIds } from '../../types/index.js';
 // `nftV1` is preserved manually because it is not resolved from MVR.
 export const PACKAGE_IDS: SuigarPackageIds = {
 	core: '0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc',
+	referral:
+		'0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8',
 	nftV1: '0x196047539fdc2f1585d28dad9f4f2ccd50d23b21799ad0c88fa4e717d13b91a4',
 	coinflip:
 		'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea',

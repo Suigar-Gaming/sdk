@@ -105,7 +105,7 @@ pnpm run release
 ### Key Patterns
 
 1. **Client extension first**: Prefer integrating through `suigar()` on an existing client such as `SuiGrpcClient` or any other `ClientWithCoreApi` implementation instead of bypassing the extension layer.
-2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`. The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`. Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. Utility function behavior:
+2. **Public package exports**: The package exposes `@suigar/sdk`, `@suigar/sdk/games`, and `@suigar/sdk/utils`. The package root exports `suigar`, `SuigarClient`, `SUPPORTED_SUI_NETWORKS`, `SuigarNetwork`, and `SuigarCoin`. Game-related public types and constants such as `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, and `PvPCoinflipAction` should prefer `@suigar/sdk/games`, and parser or helper utilities should prefer `@suigar/sdk/utils`. Reusable SDK constants such as `DEFAULT_GAS_BUDGET_MIST`, `DEFAULT_QUERY_LIMIT`, `RANGE_POINT_LIMIT`, `DEFAULT_RANGE_SCALE`, and `DEFAULT_LIMBO_MULTIPLIER_SCALE` are part of the intended `@suigar/sdk/utils` integration surface and should not be redefined in app code when the SDK export is suitable. `DEFAULT_QUERY_LIMIT` is `50`, the reusable default page size for SDK queries; `getPvPCoinflipGames()` currently uses it when called without options. Utility function behavior:
    - `toBigInt()` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` values. It throws `TypeError` for invalid input shapes and `RangeError` for negatives.
    - `toU8()` accepts a finite integer `number` or plain integer `string` in the `0..255` range. It throws `TypeError` for non-numeric input and `RangeError` for non-integer or out-of-range values.
    - `toU16()` accepts a finite integer `number` or plain integer `string` in the `0..65535` range. It uses the same `TypeError` and `RangeError` split as `toU8()`.
@@ -142,9 +142,10 @@ Key files:
 
 There are two transaction families and they must not be mixed:
 
-- **Standard games** use `client.suigar.tx.createGameBet(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, and `wheel`.
+- **Standard games** use `client.suigar.tx.createGameBet(gameId, options)` for `coinflip`, `limbo`, `plinko`, `range`, `soccer`, and `wheel`.
 - **PvP games** use dedicated per-game transaction properties, such as `client.suigar.tx.pvpCoinflip`, and should keep PvP game rules separate from standard game flows.
 - **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
+  - Calling it without options uses `DEFAULT_QUERY_LIMIT` (`50`); supply `limit: DEFAULT_QUERY_LIMIT` when also passing `cursor` or another query option.
   - Bulk-load lobby objects with `client.core.getObjects()`.
   - Skip per-object fetch or parse failures by default.
   - Reject on per-object fetch or parse failures only when `throwOnError: true` is passed.
@@ -166,10 +167,11 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - resolving price info object ids from the supported-coin mapping
 - throwing explicit errors when a required coin mapping is missing
 - providing the price info object id used by PvP coinflip join
+- exposing `packageIds.referral` for applications that build referral commission and level-up USD reward claims or simulate their claimable amounts through `client.suigar.tx.referral` and `client.suigar.view.referral`
 - exposing `packageIds.nftV1` and `objectIds.nftV1Factory` for applications that need NFT V1 lookups without adding an NFT client surface to this SDK; derive the owned-NFT query type with `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.NftV1.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.NftV1Factory.parse(object.content)`, while leaving NFT V1 minting outside this SDK
 - treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
 
-`client.suigar.getGameParameters(game, options?)` first reads the selected game's settings object from SweetHouse, then reads that game's coin-specific `Parameters<T>` object, parses it with the generated type, decodes Move float fields into JavaScript numbers (including nested Plinko and Wheel config multipliers), and caches the parsed result for `cacheTtl`.
+`client.suigar.getGameParameters(game, { coinType, ...options })` requires the coin type, first reads the selected game's settings object from SweetHouse, then reads that coin-specific `Parameters<T>` object, parses it with the generated type, decodes Move float fields into JavaScript numbers (including nested Plinko and Wheel config multipliers), and caches the parsed result for `cacheTtl`.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
