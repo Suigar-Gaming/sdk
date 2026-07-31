@@ -94,7 +94,7 @@ export async function createLoginBridge({
 	server.on('request', async (request, response) => {
 		const origin = request.headers.origin;
 		response.setHeader('access-control-allow-origin', frontendOrigin);
-		response.setHeader('access-control-allow-methods', 'POST, OPTIONS');
+		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
 		response.setHeader('access-control-allow-headers', 'content-type');
 		response.setHeader('vary', 'origin');
 		if (request.method === 'OPTIONS') {
@@ -110,12 +110,17 @@ export async function createLoginBridge({
 			respond(response, 403, { error: 'Forbidden' });
 			return;
 		}
-		if (
-			request.method !== 'POST' ||
-			!['/preflight', '/callback'].includes(
-				new URL(request.url ?? '/', `http://127.0.0.1:${port}`).pathname,
-			)
-		) {
+		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
+		if (request.method === 'GET' && url.pathname === '/handshake') {
+			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+				respond(response, 403, { ok: false, error: 'Invalid pairing state' });
+				return;
+			}
+			preflight = true;
+			respond(response, 200, { ok: true, network });
+			return;
+		}
+		if (request.method !== 'POST' || url.pathname !== '/callback') {
 			respond(response, 404, { error: 'Not found' });
 			return;
 		}
@@ -128,13 +133,11 @@ export async function createLoginBridge({
 				string,
 				unknown
 			>;
-			if (!sameState(String(payload.state ?? ''), state)) {
+			if (
+				typeof payload.state !== 'string' ||
+				!sameState(payload.state, state)
+			) {
 				respond(response, 403, { error: 'Invalid pairing state' });
-				return;
-			}
-			if (request.url?.startsWith('/preflight')) {
-				preflight = true;
-				respond(response, 200, { ok: true, network });
 				return;
 			}
 			if (
@@ -248,7 +251,8 @@ export async function createExecutionBridge({
 				unknown
 			>;
 			if (
-				!sameState(String(payload.state ?? ''), state) ||
+				typeof payload.state !== 'string' ||
+				!sameState(payload.state, state) ||
 				payload.address !== profile.address
 			) {
 				respond(response, 403, { error: 'Invalid approval callback' });
