@@ -1,6 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import type { ClientWithExtensions } from '@mysten/sui/client';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import type { Transaction } from '@mysten/sui/transactions';
@@ -35,17 +38,31 @@ const DEFAULT_PROVIDER_URLS = {
 	testnet: 'https://fullnode.testnet.sui.io:443',
 } as const satisfies Record<SuigarNetwork, string>;
 
+const readPersistedDefaultNetwork = (): SuigarNetwork => {
+	try {
+		const value: unknown = JSON.parse(
+			readFileSync(join(homedir(), '.suigar-mcp', 'credentials.json'), 'utf8'),
+		);
+		const network =
+			value && typeof value === 'object'
+				? (value as { defaultNetwork?: unknown }).defaultNetwork
+				: undefined;
+		return network === 'mainnet' || network === 'testnet' ? network : 'testnet';
+	} catch {
+		return 'testnet';
+	}
+};
+
 export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
-export const normalizeNetwork = (
-	network: string | undefined = DEFAULT_NETWORK,
-): SuigarNetwork => {
-	if (network === 'mainnet' || network === 'testnet') {
-		return network;
+export const normalizeNetwork = (network?: string): SuigarNetwork => {
+	const resolvedNetwork = network ?? readPersistedDefaultNetwork();
+	if (resolvedNetwork === 'mainnet' || resolvedNetwork === 'testnet') {
+		return resolvedNetwork;
 	}
 
 	throw new RangeError(
-		`Unsupported network: ${network}. Use "mainnet" or "testnet".`,
+		`Unsupported network: ${resolvedNetwork}. Use "mainnet" or "testnet".`,
 	);
 };
 
@@ -208,7 +225,7 @@ export const buildTransactionResult = async ({
 	client,
 	context,
 }: {
-	mode: Exclude<BuilderMode, 'read-only'>;
+	mode: Exclude<BuilderMode, 'read-only' | 'execute'>;
 	transaction: Transaction;
 	config: ResolvedMcpConfig;
 	client: SuigarClientBundle['client'];

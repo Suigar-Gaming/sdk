@@ -9,7 +9,7 @@ import {
 	POSITIVE_INTEGER_PATTERN,
 } from '../utils/index.js';
 
-const builderModes = ['build', 'dry-run', 'read-only'] as const;
+const builderModes = ['build', 'dry-run', 'read-only', 'execute'] as const;
 
 const addressDescription =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
@@ -117,6 +117,33 @@ export const listNftsInputSchema = configInputSchema
 			),
 	})
 	.strict();
+
+const walletOwnerSchema = z
+	.string()
+	.min(1)
+	.optional()
+	.describe(
+		'Optional Sui address or SuiNS name. Defaults to the connected MCP wallet.',
+	);
+
+export const getWalletBalancesInputSchema = configInputSchema
+	.extend({ owner: walletOwnerSchema })
+	.strict();
+
+export const listWalletCoinsInputSchema = configInputSchema
+	.extend({
+		owner: walletOwnerSchema,
+		coinType: z.string().min(1).optional().describe(coinTypeDescription),
+		cursor: z.string().min(1).nullable().optional(),
+		limit: z.number().int().min(1).max(100).default(50),
+	})
+	.strict();
+
+export const getExecutionStatusInputSchema = configInputSchema
+	.extend({ requestId: z.string().regex(/^[0-9a-f]{32}$/i) })
+	.strict();
+
+export const connectionInputSchema = configInputSchema.strict();
 
 const metadataSchema = z.record(
 	z.string(),
@@ -335,12 +362,23 @@ export const toolOutputSchema = z.looseObject({
 	nftCatalog: unknownJsonSchema.optional(),
 	ownedNfts: unknownJsonSchema.optional(),
 	referral: unknownJsonSchema.optional(),
+	wallet: unknownJsonSchema.optional(),
+	connection: unknownJsonSchema.optional(),
+	execution: unknownJsonSchema.optional(),
 	errors: z.array(z.string()).optional(),
 });
 
 export type ReadConfigInput = z.input<typeof readConfigInputSchema>;
 export type ReadGameMetadataInput = z.input<typeof readGameMetadataInputSchema>;
 export type ListNftsInput = z.input<typeof listNftsInputSchema>;
+export type GetWalletBalancesInput = z.input<
+	typeof getWalletBalancesInputSchema
+>;
+export type ListWalletCoinsInput = z.input<typeof listWalletCoinsInputSchema>;
+export type GetExecutionStatusInput = z.input<
+	typeof getExecutionStatusInputSchema
+>;
+export type ConnectionInput = z.input<typeof connectionInputSchema>;
 export type CommonBuildInput = z.input<typeof commonBuildInputSchema>;
 export type CoinflipInput = z.input<typeof coinflipInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;

@@ -13,7 +13,6 @@ import {
 import {
 	buildTransactionResult,
 	createSuigarClient,
-	DEFAULT_NETWORK,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	toJsonValue,
@@ -37,15 +36,26 @@ import {
 	toBaseUnits,
 	toCurrencyAmountText,
 } from '../utils/index.js';
+import {
+	createExecutionBridge,
+	createLoginBridge,
+	getExecutionStatus,
+	loadCredentials,
+	removeProfile,
+} from '../wallet/index.js';
 import type {
 	BuildReferralCommissionClaimTransactionInput,
 	BuildReferralLevelUpUsdRewardsClaimTransactionInput,
 	CoinflipInput,
 	ConfigIdInput,
+	ConnectionInput,
+	GetExecutionStatusInput,
 	GetReferralCommissionInput,
 	GetReferralLevelUpUsdRewardsInput,
+	GetWalletBalancesInput,
 	LimboInput,
 	ListNftsInput,
+	ListWalletCoinsInput,
 	PvpCoinflipCancelInput,
 	PvpCoinflipCreateInput,
 	PvpCoinflipJoinInput,
@@ -228,12 +238,152 @@ const formatGameParameters = (
 
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
+const frontendOriginFor = (network: 'mainnet' | 'testnet') =>
+	process.env.SUIGAR_MCP_WEB_URL ??
+	(network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com');
+
 const getConfigInput = (input: ReadConfigInput) => ({
-	network: input.network ?? DEFAULT_NETWORK,
+	network: input.network,
 	providerUrl: input.providerUrl,
 	config: input.config,
 	partner: input.partner,
 });
+
+const resolveWalletOwner = async (
+	input: { owner?: string; network?: 'mainnet' | 'testnet' },
+	bundle: SuigarClientBundle,
+) => {
+	if (input.owner) return await resolveOwnerAddress(input.owner, bundle);
+	const credentials = await loadCredentials();
+	const profile = credentials.profiles[bundle.config.network];
+	if (!profile)
+		throw new Error(
+			`No wallet is connected for ${bundle.config.network}. Call suigar_login first.`,
+		);
+	return profile.address;
+};
+
+export const getWalletBalancesTool = async (
+	input: GetWalletBalancesInput,
+): Promise<ToolTextResult> => {
+	const bundle = createSuigarClient(getConfigInput(input));
+	const owner = await resolveWalletOwner(input, bundle);
+	const client = bundle.client as unknown as {
+		core: {
+			getAllBalances: (input: {
+				owner: string;
+			}) => Promise<Array<{ coinType: string; totalBalance: string }>>;
+		};
+	};
+	const balances = await client.core.getAllBalances({ owner });
+	return asTextResponse({
+		network: bundle.config.network,
+		config: bundle.config,
+		wallet: {
+			owner,
+			balances: balances.map((balance) => ({
+				coinType: balance.coinType,
+				totalBalance: balance.totalBalance,
+			})),
+		},
+	});
+};
+
+export const listWalletCoinsTool = async (
+	input: ListWalletCoinsInput,
+): Promise<ToolTextResult> => {
+	const bundle = createSuigarClient(getConfigInput(input));
+	const owner = await resolveWalletOwner(input, bundle);
+	const client = bundle.client as unknown as {
+		core: {
+			listCoins: (input: {
+				owner: string;
+				coinType?: string;
+				cursor?: string | null;
+				limit: number;
+			}) => Promise<{
+				data: Array<Record<string, unknown>>;
+				nextCursor: string | null;
+				hasNextPage: boolean;
+			}>;
+		};
+	};
+	const result = await client.core.listCoins({
+		owner,
+		coinType: input.coinType,
+		cursor: input.cursor,
+		limit: input.limit ?? 50,
+	});
+	return asTextResponse({
+		network: bundle.config.network,
+		config: bundle.config,
+		wallet: {
+			owner,
+			coins: result.data,
+			nextCursor: result.nextCursor,
+			hasNextPage: result.hasNextPage,
+		},
+	});
+};
+
+export const getExecutionStatusTool = async (
+	input: GetExecutionStatusInput,
+): Promise<ToolTextResult> => {
+	const execution = getExecutionStatus(input.requestId);
+	if (!execution)
+		throw new Error(
+			'Unknown execution request. It may have expired or this MCP server restarted.',
+		);
+	const { config } = createSuigarClient(getConfigInput(input));
+	return asTextResponse({ network: config.network, config, execution });
+};
+
+export const getConnectionStatusTool = async (
+	input: ConnectionInput,
+): Promise<ToolTextResult> => {
+	const { config } = createSuigarClient(getConfigInput(input));
+	const profile = (await loadCredentials()).profiles[config.network];
+	return asTextResponse({
+		network: config.network,
+		config,
+		connection: profile
+			? {
+					connected: true,
+					address: profile.address,
+					walletType: profile.walletType,
+					status: 'connected',
+				}
+			: { connected: false, status: 'logged-out' },
+	});
+};
+
+export const suigarLoginTool = async (
+	input: ConnectionInput,
+): Promise<ToolTextResult> => {
+	const { config } = createSuigarClient(getConfigInput(input));
+	const bridge = await createLoginBridge({
+		network: config.network,
+		frontendOrigin: frontendOriginFor(config.network),
+	});
+	void bridge.done.catch(() => undefined);
+	return asTextResponse({
+		network: config.network,
+		config,
+		connection: { connected: false, loginUrl: bridge.url, status: 'pending' },
+	});
+};
+
+export const suigarLogoutTool = async (
+	input: ConnectionInput,
+): Promise<ToolTextResult> => {
+	const { config } = createSuigarClient(getConfigInput(input));
+	await removeProfile(config.network);
+	return asTextResponse({
+		network: config.network,
+		config,
+		connection: { connected: false, status: 'logged-out' },
+	});
+};
 
 const supportedGames = () =>
 	GAMES.map((id) => ({
@@ -421,6 +571,36 @@ const buildTransactionTool = async ({
 			? undefined
 			: toBaseUnits(stakeDisplay, 'stake', coin.decimals));
 	const transaction = await createTransaction(bundle);
+	if (mode === 'execute') {
+		const built = await buildTransactionResult({
+			mode: 'build',
+			transaction,
+			config: bundle.config,
+			client: bundle.client,
+			context: {
+				game,
+				action,
+				coinType: coin.coinType,
+				stake: baseStake,
+				stakeDisplay,
+				coinDecimals: coin.decimals,
+				gameInputs,
+			},
+		});
+		const execution = await createExecutionBridge({
+			network: bundle.config.network,
+			frontendOrigin: frontendOriginFor(bundle.config.network),
+			transactionBytesBase64: built.transactionBytesBase64 ?? '',
+			summary: built.summary,
+		});
+		return asTextResponse({
+			mode: 'execute',
+			network: bundle.config.network,
+			config: bundle.config,
+			summary: built.summary,
+			execution: { ...execution, status: 'pending' },
+		});
+	}
 	return asTextResponse(
 		await buildTransactionResult({
 			mode,
@@ -665,6 +845,28 @@ const buildReferralClaimTransactionTool = async ({
 					owner,
 					gasBudget: input.gasBudget,
 				});
+	if (mode === 'execute') {
+		const built = await buildTransactionResult({
+			mode: 'build',
+			transaction,
+			config: bundle.config,
+			client: bundle.client,
+			context: { coinType: coin.coinType, gameInputs: { referralClaim: kind } },
+		});
+		const execution = await createExecutionBridge({
+			network: bundle.config.network,
+			frontendOrigin: frontendOriginFor(bundle.config.network),
+			transactionBytesBase64: built.transactionBytesBase64 ?? '',
+			summary: built.summary,
+		});
+		return asTextResponse({
+			mode: 'execute',
+			network: bundle.config.network,
+			config: bundle.config,
+			summary: built.summary,
+			execution: { ...execution, status: 'pending' },
+		});
+	}
 
 	return asTextResponse(
 		await buildTransactionResult({
