@@ -268,14 +268,8 @@ export const getWalletBalancesTool = async (
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
-	const client = bundle.client as unknown as {
-		core: {
-			getAllBalances: (input: {
-				owner: string;
-			}) => Promise<Array<{ coinType: string; totalBalance: string }>>;
-		};
-	};
-	const balances = await client.core.getAllBalances({ owner });
+
+	const { balances } = await bundle.client.core.listBalances({ owner });
 	return asTextResponse({
 		network: bundle.config.network,
 		config: bundle.config,
@@ -283,7 +277,7 @@ export const getWalletBalancesTool = async (
 			owner,
 			balances: balances.map((balance) => ({
 				coinType: balance.coinType,
-				totalBalance: balance.totalBalance,
+				totalBalance: balance.balance,
 			})),
 		},
 	});
@@ -294,21 +288,8 @@ export const listWalletCoinsTool = async (
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
-	const client = bundle.client as unknown as {
-		core: {
-			listCoins: (input: {
-				owner: string;
-				coinType?: string;
-				cursor?: string | null;
-				limit: number;
-			}) => Promise<{
-				data: Array<Record<string, unknown>>;
-				nextCursor: string | null;
-				hasNextPage: boolean;
-			}>;
-		};
-	};
-	const result = await client.core.listCoins({
+
+	const result = await bundle.client.core.listCoins({
 		owner,
 		coinType: input.coinType,
 		cursor: input.cursor,
@@ -319,8 +300,15 @@ export const listWalletCoinsTool = async (
 		config: bundle.config,
 		wallet: {
 			owner,
-			coins: result.data,
-			nextCursor: result.nextCursor,
+			coins: result.objects.map((coin) => ({
+				objectId: coin.objectId,
+				version: coin.version,
+				digest: coin.digest,
+				owner: coin.owner,
+				type: coin.type,
+				balance: coin.balance,
+			})),
+			nextCursor: result.cursor,
 			hasNextPage: result.hasNextPage,
 		},
 	});
