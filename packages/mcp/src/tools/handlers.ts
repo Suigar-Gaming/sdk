@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SuiClientTypes } from '@mysten/sui/client';
 import type { Transaction } from '@mysten/sui/transactions';
 import {
 	GAMES,
@@ -661,16 +660,15 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 	});
 	const catalog = client.suigar.bcs.NftV1Factory.parse(factory.object.content);
 	const ownedNfts = [] as ListNftsResult['ownedNfts'];
-	let cursor: string | null = null;
+	let cursor: string | null | undefined;
 
 	do {
-		const page: SuiClientTypes.ListOwnedObjectsResponse<{ content: true }> =
-			await client.core.listOwnedObjects({
-				owner,
-				type: nftType,
-				cursor,
-				include: { content: true },
-			});
+		const page = await client.core.listOwnedObjects({
+			owner,
+			type: nftType,
+			cursor,
+			include: { content: true },
+		});
 		for (const object of page.objects) {
 			const nft = client.suigar.bcs.NftV1.parse(object.content);
 			ownedNfts.push({
