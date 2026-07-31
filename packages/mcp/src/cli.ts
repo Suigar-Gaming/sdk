@@ -5,6 +5,7 @@ import open from 'open';
 import type { ArgumentsCamelCase, Argv } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
+import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
 import {
 	createLoginBridge,
@@ -13,9 +14,9 @@ import {
 	setDefaultNetwork,
 } from './wallet/index.js';
 
-const defaultOrigin = (network: 'mainnet' | 'testnet') =>
+const defaultOrigin = (network: SuigarNetwork) =>
 	network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com';
-type NetworkArgs = ArgumentsCamelCase<{ network?: 'mainnet' | 'testnet' }>;
+type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
 
 const TOOL_CATALOG = [
@@ -55,7 +56,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			(command: Argv) =>
 				command
 					.option('network', {
-						choices: ['mainnet', 'testnet'] as const,
+						choices: SUPPORTED_SUI_NETWORKS,
 						default: 'testnet',
 					})
 					.option('web-url', { type: 'string' })
@@ -63,7 +64,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					.option('json', { type: 'boolean', default: false }),
 			async (
 				args: ArgumentsCamelCase<{
-					network: 'mainnet' | 'testnet';
+					network: SuigarNetwork;
 					webUrl?: string;
 					noOpen: boolean;
 					json: boolean;
@@ -96,7 +97,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			'Forget the wallet connected to a network',
 			(command: Argv) =>
 				command
-					.option('network', { choices: ['mainnet', 'testnet'] as const })
+					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
 					.option('json', { type: 'boolean', default: false }),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
@@ -114,7 +115,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			'Show non-secret MCP connection status',
 			(command: Argv) =>
 				command
-					.option('network', { choices: ['mainnet', 'testnet'] as const })
+					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
 					.option('json', { type: 'boolean', default: false }),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
@@ -151,7 +152,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			'$0',
 			'Start the stdio MCP server',
 			(command: Argv) =>
-				command.option('network', { choices: ['mainnet', 'testnet'] as const }),
+				command.option('network', { choices: SUPPORTED_SUI_NETWORKS }),
 			async (args: NetworkArgs) => {
 				if (args.network) await setDefaultNetwork(args.network);
 				await startSuigarMcpServer();
