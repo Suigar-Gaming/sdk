@@ -18,6 +18,11 @@ const defaultOrigin = (network: SuigarNetwork) =>
 	network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com';
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
+const jsonOption = {
+	type: 'boolean' as const,
+	default: false,
+	description: 'Output machine-readable JSON instead of human-readable text',
+};
 
 const TOOL_CATALOG = [
 	'suigar_login',
@@ -59,9 +64,17 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 						choices: SUPPORTED_SUI_NETWORKS,
 						default: 'testnet',
 					})
-					.option('web-url', { type: 'string' })
-					.option('no-open', { type: 'boolean', default: false })
-					.option('json', { type: 'boolean', default: false }),
+					.option('web-url', {
+						type: 'string',
+						description: 'Frontend origin for the connection page',
+					})
+					.option('no-open', {
+						type: 'boolean',
+						default: false,
+						description:
+							'Do not open the connection page in the default browser; print its URL instead',
+					})
+					.option('json', jsonOption),
 			async (
 				args: ArgumentsCamelCase<{
 					network: SuigarNetwork;
@@ -98,7 +111,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			(command: Argv) =>
 				command
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
-					.option('json', { type: 'boolean', default: false }),
+					.option('json', jsonOption),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
 				const network = args.network ?? credentials.defaultNetwork;
@@ -116,7 +129,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			(command: Argv) =>
 				command
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
-					.option('json', { type: 'boolean', default: false }),
+					.option('json', jsonOption),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
 				const network = args.network ?? credentials.defaultNetwork;
@@ -138,8 +151,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'tools',
 			'Print the MCP tool catalog',
-			(command: Argv) =>
-				command.option('json', { type: 'boolean', default: false }),
+			(command: Argv) => command.option('json', jsonOption),
 			async (args: JsonArgs) => {
 				process.stdout.write(
 					args.json
