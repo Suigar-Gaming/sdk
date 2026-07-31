@@ -28,7 +28,7 @@ export const createSuigarMcpServer = () => {
 		{
 			title: 'Suigar MCP Console',
 			description:
-				'Compact MCP App UI for inspecting Suigar config, game metadata, NFT and referral data, and transaction plans, summaries, dry-runs, and serialized bytes.',
+				'Compact MCP App UI for inspecting wallet balances and coin objects, Suigar config, game metadata, NFT and referral data, and transaction plans, summaries, dry-runs, and serialized bytes.',
 			_meta: {
 				ui: {
 					csp: {

@@ -269,16 +269,15 @@ export const getWalletBalancesTool = async (
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 
-	const { balances } = await bundle.client.core.listBalances({ owner });
+	const result = await bundle.client.core.listBalances({ owner });
 	return asTextResponse({
 		network: bundle.config.network,
 		config: bundle.config,
 		wallet: {
 			owner,
-			balances: balances.map((balance) => ({
-				coinType: balance.coinType,
-				totalBalance: balance.balance,
-			})),
+			balances: result.balances,
+			nextCursor: result.cursor,
+			hasNextPage: result.hasNextPage,
 		},
 	});
 };
@@ -300,14 +299,7 @@ export const listWalletCoinsTool = async (
 		config: bundle.config,
 		wallet: {
 			owner,
-			coins: result.objects.map((coin) => ({
-				objectId: coin.objectId,
-				version: coin.version,
-				digest: coin.digest,
-				owner: coin.owner,
-				type: coin.type,
-				balance: coin.balance,
-			})),
+			coins: result.objects,
 			nextCursor: result.cursor,
 			hasNextPage: result.hasNextPage,
 		},
@@ -673,7 +665,7 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 
 	do {
 		const page: SuiClientTypes.ListOwnedObjectsResponse<{ content: true }> =
-			await client.core.listOwnedObjects<{ content: true }>({
+			await client.core.listOwnedObjects({
 				owner,
 				type: nftType,
 				cursor,
