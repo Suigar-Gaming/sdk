@@ -16,7 +16,7 @@ import {
 const defaultOrigin = (network: 'mainnet' | 'testnet') =>
 	network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com';
 type NetworkArgs = ArgumentsCamelCase<{ network?: 'mainnet' | 'testnet' }>;
-type JsonArgs = ArgumentsCamelCase<{ json?: boolean }>;
+type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
 
 const TOOL_CATALOG = [
 	'suigar_login',
@@ -45,10 +45,10 @@ const TOOL_CATALOG = [
 
 export async function runSuigarCli(argv = hideBin(process.argv)) {
 	const parser = yargs(argv)
-		.scriptName('suigar')
+		.scriptName('')
 		.strict()
 		.help()
-		.version(false)
+		.version()
 		.command(
 			'login',
 			'Connect a wallet in the Suigar browser app',
@@ -102,10 +102,9 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const credentials = await loadCredentials();
 				const network = args.network ?? credentials.defaultNetwork;
 				await removeProfile(network);
-				const result = { network, loggedOut: true };
 				process.stdout.write(
 					args.json
-						? `${JSON.stringify(result)}\n`
+						? `${JSON.stringify({ network, loggedOut: true })}\n`
 						: `Logged out of Suigar MCP on ${network}.\n`,
 				);
 			},
