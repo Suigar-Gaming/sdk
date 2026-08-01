@@ -9,7 +9,12 @@ import {
 	POSITIVE_INTEGER_PATTERN,
 } from '../utils/index.js';
 
-const builderModes = ['build', 'dry-run', 'read-only', 'execute'] as const;
+export const BUILDER_MODES = [
+	'build',
+	'dry-run',
+	'read-only',
+	'execute',
+] as const;
 
 const addressDescription =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
@@ -153,7 +158,7 @@ const metadataSchema = z.record(
 const commonBuildInputSchema = configInputSchema
 	.extend({
 		mode: z
-			.enum(builderModes)
+			.enum(BUILDER_MODES)
 			.default('build')
 			.describe('Build, dry-run, or return a read-only plan.'),
 		owner: z.string().min(1).optional().describe(addressDescription),
@@ -301,7 +306,7 @@ export const pvpCoinflipCancelInputSchema = commonBuildInputSchema
 const referralClaimInputSchema = configInputSchema
 	.extend({
 		mode: z
-			.enum(builderModes)
+			.enum(BUILDER_MODES)
 			.default('build')
 			.describe('Build, dry-run, or return a read-only plan.'),
 		owner: z.string().min(1).optional().describe(addressDescription),
@@ -349,7 +354,7 @@ const unknownJsonSchema: z.ZodType<unknown> = z.lazy(() =>
 );
 
 export const toolOutputSchema = z.looseObject({
-	mode: z.enum(builderModes).optional(),
+	mode: z.enum(BUILDER_MODES).optional(),
 	network: z.enum(SUPPORTED_SUI_NETWORKS).optional(),
 	config: unknownJsonSchema.optional(),
 	game: unknownJsonSchema.optional(),
