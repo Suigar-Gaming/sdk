@@ -11,6 +11,18 @@ export const NFT_IMAGE_RESOURCE_DOMAINS = [
 	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
 ] as const;
 
+export const MCP_LOGIN_CONNECT_DOMAINS = ['http://127.0.0.1:*'] as const;
+
+export const createSuigarMcpAppResourceMeta = () => ({
+	ui: {
+		csp: {
+			connectDomains: [...MCP_LOGIN_CONNECT_DOMAINS],
+			resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
+		},
+		prefersBorder: true,
+	},
+});
+
 const hasErrorCode = (
 	error: unknown,
 	code: string,
@@ -41,15 +53,7 @@ export const createSuigarMcpAppResourceResult = async () => ({
 			uri: SUIGAR_MCP_APP_RESOURCE_URI,
 			mimeType: RESOURCE_MIME_TYPE,
 			text: await readSuigarMcpAppHtml(),
-			_meta: {
-				ui: {
-					csp: {
-						connectDomains: [],
-						resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
-					},
-					prefersBorder: true,
-				},
-			},
+			_meta: createSuigarMcpAppResourceMeta(),
 		},
 	],
 });
