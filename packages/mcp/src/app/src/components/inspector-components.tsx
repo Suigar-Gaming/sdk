@@ -27,12 +27,10 @@ const listItemClassNames = {
 
 export function Header({
 	coinBadge,
-	url,
 	status,
 	title = 'Transaction Inspector',
 }: {
 	coinBadge?: string | null;
-	url?: string | null;
 	status: string;
 	title?: string;
 }) {
@@ -44,16 +42,6 @@ export function Header({
 				</p>
 				<h1 className="text-2xl leading-tight font-extrabold text-foreground">
 					{title}
-					{url ? (
-						<a
-							className="ml-3 text-xs font-semibold text-primary underline underline-offset-4"
-							href={url}
-							rel="noreferrer"
-							target="_blank"
-						>
-							{url}
-						</a>
-					) : null}
 				</h1>
 			</div>
 			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
@@ -70,6 +58,38 @@ export function Header({
 				</div>
 			</div>
 		</header>
+	);
+}
+
+export function ExecutionApproval({ url }: { url: string | null }) {
+	if (!url) {
+		return null;
+	}
+
+	return (
+		<section
+			className={cn(
+				panelClassName,
+				'justify-items-center px-4 py-5 text-center',
+			)}
+		>
+			<div>
+				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">
+					Transaction approval
+				</h2>
+				<p className="mt-1 text-xs leading-5 font-semibold text-muted-foreground">
+					Review the transaction in your wallet before submitting it.
+				</p>
+			</div>
+			<a
+				className="inline-flex min-h-10 items-center justify-center rounded-md border border-primary/75 bg-primary px-5 py-2 text-sm font-extrabold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				href={url}
+				rel="noreferrer"
+				target="_blank"
+			>
+				Sign and Execute
+			</a>
+		</section>
 	);
 }
 
