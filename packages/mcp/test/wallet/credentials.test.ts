@@ -31,6 +31,17 @@ describe('wallet credentials', () => {
 			defaultNetwork: 'testnet',
 			profiles: {},
 		});
+		expect(credentials.readPersistedDefaultNetwork()).toBe('testnet');
+	});
+
+	it('reads a valid persisted default network synchronously', async () => {
+		await credentials.saveCredentials({
+			version: 1,
+			defaultNetwork: 'mainnet',
+			profiles: {},
+		});
+
+		expect(credentials.readPersistedDefaultNetwork()).toBe('mainnet');
 	});
 
 	it('persists network-specific profiles with restrictive permissions', async () => {
@@ -41,7 +52,8 @@ describe('wallet credentials', () => {
 			connectedAt: '2026-01-01T00:00:00.000Z',
 		});
 		await credentials.saveProfile('testnet', {
-			address: '0x2',
+			address:
+				'0x0000000000000000000000000000000000000000000000000000000000000002',
 			walletType: 'zklogin',
 			frontendOrigin,
 			connectedAt: '2026-01-02T00:00:00.000Z',
@@ -73,6 +85,35 @@ describe('wallet credentials', () => {
 		await writeFile(
 			credentials.credentialsPath(),
 			JSON.stringify({ defaultNetwork: 'devnet', profiles: 'invalid' }),
+		);
+
+		await expect(credentials.loadCredentials()).resolves.toEqual({
+			version: 1,
+			defaultNetwork: 'testnet',
+			profiles: {},
+		});
+	});
+
+	it('rejects profiles with an invalid Sui address', async () => {
+		await credentials.saveCredentials({
+			version: 1,
+			defaultNetwork: 'testnet',
+			profiles: {},
+		});
+		await writeFile(
+			credentials.credentialsPath(),
+			JSON.stringify({
+				version: 1,
+				defaultNetwork: 'testnet',
+				profiles: {
+					testnet: {
+						address: 'not-an-address',
+						walletType: 'wallet',
+						frontendOrigin,
+						connectedAt: '2026-01-01T00:00:00.000Z',
+					},
+				},
+			}),
 		);
 
 		await expect(credentials.loadCredentials()).resolves.toEqual({

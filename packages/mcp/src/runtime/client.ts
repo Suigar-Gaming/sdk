@@ -1,9 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import type { ClientWithExtensions } from '@mysten/sui/client';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import type { Transaction } from '@mysten/sui/transactions';
@@ -17,6 +14,7 @@ import {
 } from '@mysten/sui/utils';
 import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
 import { formatBaseUnitAmount } from '../utils/index.js';
+import { readPersistedDefaultNetwork } from '../wallet/credentials.js';
 import {
 	extractDryRunErrors,
 	summarizeDryRun,
@@ -37,21 +35,6 @@ const DEFAULT_PROVIDER_URLS = {
 	mainnet: 'https://fullnode.mainnet.sui.io:443',
 	testnet: 'https://fullnode.testnet.sui.io:443',
 } as const satisfies Record<SuigarNetwork, string>;
-
-const readPersistedDefaultNetwork = (): SuigarNetwork => {
-	try {
-		const value: unknown = JSON.parse(
-			readFileSync(join(homedir(), '.suigar-mcp', 'credentials.json'), 'utf8'),
-		);
-		const network =
-			value && typeof value === 'object'
-				? (value as { defaultNetwork?: unknown }).defaultNetwork
-				: undefined;
-		return network === 'mainnet' || network === 'testnet' ? network : 'testnet';
-	} catch {
-		return 'testnet';
-	}
-};
 
 export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
