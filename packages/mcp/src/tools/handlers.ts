@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mysten/sui/transactions';
+import { parseStructTag } from '@mysten/sui/utils';
 import {
 	GAMES,
 	type CoinSide,
@@ -248,6 +249,45 @@ const getConfigInput = (input: ReadConfigInput) => ({
 	partner: input.partner,
 });
 
+const coinSymbol = (coinType: string) => {
+	try {
+		return parseStructTag(coinType).name;
+	} catch {
+		return coinType;
+	}
+};
+
+const resolveCoinDisplayMetadata = async (
+	coinType: string,
+	bundle: SuigarClientBundle,
+) => {
+	const configuredCoin = Object.values(bundle.config.sdk.coins).find(
+		(coin) => coin.coinType === coinType,
+	);
+	if (configuredCoin) {
+		return {
+			decimals: configuredCoin.decimals,
+			symbol: coinSymbol(coinType),
+		};
+	}
+
+	try {
+		const { coinMetadata } = await bundle.client.core.getCoinMetadata({
+			coinType,
+		});
+		if (coinMetadata) {
+			return {
+				decimals: coinMetadata.decimals,
+				symbol: coinMetadata.symbol || coinSymbol(coinType),
+			};
+		}
+	} catch {
+		// A missing metadata object should not prevent the wallet from being read.
+	}
+
+	return { decimals: undefined, symbol: coinSymbol(coinType) };
+};
+
 const resolveWalletOwner = async (
 	input: { owner?: string; network?: 'mainnet' | 'testnet' },
 	bundle: SuigarClientBundle,
@@ -267,16 +307,40 @@ export const getWalletBalancesTool = async (
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
+	const balances = [];
+	let cursor: string | null = null;
+	let hasNextPage = false;
+	do {
+		const result = await bundle.client.core.listBalances({ owner, cursor });
+		balances.push(...result.balances);
+		cursor = result.cursor;
+		hasNextPage = result.hasNextPage;
+	} while (hasNextPage && cursor);
 
-	const result = await bundle.client.core.listBalances({ owner });
+	const metadata = new Map(
+		await Promise.all(
+			balances.map(
+				async (balance) =>
+					[
+						balance.coinType,
+						await resolveCoinDisplayMetadata(balance.coinType, bundle),
+					] as const,
+			),
+		),
+	);
 	return asTextResponse({
 		network: bundle.config.network,
 		config: bundle.config,
 		wallet: {
 			owner,
-			balances: result.balances,
-			nextCursor: result.cursor,
-			hasNextPage: result.hasNextPage,
+			balances: balances.map((balance) => {
+				const coin = metadata.get(balance.coinType)!;
+				return {
+					...balance,
+					balanceDisplay: formatBaseUnitAmount(balance.balance, coin.decimals),
+					symbol: coin.symbol,
+				};
+			}),
 		},
 	});
 };
@@ -293,12 +357,22 @@ export const listWalletCoinsTool = async (
 		cursor: input.cursor,
 		limit: input.limit ?? 50,
 	});
+	const metadata = await resolveCoinDisplayMetadata(
+		input.coinType ?? bundle.config.sdk.coins.sui.coinType,
+		bundle,
+	);
 	return asTextResponse({
 		network: bundle.config.network,
 		config: bundle.config,
 		wallet: {
 			owner,
-			coins: result.objects,
+			coins: result.objects.map((coin) => {
+				return {
+					...coin,
+					balanceDisplay: formatBaseUnitAmount(coin.balance, metadata.decimals),
+					symbol: metadata.symbol,
+				};
+			}),
 			nextCursor: result.cursor,
 			hasNextPage: result.hasNextPage,
 		},

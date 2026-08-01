@@ -27,10 +27,12 @@ const listItemClassNames = {
 
 export function Header({
 	coinBadge,
+	url,
 	status,
 	title = 'Transaction Inspector',
 }: {
 	coinBadge?: string | null;
+	url?: string | null;
 	status: string;
 	title?: string;
 }) {
@@ -42,6 +44,16 @@ export function Header({
 				</p>
 				<h1 className="text-2xl leading-tight font-extrabold text-foreground">
 					{title}
+					{url ? (
+						<a
+							className="ml-3 text-xs font-semibold text-primary underline underline-offset-4"
+							href={url}
+							rel="noreferrer"
+							target="_blank"
+						>
+							{url}
+						</a>
+					) : null}
 				</h1>
 			</div>
 			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">

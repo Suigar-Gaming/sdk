@@ -16,6 +16,7 @@ import {
 	Panel,
 	RawPayload,
 } from './components/inspector-components.js';
+import { asRecord } from './lib/format.js';
 import type { InspectorState } from './lib/types.js';
 import { resolveAppView } from './views/index.js';
 
@@ -204,6 +205,9 @@ export function SuigarInspectorApp() {
 
 	const inspector = viewState.inspector ?? initialState;
 	const { coinBadge, title, View } = resolveAppView(inspector.payload);
+	const execution = asRecord(asRecord(inspector.payload).execution);
+	const approvalUrl =
+		typeof execution.approvalUrl === 'string' ? execution.approvalUrl : null;
 
 	if (viewState.error) {
 		return (
@@ -231,9 +235,18 @@ export function SuigarInspectorApp() {
 		);
 	}
 
+	if (Object.keys(asRecord(inspector.payload)).length === 0) {
+		return null;
+	}
+
 	return (
 		<main className={shellClassName}>
-			<Header coinBadge={coinBadge} status={inspector.status} title={title} />
+			<Header
+				coinBadge={coinBadge}
+				status={inspector.status}
+				title={title}
+				url={approvalUrl}
+			/>
 			<View payload={inspector.payload} errors={inspector.errors} />
 			<RawPayload payload={inspector.payload} />
 		</main>

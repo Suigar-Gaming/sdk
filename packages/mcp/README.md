@@ -11,7 +11,7 @@ It provides:
 - a compact MCP App UI resource for compatible hosts
 - text and structured-content fallbacks for normal MCP clients
 
-Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval; the MCP process never receives a wallet seed phrase or primary private key.
+Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
 
 ## Wallet connection
 

@@ -218,8 +218,15 @@ export type WalletReadResult = {
 	config: ResolvedMcpConfig;
 	wallet: {
 		owner: string;
-		balances?: Array<SuiClientTypes.Balance>;
-		coins?: Array<SuiClientTypes.Coin>;
+		balances?: Array<
+			SuiClientTypes.Balance & { balanceDisplay: string; symbol: string }
+		>;
+		coins?: Array<
+			SuiClientTypes.Coin & {
+				balanceDisplay: string;
+				symbol: string;
+			}
+		>;
 		nextCursor?: string | null;
 		hasNextPage?: boolean;
 	};

@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { formatAddress } from '@mysten/sui/utils';
 import type { ReactNode } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
@@ -31,9 +30,6 @@ function WalletTable({
 	);
 }
 
-const abbreviated = (value: unknown) =>
-	typeof value === 'string' ? formatAddress(value) : '—';
-
 export function WalletView({ payload }: { payload: unknown }) {
 	const result = asRecord(payload);
 	const wallet = asRecord(result.wallet);
@@ -58,9 +54,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 						No balances found for this wallet.
 					</p>
 				) : (
-					<WalletTable
-						headers={['Coin type', 'Total', 'Coin objects', 'Address balance']}
-					>
+					<WalletTable headers={['Coin', 'Balance']}>
 						{balances.map((item) => {
 							const balance = asRecord(item);
 							return (
@@ -69,16 +63,11 @@ export function WalletView({ payload }: { payload: unknown }) {
 										className="max-w-72 truncate px-3 py-2 font-mono"
 										title={String(balance.coinType)}
 									>
-										{String(balance.coinType)}
+										{String(balance.symbol ?? balance.coinType)}
 									</td>
 									<td className="px-3 py-2 font-mono">
-										{String(balance.balance)}
-									</td>
-									<td className="px-3 py-2 font-mono">
-										{String(balance.coinBalance)}
-									</td>
-									<td className="px-3 py-2 font-mono">
-										{String(balance.addressBalance)}
+										{String(balance.balanceDisplay ?? balance.balance)}{' '}
+										{typeof balance.symbol === 'string' ? balance.symbol : ''}
 									</td>
 								</tr>
 							);
@@ -92,28 +81,20 @@ export function WalletView({ payload }: { payload: unknown }) {
 						No coin objects found for this page.
 					</p>
 				) : (
-					<WalletTable headers={['Object ID', 'Balance', 'Type', 'Version']}>
+					<WalletTable headers={['Balance', 'Coin']}>
 						{coins.map((item) => {
 							const coin = asRecord(item);
 							return (
 								<tr className="bg-card/45" key={String(coin.objectId)}>
-									<td
-										className="px-3 py-2 font-mono"
-										title={String(coin.objectId)}
-									>
-										{abbreviated(coin.objectId)}
-									</td>
 									<td className="px-3 py-2 font-mono">
-										{String(coin.balance)}
+										{String(coin.balanceDisplay ?? coin.balance)}{' '}
+										{typeof coin.symbol === 'string' ? coin.symbol : ''}
 									</td>
 									<td
 										className="max-w-72 truncate px-3 py-2 font-mono"
 										title={String(coin.type)}
 									>
-										{String(coin.type)}
-									</td>
-									<td className="px-3 py-2 font-mono">
-										{String(coin.version)}
+										{String(coin.symbol ?? coin.type)}
 									</td>
 								</tr>
 							);
