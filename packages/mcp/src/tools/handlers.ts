@@ -42,6 +42,7 @@ import {
 	getExecutionStatus,
 	loadCredentials,
 	removeProfile,
+	resolveFrontendOrigin,
 } from '../wallet/index.js';
 import type {
 	BuildReferralCommissionClaimTransactionInput,
@@ -238,10 +239,6 @@ const formatGameParameters = (
 
 const getMode = (mode: BuilderMode | undefined): BuilderMode => mode ?? 'build';
 
-const frontendOriginFor = (network: 'mainnet' | 'testnet') =>
-	process.env.SUIGAR_MCP_WEB_URL ??
-	(network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com');
-
 const getConfigInput = (input: ReadConfigInput) => ({
 	network: input.network,
 	providerUrl: input.providerUrl,
@@ -416,7 +413,7 @@ export const suigarLoginTool = async (
 	const { config } = createSuigarClient(getConfigInput(input));
 	const bridge = await createLoginBridge({
 		network: config.network,
-		frontendOrigin: frontendOriginFor(config.network),
+		frontendOrigin: resolveFrontendOrigin(config.network),
 	});
 	void bridge.done.catch(() => undefined);
 	return asTextResponse({
@@ -642,7 +639,7 @@ const buildTransactionTool = async ({
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
-			frontendOrigin: frontendOriginFor(bundle.config.network),
+			frontendOrigin: resolveFrontendOrigin(bundle.config.network),
 			transactionBytesBase64: built.transactionBytesBase64 ?? '',
 			summary: built.summary,
 		});
@@ -907,7 +904,7 @@ const buildReferralClaimTransactionTool = async ({
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
-			frontendOrigin: frontendOriginFor(bundle.config.network),
+			frontendOrigin: resolveFrontendOrigin(bundle.config.network),
 			transactionBytesBase64: built.transactionBytesBase64 ?? '',
 			summary: built.summary,
 		});

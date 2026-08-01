@@ -15,7 +15,7 @@ Transactions remain unsigned by default. `mode: "execute"` opens the paired Suig
 
 ## Wallet connection
 
-Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions. Use `npx -y @suigar/mcp status [--network ...]` to inspect it. `npx -y @suigar/mcp logout [--network ...]` opens a browser confirmation page for one network; add `--all` to disconnect every stored network. `npx -y @suigar/mcp clean` removes the local credential file without opening a browser. `npx -y @suigar/mcp tools` prints the network-independent MCP tool catalog.
+Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions. Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin. Use `npx -y @suigar/mcp status [--network ...]` to inspect it. `npx -y @suigar/mcp logout [--network ...]` opens a browser confirmation page for one network; add `--all` to disconnect every stored network. `npx -y @suigar/mcp clean` removes the local credential file without opening a browser. `npx -y @suigar/mcp tools` prints the network-independent MCP tool catalog.
 
 For SDK consumers that implement pagination alongside MCP usage, `DEFAULT_QUERY_LIMIT` is available from `@suigar/sdk/utils`. Its value is `50`, the reusable default page size for SDK queries, including the current no-argument `client.suigar.getPvPCoinflipGames()` call.
 

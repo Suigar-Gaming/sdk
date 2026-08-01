@@ -73,6 +73,34 @@ const respond = (response: ServerResponse, status: number, body: unknown) => {
 	response.end(JSON.stringify(body));
 };
 
+const createLoopbackServer = async (frontendOrigin: string) => {
+	const server = createServer();
+	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+	const port = (server.address() as AddressInfo).port;
+	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
+	const authorize = (request: IncomingMessage, response: ServerResponse) => {
+		response.setHeader('access-control-allow-origin', frontendOrigin);
+		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
+		response.setHeader('access-control-allow-headers', 'content-type');
+		response.setHeader('vary', 'origin');
+		if (
+			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
+			request.headers.origin !== frontendOrigin
+		) {
+			respond(response, 403, { error: 'Forbidden' });
+			return false;
+		}
+		if (request.method === 'OPTIONS') {
+			if (request.headers['access-control-request-private-network'] === 'true')
+				response.setHeader('access-control-allow-private-network', 'true');
+			response.writeHead(204).end();
+			return false;
+		}
+		return true;
+	};
+	return { server, port, close: () => server.close(), authorize };
+};
+
 export async function createLoginBridge({
 	network,
 	frontendOrigin,
@@ -81,10 +109,8 @@ export async function createLoginBridge({
 	frontendOrigin: string;
 }): Promise<LoginBridge> {
 	const state = randomBytes(32).toString('hex');
-	const server = createServer();
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-	const port = (server.address() as AddressInfo).port;
-	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
+	const loopback = await createLoopbackServer(frontendOrigin);
+	const { server, port, close } = loopback;
 	let preflight = false;
 	let resolveDone: (profile: WalletProfile) => void;
 	let rejectDone: (error: Error) => void;
@@ -92,31 +118,13 @@ export async function createLoginBridge({
 		resolveDone = resolve;
 		rejectDone = reject;
 	});
-	const close = () => server.close();
 	const timeout = setTimeout(() => {
 		close();
 		rejectDone(new Error('Wallet login expired. Start login again.'));
 	}, TIMEOUT_MS).unref();
 
 	server.on('request', async (request, response) => {
-		const origin = request.headers.origin;
-		response.setHeader('access-control-allow-origin', frontendOrigin);
-		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
-		response.setHeader('access-control-allow-headers', 'content-type');
-		response.setHeader('vary', 'origin');
-		if (request.method === 'OPTIONS') {
-			if (request.headers['access-control-request-private-network'] === 'true')
-				response.setHeader('access-control-allow-private-network', 'true');
-			response.writeHead(204).end();
-			return;
-		}
-		if (
-			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
-			origin !== frontendOrigin
-		) {
-			respond(response, 403, { error: 'Forbidden' });
-			return;
-		}
+		if (!loopback.authorize(request, response)) return;
 		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
 		if (request.method === 'GET' && url.pathname === '/handshake') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {
@@ -199,34 +207,15 @@ export async function createExecutionBridge({
 	const state = randomBytes(32).toString('hex');
 	const requestId = randomBytes(16).toString('hex');
 	executions.set(requestId, { requestId, status: 'pending' });
-	const server = createServer();
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-	const port = (server.address() as AddressInfo).port;
-	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
-	const close = () => server.close();
+	const loopback = await createLoopbackServer(frontendOrigin);
+	const { server, port, close } = loopback;
 	const expire = setTimeout(() => {
 		executions.set(requestId, { requestId, status: 'expired' });
 		close();
 	}, TIMEOUT_MS).unref();
 	server.on('request', async (request, response) => {
 		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
-		response.setHeader('access-control-allow-origin', frontendOrigin);
-		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
-		response.setHeader('access-control-allow-headers', 'content-type');
-		response.setHeader('vary', 'origin');
-		if (request.method === 'OPTIONS') {
-			if (request.headers['access-control-request-private-network'] === 'true')
-				response.setHeader('access-control-allow-private-network', 'true');
-			response.writeHead(204).end();
-			return;
-		}
-		if (
-			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
-			request.headers.origin !== frontendOrigin
-		) {
-			respond(response, 403, { error: 'Forbidden' });
-			return;
-		}
+		if (!loopback.authorize(request, response)) return;
 		if (
 			!sameState(url.searchParams.get('state') ?? '', state) &&
 			request.method === 'GET'
@@ -303,10 +292,8 @@ export async function createLogoutBridge({
 	frontendOrigin: string;
 }): Promise<LogoutBridge> {
 	const state = randomBytes(32).toString('hex');
-	const server = createServer();
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-	const port = (server.address() as AddressInfo).port;
-	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
+	const loopback = await createLoopbackServer(frontendOrigin);
+	const { server, port, close } = loopback;
 	let resolveDone: (result: { network?: SuigarNetwork; all: boolean }) => void;
 	let rejectDone: (error: Error) => void;
 	const done = new Promise<{ network?: SuigarNetwork; all: boolean }>(
@@ -315,30 +302,13 @@ export async function createLogoutBridge({
 			rejectDone = reject;
 		},
 	);
-	const close = () => server.close();
 	const timeout = setTimeout(() => {
 		close();
 		rejectDone(new Error('Wallet logout expired. Start logout again.'));
 	}, TIMEOUT_MS).unref();
 
 	server.on('request', async (request, response) => {
-		response.setHeader('access-control-allow-origin', frontendOrigin);
-		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
-		response.setHeader('access-control-allow-headers', 'content-type');
-		response.setHeader('vary', 'origin');
-		if (request.method === 'OPTIONS') {
-			if (request.headers['access-control-request-private-network'] === 'true')
-				response.setHeader('access-control-allow-private-network', 'true');
-			response.writeHead(204).end();
-			return;
-		}
-		if (
-			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
-			request.headers.origin !== frontendOrigin
-		) {
-			respond(response, 403, { error: 'Forbidden' });
-			return;
-		}
+		if (!loopback.authorize(request, response)) return;
 		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
 		if (request.method === 'GET' && url.pathname === '/request') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {

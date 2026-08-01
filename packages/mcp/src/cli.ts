@@ -12,11 +12,10 @@ import {
 	createLoginBridge,
 	createLogoutBridge,
 	loadCredentials,
+	resolveFrontendOrigin,
 	setDefaultNetwork,
 } from './wallet/index.js';
 
-const defaultOrigin = (network: SuigarNetwork) =>
-	network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com';
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
 const jsonOption = {
@@ -65,10 +64,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 						choices: SUPPORTED_SUI_NETWORKS,
 						default: 'testnet',
 					})
-					.option('web-url', {
-						type: 'string',
-						description: 'Frontend origin for the connection page',
-					})
 					.option('no-open', {
 						type: 'boolean',
 						default: false,
@@ -79,7 +74,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			async (
 				args: ArgumentsCamelCase<{
 					network: SuigarNetwork;
-					webUrl?: string;
 					noOpen: boolean;
 					json: boolean;
 				}>,
@@ -87,7 +81,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const network = args.network;
 				const bridge = await createLoginBridge({
 					network,
-					frontendOrigin: args.webUrl ?? defaultOrigin(network),
+					frontendOrigin: resolveFrontendOrigin(network),
 				});
 				process.stderr.write(
 					`Open this URL to connect your wallet:\n${bridge.url}\n`,
@@ -117,10 +111,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 						default: false,
 						description: 'Disconnect wallets on every network',
 					})
-					.option('web-url', {
-						type: 'string',
-						description: 'Frontend origin for the connection page',
-					})
 					.option('no-open', {
 						type: 'boolean',
 						default: false,
@@ -133,7 +123,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					JsonArgs &
 					ArgumentsCamelCase<{
 						all: boolean;
-						webUrl?: string;
 						noOpen: boolean;
 					}>,
 			) => {
@@ -144,8 +133,9 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const bridge = await createLogoutBridge({
 					network,
 					all: args.all,
-					frontendOrigin:
-						args.webUrl ?? defaultOrigin(network ?? credentials.defaultNetwork),
+					frontendOrigin: resolveFrontendOrigin(
+						network ?? credentials.defaultNetwork,
+					),
 				});
 				process.stderr.write(
 					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,
