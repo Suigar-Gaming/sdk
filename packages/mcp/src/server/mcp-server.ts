@@ -34,13 +34,13 @@ export const createSuigarMcpServer = () => {
 		createSuigarMcpAppResourceResult,
 	);
 
-	const appToolMeta = {
+	const APP_TOOL_META = {
 		ui: {
 			resourceUri: SUIGAR_MCP_APP_RESOURCE_URI,
 		},
 	} as const;
 
-	registerSuigarTools(server, appToolMeta);
+	registerSuigarTools(server, APP_TOOL_META);
 
 	return server;
 };

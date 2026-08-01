@@ -16,7 +16,7 @@ const panelClassName =
 const valueClassName =
 	'flex min-h-8 min-w-0 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-md border border-border/70 bg-background/75 px-2.5 py-1 font-mono text-xs leading-5 text-foreground';
 
-const listItemClassNames = {
+const LIST_ITEM_CLASS_NAMES = {
 	errors:
 		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-xs font-semibold leading-5 text-foreground',
 	notes:
@@ -164,7 +164,7 @@ export function ListPanel({
 	items,
 	title,
 }: {
-	className: keyof typeof listItemClassNames;
+	className: keyof typeof LIST_ITEM_CLASS_NAMES;
 	items: Array<string>;
 	title: string;
 }) {
@@ -172,7 +172,7 @@ export function ListPanel({
 		<Panel hidden={items.length === 0} title={title}>
 			<ul className="grid gap-2">
 				{items.map((item) => (
-					<li className={listItemClassNames[className]} key={item}>
+					<li className={LIST_ITEM_CLASS_NAMES[className]} key={item}>
 						{item}
 					</li>
 				))}

@@ -18,7 +18,7 @@ import {
 
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
-const jsonOption = {
+const JSON_OPTION = {
 	type: 'boolean' as const,
 	default: false,
 	description: 'Output machine-readable JSON instead of human-readable text',
@@ -70,7 +70,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 						description:
 							'Do not open the connection page in the default browser; print its URL instead',
 					})
-					.option('json', jsonOption),
+					.option('json', JSON_OPTION),
 			async (
 				args: ArgumentsCamelCase<{
 					network: SuigarNetwork;
@@ -117,7 +117,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 						description:
 							'Do not open the connection page in the default browser; print its URL instead',
 					})
-					.option('json', jsonOption),
+					.option('json', JSON_OPTION),
 			async (
 				args: NetworkArgs &
 					JsonArgs &
@@ -154,7 +154,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'clean',
 			'Remove all local Suigar MCP credentials',
-			(command: Argv) => command.option('json', jsonOption),
+			(command: Argv) => command.option('json', JSON_OPTION),
 			async (args: JsonArgs) => {
 				await clearCredentials();
 				process.stdout.write(
@@ -170,7 +170,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 			(command: Argv) =>
 				command
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
-					.option('json', jsonOption),
+					.option('json', JSON_OPTION),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
 				const network = args.network ?? credentials.defaultNetwork;
@@ -192,7 +192,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'tools',
 			'Print the MCP tool catalog',
-			(command: Argv) => command.option('json', jsonOption),
+			(command: Argv) => command.option('json', JSON_OPTION),
 			async (args: JsonArgs) => {
 				process.stdout.write(
 					args.json
