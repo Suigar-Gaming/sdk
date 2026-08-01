@@ -11,12 +11,10 @@ export const NFT_IMAGE_RESOURCE_DOMAINS = [
 	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
 ] as const;
 
-export const MCP_LOGIN_CONNECT_DOMAINS = ['http://127.0.0.1:*'] as const;
-
 export const createSuigarMcpAppResourceMeta = () => ({
 	ui: {
 		csp: {
-			connectDomains: [...MCP_LOGIN_CONNECT_DOMAINS],
+			connectDomains: [],
 			resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
 		},
 		prefersBorder: true,

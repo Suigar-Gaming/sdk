@@ -6,7 +6,6 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { LATEST_PROTOCOL_VERSION } from '@modelcontextprotocol/sdk/types.js';
 import { describe, expect, it } from 'vitest';
 import {
-	MCP_LOGIN_CONNECT_DOMAINS,
 	NFT_IMAGE_RESOURCE_DOMAINS,
 	SUIGAR_MCP_APP_RESOURCE_URI,
 } from '../../src/server/app-resource.js';
@@ -144,7 +143,7 @@ describe('MCP server registration', () => {
 				_meta: {
 					ui: {
 						csp: {
-							connectDomains: [...MCP_LOGIN_CONNECT_DOMAINS],
+							connectDomains: [],
 							resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
 						},
 						prefersBorder: true,
