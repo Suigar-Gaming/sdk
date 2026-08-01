@@ -121,4 +121,42 @@ describe('wallet loopback bridges', () => {
 			status: 'rejected',
 		});
 	});
+
+	it('requires browser confirmation before removing the selected wallet profile', async () => {
+		await credentials.saveProfile('testnet', {
+			address,
+			walletType: 'wallet',
+			frontendOrigin,
+			connectedAt: '2026-01-01T00:00:00.000Z',
+		});
+		const logout = await bridge.createLogoutBridge({
+			network: 'testnet',
+			all: false,
+			frontendOrigin,
+		});
+		const url = new URL(logout.url);
+		const origin = bridgeOrigin(logout.url, 'logoutPort');
+		const state = url.searchParams.get('logoutState');
+
+		await expect(
+			fetch(`${origin}/request?state=${state}`),
+		).resolves.toMatchObject({ status: 403 });
+		const request = await fetch(`${origin}/request?state=${state}`, {
+			headers: { origin: frontendOrigin },
+		});
+		expect(await request.json()).toEqual({ network: 'testnet', all: false });
+		expect(
+			(await credentials.loadCredentials()).profiles.testnet,
+		).toBeDefined();
+		await expect(
+			postJson(`${origin}/callback`, { state }),
+		).resolves.toMatchObject({ status: 200 });
+		await expect(logout.done).resolves.toEqual({
+			network: 'testnet',
+			all: false,
+		});
+		expect(
+			(await credentials.loadCredentials()).profiles.testnet,
+		).toBeUndefined();
+	});
 });

@@ -10,7 +10,9 @@ import {
 import type { AddressInfo } from 'node:net';
 import type { SuigarNetwork } from '@suigar/sdk';
 import {
+	clearCredentials,
 	loadCredentials,
+	removeProfile,
 	saveProfile,
 	type WalletProfile,
 	type WalletType,
@@ -22,6 +24,11 @@ const MAX_BODY_BYTES = 16 * 1024;
 export type LoginBridge = {
 	url: string;
 	done: Promise<WalletProfile>;
+	close: () => void;
+};
+export type LogoutBridge = {
+	url: string;
+	done: Promise<{ network?: SuigarNetwork; all: boolean }>;
 	close: () => void;
 };
 export type ExecutionStatus = {
@@ -284,4 +291,98 @@ export async function createExecutionBridge({
 	url.searchParams.set('approvalState', state);
 	url.searchParams.set('network', network);
 	return { requestId, approvalUrl: url.toString() };
+}
+
+export async function createLogoutBridge({
+	network,
+	all,
+	frontendOrigin,
+}: {
+	network?: SuigarNetwork;
+	all: boolean;
+	frontendOrigin: string;
+}): Promise<LogoutBridge> {
+	const state = randomBytes(32).toString('hex');
+	const server = createServer();
+	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+	const port = (server.address() as AddressInfo).port;
+	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
+	let resolveDone: (result: { network?: SuigarNetwork; all: boolean }) => void;
+	let rejectDone: (error: Error) => void;
+	const done = new Promise<{ network?: SuigarNetwork; all: boolean }>(
+		(resolve, reject) => {
+			resolveDone = resolve;
+			rejectDone = reject;
+		},
+	);
+	const close = () => server.close();
+	const timeout = setTimeout(() => {
+		close();
+		rejectDone(new Error('Wallet logout expired. Start logout again.'));
+	}, TIMEOUT_MS).unref();
+
+	server.on('request', async (request, response) => {
+		response.setHeader('access-control-allow-origin', frontendOrigin);
+		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
+		response.setHeader('access-control-allow-headers', 'content-type');
+		response.setHeader('vary', 'origin');
+		if (request.method === 'OPTIONS') {
+			if (request.headers['access-control-request-private-network'] === 'true')
+				response.setHeader('access-control-allow-private-network', 'true');
+			response.writeHead(204).end();
+			return;
+		}
+		if (
+			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
+			request.headers.origin !== frontendOrigin
+		) {
+			respond(response, 403, { error: 'Forbidden' });
+			return;
+		}
+		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
+		if (request.method === 'GET' && url.pathname === '/request') {
+			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+				respond(response, 403, { error: 'Invalid logout state' });
+				return;
+			}
+			respond(response, 200, { network, all });
+			return;
+		}
+		if (
+			request.method !== 'POST' ||
+			url.pathname !== '/callback' ||
+			!request.headers['content-type']?.startsWith('application/json')
+		) {
+			respond(response, 404, { error: 'Not found' });
+			return;
+		}
+		try {
+			const payload = JSON.parse(await readBody(request)) as Record<
+				string,
+				unknown
+			>;
+			if (
+				typeof payload.state !== 'string' ||
+				!sameState(payload.state, state)
+			) {
+				respond(response, 403, { error: 'Invalid logout callback' });
+				return;
+			}
+			if (all) await clearCredentials();
+			else if (network) await removeProfile(network);
+			clearTimeout(timeout);
+			respond(response, 200, { ok: true });
+			resolveDone({ network, all });
+			setTimeout(close, 100).unref();
+		} catch {
+			respond(response, 400, { error: 'Invalid request' });
+		}
+	});
+
+	const url = new URL('/mcp', frontendOrigin);
+	url.searchParams.set('logoutPort', String(port));
+	url.searchParams.set('logoutState', state);
+	if (network) url.searchParams.set('network', network);
+	if (all) url.searchParams.set('all', 'true');
+	return { url: url.toString(), done, close };
 }

@@ -8,9 +8,10 @@ import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
 import {
+	clearCredentials,
 	createLoginBridge,
+	createLogoutBridge,
 	loadCredentials,
-	removeProfile,
 	setDefaultNetwork,
 } from './wallet/index.js';
 
@@ -107,19 +108,69 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		)
 		.command(
 			'logout',
-			'Forget the wallet connected to a network',
+			'Disconnect a wallet through the Suigar browser app',
 			(command: Argv) =>
 				command
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
+					.option('all', {
+						type: 'boolean',
+						default: false,
+						description: 'Disconnect wallets on every network',
+					})
+					.option('web-url', {
+						type: 'string',
+						description: 'Frontend origin for the connection page',
+					})
+					.option('no-open', {
+						type: 'boolean',
+						default: false,
+						description:
+							'Do not open the connection page in the default browser; print its URL instead',
+					})
 					.option('json', jsonOption),
-			async (args: NetworkArgs & JsonArgs) => {
+			async (
+				args: NetworkArgs &
+					JsonArgs &
+					ArgumentsCamelCase<{
+						all: boolean;
+						webUrl?: string;
+						noOpen: boolean;
+					}>,
+			) => {
 				const credentials = await loadCredentials();
-				const network = args.network ?? credentials.defaultNetwork;
-				await removeProfile(network);
+				const network = args.all
+					? undefined
+					: (args.network ?? credentials.defaultNetwork);
+				const bridge = await createLogoutBridge({
+					network,
+					all: args.all,
+					frontendOrigin:
+						args.webUrl ?? defaultOrigin(network ?? credentials.defaultNetwork),
+				});
+				process.stderr.write(
+					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,
+				);
+				if (!args.noOpen) await open(bridge.url).catch(() => undefined);
+				await bridge.done;
 				process.stdout.write(
 					args.json
-						? `${JSON.stringify({ network, loggedOut: true })}\n`
-						: `Logged out of Suigar MCP on ${network}.\n`,
+						? `${JSON.stringify({ network, all: args.all, loggedOut: true })}\n`
+						: args.all
+							? 'Logged out of every Suigar MCP wallet.\n'
+							: `Logged out of Suigar MCP on ${network}.\n`,
+				);
+			},
+		)
+		.command(
+			'clean',
+			'Remove all local Suigar MCP credentials',
+			(command: Argv) => command.option('json', jsonOption),
+			async (args: JsonArgs) => {
+				await clearCredentials();
+				process.stdout.write(
+					args.json
+						? `${JSON.stringify({ cleaned: true })}\n`
+						: 'Removed all local Suigar MCP credentials.\n',
 				);
 			},
 		)
