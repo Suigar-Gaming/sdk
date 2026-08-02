@@ -184,3 +184,16 @@ export type PvpCoinflipJoinInput = z.input<typeof pvpCoinflipJoinInputSchema>;
 export type PvpCoinflipCancelInput = z.input<
 	typeof pvpCoinflipCancelInputSchema
 >;
+
+export type TransactionToolInput =
+	| CoinflipInput
+	| LimboInput
+	| ConfigIdInput
+	| RangeInput
+	| SoccerInput
+	| PvpCoinflipCreateInput
+	| PvpCoinflipJoinInput
+	| PvpCoinflipCancelInput;
+
+export type StandardTransactionToolInput =
+	CoinflipInput | LimboInput | ConfigIdInput | RangeInput | SoccerInput;
