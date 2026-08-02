@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './handlers.js';
-export * from './schemas.js';
+export * from './schemas/index.js';

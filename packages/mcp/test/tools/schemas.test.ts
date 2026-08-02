@@ -10,7 +10,7 @@ import {
 	pvpCoinflipJoinInputSchema,
 	soccerInputSchema,
 	toolOutputSchema,
-} from '../../src/tools/schemas.js';
+} from '../../src/tools/schemas/index.js';
 
 describe('config input schema', () => {
 	it('defaults to testnet and rejects unknown fields', () => {
