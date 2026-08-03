@@ -1,4 +1,4 @@
-name: Setup Node and pnpm
+name: Setup pnpm
 description: Setup the workspace Node.js and pnpm environment.
 
 inputs:
