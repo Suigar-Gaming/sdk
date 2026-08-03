@@ -2,18 +2,22 @@ name: Setup pnpm
 description: Setup the workspace Node.js and pnpm environment.
 
 inputs:
-  install:
-    description: Install workspace dependencies from the repository root.
+  cache:
+    description: Enable pnpm dependency caching.
     required: false
     default: 'true'
   doctor:
     description: Run pnpm diagnostics after pnpm setup.
     required: false
     default: 'true'
-  cache:
-    description: Enable pnpm dependency caching.
+  install:
+    description: Install workspace dependencies from the repository root.
     required: false
     default: 'true'
+  node-version:
+    description: Node.js version to install.
+    required: false
+    default: '24'
 runs:
   using: composite
   steps:
@@ -21,11 +25,10 @@ runs:
       uses: pnpm/setup@v1.0.0
       with:
         cache: ${{ inputs.cache }}
-        cache-dependency-path: pnpm-lock.yaml
-        package-json-file: package.json
         install: false
+        runtime: node@${{ inputs.node-version }}
 
-    - name: pnpm doctor
+    - name: Run pnpm installation diagnostics
       if: inputs.doctor == 'true'
       shell: bash
       run: pnpm doctor
