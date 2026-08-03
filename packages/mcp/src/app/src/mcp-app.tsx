@@ -18,6 +18,7 @@ import {
 	RawPayload,
 } from './components/inspector-components.js';
 import { asRecord } from './lib/format.js';
+import { payloadFromToolResult } from './lib/tool-result.js';
 import type { InspectorState } from './lib/types.js';
 import { resolveAppView } from './views/index.js';
 
@@ -164,7 +165,7 @@ export function SuigarInspectorApp() {
 				return;
 			}
 
-			const payload = result.structuredContent ?? result;
+			const payload = payloadFromToolResult(result);
 			const record =
 				payload && typeof payload === 'object'
 					? (payload as Record<string, unknown>)
@@ -238,7 +239,22 @@ export function SuigarInspectorApp() {
 	}
 
 	if (Object.keys(asRecord(inspector.payload)).length === 0) {
-		return null;
+		if (inspector.errors.length === 0) {
+			return null;
+		}
+	}
+
+	if (inspector.errors.length > 0) {
+		return (
+			<main className={shellClassName}>
+				<Header status="Error" title="Tool Error" />
+				<ListPanel
+					className="errors"
+					items={inspector.errors}
+					title="Unable to complete request"
+				/>
+			</main>
+		);
 	}
 
 	return (

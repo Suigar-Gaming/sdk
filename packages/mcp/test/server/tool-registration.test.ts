@@ -124,7 +124,7 @@ describe('MCP tool registration', () => {
 		});
 		expect(result.content[0]?.text).toContain('TypeError: bad input');
 		expect(result.content[0]?.text).toContain(
-			'The MCP server only builds unsigned transactions',
+			'Check required fields, network, coin type, and SDK config overrides.',
 		);
 	});
 });

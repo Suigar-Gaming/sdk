@@ -76,7 +76,7 @@ export const withToolErrors =
 				content: [
 					{
 						type: 'text',
-						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides. The MCP server only builds unsigned transactions and never signs or executes them.`,
+						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides.`,
 					},
 				],
 			};
