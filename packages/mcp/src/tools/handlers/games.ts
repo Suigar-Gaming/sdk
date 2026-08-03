@@ -24,10 +24,7 @@ import {
 	toBaseUnits,
 	toCurrencyAmountText,
 } from '../../utils/index.js';
-import {
-	createExecutionBridge,
-	resolveFrontendOrigin,
-} from '../../wallet/index.js';
+import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,
@@ -514,7 +511,7 @@ export const buildTransactionTool = async ({
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
-			frontendOrigin: resolveFrontendOrigin(bundle.config.network),
+			webOrigin: resolveWebOrigin(bundle.config.network),
 			transactionBytesBase64: built.transactionBytesBase64 ?? '',
 			summary: built.summary,
 		});

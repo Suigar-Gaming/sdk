@@ -3,6 +3,8 @@
 
 import type { SuigarNetwork } from '@suigar/sdk';
 
-export const resolveFrontendOrigin = (network: SuigarNetwork) =>
+export const resolveWebOrigin = (network: SuigarNetwork) =>
 	process.env.SUIGAR_MCP_WEB_URL ??
-	(network === 'mainnet' ? 'https://suigar.com' : 'https://testnet.suigar.com');
+	(network === 'mainnet'
+		? 'https://mcp.suigar.com'
+		: `https://mcp.${network}.suigar.com`);

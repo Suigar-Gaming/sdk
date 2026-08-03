@@ -7,10 +7,7 @@ import {
 	type ReferralClaimReadResult,
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
-import {
-	createExecutionBridge,
-	resolveFrontendOrigin,
-} from '../../wallet/index.js';
+import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
 import type {
 	BuildReferralCommissionClaimTransactionInput,
 	BuildReferralLevelUpUsdRewardsClaimTransactionInput,
@@ -157,7 +154,7 @@ const buildReferralClaimTransactionTool = async ({
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
-			frontendOrigin: resolveFrontendOrigin(bundle.config.network),
+			webOrigin: resolveWebOrigin(bundle.config.network),
 			transactionBytesBase64: built.transactionBytesBase64 ?? '',
 			summary: built.summary,
 		});

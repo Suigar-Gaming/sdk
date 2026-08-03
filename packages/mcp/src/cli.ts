@@ -12,7 +12,7 @@ import {
 	createLoginBridge,
 	createLogoutBridge,
 	loadCredentials,
-	resolveFrontendOrigin,
+	resolveWebOrigin,
 	setDefaultNetwork,
 } from './wallet/index.js';
 
@@ -81,7 +81,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const network = args.network;
 				const bridge = await createLoginBridge({
 					network,
-					frontendOrigin: resolveFrontendOrigin(network),
+					webOrigin: resolveWebOrigin(network),
 				});
 				process.stderr.write(
 					`Open this URL to connect your wallet:\n${bridge.url}\n`,
@@ -133,9 +133,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const bridge = await createLogoutBridge({
 					network,
 					all: args.all,
-					frontendOrigin: resolveFrontendOrigin(
-						network ?? credentials.defaultNetwork,
-					),
+					webOrigin: resolveWebOrigin(network ?? credentials.defaultNetwork),
 				});
 				process.stderr.write(
 					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,

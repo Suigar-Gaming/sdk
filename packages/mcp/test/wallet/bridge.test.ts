@@ -13,7 +13,7 @@ vi.mock('node:os', () => ({ homedir: () => testHome }));
 const credentials = await import('../../src/wallet/credentials.js');
 const bridge = await import('../../src/wallet/bridge.js');
 
-const frontendOrigin = 'http://localhost:5173';
+const webOrigin = 'http://localhost:5173';
 const address =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
 
@@ -27,7 +27,7 @@ const postJson = (url: string, body: unknown) =>
 	fetch(url, {
 		method: 'POST',
 		headers: {
-			origin: frontendOrigin,
+			origin: webOrigin,
 			'content-type': 'application/json',
 		},
 		body: JSON.stringify(body),
@@ -45,11 +45,14 @@ describe('wallet loopback bridges', () => {
 	it('requires a valid login handshake before accepting a matching callback', async () => {
 		const login = await bridge.createLoginBridge({
 			network: 'testnet',
-			frontendOrigin,
+			webOrigin,
 		});
 		const url = new URL(login.url);
+		expect(url.pathname).toBe('/connection');
 		const origin = bridgeOrigin(login.url, 'port');
-		const state = url.searchParams.get('connectState');
+		expect(url.searchParams.get('action')).toBe('login');
+		expect(url.searchParams.has('network')).toBe(false);
+		const state = url.searchParams.get('state');
 		expect(state).toMatch(/^[a-f0-9]{64}$/u);
 
 		await expect(
@@ -61,12 +64,12 @@ describe('wallet loopback bridges', () => {
 		).resolves.toMatchObject({ status: 400 });
 		await expect(
 			fetch(`${origin}/handshake?state=not-the-pairing-state`, {
-				headers: { origin: frontendOrigin },
+				headers: { origin: webOrigin },
 			}),
 		).resolves.toMatchObject({ status: 403 });
 		await expect(
 			fetch(`${origin}/handshake?state=${state}`, {
-				headers: { origin: frontendOrigin },
+				headers: { origin: webOrigin },
 			}),
 		).resolves.toMatchObject({ status: 200 });
 		await expect(
@@ -79,7 +82,7 @@ describe('wallet loopback bridges', () => {
 		await expect(login.done).resolves.toMatchObject({
 			address,
 			walletType: 'wallet',
-			frontendOrigin,
+			frontendOrigin: webOrigin,
 		});
 	});
 
@@ -87,18 +90,20 @@ describe('wallet loopback bridges', () => {
 		await credentials.saveProfile('testnet', {
 			address,
 			walletType: 'wallet',
-			frontendOrigin,
+			frontendOrigin: webOrigin,
 			connectedAt: '2026-01-01T00:00:00.000Z',
 		});
 		const approval = await bridge.createExecutionBridge({
 			network: 'testnet',
-			frontendOrigin,
+			webOrigin,
 			transactionBytesBase64: 'AA==',
 			summary: { game: 'coinflip' },
 		});
 		const url = new URL(approval.approvalUrl);
-		const origin = bridgeOrigin(approval.approvalUrl, 'approvalPort');
-		const state = url.searchParams.get('approvalState');
+		expect(url.pathname).toBe('/approval');
+		expect(url.searchParams.has('network')).toBe(false);
+		const origin = bridgeOrigin(approval.approvalUrl, 'port');
+		const state = url.searchParams.get('state');
 
 		await expect(
 			fetch(`${origin}/request?state=${state}`),
@@ -106,7 +111,7 @@ describe('wallet loopback bridges', () => {
 			status: 403,
 		});
 		const request = await fetch(`${origin}/request?state=${state}`, {
-			headers: { origin: frontendOrigin },
+			headers: { origin: webOrigin },
 		});
 		expect(await request.json()).toMatchObject({
 			requestId: approval.requestId,
@@ -126,23 +131,26 @@ describe('wallet loopback bridges', () => {
 		await credentials.saveProfile('testnet', {
 			address,
 			walletType: 'wallet',
-			frontendOrigin,
+			frontendOrigin: webOrigin,
 			connectedAt: '2026-01-01T00:00:00.000Z',
 		});
 		const logout = await bridge.createLogoutBridge({
 			network: 'testnet',
 			all: false,
-			frontendOrigin,
+			webOrigin,
 		});
 		const url = new URL(logout.url);
-		const origin = bridgeOrigin(logout.url, 'logoutPort');
-		const state = url.searchParams.get('logoutState');
+		expect(url.pathname).toBe('/connection');
+		expect(url.searchParams.get('action')).toBe('logout');
+		expect(url.searchParams.has('network')).toBe(false);
+		const origin = bridgeOrigin(logout.url, 'port');
+		const state = url.searchParams.get('state');
 
 		await expect(
 			fetch(`${origin}/request?state=${state}`),
 		).resolves.toMatchObject({ status: 403 });
 		const request = await fetch(`${origin}/request?state=${state}`, {
-			headers: { origin: frontendOrigin },
+			headers: { origin: webOrigin },
 		});
 		expect(await request.json()).toEqual({ network: 'testnet', all: false });
 		expect(

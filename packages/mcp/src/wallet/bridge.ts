@@ -73,19 +73,19 @@ const respond = (response: ServerResponse, status: number, body: unknown) => {
 	response.end(JSON.stringify(body));
 };
 
-const createLoopbackServer = async (frontendOrigin: string) => {
+const createLoopbackServer = async (webOrigin: string) => {
 	const server = createServer();
 	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
 	const port = (server.address() as AddressInfo).port;
 	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
 	const authorize = (request: IncomingMessage, response: ServerResponse) => {
-		response.setHeader('access-control-allow-origin', frontendOrigin);
+		response.setHeader('access-control-allow-origin', webOrigin);
 		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
 		response.setHeader('access-control-allow-headers', 'content-type');
 		response.setHeader('vary', 'origin');
 		if (
 			!allowedHosts.has((request.headers.host ?? '').toLowerCase()) ||
-			request.headers.origin !== frontendOrigin
+			request.headers.origin !== webOrigin
 		) {
 			respond(response, 403, { error: 'Forbidden' });
 			return false;
@@ -103,13 +103,13 @@ const createLoopbackServer = async (frontendOrigin: string) => {
 
 export async function createLoginBridge({
 	network,
-	frontendOrigin,
+	webOrigin,
 }: {
 	network: SuigarNetwork;
-	frontendOrigin: string;
+	webOrigin: string;
 }): Promise<LoginBridge> {
 	const state = randomBytes(32).toString('hex');
-	const loopback = await createLoopbackServer(frontendOrigin);
+	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let preflight = false;
 	let resolveDone: (profile: WalletProfile) => void;
@@ -167,7 +167,7 @@ export async function createLoginBridge({
 			const profile: WalletProfile = {
 				address: payload.address,
 				walletType: payload.walletType as WalletType,
-				frontendOrigin,
+				frontendOrigin: webOrigin,
 				connectedAt: new Date().toISOString(),
 			};
 			await saveProfile(network, profile);
@@ -180,21 +180,21 @@ export async function createLoginBridge({
 		}
 	});
 
-	const url = new URL('/mcp', frontendOrigin);
+	const url = new URL('/connection', webOrigin);
 	url.searchParams.set('port', String(port));
-	url.searchParams.set('connectState', state);
-	url.searchParams.set('network', network);
+	url.searchParams.set('state', state);
+	url.searchParams.set('action', 'login');
 	return { url: url.toString(), done, close };
 }
 
 export async function createExecutionBridge({
 	network,
-	frontendOrigin,
+	webOrigin,
 	transactionBytesBase64,
 	summary,
 }: {
 	network: SuigarNetwork;
-	frontendOrigin: string;
+	webOrigin: string;
 	transactionBytesBase64: string;
 	summary: unknown;
 }) {
@@ -207,7 +207,7 @@ export async function createExecutionBridge({
 	const state = randomBytes(32).toString('hex');
 	const requestId = randomBytes(16).toString('hex');
 	executions.set(requestId, { requestId, status: 'pending' });
-	const loopback = await createLoopbackServer(frontendOrigin);
+	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	const expire = setTimeout(() => {
 		executions.set(requestId, { requestId, status: 'expired' });
@@ -275,24 +275,23 @@ export async function createExecutionBridge({
 			respond(response, 400, { error: 'Invalid request' });
 		}
 	});
-	const url = new URL('/mcp', frontendOrigin);
-	url.searchParams.set('approvalPort', String(port));
-	url.searchParams.set('approvalState', state);
-	url.searchParams.set('network', network);
+	const url = new URL('/approval', webOrigin);
+	url.searchParams.set('port', String(port));
+	url.searchParams.set('state', state);
 	return { requestId, approvalUrl: url.toString() };
 }
 
 export async function createLogoutBridge({
 	network,
 	all,
-	frontendOrigin,
+	webOrigin,
 }: {
 	network?: SuigarNetwork;
 	all: boolean;
-	frontendOrigin: string;
+	webOrigin: string;
 }): Promise<LogoutBridge> {
 	const state = randomBytes(32).toString('hex');
-	const loopback = await createLoopbackServer(frontendOrigin);
+	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let resolveDone: (result: { network?: SuigarNetwork; all: boolean }) => void;
 	let rejectDone: (error: Error) => void;
@@ -349,10 +348,10 @@ export async function createLogoutBridge({
 		}
 	});
 
-	const url = new URL('/mcp', frontendOrigin);
-	url.searchParams.set('logoutPort', String(port));
-	url.searchParams.set('logoutState', state);
-	if (network) url.searchParams.set('network', network);
+	const url = new URL('/connection', webOrigin);
+	url.searchParams.set('port', String(port));
+	url.searchParams.set('state', state);
+	url.searchParams.set('action', 'logout');
 	if (all) url.searchParams.set('all', 'true');
 	return { url: url.toString(), done, close };
 }

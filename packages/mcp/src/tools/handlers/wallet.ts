@@ -8,7 +8,7 @@ import {
 	getExecutionStatus,
 	loadCredentials,
 	removeProfile,
-	resolveFrontendOrigin,
+	resolveWebOrigin,
 } from '../../wallet/index.js';
 import type {
 	ConnectionInput,
@@ -137,7 +137,7 @@ export const suigarLoginTool = async (
 	const { config } = createSuigarClient(getConfigInput(input));
 	const bridge = await createLoginBridge({
 		network: config.network,
-		frontendOrigin: resolveFrontendOrigin(config.network),
+		webOrigin: resolveWebOrigin(config.network),
 	});
 	void bridge.done.catch(() => undefined);
 	return asTextResponse({
