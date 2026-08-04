@@ -4,10 +4,13 @@
 import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Factory as NftV1Factory } from '../../src/contracts/nft-v1/nft.js';
 import {
 	buildClaimReferralCommissionTransaction,
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
+	buildMintNftV1PaymentCoin,
+	buildMintNftV1Transaction,
 	buildPvPCoinflipTransaction,
 	buildSoccerTransaction,
 } from '../../src/transactions/index.js';
@@ -128,6 +131,58 @@ describe('transaction builders', () => {
 			TEST_CONFIG.coins.usdc.coinType,
 		]);
 		expect(levelUpCall.arguments).toHaveLength(3);
+	});
+
+	it('builds an NFT V1 mint with the configured specification price', async () => {
+		const nftConfig = {
+			...TEST_CONFIG,
+			packageIds: {
+				...TEST_CONFIG.packageIds,
+				nftV1: '0x111',
+			},
+			objectIds: {
+				...TEST_CONFIG.objectIds,
+				nftV1Factory: '0x222',
+			},
+		};
+		const client = {} as never;
+		vi.spyOn(NftV1Factory, 'get').mockResolvedValue({
+			json: {
+				specs: {
+					contents: [
+						{
+							key: '0x999',
+							value: { id: '0x999', price: 15n },
+						},
+					],
+				},
+			},
+		} as never);
+		const paymentCoin = buildMintNftV1PaymentCoin(client, {
+			config: nftConfig,
+			specId: '0x999',
+			useGasCoin: true,
+		});
+		await (paymentCoin as (tx: Transaction) => Promise<unknown>)(
+			new Transaction(),
+		);
+		const tx = buildMintNftV1Transaction({
+			owner: '0x123',
+			specId: '0x999',
+			useGasCoin: true,
+			config: nftConfig,
+			paymentCoin,
+		});
+		const call = tx.getData().commands[1].MoveCall!;
+
+		expect(tx.getData().sender).toBe(normalizeSuiAddress('0x123'));
+		expect(call.package).toBe(normalizeSuiAddress(nftConfig.packageIds.nftV1));
+		expect(call.function).toBe('mint_to_sender');
+		expect(call.arguments).toHaveLength(4);
+		expect(NftV1Factory.get).toHaveBeenCalledWith({
+			client,
+			objectId: nftConfig.objectIds.nftV1Factory,
+		});
 	});
 });
 
