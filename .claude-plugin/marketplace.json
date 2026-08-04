@@ -5,7 +5,7 @@
 		"email": "contact.suigar@gmail.com",
 		"url": "https://github.com/Suigar-Gaming"
 	},
-	"description": "Suigar MCP plugin marketplace for Sui gaming, NFT, and referral workflows.",
+	"description": "Suigar's plugin marketplace, currently offering the Suigar MCP server.",
 	"plugins": [
 		{
 			"name": "suigar-mcp",
