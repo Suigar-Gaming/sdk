@@ -5,7 +5,7 @@
 	},
 	"plugins": [
 		{
-			"name": "suigar",
+			"name": "mcp",
 			"source": {
 				"source": "local",
 				"path": "./packages/mcp/plugin"

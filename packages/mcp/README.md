@@ -73,7 +73,7 @@ For Claude Code local testing, add this repository as a marketplace from the rep
 
 ```text
 /plugin marketplace add .
-/plugin install suigar@suigar
+/plugin install mcp@suigar
 ```
 
 For Cursor, the repository includes both the plugin manifest and a root `.cursor-plugin/marketplace.json` for multi-plugin repository flows. During local development, you can also copy or symlink `packages/mcp/plugin` into Cursor's local plugin directory and reload Cursor. If you only need MCP tools, direct MCP configuration with `npx -y @suigar/mcp` is simpler and does not require the plugin wrapper.

@@ -2,15 +2,18 @@
 	"name": "suigar",
 	"owner": {
 		"name": "Suigar",
-		"email": "contact.suigar@gmail.com"
+		"email": "contact.suigar@gmail.com",
+		"url": "https://github.com/Suigar-Gaming"
 	},
-	"description": "Suigar plugin catalog for Claude Code.",
+	"description": "Suigar MCP plugin marketplace for Sui gaming, NFT, and referral workflows.",
 	"plugins": [
 		{
-			"name": "suigar",
+			"name": "mcp",
+			"displayName": "Suigar MCP",
 			"source": "./packages/mcp/plugin",
-			"description": "Suigar MCP tools for reading game config and building unsigned Sui game transactions.",
-			"category": "Developer Tools"
+			"description": "Suigar MCP tools for reading Suigar data and building unsigned Sui game, NFT, and referral transactions.",
+			"category": "Developer Tools",
+			"tags": ["suigar", "sui", "mcp", "games", "transactions"]
 		}
 	]
 }
