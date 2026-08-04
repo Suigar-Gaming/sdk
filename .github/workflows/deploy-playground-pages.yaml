@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/actions/setup-pnpm/action.yaml'
       - '.github/workflows/deploy-playground-pages.yaml'
       - 'package.json'
       - 'packages/sdk/**'
@@ -16,7 +16,7 @@ on:
       - 'turbo.json'
   pull_request:
     paths:
-      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/actions/setup-pnpm/action.yaml'
       - '.github/workflows/deploy-playground-pages.yaml'
       - 'package.json'
       - 'packages/sdk/**'
@@ -44,8 +44,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
-      - name: Setup Node.js and pnpm
-        uses: ./.github/actions/setup-node-pnpm
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
 
       - name: Configure GitHub Pages
         id: github-pages

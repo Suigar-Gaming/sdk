@@ -24,13 +24,21 @@ import {
 	buildWheelTransactionTool,
 	coinflipInputSchema,
 	configIdInputSchema,
+	connectionInputSchema,
+	getConnectionStatusTool,
+	getExecutionStatusInputSchema,
+	getExecutionStatusTool,
 	getReferralCommissionInputSchema,
 	getReferralCommissionTool,
 	getReferralLevelUpUsdRewardsInputSchema,
 	getReferralLevelUpUsdRewardsTool,
+	getWalletBalancesInputSchema,
+	getWalletBalancesTool,
 	limboInputSchema,
 	listNftsInputSchema,
 	listNftsTool,
+	listWalletCoinsInputSchema,
+	listWalletCoinsTool,
 	pvpCoinflipCancelInputSchema,
 	pvpCoinflipCreateInputSchema,
 	pvpCoinflipJoinInputSchema,
@@ -40,6 +48,8 @@ import {
 	readGameMetadataInputSchema,
 	readGameMetadataTool,
 	soccerInputSchema,
+	suigarLoginTool,
+	suigarLogoutTool,
 	toolOutputSchema,
 } from '../tools/index.js';
 
@@ -66,7 +76,7 @@ export const withToolErrors =
 				content: [
 					{
 						type: 'text',
-						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides. The MCP server only builds unsigned transactions and never signs or executes them.`,
+						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides.`,
 					},
 				],
 			};
@@ -105,6 +115,57 @@ type AppToolMeta = {
 };
 
 const appTools = [
+	{
+		name: 'suigar_login',
+		title: 'Login to Suigar',
+		description: 'Open a secure browser wallet pairing flow.',
+		inputSchema: connectionInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: suigarLoginTool,
+	},
+	{
+		name: 'suigar_logout',
+		title: 'Logout of Suigar',
+		description: 'Forget the paired wallet for the selected network.',
+		inputSchema: connectionInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: suigarLogoutTool,
+	},
+	{
+		name: 'get_connection_status',
+		title: 'Get Suigar Connection Status',
+		description: 'Read wallet connection status without exposing secrets.',
+		inputSchema: connectionInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: getConnectionStatusTool,
+	},
+	{
+		name: 'get_execution_status',
+		title: 'Get Execution Status',
+		description:
+			'Check the browser approval status for an execute-mode transaction.',
+		inputSchema: getExecutionStatusInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: getExecutionStatusTool,
+	},
+	{
+		name: 'get_wallet_balances',
+		title: 'Get Wallet Balances',
+		description:
+			'List aggregate balances for the connected wallet or an explicit address.',
+		inputSchema: getWalletBalancesInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: getWalletBalancesTool,
+	},
+	{
+		name: 'list_wallet_coins',
+		title: 'List Wallet Coins',
+		description:
+			'List paginated individual coin objects for the connected wallet or an explicit address.',
+		inputSchema: listWalletCoinsInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: listWalletCoinsTool,
+	},
 	{
 		name: 'read_config',
 		title: 'Read Suigar Config',

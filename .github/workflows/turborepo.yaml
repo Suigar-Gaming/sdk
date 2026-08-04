@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/actions/setup-pnpm/action.yaml'
       - '.github/workflows/turborepo.yaml'
       - '.oxlintrc.json'
       - '.prettierignore'
@@ -20,7 +20,7 @@ on:
       - 'turbo.json'
   pull_request:
     paths:
-      - '.github/actions/setup-node-pnpm/action.yaml'
+      - '.github/actions/setup-pnpm/action.yaml'
       - '.github/workflows/turborepo.yaml'
       - '.oxlintrc.json'
       - '.prettierignore'
@@ -50,8 +50,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js and pnpm
-        uses: ./.github/actions/setup-node-pnpm
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
         with:
           install: 'false'
           cache: 'false'
@@ -69,8 +69,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js and pnpm
-        uses: ./.github/actions/setup-node-pnpm
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
 
       - name: Manypkg Check
         shell: bash

@@ -11,7 +11,11 @@ It provides:
 - a compact MCP App UI resource for compatible hosts
 - text and structured-content fallbacks for normal MCP clients
 
-The package never signs or executes transactions.
+Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
+
+## Wallet connection
+
+Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions. Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin. Use `npx -y @suigar/mcp status [--network ...]` to inspect it. `npx -y @suigar/mcp logout [--network ...]` opens a browser confirmation page for one network; add `--all` to disconnect every stored network. `npx -y @suigar/mcp clean` removes the local credential file without opening a browser. `npx -y @suigar/mcp tools` prints the network-independent MCP tool catalog.
 
 For SDK consumers that implement pagination alongside MCP usage, `DEFAULT_QUERY_LIMIT` is available from `@suigar/sdk/utils`. Its value is `50`, the reusable default page size for SDK queries, including the current no-argument `client.suigar.getPvPCoinflipGames()` call.
 
@@ -94,6 +98,9 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `read_config`
 - `read_game_metadata`
 - `list_nfts`
+- `get_wallet_balances`
+- `list_wallet_coins`
+- `get_execution_status`
 - `get_referral_commission`
 - `get_referral_level_up_usd_rewards`
 - `build_referral_commission_claim_transaction`

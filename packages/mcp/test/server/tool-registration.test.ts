@@ -21,6 +21,12 @@ const registeredToolNames = [
 	'read_config',
 	'read_game_metadata',
 	'list_nfts',
+	'get_wallet_balances',
+	'list_wallet_coins',
+	'get_execution_status',
+	'get_connection_status',
+	'suigar_login',
+	'suigar_logout',
 	'get_referral_commission',
 	'get_referral_level_up_usd_rewards',
 	'build_referral_commission_claim_transaction',
@@ -118,7 +124,7 @@ describe('MCP tool registration', () => {
 		});
 		expect(result.content[0]?.text).toContain('TypeError: bad input');
 		expect(result.content[0]?.text).toContain(
-			'The MCP server only builds unsigned transactions',
+			'Check required fields, network, coin type, and SDK config overrides.',
 		);
 	});
 });

@@ -14,6 +14,7 @@ import {
 } from '@mysten/sui/utils';
 import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
 import { formatBaseUnitAmount } from '../utils/index.js';
+import { readPersistedDefaultNetwork } from '../wallet/credentials.js';
 import {
 	extractDryRunErrors,
 	summarizeDryRun,
@@ -37,15 +38,14 @@ const DEFAULT_PROVIDER_URLS = {
 
 export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
-export const normalizeNetwork = (
-	network: string | undefined = DEFAULT_NETWORK,
-): SuigarNetwork => {
-	if (network === 'mainnet' || network === 'testnet') {
-		return network;
+export const normalizeNetwork = (network?: string): SuigarNetwork => {
+	const resolvedNetwork = network ?? readPersistedDefaultNetwork();
+	if (resolvedNetwork === 'mainnet' || resolvedNetwork === 'testnet') {
+		return resolvedNetwork;
 	}
 
 	throw new RangeError(
-		`Unsupported network: ${network}. Use "mainnet" or "testnet".`,
+		`Unsupported network: ${resolvedNetwork}. Use "mainnet" or "testnet".`,
 	);
 };
 
@@ -208,7 +208,7 @@ export const buildTransactionResult = async ({
 	client,
 	context,
 }: {
-	mode: Exclude<BuilderMode, 'read-only'>;
+	mode: Exclude<BuilderMode, 'read-only' | 'execute'>;
 	transaction: Transaction;
 	config: ResolvedMcpConfig;
 	client: SuigarClientBundle['client'];

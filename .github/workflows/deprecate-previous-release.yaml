@@ -29,8 +29,8 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
-      - name: Setup Node.js and pnpm
-        uses: ./.github/actions/setup-node-pnpm
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
         with:
           install: 'false'
 

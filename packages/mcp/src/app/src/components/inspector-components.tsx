@@ -16,7 +16,7 @@ const panelClassName =
 const valueClassName =
 	'flex min-h-8 min-w-0 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-md border border-border/70 bg-background/75 px-2.5 py-1 font-mono text-xs leading-5 text-foreground';
 
-const listItemClassNames = {
+const LIST_ITEM_CLASS_NAMES = {
 	errors:
 		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-xs font-semibold leading-5 text-foreground',
 	notes:
@@ -58,6 +58,38 @@ export function Header({
 				</div>
 			</div>
 		</header>
+	);
+}
+
+export function ExecutionApproval({ url }: { url: string | null }) {
+	if (!url) {
+		return null;
+	}
+
+	return (
+		<section
+			className={cn(
+				panelClassName,
+				'justify-items-center px-4 py-5 text-center',
+			)}
+		>
+			<div>
+				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">
+					Transaction approval
+				</h2>
+				<p className="mt-1 text-xs leading-5 font-semibold text-muted-foreground">
+					Review the transaction in your wallet before submitting it.
+				</p>
+			</div>
+			<a
+				className="inline-flex min-h-10 items-center justify-center rounded-md border border-primary/75 bg-primary px-5 py-2 text-sm font-extrabold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				href={url}
+				rel="noreferrer"
+				target="_blank"
+			>
+				Sign and Execute
+			</a>
+		</section>
 	);
 }
 
@@ -132,7 +164,7 @@ export function ListPanel({
 	items,
 	title,
 }: {
-	className: keyof typeof listItemClassNames;
+	className: keyof typeof LIST_ITEM_CLASS_NAMES;
 	items: Array<string>;
 	title: string;
 }) {
@@ -140,7 +172,7 @@ export function ListPanel({
 		<Panel hidden={items.length === 0} title={title}>
 			<ul className="grid gap-2">
 				{items.map((item) => (
-					<li className={listItemClassNames[className]} key={item}>
+					<li className={LIST_ITEM_CLASS_NAMES[className]} key={item}>
 						{item}
 					</li>
 				))}

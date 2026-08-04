@@ -22,7 +22,7 @@ import {
 	listNftsTool,
 	readConfigTool,
 	readGameMetadataTool,
-} from '../../src/tools/handlers.js';
+} from '../../src/tools/handlers/index.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';

@@ -3,16 +3,16 @@
 	"private": true,
 	"license": "Apache-2.0",
 	"type": "module",
-	"packageManager": "pnpm@11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c",
+	"packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
 	"devEngines": {
 		"runtime": {
 			"name": "node",
-			"version": "^22.18.0 || >=24.0.0",
+			"version": "^24.18.0 || ^26.5.0",
 			"onFail": "warn"
 		},
 		"packageManager": {
 			"name": "pnpm",
-			"version": "11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c",
+			"version": "11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
 			"onFail": "warn"
 		}
 	},
@@ -38,10 +38,10 @@
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@manypkg/cli": "^0.25.1",
 		"husky": "^9.1.7",
-		"lint-staged": "^17.2.0",
+		"lint-staged": "^17.3.0",
 		"oxlint": "^1.76.0",
 		"oxlint-tsgolint": "^7.0.2001",
 		"prettier": "catalog:tooling",
-		"turbo": "^2.10.7"
+		"turbo": "^2.10.8"
 	}
 }

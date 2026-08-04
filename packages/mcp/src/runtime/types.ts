@@ -26,7 +26,7 @@ export type JsonValue =
 
 export type DryRunResult = Record<string, JsonValue>;
 
-export type BuilderMode = 'build' | 'dry-run' | 'read-only';
+export type BuilderMode = 'build' | 'dry-run' | 'read-only' | 'execute';
 
 export type SuigarMcpConfigInput = {
 	network?: SuigarNetwork;
@@ -213,6 +213,56 @@ export type ReferralClaimReadOnlyPlan = {
 	};
 };
 
+export type WalletReadResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	wallet: {
+		owner: string;
+		balances?: Array<
+			SuiClientTypes.Balance & { balanceDisplay: string; symbol: string }
+		>;
+		coins?: Array<
+			SuiClientTypes.Coin & {
+				balanceDisplay: string;
+				symbol: string;
+			}
+		>;
+		nextCursor?: string | null;
+		hasNextPage?: boolean;
+	};
+};
+
+export type ExecutionRequestResult = {
+	mode: 'execute';
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	summary: TransactionSummary;
+	execution: { requestId: string; approvalUrl: string; status: 'pending' };
+};
+
+export type ExecutionStatusResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	execution: {
+		requestId: string;
+		status: 'pending' | 'approved' | 'rejected' | 'failed' | 'expired';
+		digest?: string;
+		error?: string;
+	};
+};
+
+export type ConnectionResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	connection: {
+		connected: boolean;
+		address?: string;
+		walletType?: string;
+		loginUrl?: string;
+		status: 'connected' | 'pending' | 'logged-out';
+	};
+};
+
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
@@ -220,7 +270,11 @@ export type ToolStructuredResult =
 	| ReferralClaimReadResult
 	| ReferralClaimReadOnlyPlan
 	| ReadOnlyPlan
-	| BuildTransactionResult;
+	| BuildTransactionResult
+	| WalletReadResult
+	| ExecutionRequestResult
+	| ExecutionStatusResult
+	| ConnectionResult;
 
 export type ToolTextResult = {
 	content: [{ type: 'text'; text: string }];

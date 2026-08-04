@@ -11,11 +11,14 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { StrictMode, useEffect, useReducer, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
+	ExecutionApproval,
 	Header,
 	ListPanel,
 	Panel,
 	RawPayload,
 } from './components/inspector-components.js';
+import { asRecord } from './lib/format.js';
+import { payloadFromToolResult } from './lib/tool-result.js';
 import type { InspectorState } from './lib/types.js';
 import { resolveAppView } from './views/index.js';
 
@@ -60,7 +63,6 @@ type AppViewAction =
 	  }
 	| {
 			type: 'tool-input';
-			payload: unknown;
 	  }
 	| {
 			type: 'tool-result';
@@ -82,11 +84,10 @@ const reducer = (state: AppViewState, action: AppViewAction): AppViewState => {
 		case 'tool-input':
 			return {
 				...state,
-				inspector: {
-					status: 'Running tool',
-					payload: action.payload,
-					errors: [],
-				},
+				// A host delivers arguments before it delivers the tool result. Those
+				// arguments are not inspector data, so rendering them creates an empty
+				// Transaction Inspector above the actual result.
+				inspector: null,
 			};
 		case 'tool-result':
 			return {
@@ -149,11 +150,8 @@ export function SuigarInspectorApp() {
 		connectStarted.current = true;
 
 		// oxlint-disable-next-line typescript/no-deprecated
-		app.ontoolinput = ({ arguments: args }) => {
-			dispatch({
-				type: 'tool-input',
-				payload: args ?? {},
-			});
+		app.ontoolinput = () => {
+			dispatch({ type: 'tool-input' });
 		};
 		// oxlint-disable-next-line typescript/no-deprecated
 		app.ontoolresult = (result) => {
@@ -167,14 +165,20 @@ export function SuigarInspectorApp() {
 				return;
 			}
 
-			const payload = result.structuredContent ?? result;
+			const payload = payloadFromToolResult(result);
 			const record =
 				payload && typeof payload === 'object'
 					? (payload as Record<string, unknown>)
 					: {};
+			const execution = asRecord(record.execution);
 			dispatch({
 				type: 'tool-result',
-				status: typeof record.mode === 'string' ? record.mode : 'read',
+				status:
+					typeof record.mode === 'string'
+						? record.mode
+						: typeof execution.status === 'string'
+							? execution.status
+							: 'read',
 				payload,
 			});
 		};
@@ -204,6 +208,9 @@ export function SuigarInspectorApp() {
 
 	const inspector = viewState.inspector ?? initialState;
 	const { coinBadge, title, View } = resolveAppView(inspector.payload);
+	const execution = asRecord(asRecord(inspector.payload).execution);
+	const approvalUrl =
+		typeof execution.approvalUrl === 'string' ? execution.approvalUrl : null;
 
 	if (viewState.error) {
 		return (
@@ -231,9 +238,29 @@ export function SuigarInspectorApp() {
 		);
 	}
 
+	if (Object.keys(asRecord(inspector.payload)).length === 0) {
+		if (inspector.errors.length === 0) {
+			return null;
+		}
+	}
+
+	if (inspector.errors.length > 0) {
+		return (
+			<main className={shellClassName}>
+				<Header status="Error" title="Tool Error" />
+				<ListPanel
+					className="errors"
+					items={inspector.errors}
+					title="Unable to complete request"
+				/>
+			</main>
+		);
+	}
+
 	return (
 		<main className={shellClassName}>
 			<Header coinBadge={coinBadge} status={inspector.status} title={title} />
+			<ExecutionApproval url={approvalUrl} />
 			<View payload={inspector.payload} errors={inspector.errors} />
 			<RawPayload payload={inspector.payload} />
 		</main>
