@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.33
+
+### Minor Changes
+
+- ab6bab9: Add a configured NFT V1 mint transaction builder that mints directly to the sender.
+
 ## 2.0.0-beta.32
 
 ### Major Changes

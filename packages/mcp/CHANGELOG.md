@@ -1,5 +1,17 @@
 # @suigar/mcp
 
+## 1.0.0-beta.17
+
+### Minor Changes
+
+- 7eb72bc: Add browser-mediated wallet connections and explicit transaction approval flows, along with wallet balance and coin-object inspection tools and MCP App views.
+- ab6bab9: Add a configured NFT V1 mint transaction builder that mints directly to the sender.
+
+### Patch Changes
+
+- Updated dependencies [ab6bab9]
+  - @suigar/sdk@2.0.0-beta.33
+
 ## 1.0.0-beta.16
 
 ### Patch Changes
