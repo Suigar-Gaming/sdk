@@ -8,7 +8,7 @@
 	"description": "Suigar MCP plugin marketplace for Sui gaming, NFT, and referral workflows.",
 	"plugins": [
 		{
-			"name": "mcp",
+			"name": "suigar-mcp",
 			"displayName": "Suigar MCP",
 			"source": "./packages/mcp/plugin",
 			"description": "Suigar MCP tools for reading Suigar data and building unsigned Sui game, NFT, and referral transactions.",

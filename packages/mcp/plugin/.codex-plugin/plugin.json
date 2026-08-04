@@ -1,5 +1,5 @@
 {
-	"name": "mcp",
+	"name": "suigar-mcp",
 	"version": "1.0.0-beta.16",
 	"description": "Suigar MCP tools for reading Suigar data and building unsigned Sui game, NFT, and referral transactions.",
 	"author": {
