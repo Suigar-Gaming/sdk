@@ -62,7 +62,7 @@ describe('package exports', () => {
 		];
 		for (const manifestUrl of manifestUrls) {
 			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
-			expect(manifest.name).toBe('suigar');
+			expect(manifest.name).toBe('mcp');
 			expect(manifest.version).toBe(packageJson.version);
 			expect(manifest.license).toBe('Apache-2.0');
 		}
