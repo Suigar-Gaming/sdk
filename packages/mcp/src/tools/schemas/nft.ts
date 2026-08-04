@@ -1,3 +1,6 @@
+// Copyright (c) Suigar
+// SPDX-License-Identifier: Apache-2.0
+
 import { z } from 'zod/v4';
 import { configInputSchema } from './config.js';
 import { ADDRESS_DESCRIPTION, BUILDER_MODES } from './shared.js';
