@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       published: ${{ steps.changesets.outputs.published }}
-      published_packages: ${{ steps.changesets.outputs['published-packages'] }}
+      published_packages: ${{ steps.changesets.outputs.publishedPackages }}
 
     steps:
       - name: Checkout repository
@@ -46,7 +46,7 @@ jobs:
   publish-mcp-registry:
     needs: release
     if: >-
-      needs.release.outputs.published == 'true' && contains(fromJSON(needs.release.outputs.published_packages).*.name, '@suigar/mcp')
+      needs.release.outputs.published == 'true' && contains(fromJSON(needs.release.outputs.published_packages || '[]').*.name, '@suigar/mcp')
     permissions:
       contents: read
       id-token: write
