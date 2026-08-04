@@ -14,6 +14,10 @@ inputs:
     description: Install workspace dependencies from the repository root.
     required: false
     default: 'true'
+  node-version:
+    description: Node.js version to install.
+    required: false
+    default: '24'
 runs:
   using: composite
   steps:
@@ -22,6 +26,7 @@ runs:
       with:
         cache: ${{ inputs.cache }}
         install: false
+        runtime: node@${{ inputs.node-version }}
 
     - name: Run pnpm installation diagnostics
       if: inputs.doctor == 'true'
