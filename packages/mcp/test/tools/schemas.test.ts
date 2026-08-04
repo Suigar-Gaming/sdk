@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+	buildNftV1MintTransactionInputSchema,
 	buildReferralCommissionClaimTransactionInputSchema,
 	coinflipInputSchema,
 	configInputSchema,
@@ -60,6 +61,16 @@ describe('config input schema', () => {
 });
 
 describe('build input schemas', () => {
+	it('accepts NFT V1 mint inputs', () => {
+		expect(
+			buildNftV1MintTransactionInputSchema.parse({
+				owner: '0x123',
+				specId: '0x456',
+				useGasCoin: true,
+			}),
+		).toMatchObject({ specId: '0x456', useGasCoin: true });
+	});
+
 	it('accepts decimal currency strings and rejects negative stake values', () => {
 		const input = coinflipInputSchema.parse({
 			mode: 'build',

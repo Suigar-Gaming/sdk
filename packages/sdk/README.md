@@ -194,8 +194,6 @@ coins?: {
 };
 ```
 
-`packageIds.nftV1` exposes the network-specific NFT V1 package id. Use `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })` when querying owned NFTs instead of constructing the Move type string manually. `objectIds.nftV1Factory` is available for applications that need to read the NFT V1 catalog. Request `content: true`, then use `client.suigar.bcs.NftV1Factory.parse(object.content)` to decode the factory and `client.suigar.bcs.NftV1.parse(object.content)` for a minted NFT. The SDK does not provide a dedicated NFT client API or NFT V1 mint transaction builder.
-
 ```ts
 const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 	suigar({
@@ -395,19 +393,21 @@ const rangeTx = client.suigar.tx.createGameBet('range', {
 
 > **Note:**
 >
-> - limbo converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
-> - with the default limbo scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` on-chain
-> - range converts each point with `Math.round(value * scale)`
-> - range points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
-> - with the default range scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-> - plinko, soccer, and wheel `configId` values must fit in `u8`; soccer `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
+> - `limbo` converts `targetMultiplier` with `Math.round(targetMultiplier * scale)`
+> - With the default `limbo` scale `100`, exposed as `DEFAULT_LIMBO_MULTIPLIER_SCALE`, a target multiplier of `2.5` becomes `250` on-chain
+> - `range` converts each point with `Math.round(value * scale)`
+> - `range` points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
+> - With the default `range` scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
+> - `plinko`, `soccer`, and `wheel` `configId` values must fit in `u8`; `soccer` `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
 
 > **Tip:**
 >
-> - if you set `scale` to `10_000_000`, valid UI values become `0` to `10`
-> - do not pre-scale range points before passing them to the SDK; pass the human value and let the SDK scale it once
+> - If you set `scale` to `10_000_000`, valid UI values become `0` to `10`
+> - Do not pre-scale `range` points before passing them to the SDK; pass the human value and let the SDK scale it once
 
-### PvP Coinflip
+### PvP Games
+
+#### PvP Coinflip
 
 Use the action-specific `pvpCoinflip` builders for PvP coinflip flows:
 
@@ -498,6 +498,26 @@ const levelUpUsdcAmount =
 ```
 
 The deployed referral contract does not expose public balance getters. These simulated reads execute the same pool and oracle checks as a real claim, so they can fail for the same reasons and can change before execution.
+
+### NFT V1
+
+#### Reading NFTs
+
+- Use `packageIds.nftV1` as the network-specific NFT V1 package ID.
+- Derive the owned-NFT type with `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })` instead of constructing the Move type manually.
+- Use `objectIds.nftV1Factory` to fetch the NFT V1 catalog with `content: true`, then decode it with `client.suigar.bcs.NftV1Factory.parse(object.content)`.
+- Decode owned NFTs with `client.suigar.bcs.NftV1.parse(object.content)`.
+
+#### Minting
+
+Mint an NFT V1 directly to the transaction sender with a factory specification ID. The transaction resolves the configured factory for that specification's SUI price when built, then resolves the NFT package and SweetHouse object from SDK configuration:
+
+```ts
+const transaction = client.suigar.tx.nftV1.mint({
+	owner: accountAddress,
+	specId: '0xNFT_SPEC_ID',
+});
+```
 
 ## `bcs`
 
@@ -610,16 +630,16 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 
 > **Important:**
 >
-> - execute or wait for the transaction with `include: { events: true }`
-> - unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
-> - parse emitted events from the unwrapped transaction result
-> - use `event.bcs` for consistent decoding across transports
-> - use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails(gameId, decoded.game_details)` instead of hand-decoding standard game detail byte arrays
+> - Execute or wait for the transaction with `include: { events: true }`
+> - Unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
+> - Parse emitted events from the unwrapped transaction result
+> - Use `event.bcs` for consistent decoding across transports
+> - Use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails(gameId, decoded.game_details)` instead of hand-decoding standard game detail byte arrays
 
 > **Tip:**
 >
 > - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
-> - these helpers decode the event payload itself, not a full transaction response
+> - These helpers decode the event payload itself, not a full transaction response
 
 ### Parse PvP Coinflip Event Data
 

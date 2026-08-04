@@ -17,11 +17,8 @@ import {
 import { resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
-	CancelPvPCoinflipTransactionOptions,
-	CreatePvPCoinflipTransactionOptions,
 	PvPCoinflipAction,
 	PvPCoinflipTransactionOptions,
-	ResolvedJoinPvPCoinflipTransactionOptions,
 	WithPartner,
 } from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
@@ -30,7 +27,11 @@ import { createBaseGameTransaction } from './shared.js';
 type PvPCoinflipTransactionOptionsWithPartner<
 	Action extends PvPCoinflipAction,
 > = Action extends 'join'
-	? WithPartner<ResolvedJoinPvPCoinflipTransactionOptions>
+	? WithPartner<
+			PvPCoinflipTransactionOptions<Action> & {
+				betCoin: TransactionArgument;
+			}
+		>
 	: WithPartner<PvPCoinflipTransactionOptions<Action>>;
 
 /**
@@ -73,7 +74,8 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 
 	switch (action) {
 		case 'create': {
-			const createOptions = options as CreatePvPCoinflipTransactionOptions;
+			const createOptions =
+				options as PvPCoinflipTransactionOptionsWithPartner<'create'>;
 			const stake = toBigInt(createOptions.stake);
 
 			tx.add(
@@ -98,7 +100,8 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'join': {
-			const joinOptions = options as ResolvedJoinPvPCoinflipTransactionOptions;
+			const joinOptions =
+				options as PvPCoinflipTransactionOptionsWithPartner<'join'>;
 			const priceInfoObjectId = resolvePriceInfoObjectId(
 				joinOptions.config,
 				normalizedCoinType,
@@ -122,7 +125,8 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'cancel': {
-			const cancelOptions = options as CancelPvPCoinflipTransactionOptions;
+			const cancelOptions =
+				options as PvPCoinflipTransactionOptionsWithPartner<'cancel'>;
 
 			tx.add(
 				cancelGame({

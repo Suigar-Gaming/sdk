@@ -38,6 +38,7 @@ const TOOL_CATALOG = [
 	'get_referral_level_up_usd_rewards',
 	'build_referral_commission_claim_transaction',
 	'build_referral_level_up_usd_rewards_claim_transaction',
+	'build_nft_v1_mint_transaction',
 	'build_coinflip_transaction',
 	'build_limbo_transaction',
 	'build_plinko_transaction',

@@ -15,7 +15,7 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		package: TESTNET_PACKAGE_IDS.nftV1,
 		packageName: 'nft-v1',
 		types: ['Factory', 'Nft'],
-		functions: false,
+		functions: ['mint_to_sender'],
 	},
 	core: {
 		package: TESTNET_PACKAGE_IDS.core,

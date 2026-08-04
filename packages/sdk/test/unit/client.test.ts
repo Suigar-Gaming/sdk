@@ -642,7 +642,7 @@ describe('SuigarClient', () => {
 		]);
 	});
 
-	it('exposes both standard and pvp transaction factories', () => {
+	it('exposes standard, PvP, and NFT transaction factories', () => {
 		const client = createSuigarTestClient({
 			objects: [
 				{
@@ -668,6 +668,7 @@ describe('SuigarClient', () => {
 		expect(client.suigar.tx.pvpCoinflip.createGame).toBeTypeOf('function');
 		expect(client.suigar.tx.pvpCoinflip.joinGame).toBeTypeOf('function');
 		expect(client.suigar.tx.pvpCoinflip.cancelGame).toBeTypeOf('function');
+		expect(client.suigar.tx.nftV1.mint).toBeTypeOf('function');
 		expect(
 			client.suigar.tx.pvpCoinflip.createGame({
 				owner: '0x123',

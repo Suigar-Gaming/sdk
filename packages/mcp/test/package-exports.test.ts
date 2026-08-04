@@ -62,7 +62,7 @@ describe('package exports', () => {
 		];
 		for (const manifestUrl of manifestUrls) {
 			const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
-			expect(manifest.name).toBe('suigar');
+			expect(manifest.name).toBe('suigar-mcp');
 			expect(manifest.version).toBe(packageJson.version);
 			expect(manifest.license).toBe('Apache-2.0');
 		}
@@ -103,5 +103,6 @@ describe('package exports', () => {
 		);
 		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
 		expect(cursorManifest.logo).toBe('./assets/logo.svg');
+		expect(cursorManifest.displayName).toBe('Suigar MCP');
 	});
 });

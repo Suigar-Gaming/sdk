@@ -162,18 +162,30 @@ When making changes:
 
 Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is responsible for:
 
-- resolving network-scoped package ids
-- normalizing the configured supported coin types for the active network
-- resolving price info object ids from the supported-coin mapping
-- throwing explicit errors when a required coin mapping is missing
-- providing the price info object id used by PvP coinflip join
-- exposing `packageIds.referral` for applications that build referral commission and level-up USD reward claims or simulate their claimable amounts through `client.suigar.tx.referral` and `client.suigar.view.referral`
-- exposing `packageIds.nftV1` and `objectIds.nftV1Factory` for applications that need NFT V1 lookups without adding an NFT client surface to this SDK; derive the owned-NFT query type with `client.suigar.bcs.NftV1.typeTag({ package: client.suigar.getConfig().packageIds.nftV1 })`, call `client.core.listOwnedObjects({ owner, type: nftType, include: { content: true } })`, and decode results with `client.suigar.bcs.NftV1.parse(object.content)`. Fetch catalog reads with `include: { content: true }` and decode them with `client.suigar.bcs.NftV1Factory.parse(object.content)`, while leaving NFT V1 minting outside this SDK
-- treating unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows
+- Resolving network-scoped package ids
+- Normalizing the configured supported coin types for the active network
+- Resolving price info object ids from the supported-coin mapping
+- Throwing explicit errors when a required coin mapping is missing
+- Providing the price info object id used by PvP coinflip join
 
-`client.suigar.getGameParameters(game, { coinType, ...options })` requires the coin type, first reads the selected game's settings object from SweetHouse, then reads that coin-specific `Parameters<T>` object, parses it with the generated type, decodes Move float fields into JavaScript numbers (including nested Plinko and Wheel config multipliers), and caches the parsed result for `cacheTtl`.
+Treat unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows.
+
+#### Game Parameters
+
+`client.suigar.getGameParameters(game, { coinType, ...options })` requires a coin type. It reads the selected game's settings object from SweetHouse, then that coin's `Parameters<T>` object. It parses the result, decodes Move float fields into JavaScript numbers—including nested Plinko and Wheel multipliers—and caches it for `cacheTtl`.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
+
+#### Referral
+
+- Use `packageIds.referral` with `client.suigar.tx.referral` for claims.
+- Use `client.suigar.view.referral` for simulated claimable amounts.
+
+#### NFT V1
+
+- Use `packageIds.nftV1` and `objectIds.nftV1Factory` for lookups.
+- Use `client.suigar.tx.nftV1.mint({ owner, specId })` to mint.
+- Read the selected specification's SUI price from the configured factory when the transaction is built.
 
 #### Metadata and Amount Handling
 
@@ -272,9 +284,9 @@ Claude Code compatibility:
 
 When creating a PR:
 
-- summarize the SDK or transaction behavior change clearly
-- if the branch modifies anything under `packages/sdk/src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first SDK source change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated SDK source edits unless multiple release notes are intentionally needed
+- Summarize the SDK or transaction behavior change clearly
+- If the branch modifies anything under `packages/sdk/src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first SDK source change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated SDK source edits unless multiple release notes are intentionally needed
 - PRs that change `packages/sdk/src/` without a changeset are expected to fail merge checks and receive a PR comment
-- mention whether generated bindings changed
-- include tests run
-- if the PR was primarily written by AI, mark that in the PR description
+- Mention whether generated bindings changed
+- Include tests run
+- If the PR was primarily written by AI, mark that in the PR description

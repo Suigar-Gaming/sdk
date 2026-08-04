@@ -2,6 +2,8 @@
 
 MCP server and MCP App for Suigar transaction workflows on Sui.
 
+The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
+
 It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
@@ -12,14 +14,6 @@ It provides:
 - text and structured-content fallbacks for normal MCP clients
 
 Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
-
-## Wallet connection
-
-Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions. Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin. Use `npx -y @suigar/mcp status [--network ...]` to inspect it. `npx -y @suigar/mcp logout [--network ...]` opens a browser confirmation page for one network; add `--all` to disconnect every stored network. `npx -y @suigar/mcp clean` removes the local credential file without opening a browser. `npx -y @suigar/mcp tools` prints the network-independent MCP tool catalog.
-
-For SDK consumers that implement pagination alongside MCP usage, `DEFAULT_QUERY_LIMIT` is available from `@suigar/sdk/utils`. Its value is `50`, the reusable default page size for SDK queries, including the current no-argument `client.suigar.getPvPCoinflipGames()` call.
-
-The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
 ## Install
 
@@ -63,24 +57,27 @@ The package also ships `plugin/` manifests for plugin-capable hosts:
 
 The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp@<package-version>` stdio server. Plugin manifest versions and the MCP config package specifier are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
 
-Repo-level marketplace catalogs are included for local plugin testing:
+Repository marketplace catalogs support GitHub installation and local plugin testing:
 
 - `.agents/plugins/marketplace.json` for ChatGPT desktop and Codex
 - `.claude-plugin/marketplace.json` for Claude Code
 - `.cursor-plugin/marketplace.json` for Cursor multi-plugin repository discovery
 
-For ChatGPT desktop or Codex local testing, open the repository in ChatGPT desktop, restart the app, open the Plugins directory in Work mode or Codex, then install `suigar` from the `Suigar` source. The same marketplace can be registered from the Codex CLI with:
+For Codex, install the marketplace from GitHub, then install the `suigar-mcp` plugin:
 
 ```bash
-codex plugin marketplace add .
+codex plugin marketplace add Suigar-Gaming/ts-sdks
+codex plugin add suigar-mcp@suigar
 ```
 
-For Claude Code local testing, add this repository as a marketplace from the repository root and install the plugin:
+For Claude Code, use the equivalent GitHub marketplace flow:
 
-```text
-/plugin marketplace add .
-/plugin install suigar@suigar
+```bash
+claude plugin marketplace add Suigar-Gaming/ts-sdks
+claude plugin install suigar-mcp@suigar
 ```
+
+Inside an interactive Claude Code session, use `/plugin marketplace add Suigar-Gaming/ts-sdks` and `/plugin install suigar-mcp@suigar` instead. For local development, replace `Suigar-Gaming/ts-sdks` with `.` in either marketplace-add command. ChatGPT desktop local testing works by opening the repository, restarting the app, opening the Plugins directory in Work mode or Codex, then installing `suigar-mcp` from the `Suigar` source.
 
 For Cursor, the repository includes both the plugin manifest and a root `.cursor-plugin/marketplace.json` for multi-plugin repository flows. During local development, you can also copy or symlink `packages/mcp/plugin` into Cursor's local plugin directory and reload Cursor. If you only need MCP tools, direct MCP configuration with `npx -y @suigar/mcp` is simpler and does not require the plugin wrapper.
 
@@ -92,6 +89,15 @@ node packages/mcp/dist/bin.mjs
 ```
 
 This builds the local workspace dependencies, MCP server, and bundled MCP App. Run the generated stdio entrypoint from the repository root for manual client testing.
+
+## Wallet connection
+
+- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
+- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
+- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
+- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
+- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
 
 ## Tools
 
@@ -105,6 +111,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `get_referral_level_up_usd_rewards`
 - `build_referral_commission_claim_transaction`
 - `build_referral_level_up_usd_rewards_claim_transaction`
+- `build_nft_v1_mint_transaction`
 - `build_coinflip_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
@@ -148,7 +155,20 @@ Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `u
 
 When `betCount` is provided for Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
-Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `configId`/`countryId`/`shotZoneId` for Soccer, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`. Referral claim builders require an `owner`; commission claims optionally accept `coinType`, while level-up USD reward claims use configured USDC.
+### Workflow-specific inputs
+
+| Workflow | Required inputs | Optional inputs | Notes |
+| --- | --- | --- | --- |
+| Coinflip | `side` | — | — |
+| Limbo | `targetMultiplier` | — | — |
+| Plinko, Wheel | `configId` | — | — |
+| Soccer | `configId`, `countryId`, `shotZoneId` | — | — |
+| Range | `leftPoint`, `rightPoint` | `outOfRange` | — |
+| PvP Coinflip Create | `creatorSide` | `isPrivate` | — |
+| PvP Coinflip Join, Cancel | `gameId` | — | — |
+| Referral Commission Claim | `owner` | `coinType` | `coinType` defaults to configured SUI. |
+| Referral Level-up USD Rewards Claim | `owner` | — | Uses configured USDC. |
+| NFT V1 Mint | `owner`, `specId` | — | Resolves the specification's SUI price from the configured NFT factory when built. |
 
 ## Config
 

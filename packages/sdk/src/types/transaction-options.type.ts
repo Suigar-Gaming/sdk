@@ -1,10 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type {
-	Transaction,
-	TransactionArgument,
-} from '@mysten/sui/transactions';
+import type { Transaction } from '@mysten/sui/transactions';
 import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
@@ -92,11 +89,6 @@ export type JoinPvPCoinflipTransactionOptions =
 		gameId: string;
 	};
 
-export type ResolvedJoinPvPCoinflipTransactionOptions =
-	JoinPvPCoinflipTransactionOptions & {
-		betCoin: TransactionArgument;
-	};
-
 export type CancelPvPCoinflipTransactionOptions =
 	SharedPvPCoinflipTransactionOptions & {
 		gameId: string;
@@ -116,3 +108,8 @@ export type ClaimReferralCommissionOptions = TransactionSenderOptions &
 	Pick<CoinTransactionOptions, 'coinType'>;
 
 export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
+
+export type MintNftV1Options = TransactionSenderOptions &
+	Pick<CoinTransactionOptions, 'useGasCoin'> & {
+		specId: string;
+	};
