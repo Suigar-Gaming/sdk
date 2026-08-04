@@ -13,7 +13,7 @@
 	"keywords": ["suigar", "sui", "mcp", "games", "transactions"],
 	"mcpServers": "./.mcp.json",
 	"interface": {
-		"displayName": "Suigar",
+		"displayName": "Suigar MCP",
 		"shortDescription": "Build unsigned Suigar transactions on Sui",
 		"longDescription": "Suigar adds MCP tools for reading network config, game parameters, NFTs, and referral rewards, plus building or dry-running unsigned Sui game, NFT, and referral transactions.",
 		"developerName": "Suigar",

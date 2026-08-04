@@ -103,5 +103,6 @@ describe('package exports', () => {
 		);
 		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
 		expect(cursorManifest.logo).toBe('./assets/logo.svg');
+		expect(cursorManifest.displayName).toBe('Suigar MCP');
 	});
 });
