@@ -3,6 +3,7 @@
 
 export * from './coinflip.js';
 export * from './limbo.js';
+export * from './nft-v1.js';
 export * from './plinko.js';
 export * from './pvp-coinflip.js';
 export * from './range.js';

@@ -108,3 +108,8 @@ export type ClaimReferralCommissionOptions = TransactionSenderOptions &
 	Pick<CoinTransactionOptions, 'coinType'>;
 
 export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
+
+export type MintNftV1Options = TransactionSenderOptions &
+	Pick<CoinTransactionOptions, 'useGasCoin'> & {
+		specId: string;
+	};

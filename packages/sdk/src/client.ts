@@ -33,6 +33,8 @@ import {
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
 	buildLimboTransaction,
+	buildMintNftV1PaymentCoin,
+	buildMintNftV1Transaction,
 	buildPlinkoTransaction,
 	buildPvPCoinflipJoinBetCoin,
 	buildPvPCoinflipTransaction,
@@ -51,6 +53,7 @@ import type {
 	GameParameters,
 	GetGameParametersOptions,
 	LimboTransactionOptions,
+	MintNftV1Options,
 	OnChainGameParameters,
 	PlinkoTransactionOptions,
 	PvPCoinflipGameOptions,
@@ -425,6 +428,18 @@ export class SuigarClient {
 			): Transaction => {
 				return buildClaimReferralLevelUpUsdRewardsTransaction({
 					...options,
+					config: this.#config,
+				});
+			},
+		},
+		nftV1: {
+			mint: (options: MintNftV1Options): Transaction => {
+				return buildMintNftV1Transaction({
+					...options,
+					paymentCoin: buildMintNftV1PaymentCoin(this.#client, {
+						...options,
+						config: this.#config,
+					}),
 					config: this.#config,
 				});
 			},
