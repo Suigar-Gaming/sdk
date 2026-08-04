@@ -23,7 +23,6 @@
 		"defaultPrompt": [
 			"Read testnet config",
 			"Build a coinflip transaction",
-			"Build an NFT V1 mint transaction",
 			"Dry-run a PvP coinflip transaction"
 		],
 		"brandColor": "#2AC2FF",
