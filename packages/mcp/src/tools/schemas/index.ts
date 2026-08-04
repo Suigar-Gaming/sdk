@@ -3,6 +3,7 @@
 
 export * from './config.js';
 export * from './games.js';
+export * from './nft.js';
 export * from './output.js';
 export * from './read.js';
 export * from './referral.js';

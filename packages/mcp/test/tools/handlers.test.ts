@@ -10,6 +10,7 @@ import type {
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
+	buildNftV1MintTransactionTool,
 	buildPlinkoTransactionTool,
 	buildPvpCoinflipCancelTransactionTool,
 	buildPvpCoinflipCreateTransactionTool,
@@ -47,7 +48,10 @@ describe('read tools', () => {
 		);
 		expect(content.supportedFeatures).toEqual(
 			expect.arrayContaining([
-				expect.objectContaining({ id: 'nfts', tools: ['list_nfts'] }),
+				expect.objectContaining({
+					id: 'nfts',
+					tools: ['list_nfts', 'build_nft_v1_mint_transaction'],
+				}),
 				expect.objectContaining({
 					id: 'referrals',
 					tools: expect.arrayContaining([
@@ -77,6 +81,7 @@ describe('read tools', () => {
 
 describe('read-only transaction tools', () => {
 	it.each([
+		['NFT V1 mint', () => buildNftV1MintTransactionTool({ mode: 'read-only' })],
 		[
 			'coinflip',
 			() => buildCoinflipTransactionTool({ mode: 'read-only', side: 'heads' }),
@@ -156,6 +161,21 @@ describe('read-only transaction tools', () => {
 		expect(content.network).toBe('testnet');
 		expect(content.plan.target).toMatch(/^0x.*::/u);
 		expect(result.content[0].text).toContain('"read-only"');
+	});
+
+	it('returns an NFT V1 mint plan with its resolved configuration', async () => {
+		const result = await buildNftV1MintTransactionTool({
+			mode: 'read-only',
+		});
+		const content = result.structuredContent as {
+			plan: { target: string; requiredInputs: Array<string> };
+			nft: { packageId: string; factoryId: string };
+		};
+
+		expect(content.plan.target).toMatch(/::nft::mint_to_sender$/u);
+		expect(content.plan.requiredInputs).toEqual(['owner', 'specId']);
+		expect(content.nft.packageId).toMatch(/^0x/u);
+		expect(content.nft.factoryId).toMatch(/^0x/u);
 	});
 
 	it('uses the generated commission claim target in its referral plan', async () => {

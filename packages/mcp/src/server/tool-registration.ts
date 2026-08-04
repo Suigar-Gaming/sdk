@@ -11,6 +11,8 @@ import type { ToolTextResult } from '../runtime/index.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
+	buildNftV1MintTransactionInputSchema,
+	buildNftV1MintTransactionTool,
 	buildPlinkoTransactionTool,
 	buildPvpCoinflipCancelTransactionTool,
 	buildPvpCoinflipCreateTransactionTool,
@@ -227,6 +229,15 @@ const appTools = [
 		inputSchema: buildReferralLevelUpUsdRewardsClaimTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildReferralLevelUpUsdRewardsClaimTransactionTool,
+	},
+	{
+		name: 'build_nft_v1_mint_transaction',
+		title: 'Build NFT V1 Mint Transaction',
+		description:
+			'Build, dry-run, or inspect an unsigned NFT V1 mint transaction.',
+		inputSchema: buildNftV1MintTransactionInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: buildNftV1MintTransactionTool,
 	},
 	{
 		name: 'build_coinflip_transaction',

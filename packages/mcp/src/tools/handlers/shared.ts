@@ -216,7 +216,7 @@ export const supportedFeatures = () => [
 	{
 		id: 'nfts' as const,
 		label: 'NFTs',
-		tools: ['list_nfts'],
+		tools: ['list_nfts', 'build_nft_v1_mint_transaction'],
 	},
 	{
 		id: 'referrals' as const,

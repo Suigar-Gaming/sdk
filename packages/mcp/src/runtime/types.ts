@@ -213,6 +213,17 @@ export type ReferralClaimReadOnlyPlan = {
 	};
 };
 
+export type NftV1MintReadOnlyPlan = {
+	mode: 'read-only';
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	plan: ReadOnlyPlan['plan'];
+	nft: {
+		packageId: string;
+		factoryId: string;
+	};
+};
+
 export type WalletReadResult = {
 	network: SuigarNetwork;
 	config: ResolvedMcpConfig;
@@ -269,6 +280,7 @@ export type ToolStructuredResult =
 	| ListNftsResult
 	| ReferralClaimReadResult
 	| ReferralClaimReadOnlyPlan
+	| NftV1MintReadOnlyPlan
 	| ReadOnlyPlan
 	| BuildTransactionResult
 	| WalletReadResult
