@@ -5,7 +5,7 @@ inputs:
   cache:
     description: Enable pnpm dependency caching.
     required: false
-    default: 'true'
+    default: 'false'
   doctor:
     description: Run pnpm diagnostics after pnpm setup.
     required: false
