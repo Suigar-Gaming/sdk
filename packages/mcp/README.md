@@ -2,6 +2,8 @@
 
 MCP server and MCP App for Suigar transaction workflows on Sui.
 
+The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
+
 It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
@@ -12,14 +14,6 @@ It provides:
 - text and structured-content fallbacks for normal MCP clients
 
 Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
-
-## Wallet connection
-
-Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions. Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin. Use `npx -y @suigar/mcp status [--network ...]` to inspect it. `npx -y @suigar/mcp logout [--network ...]` opens a browser confirmation page for one network; add `--all` to disconnect every stored network. `npx -y @suigar/mcp clean` removes the local credential file without opening a browser. `npx -y @suigar/mcp tools` prints the network-independent MCP tool catalog.
-
-For SDK consumers that implement pagination alongside MCP usage, `DEFAULT_QUERY_LIMIT` is available from `@suigar/sdk/utils`. Its value is `50`, the reusable default page size for SDK queries, including the current no-argument `client.suigar.getPvPCoinflipGames()` call.
-
-The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
 ## Install
 
@@ -93,6 +87,15 @@ node packages/mcp/dist/bin.mjs
 
 This builds the local workspace dependencies, MCP server, and bundled MCP App. Run the generated stdio entrypoint from the repository root for manual client testing.
 
+## Wallet connection
+
+- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
+- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
+- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
+- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
+- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
+
 ## Tools
 
 - `read_config`
@@ -105,6 +108,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `get_referral_level_up_usd_rewards`
 - `build_referral_commission_claim_transaction`
 - `build_referral_level_up_usd_rewards_claim_transaction`
+- `build_nft_v1_mint_transaction`
 - `build_coinflip_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
@@ -148,7 +152,20 @@ Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `u
 
 When `betCount` is provided for Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
-Game-specific inputs are `side` for coinflip, `targetMultiplier` for limbo, `configId` for plinko and wheel, `configId`/`countryId`/`shotZoneId` for Soccer, `leftPoint`/`rightPoint` for range, and `gameId` for PvP coinflip join and cancel. PvP coinflip creation uses `creatorSide` and optional `isPrivate`. Referral claim builders require an `owner`; commission claims optionally accept `coinType`, while level-up USD reward claims use configured USDC.
+### Workflow-specific inputs
+
+| Workflow | Required inputs | Optional inputs | Notes |
+| --- | --- | --- | --- |
+| Coinflip | `side` | — | — |
+| Limbo | `targetMultiplier` | — | — |
+| Plinko, Wheel | `configId` | — | — |
+| Soccer | `configId`, `countryId`, `shotZoneId` | — | — |
+| Range | `leftPoint`, `rightPoint` | `outOfRange` | — |
+| PvP Coinflip Create | `creatorSide` | `isPrivate` | — |
+| PvP Coinflip Join, Cancel | `gameId` | — | — |
+| Referral Commission Claim | `owner` | `coinType` | `coinType` defaults to configured SUI. |
+| Referral Level-up USD Rewards Claim | `owner` | — | Uses configured USDC. |
+| NFT V1 Mint | `owner`, `specId` | — | Resolves the specification's SUI price from the configured NFT factory when built. |
 
 ## Config
 
