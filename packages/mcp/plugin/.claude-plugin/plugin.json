@@ -1,7 +1,7 @@
 {
 	"name": "suigar-mcp",
 	"displayName": "Suigar MCP",
-	"version": "1.0.0-beta.17",
+	"version": "1.0.0-beta.18",
 	"description": "Suigar MCP tools for reading Suigar data and building unsigned Sui game, NFT, and referral transactions.",
 	"author": {
 		"name": "Suigar",
