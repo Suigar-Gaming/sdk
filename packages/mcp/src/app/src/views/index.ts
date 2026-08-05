@@ -50,7 +50,8 @@ export const resolveAppView = (payload: unknown): ResolvedAppView => {
 	if (result.supportedGames && !result.summary) {
 		return { coinBadge, title: 'Suigar Config', View: ConfigView };
 	}
-	if (result.execution && !result.summary) {
+	const execution = asRecord(result.execution);
+	if (result.execution && (!result.summary || execution.wallet === 'session')) {
 		return {
 			coinBadge: null,
 			title: 'Transaction Status',

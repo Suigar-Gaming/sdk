@@ -47,6 +47,12 @@ const commonBuildInputSchema = configInputSchema
 			.boolean()
 			.optional()
 			.describe('Allow the SUI gas coin to be used for native SUI bet coins.'),
+		executionWallet: z
+			.enum(['connected', 'session'])
+			.default('connected')
+			.describe(
+				'For execute mode, use connected for browser approval or session to sign and submit with the local session wallet.',
+			),
 	})
 	.strict();
 

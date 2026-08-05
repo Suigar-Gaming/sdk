@@ -17,8 +17,9 @@ import {
 	suigarMcpDataDirectory,
 } from './storage.js';
 
-const service = 'suigar.mcp.session-wallet';
-const file = join(suigarMcpDataDirectory, 'session-wallets.json');
+const service = 'suigar.mcp';
+const sharedKeychainAccount = 'session-wallet';
+const file = join(suigarMcpDataDirectory, 'session-wallet.json');
 const displayFile = `~/${relative(homedir(), file)}`;
 
 export type SessionWallet = {
@@ -27,55 +28,47 @@ export type SessionWallet = {
 	source: 'created' | 'imported';
 };
 
-type SessionWallets = Partial<Record<SuigarNetwork, SessionWallet>>;
+const keychain = () => new Entry(service, sharedKeychainAccount);
 
-const keychain = (network: SuigarNetwork) => new Entry(service, network);
-
-const loadWallets = async (): Promise<SessionWallets> => {
-	try {
-		return JSON.parse(await readFile(file, 'utf8')) as SessionWallets;
-	} catch (error) {
-		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return {};
-		throw error;
-	}
-};
-
-const saveWallets = async (wallets: SessionWallets) => {
+const saveWalletFile = async (wallet: SessionWallet) => {
 	await ensureSuigarMcpDataDirectory();
-	await writeFile(file, `${JSON.stringify(wallets, null, 2)}\n`, {
+	await writeFile(file, `${JSON.stringify(wallet, null, 2)}\n`, {
 		mode: 0o600,
 	});
 	await chmod(file, 0o600);
 };
 
-export const loadSessionWallet = async (network: SuigarNetwork) =>
-	(await loadWallets())[network] ?? null;
+export const loadSessionWallet = async (): Promise<SessionWallet | null> => {
+	try {
+		return JSON.parse(await readFile(file, 'utf8')) as SessionWallet;
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+		throw error;
+	}
+};
 
-export const loadSessionSigner = async (network: SuigarNetwork) => {
-	const secret = keychain(network).getPassword();
+export const loadSessionSigner = async () => {
+	const secret = keychain().getPassword();
 	if (!secret) {
 		throw new Error(
-			`No ${network} session wallet is available. Create or recover one first.`,
+			'No session wallet is available. Create or recover one first.',
 		);
 	}
 	return Ed25519Keypair.fromSecretKey(secret);
 };
 
 const persistSessionWallet = async (
-	network: SuigarNetwork,
 	mnemonic: string,
 	source: SessionWallet['source'],
 ) => {
 	const signer = Ed25519Keypair.deriveKeypair(mnemonic);
-	keychain(network).setPassword(signer.getSecretKey());
-	const wallets = await loadWallets();
+	keychain().setPassword(signer.getSecretKey());
 	const wallet: SessionWallet = {
 		address: signer.toSuiAddress(),
 		createdAt: new Date().toISOString(),
 		source,
 	};
-	wallets[network] = wallet;
-	await saveWallets(wallets);
+	await saveWalletFile(wallet);
 	return wallet;
 };
 
@@ -170,7 +163,6 @@ export const createSessionWalletSetup = async (network: SuigarNetwork) => {
 			if (url.pathname === '/save' && form.get('confirmed') !== 'on')
 				throw new Error('Confirm that you saved the recovery phrase.');
 			const wallet = await persistSessionWallet(
-				network,
 				phrase,
 				url.pathname === '/save' ? 'created' : 'imported',
 			);

@@ -186,7 +186,7 @@ export const getSessionWalletTool = async (
 	input: SessionWalletInput,
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
-	const wallet = await loadSessionWallet(bundle.config.network);
+	const wallet = await loadSessionWallet();
 	if (!wallet)
 		throw new Error(
 			'No session wallet exists. Call setup_session_wallet first.',

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithExtensions } from '@mysten/sui/client';
+import type { Signer } from '@mysten/sui/cryptography';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import type { Transaction } from '@mysten/sui/transactions';
 import {
@@ -238,5 +239,35 @@ export const buildTransactionResult = async ({
 		summary,
 		transactionBytesBase64:
 			await client.suigar.serializeTransactionToBase64(transaction),
+	};
+};
+
+/** Sign and submit a transaction with a local session-wallet signer. */
+export const executeSessionTransaction = async ({
+	transaction,
+	client,
+	signer,
+}: {
+	transaction: Transaction;
+	client: SuigarClientBundle['client'];
+	signer: Signer;
+}) => {
+	const result = await client.signAndExecuteTransaction({
+		transaction,
+		signer,
+		include: { effects: true },
+	});
+	const executed =
+		result.$kind === 'Transaction'
+			? result.Transaction
+			: result.FailedTransaction;
+	const error = executed.status.error?.message;
+	return {
+		address: signer.toSuiAddress(),
+		digest: executed.digest,
+		status: executed.status.success
+			? ('success' as const)
+			: ('failed' as const),
+		...(error ? { error } : {}),
 	};
 };

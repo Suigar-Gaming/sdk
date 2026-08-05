@@ -18,6 +18,8 @@ export function ExecutionStatusView({ payload }: { payload: unknown }) {
 				<DefinitionList
 					entries={[
 						['Network', result.network],
+						['Wallet', execution.wallet],
+						['Sender', execution.address],
 						['Status', execution.status],
 						['Transaction digest', execution.digest],
 						['Request ID', execution.requestId],

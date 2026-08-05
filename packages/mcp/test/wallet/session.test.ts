@@ -63,17 +63,18 @@ describe('session wallet setup', () => {
 		expect(response.ok).toBe(true);
 		const savedPage = await response.text();
 		expect(savedPage).toContain('Session wallet ready');
-		expect(savedPage).toContain('~/.suigar-mcp/session-wallets.json');
+		expect(savedPage).toContain('~/.suigar-mcp/session-wallet.json');
 		expect(savedPage).toContain('operating-system keychain');
-		const wallet = await session.loadSessionWallet('testnet');
+		const wallet = await session.loadSessionWallet();
 		expect(wallet).toEqual(
 			expect.objectContaining({
 				source: 'created',
 				address: expect.stringMatching(/^0x/u),
 			}),
 		);
-		expect((await session.loadSessionSigner('testnet')).toSuiAddress()).toBe(
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
 			wallet!.address,
 		);
+		expect([...keychainEntries.keys()]).toEqual(['suigar.mcp:session-wallet']);
 	});
 });

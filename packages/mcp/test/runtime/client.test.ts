@@ -1,8 +1,10 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
 import {
+	executeSessionTransaction,
 	getProviderUrl,
 	normalizeNetwork,
 	resolveDefaultCoinType,
@@ -105,5 +107,72 @@ describe('owner resolution', () => {
 				createResolverBundle(async () => null),
 			),
 		).rejects.toThrow(/did not resolve/u);
+	});
+});
+
+describe('session execution', () => {
+	it('signs and submits with the supplied session signer', async () => {
+		const signer = {
+			toSuiAddress: () => owner,
+		} as never;
+		const signAndExecuteTransaction = vi
+			.fn<(input: unknown) => Promise<unknown>>()
+			.mockResolvedValue({
+				$kind: 'Transaction',
+				Transaction: {
+					digest: 'session-digest',
+					status: { success: true, error: null },
+				},
+			});
+		const client = {
+			signAndExecuteTransaction,
+		};
+		const transaction = new Transaction();
+
+		await expect(
+			executeSessionTransaction({
+				transaction,
+				client: client as never,
+				signer,
+			}),
+		).resolves.toEqual({
+			address: owner,
+			digest: 'session-digest',
+			status: 'success',
+		});
+		expect(client.signAndExecuteTransaction).toHaveBeenCalledWith({
+			transaction,
+			signer,
+			include: { effects: true },
+		});
+	});
+
+	it('reports an on-chain failed session execution without an approval flow', async () => {
+		const signer = { toSuiAddress: () => owner } as never;
+		const signAndExecuteTransaction = vi
+			.fn<(input: unknown) => Promise<unknown>>()
+			.mockResolvedValue({
+				$kind: 'FailedTransaction',
+				FailedTransaction: {
+					digest: 'failed-digest',
+					status: { success: false, error: { message: 'Insufficient gas' } },
+				},
+			});
+		const client = {
+			signAndExecuteTransaction,
+		};
+
+		await expect(
+			executeSessionTransaction({
+				transaction: new Transaction(),
+				client: client as never,
+				signer,
+			}),
+		).resolves.toEqual({
+			address: owner,
+			digest: 'failed-digest',
+			status: 'failed',
+			error: 'Insufficient gas',
+		});
 	});
 });
