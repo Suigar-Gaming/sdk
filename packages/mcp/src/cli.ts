@@ -25,6 +25,8 @@ const JSON_OPTION = {
 };
 
 const TOOL_CATALOG = [
+	'setup_session_wallet',
+	'get_session_wallet',
 	'suigar_login',
 	'suigar_logout',
 	'get_connection_status',

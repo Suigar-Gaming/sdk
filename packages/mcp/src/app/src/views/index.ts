@@ -9,6 +9,7 @@ import { ExecutionStatusView } from './execution-status.js';
 import { GameMetadataView } from './game-metadata.js';
 import { NftView } from './nft.js';
 import { ReferralView } from './referral.js';
+import { SessionWalletView } from './session-wallet.js';
 import { TransactionView } from './transaction.js';
 import { WalletView } from './wallet.js';
 
@@ -25,6 +26,13 @@ export type ResolvedAppView = {
 
 export const resolveAppView = (payload: unknown): ResolvedAppView => {
 	const result = asRecord(payload);
+	if (result.sessionWallet) {
+		return {
+			coinBadge: null,
+			title: 'Session Wallet',
+			View: SessionWalletView,
+		};
+	}
 	const wallet = asRecord(result.wallet);
 	if (Array.isArray(wallet.balances) || Array.isArray(wallet.coins)) {
 		return { coinBadge: null, title: 'Wallet', View: WalletView };
