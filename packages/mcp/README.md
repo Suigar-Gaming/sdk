@@ -133,7 +133,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - The derived signing key is persisted in the operating-system keychain.
   - `get_session_wallet` returns the public address, formatted balances, a funding QR code, and—when a wallet is paired on the selected network—a prefilled funding URL.
   - `fund_session_wallet` requires a paired wallet and opens a prefilled mcp-website transfer form. The user chooses an owned coin and amount, then reviews and signs the transfer in their browser.
-  - In an App-capable host, it displays a dedicated Session Wallet view with balances, a funding QR code, and a paired-wallet funding link when available. Missing-wallet failures render as a tool error rather than a transaction inspector.
+  - In an App-capable host, it displays a dedicated Session Wallet view with balances for the selected network, a funding QR code, and a paired-wallet funding link when available. If no wallet exists, the same view provides the local setup link.
   - Fund only the amount the user is willing to delegate to the local MCP process.
   - For game tools, use `mode: "execute", executionWallet: "session"` to make the session wallet the sender and submit immediately. `owner` is optional in this mode; if supplied, it must match the session-wallet address. Ensure it is funded for both the wager and gas.
 - **Command-line wallet management**

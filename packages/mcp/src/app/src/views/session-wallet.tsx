@@ -17,6 +17,30 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 		: [];
 	const fundingUrl =
 		typeof funding.fundingUrl === 'string' ? funding.fundingUrl : null;
+	const setupUrl =
+		typeof sessionWallet.setupUrl === 'string' ? sessionWallet.setupUrl : null;
+
+	if (setupUrl) {
+		return (
+			<section className="grid grid-cols-1 gap-3.5">
+				<Panel title="Set up your session wallet">
+					<p className="text-xs font-semibold leading-5 text-muted-foreground">
+						{typeof sessionWallet.note === 'string'
+							? sessionWallet.note
+							: 'Create or recover the session wallet shared by mainnet and testnet.'}
+					</p>
+					<a
+						className="inline-flex min-h-10 w-max items-center justify-center rounded-md border border-primary/75 bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
+						href={setupUrl}
+						rel="noreferrer"
+						target="_blank"
+					>
+						Open local setup page
+					</a>
+				</Panel>
+			</section>
+		);
+	}
 
 	return (
 		<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
@@ -24,6 +48,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 				<DefinitionList
 					entries={[
 						['Networks', 'Mainnet and testnet'],
+						['Balance network', result.network],
 						['Address', sessionWallet.address],
 						['Status', sessionWallet.status],
 					]}

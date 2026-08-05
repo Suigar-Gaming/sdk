@@ -190,16 +190,35 @@ export const getSessionWalletTool = async (
 		loadSessionWallet(),
 		loadCredentials(),
 	]);
-	if (!wallet)
-		throw new Error(
-			'No session wallet exists. Call setup_session_wallet first.',
-		);
-	const result = await bundle.client.core.listBalances({
-		owner: wallet.address,
-	});
+	if (!wallet) {
+		const setup = await createSessionWalletSetup();
+		return asTextResponse({
+			network: bundle.config.network,
+			config: bundle.config,
+			sessionWallet: {
+				status: 'setup-required',
+				setupUrl: setup.setupUrl,
+				note: 'Create or recover the one session wallet shared by mainnet and testnet. Its recovery phrase is shown only on the local setup page.',
+			},
+		});
+	}
+
+	const balances = [];
+	let cursor: string | null = null;
+	let hasNextPage = false;
+	do {
+		const result = await bundle.client.core.listBalances({
+			owner: wallet.address,
+			cursor,
+		});
+		balances.push(...result.balances);
+		cursor = result.cursor;
+		hasNextPage = result.hasNextPage;
+	} while (hasNextPage && cursor);
+
 	const metadata = new Map(
 		await Promise.all(
-			result.balances.map(
+			balances.map(
 				async (balance) =>
 					[
 						balance.coinType,
@@ -230,7 +249,7 @@ export const getSessionWalletTool = async (
 		config: bundle.config,
 		sessionWallet: {
 			...wallet,
-			balances: result.balances.map((balance) => {
+			balances: balances.map((balance) => {
 				const coin = metadata.get(balance.coinType)!;
 				return {
 					...balance,
