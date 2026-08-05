@@ -24,6 +24,7 @@ const publicToolNames = [
 	'build_referral_level_up_usd_rewards_claim_transaction',
 	'build_soccer_transaction',
 	'build_wheel_transaction',
+	'fund_session_wallet',
 	'get_referral_commission',
 	'get_referral_level_up_usd_rewards',
 	'get_wallet_balances',
