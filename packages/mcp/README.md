@@ -130,7 +130,9 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
 - **Local session wallet**
   - `setup_session_wallet` opens a local, one-time setup page to create or recover one persistent session wallet shared by mainnet and testnet.
   - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
-  - The derived signing key is persisted in the operating-system keychain.
+  - The local setup page can also import a standard `suiprivkey...` export. It never passes through MCP or the session-wallet JSON file.
+  - The signing key is persisted in the operating-system keychain. Do not use a custom encrypted file: OS keychain protection is safer and avoids managing an application passphrase. For the smallest blast radius, create a dedicated, low-funded session wallet instead of importing a primary wallet.
+  - MCP keeps one active session wallet. Restarting MCP automatically uses that same keychain entry; importing or recovering another wallet requires explicit replacement confirmation. Keep the original recovery phrase/private-key backup to restore it later.
   - `get_session_wallet` returns the public address, formatted balances, a funding QR code, and—when a wallet is paired on the selected network—a prefilled funding URL.
   - `fund_session_wallet` requires a paired wallet and opens a prefilled mcp-website transfer form. The user chooses an owned coin and amount, then reviews and signs the transfer in their browser.
   - In an App-capable host, it displays a dedicated Session Wallet view with balances for the selected network, a funding QR code, and a paired-wallet funding link when available. If no wallet exists, the same view provides the local setup link.

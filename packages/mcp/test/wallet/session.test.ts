@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { rm } from 'node:fs/promises';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const testHome = vi.hoisted(
@@ -78,6 +79,101 @@ describe('session wallet setup', () => {
 		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
 			wallet!.address,
 		);
-		expect([...keychainEntries.keys()]).toEqual(['suigar.mcp:session-wallet']);
+		expect([...keychainEntries.keys()]).toEqual([
+			'com.suigar.mcp:session-wallet',
+		]);
+	});
+
+	it('imports a standard Sui private key through the local setup page', async () => {
+		const signer = Ed25519Keypair.generate();
+		const { setupUrl } = await session.createSessionWalletSetup();
+		const page = await (await fetch(setupUrl)).text();
+		const state = page.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
+
+		expect(page).toContain('Import a Sui private key');
+		expect(page).toContain('suiprivkey');
+
+		const response = await fetch(`${setupUrl}import-private-key`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				state: state!,
+				privateKey: signer.getSecretKey(),
+			}),
+		});
+
+		expect(response.ok).toBe(true);
+		expect(await session.loadSessionWallet()).toEqual(
+			expect.objectContaining({
+				address: signer.toSuiAddress(),
+				source: 'private-key',
+			}),
+		);
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
+			signer.toSuiAddress(),
+		);
+	});
+
+	it('requires explicit confirmation before replacing an existing session wallet', async () => {
+		const firstSigner = Ed25519Keypair.generate();
+		const secondSigner = Ed25519Keypair.generate();
+		const firstSetup = await session.createSessionWalletSetup();
+		const firstPage = await (await fetch(firstSetup.setupUrl)).text();
+		const firstState = firstPage.match(
+			/name="state" value="([0-9a-f]+)"/u,
+		)?.[1];
+		await fetch(`${firstSetup.setupUrl}import-private-key`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				state: firstState!,
+				privateKey: firstSigner.getSecretKey(),
+			}),
+		});
+
+		const replacementSetup = await session.createSessionWalletSetup();
+		const replacementPage = await (
+			await fetch(replacementSetup.setupUrl)
+		).text();
+		const replacementState = replacementPage.match(
+			/name="state" value="([0-9a-f]+)"/u,
+		)?.[1];
+		expect(replacementPage).toContain(firstSigner.toSuiAddress());
+		expect(replacementPage).toContain(
+			'replaces the current local session wallet',
+		);
+
+		const rejectedResponse = await fetch(
+			`${replacementSetup.setupUrl}import-private-key`,
+			{
+				method: 'POST',
+				headers: { 'content-type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams({
+					state: replacementState!,
+					privateKey: secondSigner.getSecretKey(),
+				}),
+			},
+		);
+		expect(rejectedResponse.status).toBe(400);
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
+			firstSigner.toSuiAddress(),
+		);
+
+		const replacementResponse = await fetch(
+			`${replacementSetup.setupUrl}import-private-key`,
+			{
+				method: 'POST',
+				headers: { 'content-type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams({
+					state: replacementState!,
+					privateKey: secondSigner.getSecretKey(),
+					replace: 'on',
+				}),
+			},
+		);
+		expect(replacementResponse.ok).toBe(true);
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
+			secondSigner.toSuiAddress(),
+		);
 	});
 });
