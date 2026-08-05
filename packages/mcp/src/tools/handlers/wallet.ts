@@ -170,14 +170,14 @@ export const setupSessionWalletTool = async (
 	input: SessionWalletInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const setup = await createSessionWalletSetup(config.network);
+	const setup = await createSessionWalletSetup();
 	return asTextResponse({
 		network: config.network,
 		config,
 		sessionWallet: {
 			status: 'setup-pending',
 			setupUrl: setup.setupUrl,
-			note: 'Open this local URL yourself. The recovery phrase is intentionally never returned through MCP.',
+			note: 'Open this local URL yourself to create or recover the one session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
 		},
 	});
 };
@@ -186,7 +186,10 @@ export const getSessionWalletTool = async (
 	input: SessionWalletInput,
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
-	const wallet = await loadSessionWallet();
+	const [wallet, credentials] = await Promise.all([
+		loadSessionWallet(),
+		loadCredentials(),
+	]);
 	if (!wallet)
 		throw new Error(
 			'No session wallet exists. Call setup_session_wallet first.',
@@ -194,20 +197,54 @@ export const getSessionWalletTool = async (
 	const result = await bundle.client.core.listBalances({
 		owner: wallet.address,
 	});
+	const metadata = new Map(
+		await Promise.all(
+			result.balances.map(
+				async (balance) =>
+					[
+						balance.coinType,
+						await resolveCoinDisplayMetadata(balance.coinType, bundle),
+					] as const,
+			),
+		),
+	);
 	const addressQrCodeDataUrl = await QRCode.toDataURL(wallet.address, {
 		errorCorrectionLevel: 'M',
 		margin: 1,
 	});
+	const pairedWallet = credentials.profiles[bundle.config.network];
+	const fundingUrl = pairedWallet
+		? (() => {
+				const url = new URL(
+					'/fund-session-wallet',
+					resolveWebOrigin(bundle.config.network),
+				);
+				url.searchParams.set('destination', wallet.address);
+				url.searchParams.set('owner', pairedWallet.address);
+				url.searchParams.set('network', bundle.config.network);
+				return url.toString();
+			})()
+		: undefined;
 	return asTextResponse({
 		network: bundle.config.network,
 		config: bundle.config,
 		sessionWallet: {
 			...wallet,
-			balances: result.balances,
+			balances: result.balances.map((balance) => {
+				const coin = metadata.get(balance.coinType)!;
+				return {
+					...balance,
+					balanceDisplay: formatBaseUnitAmount(balance.balance, coin.decimals),
+					symbol: coin.symbol,
+				};
+			}),
 			funding: {
 				address: wallet.address,
 				addressQrCodeDataUrl,
-				note: 'This QR code contains only the Sui address, making it suitable for wallet send flows. Approve the funding transfer in your wallet.',
+				fundingUrl,
+				note: fundingUrl
+					? 'Open the funding URL to select a coin and amount from the paired wallet, then approve the transfer in the browser.'
+					: `Pair a wallet on ${bundle.config.network} with suigar_login before opening the funding flow.`,
 			},
 		},
 	});

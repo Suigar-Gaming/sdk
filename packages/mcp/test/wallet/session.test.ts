@@ -40,7 +40,7 @@ afterEach(async () => {
 
 describe('session wallet setup', () => {
 	it('stores a newly created wallet in the OS keychain after local confirmation', async () => {
-		const { setupUrl } = await session.createSessionWalletSetup('testnet');
+		const { setupUrl } = await session.createSessionWalletSetup();
 		const page = await (await fetch(setupUrl)).text();
 		const state = page.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
 		const mnemonic = page.match(/name="mnemonic" value="([^"]+)"/u)?.[1];
@@ -48,6 +48,8 @@ describe('session wallet setup', () => {
 		expect(state).toMatch(/^[0-9a-f]{64}$/u);
 		expect(mnemonic?.split(' ')).toHaveLength(24);
 		expect(page).toContain('SUIGAR MCP');
+		expect(page).toContain('shared by Suigar mainnet and testnet');
+		expect(page).not.toContain('<span class="badge">testnet</span>');
 		expect(page).toContain('color-scheme:light dark');
 
 		const response = await fetch(`${setupUrl}save`, {
@@ -63,6 +65,7 @@ describe('session wallet setup', () => {
 		expect(response.ok).toBe(true);
 		const savedPage = await response.text();
 		expect(savedPage).toContain('Session wallet ready');
+		expect(savedPage).toContain('both Suigar mainnet and testnet');
 		expect(savedPage).toContain('~/.suigar-mcp/session-wallet.json');
 		expect(savedPage).toContain('operating-system keychain');
 		const wallet = await session.loadSessionWallet();

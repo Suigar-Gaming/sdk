@@ -107,6 +107,14 @@ describe('MCP server registration', () => {
 			expect(readGameMetadataTool?._meta).toMatchObject({
 				ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI },
 			});
+			const getSessionWalletTool = result.tools.find(
+				(tool) => tool.name === 'get_session_wallet',
+			);
+			expect(getSessionWalletTool).toMatchObject({
+				title: 'Get Session Wallet',
+				execution: { taskSupport: 'forbidden' },
+				_meta: { ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI } },
+			});
 			const listNftsTool = result.tools.find(
 				(tool) => tool.name === 'list_nfts',
 			);

@@ -11,7 +11,6 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Entry } from '@napi-rs/keyring';
 import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
-import type { SuigarNetwork } from '@suigar/sdk';
 import {
 	ensureSuigarMcpDataDirectory,
 	suigarMcpDataDirectory,
@@ -88,30 +87,22 @@ const layout = ({
 const escapeHtml = (value: string) =>
 	value.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
 
-const page = ({
-	network,
-	state,
-	mnemonic,
-}: {
-	network: SuigarNetwork;
-	state: string;
-	mnemonic: string;
-}) =>
+const page = ({ state, mnemonic }: { state: string; mnemonic: string }) =>
 	layout({
 		title: 'Suigar session wallet',
-		children: `<p class="eyebrow">SUIGAR MCP</p><h1 class="heading">Session wallet <span class="badge">${network}</span></h1>
+		children: `<p class="eyebrow">SUIGAR MCP</p><h1 class="heading">Session wallet</h1>
 <p class="notice">Keep this recovery phrase private. Do not paste it into an AI chat, MCP tool, or website.</p>
-<p class="lead">Save the phrase offline, then confirm it. You can later import it into a compatible Sui wallet to recover the session-wallet funds.</p>
+<p class="lead">This is one session wallet shared by Suigar mainnet and testnet. Save the phrase offline, then confirm it. You can later import it into a compatible Sui wallet to recover the session-wallet funds.</p>
 <code class="recovery">${mnemonic}</code>
 <form method="post" action="/save"><input type="hidden" name="state" value="${state}"><input type="hidden" name="mnemonic" value="${mnemonic}"><label class="confirmation"><input required type="checkbox" name="confirmed"> <span>I saved this recovery phrase somewhere private.</span></label><div class="actions"><button>Create session wallet</button></div></form>
 <hr><h2>Recover an existing session wallet</h2><p class="lead">Use a recovery phrase you already saved. It stays on this local page.</p><form method="post" action="/recover"><input type="hidden" name="state" value="${state}"><textarea required name="mnemonic" placeholder="Enter the recovery phrase locally" aria-label="Recovery phrase"></textarea><div class="actions"><button class="secondary">Recover session wallet</button></div></form>`,
 	});
 
-const success = (wallet: SessionWallet, network: SuigarNetwork) =>
+const success = (wallet: SessionWallet) =>
 	layout({
 		title: 'Session wallet ready',
-		children: `<p class="eyebrow">SUIGAR MCP</p><div class="success" aria-hidden="true">✓</div><h1 class="heading">Session wallet ready <span class="badge">${network}</span></h1>
-<p class="lead">Your ${wallet.source === 'created' ? 'new' : 'recovered'} session wallet is ready to use.</p>
+		children: `<p class="eyebrow">SUIGAR MCP</p><div class="success" aria-hidden="true">✓</div><h1 class="heading">Session wallet ready</h1>
+<p class="lead">Your ${wallet.source === 'created' ? 'new' : 'recovered'} session wallet is ready to use for both Suigar mainnet and testnet.</p>
 <div class="details"><p>Address</p><code class="recovery">${wallet.address}</code><p>Session wallet details saved to <code class="inline">${displayFile}</code>.</p><p>The signing key is stored in your operating-system keychain, not in that file.</p></div>
 <p class="lead">You may close this window and return to your MCP client.</p>`,
 	});
@@ -134,7 +125,7 @@ const readForm = (request: IncomingMessage) =>
 		request.on('error', reject);
 	});
 
-export const createSessionWalletSetup = async (network: SuigarNetwork) => {
+export const createSessionWalletSetup = async () => {
 	const state = randomBytes(32).toString('hex');
 	const mnemonic = generateMnemonic(wordlist, 256);
 	const server = createServer(async (request, response) => {
@@ -144,7 +135,7 @@ export const createSessionWalletSetup = async (network: SuigarNetwork) => {
 				'content-type': 'text/html; charset=utf-8',
 				'cache-control': 'no-store',
 			});
-			response.end(page({ network, state, mnemonic }));
+			response.end(page({ state, mnemonic }));
 			return;
 		}
 		if (
@@ -170,7 +161,7 @@ export const createSessionWalletSetup = async (network: SuigarNetwork) => {
 				'content-type': 'text/html; charset=utf-8',
 				'cache-control': 'no-store',
 			});
-			response.end(success(wallet, network));
+			response.end(success(wallet));
 			setTimeout(() => server.close(), 500).unref();
 		} catch (error) {
 			response.writeHead(400, {

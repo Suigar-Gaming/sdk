@@ -12,17 +12,52 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 		typeof funding.addressQrCodeDataUrl === 'string'
 			? funding.addressQrCodeDataUrl
 			: null;
+	const balances = Array.isArray(sessionWallet.balances)
+		? sessionWallet.balances
+		: [];
+	const fundingUrl =
+		typeof funding.fundingUrl === 'string' ? funding.fundingUrl : null;
 
 	return (
 		<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
 			<Panel title="Session wallet">
 				<DefinitionList
 					entries={[
-						['Network', result.network],
+						['Networks', 'Mainnet and testnet'],
 						['Address', sessionWallet.address],
 						['Status', sessionWallet.status],
 					]}
 				/>
+			</Panel>
+			<Panel title="Balances">
+				{balances.length === 0 ? (
+					<p className="text-xs font-semibold text-muted-foreground">
+						No balances found for this wallet.
+					</p>
+				) : (
+					<dl className="grid gap-2">
+						{balances.map((item) => {
+							const balance = asRecord(item);
+							return (
+								<div
+									className="flex justify-between gap-3 text-xs"
+									key={String(balance.coinType)}
+								>
+									<dt
+										className="truncate font-mono text-muted-foreground"
+										title={String(balance.coinType)}
+									>
+										{String(balance.symbol ?? balance.coinType)}
+									</dt>
+									<dd className="shrink-0 font-mono font-bold">
+										{String(balance.balanceDisplay ?? balance.balance)}{' '}
+										{typeof balance.symbol === 'string' ? balance.symbol : ''}
+									</dd>
+								</div>
+							);
+						})}
+					</dl>
+				)}
 			</Panel>
 			<Panel title="Fund this wallet">
 				{qrCode ? (
@@ -39,6 +74,16 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 								? funding.note
 								: 'Scan this code in a Sui wallet to fund the session wallet.'}
 						</p>
+						{fundingUrl ? (
+							<a
+								className="inline-flex min-h-10 items-center justify-center rounded-md border border-primary/75 bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
+								href={fundingUrl}
+								rel="noreferrer"
+								target="_blank"
+							>
+								Fund from paired wallet
+							</a>
+						) : null}
 					</div>
 				) : (
 					<p className="text-xs font-semibold text-muted-foreground">
