@@ -27,6 +27,7 @@ import {
 	coinflipInputSchema,
 	configIdInputSchema,
 	connectionInputSchema,
+	fundSessionWalletTool,
 	getConnectionStatusTool,
 	getExecutionStatusInputSchema,
 	getExecutionStatusTool,
@@ -129,6 +130,16 @@ const toolDefinitions = [
 		inputSchema: sessionWalletInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: setupSessionWalletTool,
+		isAppTool: false,
+	},
+	{
+		name: 'fund_session_wallet',
+		title: 'Fund Session Wallet',
+		description:
+			'Open a prefilled browser transfer form to fund the local session wallet from the paired wallet.',
+		inputSchema: sessionWalletInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: fundSessionWalletTool,
 		isAppTool: false,
 	},
 	{

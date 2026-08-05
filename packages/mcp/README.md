@@ -94,6 +94,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 
 - `setup_session_wallet`
 - `get_session_wallet`
+- `fund_session_wallet`
 - `suigar_login`
 - `suigar_logout`
 - `get_connection_status`
@@ -131,6 +132,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
   - The derived signing key is persisted in the operating-system keychain.
   - `get_session_wallet` returns the public address, balances, and a funding QR code.
+  - `fund_session_wallet` requires a paired wallet and opens a prefilled mcp-website transfer form. The user chooses an owned coin and amount, then reviews and signs the transfer in their browser.
   - In an App-capable host, it displays that QR code in a dedicated Session Wallet view.
   - Fund only the amount the user is willing to delegate to the local MCP process.
   - For game tools, use `mode: "execute", executionWallet: "session"` to make the session wallet the sender and submit immediately. `owner` is optional in this mode; if supplied, it must match the session-wallet address. Ensure it is funded for both the wager and gas.

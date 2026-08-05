@@ -212,3 +212,42 @@ export const getSessionWalletTool = async (
 		},
 	});
 };
+
+export const fundSessionWalletTool = async (
+	input: SessionWalletInput,
+): Promise<ToolTextResult> => {
+	const { config } = createSuigarClient(getConfigInput(input));
+	const [credentials, sessionWallet] = await Promise.all([
+		loadCredentials(),
+		loadSessionWallet(),
+	]);
+	const profile = credentials.profiles[config.network];
+	if (!profile) {
+		throw new Error(
+			'No wallet is connected for this network. Call suigar_login first.',
+		);
+	}
+	if (!sessionWallet) {
+		throw new Error(
+			'No session wallet exists. Call setup_session_wallet first.',
+		);
+	}
+
+	const fundingUrl = new URL(
+		'/fund-session-wallet',
+		resolveWebOrigin(config.network),
+	);
+	fundingUrl.searchParams.set('destination', sessionWallet.address);
+	fundingUrl.searchParams.set('owner', profile.address);
+	fundingUrl.searchParams.set('network', config.network);
+
+	return asTextResponse({
+		network: config.network,
+		config,
+		sessionWallet: {
+			address: sessionWallet.address,
+			fundingUrl: fundingUrl.toString(),
+			note: 'Open this URL to select a coin and amount from the connected wallet. The transfer is reviewed and signed in the browser.',
+		},
+	});
+};

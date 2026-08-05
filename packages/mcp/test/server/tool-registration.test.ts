@@ -25,6 +25,7 @@ const registeredToolNames = [
 	'list_wallet_coins',
 	'get_execution_status',
 	'get_session_wallet',
+	'fund_session_wallet',
 	'get_connection_status',
 	'suigar_login',
 	'suigar_logout',
@@ -78,6 +79,7 @@ const appToolNames = [
 
 const nonAppToolNames = [
 	'setup_session_wallet',
+	'fund_session_wallet',
 	'suigar_login',
 	'suigar_logout',
 	'get_connection_status',
