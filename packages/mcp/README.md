@@ -13,7 +13,7 @@ It provides:
 - a compact MCP App UI resource for compatible hosts
 - text and structured-content fallbacks for normal MCP clients
 
-Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
+Transactions remain unsigned by default. `mode: "execute"` uses the paired Suigar browser wallet and opens an explicit approval request unless `executionWallet: "session"` is selected. Session execution signs and submits directly from the local session-wallet key held in the operating-system keychain; it returns the final transaction digest without an approval URL. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
 
 ## Install
 
@@ -90,17 +90,14 @@ node packages/mcp/dist/bin.mjs
 
 This builds the local workspace dependencies, MCP server, and bundled MCP App. Run the generated stdio entrypoint from the repository root for manual client testing.
 
-## Wallet connection
-
-- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
-- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
-- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
-- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
-- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
-- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
-
 ## Tools
 
+- `setup_session_wallet`
+- `get_session_wallet`
+- `fund_session_wallet`
+- `suigar_login`
+- `suigar_logout`
+- `get_connection_status`
 - `read_config`
 - `read_game_metadata`
 - `list_nfts`
@@ -124,9 +121,37 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 
 All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, referral rewards, or transaction inspection.
 
+### Wallet tools
+
+- **Paired browser wallet**
+  - `suigar_login`, `suigar_logout`, and `get_connection_status` manage the paired browser wallet.
+  - `get_wallet_balances` and `list_wallet_coins` read aggregate balances or paginated coin objects. Both also accept an explicit address.
+  - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
+- **Local session wallet**
+  - `setup_session_wallet` opens a local, one-time setup page to create or recover one persistent session wallet shared by mainnet and testnet.
+  - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
+  - The local setup page can also import a standard `suiprivkey...` export. It never passes through MCP or the session-wallet JSON file.
+  - The signing key is persisted in the operating-system keychain. Do not use a custom encrypted file: OS keychain protection is safer and avoids managing an application passphrase. For the smallest blast radius, create a dedicated, low-funded session wallet instead of importing a primary wallet.
+  - MCP keeps one active session wallet. Restarting MCP automatically uses that same keychain entry; importing or recovering another wallet requires explicit replacement confirmation. Keep the original recovery phrase/private-key backup to restore it later.
+  - `get_session_wallet` returns the public address, formatted balances, a funding QR code, and—when a wallet is paired on the selected network—a prefilled funding URL.
+  - `fund_session_wallet` requires a paired wallet and opens a prefilled mcp-website transfer form. The user chooses an owned coin and amount, then reviews and signs the transfer in their browser.
+  - In an App-capable host, it displays a dedicated Session Wallet view with balances for the selected network, a funding QR code, and a paired-wallet funding link when available. If no wallet exists, the same view provides the local setup link.
+  - Fund only the amount the user is willing to delegate to the local MCP process.
+  - For game tools, use `mode: "execute", executionWallet: "session"` to make the session wallet the sender and submit immediately. `owner` is optional in this mode; if supplied, it must match the session-wallet address. Ensure it is funded for both the wager and gas.
+- **Command-line wallet management**
+  - Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`), `status`, `logout`, or `clean`.
+  - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
+  - `status` inspects the current connection; `logout --all` disconnects every stored network; and `clean` removes the local credential file without opening a browser.
+  - Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+  - Run `npx -y @suigar/mcp tools` to print the network-independent tool catalog.
+
 ### Read tools
 
-`read_config`, `read_game_metadata`, `list_nfts`, and the referral amount reads are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name. Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated. `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
+- `read_config`, `read_game_metadata`, `list_nfts`, wallet balance/coin reads, execution status, and the referral amount reads are read-only.
+- SDK-backed reads accept shared network, provider, SDK config, and partner inputs.
+- `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name.
+- Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated.
+- `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
 
 In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text. Referral reads render a dedicated Referral Rewards view with the referrer, reward type, coin type, and simulated claimable amount.
 
@@ -137,6 +162,7 @@ All transaction tools accept the shared config inputs and support these `mode` v
 - `read-only`: resolves SDK config and returns the intended Move target, type arguments, required inputs, and notes.
 - `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed dry-runs include an `errors` array extracted from the failed transaction status.
+- `execute`: by default opens a paired-wallet approval request. Set `executionWallet: "session"` for game tools to have MCP sign and execute immediately with the local session wallet instead.
 
 Dry-run summaries include:
 
@@ -147,7 +173,7 @@ Dry-run summaries include:
 
 ### Shared transaction inputs
 
-For `build` and `dry-run`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. `read-only` can be used to inspect a tool's requirements before providing an owner.
+For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. In session execution (`mode: "execute", executionWallet: "session"`), MCP uses the local session-wallet address and no owner is required. `read-only` can be used to inspect a tool's requirements before providing an owner.
 
 `coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
 

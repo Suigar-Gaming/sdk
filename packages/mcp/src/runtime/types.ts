@@ -27,6 +27,7 @@ export type JsonValue =
 export type DryRunResult = Record<string, JsonValue>;
 
 export type BuilderMode = 'build' | 'dry-run' | 'read-only' | 'execute';
+export type ExecutionWallet = 'connected' | 'session';
 
 export type SuigarMcpConfigInput = {
 	network?: SuigarNetwork;
@@ -248,7 +249,15 @@ export type ExecutionRequestResult = {
 	network: SuigarNetwork;
 	config: ResolvedMcpConfig;
 	summary: TransactionSummary;
-	execution: { requestId: string; approvalUrl: string; status: 'pending' };
+	execution:
+		| { requestId: string; approvalUrl: string; status: 'pending' }
+		| {
+				wallet: 'session';
+				address: string;
+				status: 'success' | 'failed';
+				digest: string;
+				error?: string;
+		  };
 };
 
 export type ExecutionStatusResult = {
@@ -274,6 +283,12 @@ export type ConnectionResult = {
 	};
 };
 
+export type SessionWalletResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	sessionWallet: Record<string, unknown>;
+};
+
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
@@ -286,7 +301,8 @@ export type ToolStructuredResult =
 	| WalletReadResult
 	| ExecutionRequestResult
 	| ExecutionStatusResult
-	| ConnectionResult;
+	| ConnectionResult
+	| SessionWalletResult;
 
 export type ToolTextResult = {
 	content: [{ type: 'text'; text: string }];

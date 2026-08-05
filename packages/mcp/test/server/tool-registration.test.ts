@@ -24,9 +24,12 @@ const registeredToolNames = [
 	'get_wallet_balances',
 	'list_wallet_coins',
 	'get_execution_status',
+	'get_session_wallet',
+	'fund_session_wallet',
 	'get_connection_status',
 	'suigar_login',
 	'suigar_logout',
+	'setup_session_wallet',
 	'get_referral_commission',
 	'get_referral_level_up_usd_rewards',
 	'build_referral_commission_claim_transaction',
@@ -50,6 +53,38 @@ const transactionToolAnnotations = {
 	openWorldHint: true,
 };
 
+const appToolNames = [
+	'get_session_wallet',
+	'get_execution_status',
+	'get_wallet_balances',
+	'list_wallet_coins',
+	'read_config',
+	'read_game_metadata',
+	'list_nfts',
+	'get_referral_commission',
+	'get_referral_level_up_usd_rewards',
+	'build_referral_commission_claim_transaction',
+	'build_referral_level_up_usd_rewards_claim_transaction',
+	'build_nft_v1_mint_transaction',
+	'build_coinflip_transaction',
+	'build_limbo_transaction',
+	'build_plinko_transaction',
+	'build_pvp_coinflip_cancel_transaction',
+	'build_pvp_coinflip_create_transaction',
+	'build_pvp_coinflip_join_transaction',
+	'build_range_transaction',
+	'build_soccer_transaction',
+	'build_wheel_transaction',
+];
+
+const nonAppToolNames = [
+	'setup_session_wallet',
+	'fund_session_wallet',
+	'suigar_login',
+	'suigar_logout',
+	'get_connection_status',
+];
+
 describe('MCP tool registration', () => {
 	it('registers all Suigar tools with shared definitions', () => {
 		const server = new McpServer({ name: 'suigar-test', version: '0.0.0' });
@@ -72,6 +107,9 @@ describe('MCP tool registration', () => {
 		)._registeredTools;
 
 		expect(Object.keys(registeredTools).sort()).toEqual(
+			registeredToolNames.sort(),
+		);
+		expect([...appToolNames, ...nonAppToolNames].sort()).toEqual(
 			registeredToolNames.sort(),
 		);
 		expect(registeredTools.read_config).toMatchObject({
@@ -106,6 +144,12 @@ describe('MCP tool registration', () => {
 				_meta: appToolMeta,
 			},
 		);
+		for (const name of appToolNames) {
+			expect(registeredTools[name]?._meta).toMatchObject(appToolMeta);
+		}
+		for (const name of nonAppToolNames) {
+			expect(registeredTools[name]?._meta).toBeUndefined();
+		}
 
 		for (const tool of Object.values(registeredTools)) {
 			expect(tool.inputSchema).toBeDefined();
@@ -132,5 +176,11 @@ describe('MCP tool registration', () => {
 		expect(result.content[0]?.text).toContain(
 			'Check required fields, network, coin type, and SDK config overrides.',
 		);
+		expect(result.structuredContent).toEqual({
+			errors: [
+				'TypeError: bad input',
+				'Check required fields, network, coin type, and SDK config overrides.',
+			],
+		});
 	});
 });

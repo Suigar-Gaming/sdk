@@ -11,6 +11,7 @@ import {
 import {
 	buildTransactionResult,
 	createSuigarClient,
+	executeSessionTransaction,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	type ReadOnlyPlan,
@@ -24,7 +25,12 @@ import {
 	toBaseUnits,
 	toCurrencyAmountText,
 } from '../../utils/index.js';
-import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
+import {
+	createExecutionBridge,
+	loadSessionSigner,
+	loadSessionWallet,
+	resolveWebOrigin,
+} from '../../wallet/index.js';
 import type {
 	CoinflipInput,
 	ConfigIdInput,
@@ -392,11 +398,39 @@ const gameTransactionOptions = async (
 	input: TransactionToolInput,
 	bundle: SuigarClientBundle,
 ) => {
-	return {
-		owner: await resolveOwnerAddress(
+	const sessionExecution =
+		getMode(input.mode) === 'execute' && input.executionWallet === 'session';
+	let owner: string;
+	if (sessionExecution) {
+		const sessionWallet = await loadSessionWallet();
+		if (!sessionWallet) {
+			throw new Error(
+				'No session wallet exists. Call setup_session_wallet first, then fund its address before executing games.',
+			);
+		}
+		const sessionAddress = (await loadSessionSigner()).toSuiAddress();
+		if (sessionWallet.address !== sessionAddress) {
+			throw new Error(
+				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with setup_session_wallet before executing games.',
+			);
+		}
+		if (input.owner) {
+			const requestedOwner = await resolveOwnerAddress(input.owner, bundle);
+			if (requestedOwner !== sessionAddress) {
+				throw new RangeError(
+					'owner must match the local session wallet address when executionWallet is "session".',
+				);
+			}
+		}
+		owner = sessionAddress;
+	} else {
+		owner = await resolveOwnerAddress(
 			requireString(input.owner, 'owner'),
 			bundle,
-		),
+		);
+	}
+	return {
+		owner,
 		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
 		metadata: input.metadata,
 		gasBudget: input.gasBudget,
@@ -493,21 +527,43 @@ export const buildTransactionTool = async ({
 			? undefined
 			: toBaseUnits(stakeDisplay, 'stake', coin.decimals));
 	const transaction = await createTransaction(bundle);
+	const context = {
+		game,
+		action,
+		coinType: coin.coinType,
+		stake: baseStake,
+		stakeDisplay,
+		coinDecimals: coin.decimals,
+		gameInputs,
+	};
 	if (mode === 'execute') {
+		if (input.executionWallet === 'session') {
+			const built = await buildTransactionResult({
+				mode: 'build',
+				transaction,
+				config: bundle.config,
+				client: bundle.client,
+				context,
+			});
+			const execution = await executeSessionTransaction({
+				transaction,
+				client: bundle.client,
+				signer: await loadSessionSigner(),
+			});
+			return asTextResponse({
+				mode: 'execute',
+				network: bundle.config.network,
+				config: bundle.config,
+				summary: built.summary,
+				execution: { wallet: 'session', ...execution },
+			});
+		}
 		const built = await buildTransactionResult({
 			mode: 'build',
 			transaction,
 			config: bundle.config,
 			client: bundle.client,
-			context: {
-				game,
-				action,
-				coinType: coin.coinType,
-				stake: baseStake,
-				stakeDisplay,
-				coinDecimals: coin.decimals,
-				gameInputs,
-			},
+			context,
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
@@ -529,15 +585,7 @@ export const buildTransactionTool = async ({
 			transaction,
 			config: bundle.config,
 			client: bundle.client,
-			context: {
-				game,
-				action,
-				coinType: coin.coinType,
-				stake: baseStake,
-				stakeDisplay,
-				coinDecimals: coin.decimals,
-				gameInputs,
-			},
+			context,
 		}),
 	);
 };

@@ -221,22 +221,22 @@ This is a core invariant: standard game transactions must fail clearly when the 
 - **`minor`**: New public methods, new supported fields, or additive public type changes
 - **`major`**: Breaking API changes, changed behavior contracts, or removed support
 - Changeset notes must describe only package behavior for the packages listed in the changeset frontmatter. Do not mention root-only, workspace-only, playground-only, or tooling-only changes unless they directly affect that package's published behavior.
-- Do not edit changeset files inherited from `main` or previous work. When a branch needs a release note, create or update only the changeset created for the current branch.
+- Do not edit changeset files inherited from `main` or previous work. When a branch needs a release note, update the changeset already committed on the current branch; create one only if the branch has none.
 
 ### Development Workflow
 
-1. Update or add SDK code in `packages/sdk/src/`
-2. If the branch modifies any file under `packages/sdk/src/`, create a `.changeset/*.md` file once for that branch as soon as the first SDK source change is made
-3. Reuse only that branch-created changeset for later `packages/sdk/src/` edits instead of creating a new changeset for every additional modification, unless the user explicitly wants multiple distinct release notes
-4. Regenerate code with `pnpm --dir packages/sdk run codegen` if contract bindings or package sources changed
-5. Run `pnpm --dir packages/sdk run test`
-6. Run `pnpm --dir packages/sdk run typecheck`
-7. Add or update the current branch changeset when the user-visible package behavior changes, keeping the note scoped to `@suigar/sdk` package changes only
+1. Update or add code in the relevant package under `packages/*/src/`
+2. If the branch modifies source files under any publishable package, update the `.changeset/*.md` file already committed on that branch; create one only when no branch changeset exists
+3. Reuse that committed branch changeset for later publishable-package source edits instead of creating a new changeset, unless the user explicitly wants multiple distinct release notes
+4. When SDK contract bindings or generated SDK sources change, regenerate them with `pnpm --dir packages/sdk run codegen`; otherwise run any generation required by each changed package
+5. Run tests for every changed package, for example `pnpm --dir packages/sdk run test` or `pnpm --dir packages/mcp run test`
+6. Run type checking for every changed package, for example `pnpm --dir packages/sdk run typecheck` or `pnpm --dir packages/mcp run typecheck`
+7. Add or update the current branch changeset when user-visible package behavior changes, keeping each note scoped to the package or packages listed in its frontmatter
 
 Documentation is part of the deliverable:
 
-- When SDK behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
-- At minimum, review root `README.md`, `packages/sdk/README.md`, `AGENTS.md`, the relevant Suigar skills in `Suigar-Gaming/agent-skills`, and any other user-facing markdown that describes the changed behavior.
+- When publishable-package behavior, public types, generated bindings, examples, or integration guidance change, update the relevant documentation in the same task without waiting for an extra prompt.
+- At minimum, review root `README.md`, the changed package's README where present, `AGENTS.md`, the relevant Suigar skills in `Suigar-Gaming/agent-skills`, and any other user-facing markdown that describes the changed behavior.
 - Treat skill updates as automatic follow-up work when their guidance overlaps the changed SDK behavior; do not wait for the user to ask explicitly.
 - If constants, helper locations, or public utility exports move, update docs and examples to use the public import path instead of internal file paths or copied values.
 - If generated bindings or public runtime ergonomics change, make sure examples and event-decoding guidance stay aligned with the current generated API.
@@ -285,8 +285,8 @@ Claude Code compatibility:
 When creating a PR:
 
 - Summarize the SDK or transaction behavior change clearly
-- If the branch modifies anything under `packages/sdk/src/`, make sure the branch includes a `.changeset/*.md` file; create one on the first SDK source change, then keep reusing that same branch changeset instead of creating multiple changesets for repeated SDK source edits unless multiple release notes are intentionally needed
-- PRs that change `packages/sdk/src/` without a changeset are expected to fail merge checks and receive a PR comment
+- If the branch modifies source files under any publishable package, make sure the branch includes a `.changeset/*.md` file; update the changeset already committed on the branch, creating one only if none exists, unless multiple release notes are intentionally needed
+- PRs that change publishable-package source files without a changeset are expected to fail merge checks and receive a PR comment
 - Mention whether generated bindings changed
 - Include tests run
 - If the PR was primarily written by AI, mark that in the PR description

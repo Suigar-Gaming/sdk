@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { readFileSync } from 'node:fs';
-import { chmod, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { homedir } from 'node:os';
+import { chmod, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { isValidSuiAddress } from '@mysten/sui/utils';
 import type { SuigarNetwork } from '@suigar/sdk';
+import {
+	ensureSuigarMcpDataDirectory,
+	suigarMcpDataDirectory,
+} from './storage.js';
 
 export type WalletType = 'wallet' | 'zklogin';
 
@@ -23,8 +26,7 @@ export type Credentials = {
 	profiles: Partial<Record<SuigarNetwork, WalletProfile>>;
 };
 
-const directory = join(homedir(), '.suigar-mcp');
-const file = join(directory, 'credentials.json');
+const file = join(suigarMcpDataDirectory, 'credentials.json');
 const empty = (): Credentials => ({
 	version: 1,
 	defaultNetwork: 'testnet',
@@ -93,8 +95,7 @@ export async function loadCredentials(): Promise<Credentials> {
 }
 
 export async function saveCredentials(credentials: Credentials) {
-	await mkdir(directory, { recursive: true, mode: 0o700 });
-	await chmod(directory, 0o700);
+	await ensureSuigarMcpDataDirectory();
 	await writeFile(file, `${JSON.stringify(credentials, null, 2)}\n`, {
 		mode: 0o600,
 	});

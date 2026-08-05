@@ -32,6 +32,7 @@ export const toolOutputSchema = z.looseObject({
 	referral: unknownJsonSchema.optional(),
 	wallet: unknownJsonSchema.optional(),
 	connection: unknownJsonSchema.optional(),
+	sessionWallet: unknownJsonSchema.optional(),
 	execution: unknownJsonSchema.optional(),
 	errors: z.array(z.string()).optional(),
 });

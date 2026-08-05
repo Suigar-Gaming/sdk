@@ -86,6 +86,18 @@ describe('build input schemas', () => {
 		);
 	});
 
+	it('defaults to connected execution and accepts direct session execution', () => {
+		expect(coinflipInputSchema.parse({}).executionWallet).toBe('connected');
+		expect(
+			coinflipInputSchema.parse({
+				mode: 'execute',
+				executionWallet: 'session',
+				stake: 1,
+				side: 'heads',
+			}),
+		).toMatchObject({ mode: 'execute', executionWallet: 'session' });
+	});
+
 	it('keeps PvP join game id optional for read-only planning', () => {
 		expect(pvpCoinflipJoinInputSchema.parse({ mode: 'read-only' }).mode).toBe(
 			'read-only',

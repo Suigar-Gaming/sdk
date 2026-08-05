@@ -18,7 +18,6 @@ import {
 	RawPayload,
 } from './components/inspector-components.js';
 import { asRecord } from './lib/format.js';
-import { payloadFromToolResult } from './lib/tool-result.js';
 import type { InspectorState } from './lib/types.js';
 import { resolveAppView } from './views/index.js';
 
@@ -149,12 +148,10 @@ export function SuigarInspectorApp() {
 		}
 		connectStarted.current = true;
 
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.ontoolinput = () => {
+		app.addEventListener('toolinput', () => {
 			dispatch({ type: 'tool-input' });
-		};
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.ontoolresult = (result) => {
+		});
+		app.addEventListener('toolresult', (result) => {
 			if (result.isError) {
 				const errors = textErrors(result);
 				dispatch({
@@ -165,7 +162,7 @@ export function SuigarInspectorApp() {
 				return;
 			}
 
-			const payload = payloadFromToolResult(result);
+			const payload = result.structuredContent ?? {};
 			const record =
 				payload && typeof payload === 'object'
 					? (payload as Record<string, unknown>)
@@ -181,12 +178,11 @@ export function SuigarInspectorApp() {
 							: 'read',
 				payload,
 			});
-		};
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.onhostcontextchanged = ({ context }) => {
+		});
+		app.addEventListener('hostcontextchanged', ({ context }) => {
 			dispatch({ type: 'host-context', context });
 			applyHostContext(context);
-		};
+		});
 
 		app
 			.connect()

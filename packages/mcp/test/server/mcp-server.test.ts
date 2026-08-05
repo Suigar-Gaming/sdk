@@ -24,14 +24,17 @@ const publicToolNames = [
 	'build_referral_level_up_usd_rewards_claim_transaction',
 	'build_soccer_transaction',
 	'build_wheel_transaction',
+	'fund_session_wallet',
 	'get_referral_commission',
 	'get_referral_level_up_usd_rewards',
 	'get_wallet_balances',
 	'list_wallet_coins',
 	'get_execution_status',
+	'get_session_wallet',
 	'get_connection_status',
 	'suigar_login',
 	'suigar_logout',
+	'setup_session_wallet',
 	'read_config',
 	'read_game_metadata',
 	'list_nfts',
@@ -103,6 +106,14 @@ describe('MCP server registration', () => {
 			});
 			expect(readGameMetadataTool?._meta).toMatchObject({
 				ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI },
+			});
+			const getSessionWalletTool = result.tools.find(
+				(tool) => tool.name === 'get_session_wallet',
+			);
+			expect(getSessionWalletTool).toMatchObject({
+				title: 'Get Session Wallet',
+				execution: { taskSupport: 'forbidden' },
+				_meta: { ui: { resourceUri: SUIGAR_MCP_APP_RESOURCE_URI } },
 			});
 			const listNftsTool = result.tools.find(
 				(tool) => tool.name === 'list_nfts',

@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { createInspectorViewModel } from '../../src/app/src/lib/inspector.js';
+import { resolveAppView } from '../../src/app/src/views/index.js';
 
 describe('createInspectorViewModel', () => {
 	it('derives transaction, event, and display data from a transaction result', () => {
@@ -54,5 +55,39 @@ describe('createInspectorViewModel', () => {
 		]);
 
 		expect(view.errors).toEqual(['RangeError: unsupported coin']);
+	});
+});
+
+describe('execution views', () => {
+	it('uses the session-wallet view when a session wallet result is available', () => {
+		expect(
+			resolveAppView({
+				sessionWallet: {
+					address: '0x1',
+					balances: [
+						{
+							coinType: '0x2::sui::SUI',
+							balanceDisplay: '1',
+							symbol: 'SUI',
+						},
+					],
+					funding: { fundingUrl: 'https://example.test/fund' },
+				},
+			}),
+		).toMatchObject({ title: 'Session Wallet' });
+	});
+
+	it('uses the status view for direct session-wallet execution', () => {
+		expect(
+			resolveAppView({
+				summary: { game: 'coinflip' },
+				execution: {
+					wallet: 'session',
+					address: '0x1',
+					status: 'success',
+					digest: 'digest',
+				},
+			}),
+		).toMatchObject({ title: 'Transaction Status' });
 	});
 });
