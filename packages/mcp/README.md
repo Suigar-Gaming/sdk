@@ -92,6 +92,11 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 
 ## Tools
 
+- `setup_session_wallet`
+- `get_session_wallet`
+- `suigar_login`
+- `suigar_logout`
+- `get_connection_status`
 - `read_config`
 - `read_game_metadata`
 - `list_nfts`
@@ -115,9 +120,33 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 
 All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, referral rewards, or transaction inspection.
 
+### Wallet tools
+
+- **Paired browser wallet**
+  - `suigar_login`, `suigar_logout`, and `get_connection_status` manage the paired browser wallet.
+  - `get_wallet_balances` and `list_wallet_coins` read aggregate balances or paginated coin objects. Both also accept an explicit address.
+  - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
+- **Local session wallet**
+  - `setup_session_wallet` opens a local, one-time setup page to create or recover a persistent session wallet.
+  - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
+  - The derived signing key is persisted in the operating-system keychain.
+  - `get_session_wallet` returns the public address, balances, and a funding QR code.
+  - In an App-capable host, it displays that QR code in a dedicated Session Wallet view.
+  - Fund only the amount the user is willing to delegate to the local MCP process.
+- **Command-line wallet management**
+  - Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`), `status`, `logout`, or `clean`.
+  - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
+  - `status` inspects the current connection; `logout --all` disconnects every stored network; and `clean` removes the local credential file without opening a browser.
+  - Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+  - Run `npx -y @suigar/mcp tools` to print the network-independent tool catalog.
+
 ### Read tools
 
-`read_config`, `read_game_metadata`, `list_nfts`, and the referral amount reads are read-only. They accept shared network, provider, SDK config, and partner inputs. `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name. Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated. `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
+- `read_config`, `read_game_metadata`, `list_nfts`, wallet balance/coin reads, execution status, and the referral amount reads are read-only.
+- SDK-backed reads accept shared network, provider, SDK config, and partner inputs.
+- `read_game_metadata` additionally requires `game`; the NFT and referral reads additionally require an `owner` address or SuiNS name.
+- Referral reads simulate the SDK's real claim transaction and return `0` when it cannot be claimed or simulated.
+- `get_referral_commission` accepts an optional `coinType` (defaulting to configured SUI); level-up USD rewards use configured USDC.
 
 In an App-capable host, the NFT view presents catalog and owned-NFT tables separately. HTTPS NFT image URLs are displayed as thumbnails, while unavailable or unsupported image URLs remain visible as text. Referral reads render a dedicated Referral Rewards view with the referrer, reward type, coin type, and simulated claimable amount.
 
@@ -196,23 +225,6 @@ Optional `config` input follows the public SDK extension override shape:
 Partner attribution should be passed as top-level `partner`; the MCP server forwards it through `suigar({ partner })`.
 
 Transaction `metadata` values must be JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
-
-## Wallet connection
-
-- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
-- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
-- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
-- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
-- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
-- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
-
-## Local session wallet
-
-- `setup_session_wallet` opens a local, one-time setup page where users can create a new recovery phrase or recover an existing session wallet.
-- The recovery phrase stays in that local page and is never returned through MCP.
-- The derived signing key is persisted in the operating-system keychain, so the wallet remains available after the MCP client restarts.
-- `get_session_wallet` returns the public address, balances, and an address QR code for funding from Slush, Phantom, or another Sui wallet.
-- Fund only the amount the user is willing to delegate to the local MCP process.
 
 ## Notes
 
