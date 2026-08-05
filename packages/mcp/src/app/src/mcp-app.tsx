@@ -148,10 +148,13 @@ export function SuigarInspectorApp() {
 		}
 		connectStarted.current = true;
 
-		app.addEventListener('toolinput', () => {
+		// oxlint-disable-next-line typescript/no-deprecated
+		app.ontoolinput = () => {
 			dispatch({ type: 'tool-input' });
-		});
-		app.addEventListener('toolresult', (result) => {
+		};
+
+		// oxlint-disable-next-line typescript/no-deprecated
+		app.ontoolresult = (result) => {
 			if (result.isError) {
 				const errors = textErrors(result);
 				dispatch({
@@ -178,11 +181,13 @@ export function SuigarInspectorApp() {
 							: 'read',
 				payload,
 			});
-		});
-		app.addEventListener('hostcontextchanged', ({ context }) => {
+		};
+
+		// oxlint-disable-next-line typescript/no-deprecated
+		app.onhostcontextchanged = ({ context }) => {
 			dispatch({ type: 'host-context', context });
 			applyHostContext(context);
-		});
+		};
 
 		app
 			.connect()
