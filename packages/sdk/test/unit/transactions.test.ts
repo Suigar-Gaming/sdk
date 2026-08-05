@@ -146,7 +146,7 @@ describe('transaction builders', () => {
 			},
 		};
 		const client = {} as never;
-		vi.spyOn(NftV1Factory, 'get').mockResolvedValue({
+		const getNftV1Factory = vi.spyOn(NftV1Factory, 'get').mockResolvedValue({
 			json: {
 				specs: {
 					contents: [
@@ -179,7 +179,7 @@ describe('transaction builders', () => {
 		expect(call.package).toBe(normalizeSuiAddress(nftConfig.packageIds.nftV1));
 		expect(call.function).toBe('mint_to_sender');
 		expect(call.arguments).toHaveLength(4);
-		expect(NftV1Factory.get).toHaveBeenCalledWith({
+		expect(getNftV1Factory).toHaveBeenCalledWith({
 			client,
 			objectId: nftConfig.objectIds.nftV1Factory,
 		});
