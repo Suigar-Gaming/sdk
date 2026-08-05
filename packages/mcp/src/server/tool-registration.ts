@@ -111,6 +111,7 @@ type ToolDefinition = {
 	inputSchema: NonNullable<ToolConfig['inputSchema']>;
 	annotations: ToolAnnotations;
 	handler: ToolHandler;
+	isAppTool: boolean;
 };
 
 type AppToolMeta = {
@@ -119,7 +120,7 @@ type AppToolMeta = {
 	};
 };
 
-const appTools = [
+const toolDefinitions = [
 	{
 		name: 'setup_session_wallet',
 		title: 'Set Up Session Wallet',
@@ -128,6 +129,7 @@ const appTools = [
 		inputSchema: sessionWalletInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: setupSessionWalletTool,
+		isAppTool: false,
 	},
 	{
 		name: 'get_session_wallet',
@@ -137,6 +139,7 @@ const appTools = [
 		inputSchema: sessionWalletInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getSessionWalletTool,
+		isAppTool: true,
 	},
 	{
 		name: 'suigar_login',
@@ -145,6 +148,7 @@ const appTools = [
 		inputSchema: connectionInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: suigarLoginTool,
+		isAppTool: false,
 	},
 	{
 		name: 'suigar_logout',
@@ -153,6 +157,7 @@ const appTools = [
 		inputSchema: connectionInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: suigarLogoutTool,
+		isAppTool: false,
 	},
 	{
 		name: 'get_connection_status',
@@ -161,6 +166,7 @@ const appTools = [
 		inputSchema: connectionInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getConnectionStatusTool,
+		isAppTool: false,
 	},
 	{
 		name: 'get_execution_status',
@@ -170,6 +176,7 @@ const appTools = [
 		inputSchema: getExecutionStatusInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getExecutionStatusTool,
+		isAppTool: true,
 	},
 	{
 		name: 'get_wallet_balances',
@@ -179,6 +186,7 @@ const appTools = [
 		inputSchema: getWalletBalancesInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getWalletBalancesTool,
+		isAppTool: true,
 	},
 	{
 		name: 'list_wallet_coins',
@@ -188,6 +196,7 @@ const appTools = [
 		inputSchema: listWalletCoinsInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: listWalletCoinsTool,
+		isAppTool: true,
 	},
 	{
 		name: 'read_config',
@@ -197,15 +206,17 @@ const appTools = [
 		inputSchema: readConfigInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: readConfigTool,
+		isAppTool: true,
 	},
 	{
 		name: 'read_game_metadata',
 		title: 'Read Suigar Game Metadata',
 		description:
-			'Read live on-chain parameters for one selected Suigar game and coin type without opening the MCP App.',
+			'Read live on-chain parameters for one selected Suigar game and coin type.',
 		inputSchema: readGameMetadataInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: readGameMetadataTool,
+		isAppTool: true,
 	},
 	{
 		name: 'list_nfts',
@@ -215,6 +226,7 @@ const appTools = [
 		inputSchema: listNftsInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: listNftsTool,
+		isAppTool: true,
 	},
 	{
 		name: 'get_referral_commission',
@@ -224,6 +236,7 @@ const appTools = [
 		inputSchema: getReferralCommissionInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getReferralCommissionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'get_referral_level_up_usd_rewards',
@@ -232,6 +245,7 @@ const appTools = [
 		inputSchema: getReferralLevelUpUsdRewardsInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getReferralLevelUpUsdRewardsTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_referral_commission_claim_transaction',
@@ -241,6 +255,7 @@ const appTools = [
 		inputSchema: buildReferralCommissionClaimTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildReferralCommissionClaimTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_referral_level_up_usd_rewards_claim_transaction',
@@ -250,6 +265,7 @@ const appTools = [
 		inputSchema: buildReferralLevelUpUsdRewardsClaimTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildReferralLevelUpUsdRewardsClaimTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_nft_v1_mint_transaction',
@@ -259,6 +275,7 @@ const appTools = [
 		inputSchema: buildNftV1MintTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildNftV1MintTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_coinflip_transaction',
@@ -268,6 +285,7 @@ const appTools = [
 		inputSchema: coinflipInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildCoinflipTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_limbo_transaction',
@@ -277,6 +295,7 @@ const appTools = [
 		inputSchema: limboInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildLimboTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_plinko_transaction',
@@ -286,6 +305,7 @@ const appTools = [
 		inputSchema: configIdInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPlinkoTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_wheel_transaction',
@@ -295,6 +315,7 @@ const appTools = [
 		inputSchema: configIdInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildWheelTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_range_transaction',
@@ -304,6 +325,7 @@ const appTools = [
 		inputSchema: rangeInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildRangeTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_soccer_transaction',
@@ -313,6 +335,7 @@ const appTools = [
 		inputSchema: soccerInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildSoccerTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_pvp_coinflip_create_transaction',
@@ -322,6 +345,7 @@ const appTools = [
 		inputSchema: pvpCoinflipCreateInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCreateTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_pvp_coinflip_join_transaction',
@@ -331,6 +355,7 @@ const appTools = [
 		inputSchema: pvpCoinflipJoinInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipJoinTransactionTool,
+		isAppTool: true,
 	},
 	{
 		name: 'build_pvp_coinflip_cancel_transaction',
@@ -340,6 +365,7 @@ const appTools = [
 		inputSchema: pvpCoinflipCancelInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,
+		isAppTool: true,
 	},
 ] satisfies Array<ToolDefinition>;
 
@@ -347,26 +373,34 @@ const registerTool = <TInput>(
 	server: McpServer,
 	appToolMeta: AppToolMeta,
 	tool: ToolDefinition & { handler: ToolHandler<TInput> },
-) =>
-	registerAppTool(
-		server,
-		tool.name,
-		{
-			title: tool.title,
-			description: tool.description,
-			inputSchema: tool.inputSchema,
-			annotations: tool.annotations,
-			outputSchema: toolOutputSchema,
-			_meta: appToolMeta,
-		},
-		withToolErrors(tool.handler),
-	);
+) => {
+	const config = {
+		title: tool.title,
+		description: tool.description,
+		inputSchema: tool.inputSchema,
+		annotations: tool.annotations,
+		outputSchema: toolOutputSchema,
+	};
+	const handler = withToolErrors(tool.handler);
+
+	if (tool.isAppTool) {
+		registerAppTool(
+			server,
+			tool.name,
+			{ ...config, _meta: appToolMeta },
+			handler,
+		);
+		return;
+	}
+
+	server.registerTool(tool.name, config, handler);
+};
 
 export const registerSuigarTools = (
 	server: McpServer,
 	appToolMeta: AppToolMeta,
 ) => {
-	for (const tool of appTools) {
+	for (const tool of toolDefinitions) {
 		registerTool(server, appToolMeta, tool);
 	}
 };
