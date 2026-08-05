@@ -13,7 +13,7 @@ It provides:
 - a compact MCP App UI resource for compatible hosts
 - text and structured-content fallbacks for normal MCP clients
 
-Transactions remain unsigned by default. `mode: "execute"` opens the paired Suigar browser wallet for an explicit user approval, and the approval URL is shown beside the MCP App title; the MCP process never receives a wallet seed phrase or primary private key. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
+Transactions remain unsigned by default. `mode: "execute"` uses the paired Suigar browser wallet and opens an explicit approval request unless `executionWallet: "session"` is selected. Session execution signs and submits directly from the local session-wallet key held in the operating-system keychain; it returns the final transaction digest without an approval URL. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
 
 ## Install
 
@@ -127,12 +127,13 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - `get_wallet_balances` and `list_wallet_coins` read aggregate balances or paginated coin objects. Both also accept an explicit address.
   - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
 - **Local session wallet**
-  - `setup_session_wallet` opens a local, one-time setup page to create or recover a persistent session wallet.
+  - `setup_session_wallet` opens a local, one-time setup page to create or recover one persistent session wallet shared by mainnet and testnet.
   - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
   - The derived signing key is persisted in the operating-system keychain.
   - `get_session_wallet` returns the public address, balances, and a funding QR code.
   - In an App-capable host, it displays that QR code in a dedicated Session Wallet view.
   - Fund only the amount the user is willing to delegate to the local MCP process.
+  - For game tools, use `mode: "execute", executionWallet: "session"` to make the session wallet the sender and submit immediately. `owner` is optional in this mode; if supplied, it must match the session-wallet address. Ensure it is funded for both the wager and gas.
 - **Command-line wallet management**
   - Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`), `status`, `logout`, or `clean`.
   - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
@@ -157,6 +158,7 @@ All transaction tools accept the shared config inputs and support these `mode` v
 - `read-only`: resolves SDK config and returns the intended Move target, type arguments, required inputs, and notes.
 - `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed dry-runs include an `errors` array extracted from the failed transaction status.
+- `execute`: by default opens a paired-wallet approval request. Set `executionWallet: "session"` for game tools to have MCP sign and execute immediately with the local session wallet instead.
 
 Dry-run summaries include:
 
@@ -167,7 +169,7 @@ Dry-run summaries include:
 
 ### Shared transaction inputs
 
-For `build` and `dry-run`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. `read-only` can be used to inspect a tool's requirements before providing an owner.
+For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. In session execution (`mode: "execute", executionWallet: "session"`), MCP uses the local session-wallet address and no owner is required. `read-only` can be used to inspect a tool's requirements before providing an owner.
 
 `coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
 
