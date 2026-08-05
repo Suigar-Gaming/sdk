@@ -176,5 +176,11 @@ describe('MCP tool registration', () => {
 		expect(result.content[0]?.text).toContain(
 			'Check required fields, network, coin type, and SDK config overrides.',
 		);
+		expect(result.structuredContent).toEqual({
+			errors: [
+				'TypeError: bad input',
+				'Check required fields, network, coin type, and SDK config overrides.',
+			],
+		});
 	});
 });

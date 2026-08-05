@@ -66,25 +66,32 @@ const errorText = (error: unknown) => {
 	return String(error);
 };
 
+type ToolErrorResult = {
+	isError: true;
+	content: [{ type: 'text'; text: string }];
+	structuredContent: {
+		errors: Array<string>;
+	};
+};
+
 export const withToolErrors =
 	<TInput>(handler: (input: TInput) => Promise<ToolTextResult>) =>
-	async (
-		input: TInput,
-	): Promise<
-		| ToolTextResult
-		| { isError: true; content: [{ type: 'text'; text: string }] }
-	> => {
+	async (input: TInput): Promise<ToolTextResult | ToolErrorResult> => {
 		try {
 			return await handler(input);
 		} catch (error) {
+			const message = errorText(error);
+			const guidance =
+				'Check required fields, network, coin type, and SDK config overrides.';
 			return {
 				isError: true,
 				content: [
 					{
 						type: 'text',
-						text: `${errorText(error)}\n\nCheck required fields, network, coin type, and SDK config overrides.`,
+						text: `${message}\n\n${guidance}`,
 					},
 				],
+				structuredContent: { errors: [message, guidance] },
 			};
 		}
 	};
