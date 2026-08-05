@@ -16,7 +16,7 @@ import {
 	suigarMcpDataDirectory,
 } from './storage.js';
 
-const SERVICE = 'io.github.suigar-gaming.mcp.session-wallet';
+const service = 'suigar.mcp.session-wallet';
 const file = join(suigarMcpDataDirectory, 'session-wallets.json');
 
 export type SessionWallet = {
@@ -27,7 +27,7 @@ export type SessionWallet = {
 
 type SessionWallets = Partial<Record<SuigarNetwork, SessionWallet>>;
 
-const keychain = (network: SuigarNetwork) => new Entry(SERVICE, network);
+const keychain = (network: SuigarNetwork) => new Entry(service, network);
 
 const loadWallets = async (): Promise<SessionWallets> => {
 	try {
