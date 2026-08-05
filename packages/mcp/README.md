@@ -90,15 +90,6 @@ node packages/mcp/dist/bin.mjs
 
 This builds the local workspace dependencies, MCP server, and bundled MCP App. Run the generated stdio entrypoint from the repository root for manual client testing.
 
-## Wallet connection
-
-- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
-- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
-- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
-- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
-- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
-- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
-
 ## Tools
 
 - `read_config`
@@ -205,6 +196,23 @@ Optional `config` input follows the public SDK extension override shape:
 Partner attribution should be passed as top-level `partner`; the MCP server forwards it through `suigar({ partner })`.
 
 Transaction `metadata` values must be JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
+
+## Wallet connection
+
+- Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`) to open the Suigar connection page. The browser pairs with a short-lived, localhost-only listener and stores non-secret network-specific connection metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
+- Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+- Run `npx -y @suigar/mcp status [--network ...]` to inspect the current connection.
+- Run `npx -y @suigar/mcp logout [--network ...]` to open a browser confirmation page for one network; add `--all` to disconnect every stored network.
+- Run `npx -y @suigar/mcp clean` to remove the local credential file without opening a browser.
+- Run `npx -y @suigar/mcp tools` to print the network-independent MCP tool catalog.
+
+## Local session wallet
+
+- `setup_session_wallet` opens a local, one-time setup page where users can create a new recovery phrase or recover an existing session wallet.
+- The recovery phrase stays in that local page and is never returned through MCP.
+- The derived signing key is persisted in the operating-system keychain, so the wallet remains available after the MCP client restarts.
+- `get_session_wallet` returns the public address, balances, and an address QR code for funding from Slush, Phantom, or another Sui wallet.
+- Fund only the amount the user is willing to delegate to the local MCP process.
 
 ## Notes
 
