@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.34
+
+### Patch Changes
+
+- 37d17de: Update SDK and MCP compatibility with the latest patch release of the shared `@mysten/sui` dependency.
+
 ## 2.0.0-beta.33
 
 ### Minor Changes
