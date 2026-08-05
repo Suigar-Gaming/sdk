@@ -4,10 +4,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-	loadCredentials: vi.fn(),
-	loadSessionWallet: vi.fn(),
-	createSessionWalletSetup: vi.fn(),
-	listBalances: vi.fn(),
+	loadCredentials: vi.fn<() => Promise<unknown>>(),
+	loadSessionWallet: vi.fn<() => Promise<unknown>>(),
+	createSessionWalletSetup: vi.fn<() => Promise<unknown>>(),
+	listBalances: vi.fn<() => Promise<unknown>>(),
 }));
 
 const sessionAddress =
@@ -16,7 +16,11 @@ const pairedAddress =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
 
 vi.mock('qrcode', () => ({
-	default: { toDataURL: vi.fn(async () => 'data:image/png;base64,qr') },
+	default: {
+		toDataURL: vi.fn<() => Promise<string>>(
+			async () => 'data:image/png;base64,qr',
+		),
+	},
 }));
 
 vi.mock('../../src/runtime/index.js', () => ({
