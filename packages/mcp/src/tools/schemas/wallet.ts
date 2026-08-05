@@ -32,6 +32,8 @@ export const getExecutionStatusInputSchema = configInputSchema
 
 export const connectionInputSchema = configInputSchema.strict();
 
+export const sessionWalletInputSchema = configInputSchema.strict();
+
 export type GetWalletBalancesInput = z.input<
 	typeof getWalletBalancesInputSchema
 >;
@@ -40,3 +42,4 @@ export type GetExecutionStatusInput = z.input<
 	typeof getExecutionStatusInputSchema
 >;
 export type ConnectionInput = z.input<typeof connectionInputSchema>;
+export type SessionWalletInput = z.input<typeof sessionWalletInputSchema>;

@@ -34,6 +34,7 @@ import {
 	getReferralCommissionTool,
 	getReferralLevelUpUsdRewardsInputSchema,
 	getReferralLevelUpUsdRewardsTool,
+	getSessionWalletTool,
 	getWalletBalancesInputSchema,
 	getWalletBalancesTool,
 	limboInputSchema,
@@ -49,6 +50,8 @@ import {
 	readConfigTool,
 	readGameMetadataInputSchema,
 	readGameMetadataTool,
+	sessionWalletInputSchema,
+	setupSessionWalletTool,
 	soccerInputSchema,
 	suigarLoginTool,
 	suigarLogoutTool,
@@ -117,6 +120,24 @@ type AppToolMeta = {
 };
 
 const appTools = [
+	{
+		name: 'setup_session_wallet',
+		title: 'Set Up Session Wallet',
+		description:
+			'Open a local, user-only setup page to create or recover a persistent session wallet. Recovery phrases never pass through MCP.',
+		inputSchema: sessionWalletInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: setupSessionWalletTool,
+	},
+	{
+		name: 'get_session_wallet',
+		title: 'Get Session Wallet',
+		description:
+			'Read the persistent local session wallet address, balances, and a wallet-funding QR code without exposing its private key.',
+		inputSchema: sessionWalletInputSchema,
+		annotations: readOnlyToolAnnotations,
+		handler: getSessionWalletTool,
+	},
 	{
 		name: 'suigar_login',
 		title: 'Login to Suigar',

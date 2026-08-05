@@ -274,6 +274,12 @@ export type ConnectionResult = {
 	};
 };
 
+export type SessionWalletResult = {
+	network: SuigarNetwork;
+	config: ResolvedMcpConfig;
+	sessionWallet: Record<string, unknown>;
+};
+
 export type ToolStructuredResult =
 	| ReadConfigResult
 	| ReadGameMetadataResult
@@ -286,7 +292,8 @@ export type ToolStructuredResult =
 	| WalletReadResult
 	| ExecutionRequestResult
 	| ExecutionStatusResult
-	| ConnectionResult;
+	| ConnectionResult
+	| SessionWalletResult;
 
 export type ToolTextResult = {
 	content: [{ type: 'text'; text: string }];

@@ -4,3 +4,5 @@
 export * from './bridge.js';
 export * from './credentials.js';
 export * from './origin.js';
+export * from './session.js';
+export * from './storage.js';
