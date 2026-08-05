@@ -4,8 +4,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-	loadCredentials: vi.fn(),
-	loadSessionWallet: vi.fn(),
+	loadCredentials:
+		vi.fn<() => Promise<{ profiles: Record<string, { address: string }> }>>(),
+	loadSessionWallet: vi.fn<() => Promise<{ address: string } | null>>(),
 }));
 
 vi.mock('../../src/runtime/index.js', () => ({
