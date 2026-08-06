@@ -260,7 +260,7 @@ export const getSessionWalletTool = async (
 			funding: {
 				address: wallet.address,
 				addressQrCodeDataUrl,
-				fundingUrl,
+				...(fundingUrl ? { fundingUrl } : {}),
 				note: fundingUrl
 					? 'Open the funding URL to select a coin and amount from the paired wallet, then approve the transfer in the browser.'
 					: `Pair a wallet on ${bundle.config.network} with suigar_login before opening the funding flow.`,

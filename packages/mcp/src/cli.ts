@@ -24,34 +24,6 @@ const JSON_OPTION = {
 	description: 'Output machine-readable JSON instead of human-readable text',
 };
 
-const TOOL_CATALOG = [
-	'setup_session_wallet',
-	'get_session_wallet',
-	'suigar_login',
-	'suigar_logout',
-	'get_connection_status',
-	'get_execution_status',
-	'read_config',
-	'read_game_metadata',
-	'list_nfts',
-	'get_wallet_balances',
-	'list_wallet_coins',
-	'get_referral_commission',
-	'get_referral_level_up_usd_rewards',
-	'build_referral_commission_claim_transaction',
-	'build_referral_level_up_usd_rewards_claim_transaction',
-	'build_nft_v1_mint_transaction',
-	'build_coinflip_transaction',
-	'build_limbo_transaction',
-	'build_plinko_transaction',
-	'build_wheel_transaction',
-	'build_range_transaction',
-	'build_soccer_transaction',
-	'build_pvp_coinflip_create_transaction',
-	'build_pvp_coinflip_join_transaction',
-	'build_pvp_coinflip_cancel_transaction',
-] as const;
-
 export async function runSuigarCli(argv = hideBin(process.argv)) {
 	const parser = yargs(argv)
 		.scriptName('')
@@ -187,18 +159,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					args.json
 						? `${JSON.stringify(result)}\n`
 						: `Suigar MCP status\n\nNetwork: ${network}\nWallet: ${profile ? `${profile.address} (${profile.walletType})` : 'Not connected'}\nDefault network: ${credentials.defaultNetwork}\n`,
-				);
-			},
-		)
-		.command(
-			'tools',
-			'Print the MCP tool catalog',
-			(command: Argv) => command.option('json', JSON_OPTION),
-			async (args: JsonArgs) => {
-				process.stdout.write(
-					args.json
-						? `${JSON.stringify({ tools: TOOL_CATALOG })}\n`
-						: `Suigar MCP tools\n\n${TOOL_CATALOG.map((tool) => `- ${tool}`).join('\n')}\n`,
 				);
 			},
 		)

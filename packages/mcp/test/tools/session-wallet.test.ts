@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { toolOutputSchema } from '../../src/tools/schemas/output.js';
 
 const mocks = vi.hoisted(() => ({
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
@@ -145,7 +146,18 @@ describe('get_session_wallet', () => {
 			sessionWallet: { funding: { fundingUrl?: string; note: string } };
 		};
 
-		expect(content.sessionWallet.funding.fundingUrl).toBeUndefined();
+		expect(content.sessionWallet.funding).not.toHaveProperty('fundingUrl');
 		expect(content.sessionWallet.funding.note).toContain('suigar_login');
+	});
+
+	it('returns JSON-safe structured content when no wallet is paired', async () => {
+		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
+		mocks.loadCredentials.mockResolvedValue({ profiles: {} });
+
+		const result = await getSessionWalletTool({ network: 'testnet' });
+
+		expect(toolOutputSchema.safeParse(result.structuredContent).success).toBe(
+			true,
+		);
 	});
 });

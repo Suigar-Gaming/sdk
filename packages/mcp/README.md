@@ -143,7 +143,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
   - `status` inspects the current connection; `logout --all` disconnects every stored network; and `clean` removes the local credential file without opening a browser.
   - Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
-  - Run `npx -y @suigar/mcp tools` to print the network-independent tool catalog.
+  - Your MCP client discovers the available tools automatically through the MCP protocol.
 
 ### Read tools
 
