@@ -14,7 +14,7 @@
 		"games"
 	],
 	"license": "Apache-2.0",
-	"mcpName": "io.github.suigar-gaming/mcp",
+	"mcpName": "io.github.Suigar-Gaming/mcp",
 	"type": "module",
 	"sideEffects": false,
 	"files": [
