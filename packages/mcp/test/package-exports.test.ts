@@ -29,7 +29,7 @@ describe('package exports', () => {
 	it('ships synchronized plugin manifests and MCP server config', async () => {
 		expect(packageJson.files).toContain('plugin');
 		expect(packageJson.files).not.toContain('server.json');
-		expect(packageJson.mcpName).toBe('io.github.suigar-gaming/mcp');
+		expect(packageJson.mcpName).toBe('io.github.Suigar-Gaming/mcp');
 
 		const serverManifest = JSON.parse(
 			await readFile(new URL('../server.json', import.meta.url), 'utf8'),
