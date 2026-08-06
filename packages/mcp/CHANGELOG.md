@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 1.0.0-beta.20
+
+### Patch Changes
+
+- bb4e190: Publish the server manifest under the authorized Suigar-Gaming MCP Registry namespace.
+
 ## 1.0.0-beta.19
 
 ### Patch Changes
