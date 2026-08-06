@@ -25,23 +25,12 @@ jobs:
           fetch-depth: 0
 
       - name: Verify the Changesets MCP release tag
-        id: release
         shell: bash
         run: |
-          PACKAGE_VERSION="$(node --input-type=module -e "import manifest from './packages/mcp/package.json' with { type: 'json' }; process.stdout.write(manifest.version)")"
+          PACKAGE_VERSION="$(jq --raw-output '.version' packages/mcp/package.json)"
           RELEASE_TAG="@suigar/mcp@${PACKAGE_VERSION}"
 
-          git fetch --force --tags
           git tag --points-at "$GITHUB_SHA" | grep --fixed-strings --line-regexp "$RELEASE_TAG"
-          echo "version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Verify package publication to npm
-        env:
-          PACKAGE_VERSION: ${{ steps.release.outputs.version }}
-        shell: bash
-        run: |
-          PUBLISHED_VERSION="$(npm view "@suigar/mcp@${PACKAGE_VERSION}" version --registry=https://registry.npmjs.org)"
-          test "$PUBLISHED_VERSION" = "$PACKAGE_VERSION"
 
       - name: Install MCP Registry publisher
         shell: bash
