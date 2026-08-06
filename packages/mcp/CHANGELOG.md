@@ -1,5 +1,11 @@
 # @suigar/mcp
 
+## 1.0.0-beta.19
+
+### Patch Changes
+
+- 09043aa: Keep the MCP Registry manifest description within the registry validation limit.
+
 ## 1.0.0-beta.18
 
 ### Minor Changes
