@@ -387,10 +387,10 @@ const toolDefinitions = [
 	},
 ] satisfies Array<ToolDefinition>;
 
-const registerTool = <TInput>(
+const registerTool = (
 	server: McpServer,
 	appToolMeta: AppToolMeta,
-	tool: ToolDefinition & { handler: ToolHandler<TInput> },
+	tool: ToolDefinition,
 ) => {
 	const config = {
 		title: tool.title,

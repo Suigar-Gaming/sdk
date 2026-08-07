@@ -7,6 +7,7 @@ import { toolOutputSchema } from '../../src/tools/schemas/output.js';
 const mocks = vi.hoisted(() => ({
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
 	loadSessionWallet: vi.fn<() => Promise<unknown>>(),
+	listSessionWallets: vi.fn<() => Promise<unknown>>(),
 	createSessionWalletSetup: vi.fn<() => Promise<unknown>>(),
 	listBalances: vi.fn<() => Promise<unknown>>(),
 }));
@@ -38,6 +39,7 @@ vi.mock('../../src/runtime/index.js', () => ({
 vi.mock('../../src/wallet/index.js', () => ({
 	loadCredentials: mocks.loadCredentials,
 	loadSessionWallet: mocks.loadSessionWallet,
+	listSessionWallets: mocks.listSessionWallets,
 	createSessionWalletSetup: mocks.createSessionWalletSetup,
 	resolveWebOrigin: () => 'https://mcp.testnet.suigar.com',
 }));
@@ -56,7 +58,14 @@ const { getSessionWalletTool } =
 
 describe('get_session_wallet', () => {
 	beforeEach(() => {
+		mocks.loadCredentials.mockReset();
+		mocks.loadSessionWallet.mockReset();
+		mocks.listSessionWallets.mockReset();
+		mocks.createSessionWalletSetup.mockReset();
 		mocks.listBalances.mockReset();
+		mocks.listSessionWallets.mockResolvedValue([
+			{ id: 'wallet-1', name: 'Daily bets', address: sessionAddress },
+		]);
 		mocks.listBalances.mockResolvedValue({
 			balances: [{ coinType: '0x2::sui::SUI', balance: '1200000000' }],
 			cursor: null,
@@ -65,7 +74,11 @@ describe('get_session_wallet', () => {
 	});
 
 	it('returns formatted balances and a paired-wallet funding URL', async () => {
-		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
+		mocks.loadSessionWallet.mockResolvedValue({
+			id: 'wallet-1',
+			name: 'Daily bets',
+			address: sessionAddress,
+		});
 		mocks.loadCredentials.mockResolvedValue({
 			profiles: { testnet: { address: pairedAddress } },
 		});
@@ -73,12 +86,18 @@ describe('get_session_wallet', () => {
 		const result = await getSessionWalletTool({ network: 'testnet' });
 		const content = result.structuredContent as unknown as {
 			sessionWallet: {
+				status: string;
+				selectedSessionWalletId: string;
+				name: string;
 				balances: Array<{ balanceDisplay: string; symbol: string }>;
 				funding: { fundingUrl?: string };
 			};
 		};
 		const fundingUrl = new URL(content.sessionWallet.funding.fundingUrl!);
 
+		expect(content.sessionWallet.status).toBe('ready');
+		expect(content.sessionWallet.selectedSessionWalletId).toBe('wallet-1');
+		expect(content.sessionWallet.name).toBe('Daily bets');
 		expect(content.sessionWallet.balances).toEqual([
 			expect.objectContaining({ balanceDisplay: '1.2', symbol: 'SUI' }),
 		]);
@@ -102,12 +121,19 @@ describe('get_session_wallet', () => {
 		expect(content.sessionWallet).toEqual({
 			status: 'setup-required',
 			setupUrl: 'http://127.0.0.1:12345/',
+			wallets: [
+				{ id: 'wallet-1', name: 'Daily bets', address: sessionAddress },
+			],
 			note: expect.stringContaining('shared by mainnet and testnet'),
 		});
 	});
 
 	it('loads every balance page', async () => {
-		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
+		mocks.loadSessionWallet.mockResolvedValue({
+			id: 'wallet-1',
+			name: 'Daily bets',
+			address: sessionAddress,
+		});
 		mocks.loadCredentials.mockResolvedValue({ profiles: {} });
 		mocks.listBalances
 			.mockResolvedValueOnce({
@@ -138,7 +164,11 @@ describe('get_session_wallet', () => {
 	});
 
 	it('explains how to enable funding when no wallet is paired', async () => {
-		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
+		mocks.loadSessionWallet.mockResolvedValue({
+			id: 'wallet-1',
+			name: 'Daily bets',
+			address: sessionAddress,
+		});
 		mocks.loadCredentials.mockResolvedValue({ profiles: {} });
 
 		const result = await getSessionWalletTool({ network: 'testnet' });
@@ -151,7 +181,11 @@ describe('get_session_wallet', () => {
 	});
 
 	it('returns JSON-safe structured content when no wallet is paired', async () => {
-		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
+		mocks.loadSessionWallet.mockResolvedValue({
+			id: 'wallet-1',
+			name: 'Daily bets',
+			address: sessionAddress,
+		});
 		mocks.loadCredentials.mockResolvedValue({ profiles: {} });
 
 		const result = await getSessionWalletTool({ network: 'testnet' });

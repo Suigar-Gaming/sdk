@@ -59,6 +59,7 @@ describe('session wallet setup', () => {
 			body: new URLSearchParams({
 				state: state!,
 				mnemonic: mnemonic!,
+				name: 'Daily bets',
 				confirmed: 'on',
 			}),
 		});
@@ -67,12 +68,14 @@ describe('session wallet setup', () => {
 		const savedPage = await response.text();
 		expect(savedPage).toContain('Session wallet ready');
 		expect(savedPage).toContain('both Suigar mainnet and testnet');
-		expect(savedPage).toContain('~/.suigar-mcp/session-wallet.json');
+		expect(savedPage).toContain('~/.suigar-mcp/session-wallets.json');
 		expect(savedPage).toContain('operating-system keychain');
 		const wallet = await session.loadSessionWallet();
 		expect(wallet).toEqual(
 			expect.objectContaining({
 				source: 'created',
+				name: 'Daily bets',
+				id: expect.stringMatching(/^[0-9a-f-]{36}$/u),
 				address: expect.stringMatching(/^0x/u),
 			}),
 		);
@@ -80,7 +83,7 @@ describe('session wallet setup', () => {
 			wallet!.address,
 		);
 		expect([...keychainEntries.keys()]).toEqual([
-			'com.suigar.mcp:session-wallet',
+			`com.suigar.mcp:session-wallet:${wallet!.id}`,
 		]);
 	});
 
@@ -99,6 +102,7 @@ describe('session wallet setup', () => {
 			body: new URLSearchParams({
 				state: state!,
 				privateKey: signer.getSecretKey(),
+				name: 'Imported wallet',
 			}),
 		});
 
@@ -107,6 +111,7 @@ describe('session wallet setup', () => {
 			expect.objectContaining({
 				address: signer.toSuiAddress(),
 				source: 'private-key',
+				name: 'Imported wallet',
 			}),
 		);
 		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
@@ -114,7 +119,7 @@ describe('session wallet setup', () => {
 		);
 	});
 
-	it('requires explicit confirmation before replacing an existing session wallet', async () => {
+	it('keeps multiple named wallets and selects each signer by ID', async () => {
 		const firstSigner = Ed25519Keypair.generate();
 		const secondSigner = Ed25519Keypair.generate();
 		const firstSetup = await session.createSessionWalletSetup();
@@ -128,52 +133,47 @@ describe('session wallet setup', () => {
 			body: new URLSearchParams({
 				state: firstState!,
 				privateKey: firstSigner.getSecretKey(),
+				name: 'First wallet',
 			}),
 		});
 
-		const replacementSetup = await session.createSessionWalletSetup();
-		const replacementPage = await (
-			await fetch(replacementSetup.setupUrl)
-		).text();
-		const replacementState = replacementPage.match(
+		const secondSetup = await session.createSessionWalletSetup();
+		const secondPage = await (await fetch(secondSetup.setupUrl)).text();
+		const secondState = secondPage.match(
 			/name="state" value="([0-9a-f]+)"/u,
 		)?.[1];
-		expect(replacementPage).toContain(firstSigner.toSuiAddress());
-		expect(replacementPage).toContain(
-			'replaces the current local session wallet',
-		);
+		expect(secondPage).toContain(firstSigner.toSuiAddress());
+		expect(secondPage).toContain('adds it to your local wallet list');
 
-		const rejectedResponse = await fetch(
-			`${replacementSetup.setupUrl}import-private-key`,
+		const secondResponse = await fetch(
+			`${secondSetup.setupUrl}import-private-key`,
 			{
 				method: 'POST',
 				headers: { 'content-type': 'application/x-www-form-urlencoded' },
 				body: new URLSearchParams({
-					state: replacementState!,
+					state: secondState!,
 					privateKey: secondSigner.getSecretKey(),
+					name: 'Second wallet',
 				}),
 			},
 		);
-		expect(rejectedResponse.status).toBe(400);
-		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
-			firstSigner.toSuiAddress(),
-		);
-
-		const replacementResponse = await fetch(
-			`${replacementSetup.setupUrl}import-private-key`,
-			{
-				method: 'POST',
-				headers: { 'content-type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({
-					state: replacementState!,
-					privateKey: secondSigner.getSecretKey(),
-					replace: 'on',
-				}),
-			},
-		);
-		expect(replacementResponse.ok).toBe(true);
-		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
-			secondSigner.toSuiAddress(),
-		);
+		expect(secondResponse.ok).toBe(true);
+		const wallets = await session.listSessionWallets();
+		expect(wallets).toEqual([
+			expect.objectContaining({
+				name: 'First wallet',
+				address: firstSigner.toSuiAddress(),
+			}),
+			expect.objectContaining({
+				name: 'Second wallet',
+				address: secondSigner.toSuiAddress(),
+			}),
+		]);
+		expect(
+			(await session.loadSessionSigner(wallets[0]!.id)).toSuiAddress(),
+		).toBe(firstSigner.toSuiAddress());
+		expect(
+			(await session.loadSessionSigner(wallets[1]!.id)).toSuiAddress(),
+		).toBe(secondSigner.toSuiAddress());
 	});
 });

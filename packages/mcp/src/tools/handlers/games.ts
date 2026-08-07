@@ -402,13 +402,15 @@ const gameTransactionOptions = async (
 		getMode(input.mode) === 'execute' && input.executionWallet === 'session';
 	let owner: string;
 	if (sessionExecution) {
-		const sessionWallet = await loadSessionWallet();
+		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
 		if (!sessionWallet) {
 			throw new Error(
 				'No session wallet exists. Call setup_session_wallet first, then fund its address before executing games.',
 			);
 		}
-		const sessionAddress = (await loadSessionSigner()).toSuiAddress();
+		const sessionAddress = (
+			await loadSessionSigner(input.sessionWalletId)
+		).toSuiAddress();
 		if (sessionWallet.address !== sessionAddress) {
 			throw new Error(
 				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with setup_session_wallet before executing games.',
@@ -548,7 +550,7 @@ export const buildTransactionTool = async ({
 			const execution = await executeSessionTransaction({
 				transaction,
 				client: bundle.client,
-				signer: await loadSessionSigner(),
+				signer: await loadSessionSigner(input.sessionWalletId),
 			});
 			return asTextResponse({
 				mode: 'execute',

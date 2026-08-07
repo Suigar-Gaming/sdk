@@ -13,7 +13,7 @@ import {
 	type ToolTextResult,
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
-import { loadCredentials } from '../../wallet/index.js';
+import { loadCredentials, loadSessionWallet } from '../../wallet/index.js';
 import type { ReadConfigInput } from '../schemas/index.js';
 
 export const GAME_LABELS = {
@@ -192,10 +192,21 @@ export const resolveCoinDisplayMetadata = async (
 };
 
 export const resolveWalletOwner = async (
-	input: { owner?: string; network?: 'mainnet' | 'testnet' },
+	input: {
+		owner?: string;
+		network?: 'mainnet' | 'testnet';
+		sessionWalletId?: string;
+	},
 	bundle: SuigarClientBundle,
 ) => {
 	if (input.owner) return await resolveOwnerAddress(input.owner, bundle);
+	if (input.sessionWalletId) {
+		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
+		if (!sessionWallet) {
+			throw new Error('No local session wallet exists with that ID.');
+		}
+		return sessionWallet.address;
+	}
 	const credentials = await loadCredentials();
 	const profile = credentials.profiles[bundle.config.network];
 	if (!profile)

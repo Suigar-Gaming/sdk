@@ -11,6 +11,7 @@ import {
 	createLoginBridge,
 	createSessionWalletSetup,
 	getExecutionStatus,
+	listSessionWallets,
 	loadCredentials,
 	loadSessionWallet,
 	removeProfile,
@@ -170,14 +171,19 @@ export const setupSessionWalletTool = async (
 	input: SessionWalletInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const setup = await createSessionWalletSetup();
+	const setup = await createSessionWalletSetup({
+		accountUrl: new URL(
+			'/account',
+			resolveWebOrigin(config.network),
+		).toString(),
+	});
 	return asTextResponse({
 		network: config.network,
 		config,
 		sessionWallet: {
 			status: 'setup-pending',
 			setupUrl: setup.setupUrl,
-			note: 'Open this local URL yourself to create or recover the one session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
+			note: 'Open this local URL yourself to create or recover a named session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
 		},
 	});
 };
@@ -186,19 +192,28 @@ export const getSessionWalletTool = async (
 	input: SessionWalletInput,
 ): Promise<ToolTextResult> => {
 	const bundle = createSuigarClient(getConfigInput(input));
-	const [wallet, credentials] = await Promise.all([
-		loadSessionWallet(),
+	const [wallet, wallets, credentials] = await Promise.all([
+		loadSessionWallet(input.sessionWalletId),
+		listSessionWallets(),
 		loadCredentials(),
 	]);
 	if (!wallet) {
-		const setup = await createSessionWalletSetup();
+		const setup = await createSessionWalletSetup({
+			accountUrl: new URL(
+				'/account',
+				resolveWebOrigin(bundle.config.network),
+			).toString(),
+		});
 		return asTextResponse({
 			network: bundle.config.network,
 			config: bundle.config,
 			sessionWallet: {
 				status: 'setup-required',
 				setupUrl: setup.setupUrl,
-				note: 'Create or recover the one session wallet shared by mainnet and testnet. Its recovery phrase is shown only on the local setup page.',
+				wallets,
+				note: input.sessionWalletId
+					? 'No local session wallet exists with that ID. Create or recover a named session wallet, or call get_session_wallet without sessionWalletId to use the first wallet.'
+					: 'Create or recover a named session wallet shared by mainnet and testnet. Its recovery phrase is shown only on the local setup page.',
 			},
 		});
 	}
@@ -248,6 +263,9 @@ export const getSessionWalletTool = async (
 		network: bundle.config.network,
 		config: bundle.config,
 		sessionWallet: {
+			status: 'ready',
+			selectedSessionWalletId: wallet.id,
+			wallets,
 			...wallet,
 			balances: balances.map((balance) => {
 				const coin = metadata.get(balance.coinType)!;
@@ -275,7 +293,7 @@ export const fundSessionWalletTool = async (
 	const { config } = createSuigarClient(getConfigInput(input));
 	const [credentials, sessionWallet] = await Promise.all([
 		loadCredentials(),
-		loadSessionWallet(),
+		loadSessionWallet(input.sessionWalletId),
 	]);
 	const profile = credentials.profiles[config.network];
 	if (!profile) {
@@ -301,6 +319,8 @@ export const fundSessionWalletTool = async (
 		network: config.network,
 		config,
 		sessionWallet: {
+			id: sessionWallet.id,
+			name: sessionWallet.name,
 			address: sessionWallet.address,
 			fundingUrl: fundingUrl.toString(),
 			note: 'Open this URL to select a coin and amount from the connected wallet. The transfer is reviewed and signed in the browser.',
