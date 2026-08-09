@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {
 	createSuigarClient,
@@ -8,13 +9,11 @@ import {
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
 import {
-	createLoginBridge,
 	createSessionWalletSetup,
 	getExecutionStatus,
 	listSessionWallets,
 	loadCredentials,
 	loadSessionWallet,
-	removeProfile,
 	resolveWebOrigin,
 } from '../../wallet/index.js';
 import type {
@@ -30,6 +29,21 @@ import {
 	resolveCoinDisplayMetadata,
 	resolveWalletOwner,
 } from './shared.js';
+
+const runSuigarNpxCommand = (...args: Array<string>) => {
+	const npxArgs = ['-y', '@suigar/mcp', ...args];
+	const child = spawn('npx', npxArgs, {
+		detached: true,
+		stdio: 'ignore',
+		env: process.env,
+	});
+	child.on('error', () => undefined);
+	child.unref();
+	return {
+		command: ['npx', ...npxArgs].join(' '),
+		pid: child.pid,
+	};
+};
 
 export const getWalletBalancesTool = async (
 	input: GetWalletBalancesInput,
@@ -143,15 +157,16 @@ export const suigarLoginTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const bridge = await createLoginBridge({
-		network: config.network,
-		webOrigin: resolveWebOrigin(config.network),
-	});
-	void bridge.done.catch(() => undefined);
+	const command = runSuigarNpxCommand('login', '--network', config.network);
 	return asTextResponse({
 		network: config.network,
 		config,
-		connection: { connected: false, loginUrl: bridge.url, status: 'pending' },
+		connection: {
+			connected: false,
+			status: 'pending',
+			...command,
+			note: 'Started the local Suigar MCP CLI login flow. It opens the correct network in the default browser and writes the paired wallet credentials locally.',
+		},
 	});
 };
 
@@ -159,11 +174,16 @@ export const suigarLogoutTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	await removeProfile(config.network);
+	const command = runSuigarNpxCommand('logout', '--network', config.network);
 	return asTextResponse({
 		network: config.network,
 		config,
-		connection: { connected: false, status: 'logged-out' },
+		connection: {
+			connected: false,
+			status: 'pending',
+			...command,
+			note: 'Started the local Suigar MCP CLI logout flow. It opens the correct network in the default browser and updates local wallet credentials after confirmation.',
+		},
 	});
 };
 

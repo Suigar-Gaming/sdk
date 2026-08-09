@@ -279,6 +279,9 @@ export type ConnectionResult = {
 		address?: string;
 		walletType?: string;
 		loginUrl?: string;
+		command?: string;
+		pid?: number;
+		note?: string;
 		status: 'connected' | 'pending' | 'logged-out';
 	};
 };

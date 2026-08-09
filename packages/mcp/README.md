@@ -125,6 +125,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
 
 - **Paired browser wallet**
   - `suigar_login`, `suigar_logout`, and `get_connection_status` manage the paired browser wallet.
+  - `suigar_login` and `suigar_logout` start the same local `npx -y @suigar/mcp ...` CLI flows used for command-line wallet management, so the correct mainnet or testnet pairing page opens in the default browser instead of requiring manual URL copy/paste.
   - `get_wallet_balances` and `list_wallet_coins` read aggregate balances or paginated coin objects. Both also accept an explicit address.
   - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
 - **Local session wallet**
