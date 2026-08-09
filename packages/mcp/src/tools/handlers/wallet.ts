@@ -29,6 +29,17 @@ import {
 	resolveWalletOwner,
 } from './shared.js';
 
+const connectionBridgeArgs = (input: ConnectionInput) => {
+	const args: Array<string> = [];
+	if (input.webUrl) args.push('--web-url', input.webUrl);
+	if (input.timeoutMs !== undefined)
+		args.push('--timeout-ms', String(input.timeoutMs));
+	if (input.maxBodyBytes !== undefined)
+		args.push('--max-body-bytes', String(input.maxBodyBytes));
+	if (input.noOpen === true || input.open === false) args.push('--no-open');
+	return args;
+};
+
 export const getWalletBalancesTool = async (
 	input: GetWalletBalancesInput,
 ): Promise<ToolTextResult> => {
@@ -141,7 +152,12 @@ export const suigarLoginTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const command = runSuigarCommand('login', '--network', config.network);
+	const command = runSuigarCommand(
+		'login',
+		'--network',
+		config.network,
+		...connectionBridgeArgs(input),
+	);
 	return asTextResponse({
 		network: config.network,
 		config,
@@ -158,7 +174,12 @@ export const suigarLogoutTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const command = runSuigarCommand('logout', '--network', config.network);
+	const command = runSuigarCommand(
+		'logout',
+		'--network',
+		config.network,
+		...connectionBridgeArgs(input),
+	);
 	return asTextResponse({
 		network: config.network,
 		config,

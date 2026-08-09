@@ -120,6 +120,35 @@ describe('wallet tools', () => {
 				status: 'pending',
 			});
 		});
+
+		it('passes bridge options to the CLI login flow', async () => {
+			mocks.runSuigarCommand.mockReturnValue({
+				command:
+					'npx -y @suigar/mcp@test login --network testnet --web-url http://localhost:5173 --timeout-ms 1000 --max-body-bytes 2048 --no-open',
+				pid: 1234,
+			});
+
+			await suigarLoginTool({
+				network: 'testnet',
+				webUrl: 'http://localhost:5173',
+				timeoutMs: 1000,
+				maxBodyBytes: 2048,
+				noOpen: true,
+			});
+
+			expect(mocks.runSuigarCommand).toHaveBeenCalledWith(
+				'login',
+				'--network',
+				'testnet',
+				'--web-url',
+				'http://localhost:5173',
+				'--timeout-ms',
+				'1000',
+				'--max-body-bytes',
+				'2048',
+				'--no-open',
+			);
+		});
 	});
 
 	describe('suigar_logout', () => {
@@ -144,6 +173,35 @@ describe('wallet tools', () => {
 				pid: 5678,
 				status: 'pending',
 			});
+		});
+
+		it('passes bridge options to the CLI logout flow', async () => {
+			mocks.runSuigarCommand.mockReturnValue({
+				command:
+					'npx -y @suigar/mcp@test logout --network mainnet --web-url http://localhost:5173 --timeout-ms 1000 --max-body-bytes 2048 --no-open',
+				pid: 5678,
+			});
+
+			await suigarLogoutTool({
+				network: 'mainnet',
+				webUrl: 'http://localhost:5173',
+				timeoutMs: 1000,
+				maxBodyBytes: 2048,
+				open: false,
+			});
+
+			expect(mocks.runSuigarCommand).toHaveBeenCalledWith(
+				'logout',
+				'--network',
+				'mainnet',
+				'--web-url',
+				'http://localhost:5173',
+				'--timeout-ms',
+				'1000',
+				'--max-body-bytes',
+				'2048',
+				'--no-open',
+			);
 		});
 	});
 

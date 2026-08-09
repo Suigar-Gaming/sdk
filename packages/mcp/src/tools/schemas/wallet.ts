@@ -40,7 +40,44 @@ export const getExecutionStatusInputSchema = configInputSchema
 	})
 	.strict();
 
-export const connectionInputSchema = configInputSchema.strict();
+export const connectionInputSchema = configInputSchema
+	.extend({
+		webUrl: z
+			.url()
+			.optional()
+			.describe(
+				'Browser app origin for wallet pairing and approval pages. Mirrors the login/logout CLI --web-url option.',
+			),
+		timeoutMs: z
+			.number()
+			.int()
+			.positive()
+			.optional()
+			.describe(
+				'Milliseconds before the local browser bridge expires. Mirrors the login/logout CLI --timeout-ms option.',
+			),
+		maxBodyBytes: z
+			.number()
+			.int()
+			.positive()
+			.optional()
+			.describe(
+				'Maximum JSON callback body size for the local browser bridge. Mirrors the login/logout CLI --max-body-bytes option.',
+			),
+		open: z
+			.boolean()
+			.optional()
+			.describe(
+				'Whether the login/logout CLI should open the bridge page. Defaults to true.',
+			),
+		noOpen: z
+			.boolean()
+			.optional()
+			.describe(
+				'Set true to pass --no-open to the login/logout CLI and only return the bridge URL.',
+			),
+	})
+	.strict();
 
 export const sessionWalletInputSchema = configInputSchema
 	.extend({

@@ -7,6 +7,7 @@ import {
 	buildReferralCommissionClaimTransactionInputSchema,
 	coinflipInputSchema,
 	configInputSchema,
+	connectionInputSchema,
 	getReferralCommissionInputSchema,
 	pvpCoinflipJoinInputSchema,
 	soccerInputSchema,
@@ -125,6 +126,38 @@ describe('build input schemas', () => {
 		).toMatchObject({ countryId: 65_535 });
 		expect(() => soccerInputSchema.parse({ countryId: 65_536 })).toThrow(
 			/Too big/u,
+		);
+	});
+});
+
+describe('wallet input schemas', () => {
+	it('accepts bridge options for login and logout connection tools', () => {
+		expect(
+			connectionInputSchema.parse({
+				network: 'mainnet',
+				webUrl: 'http://localhost:5173',
+				timeoutMs: 1000,
+				maxBodyBytes: 2048,
+				noOpen: true,
+			}),
+		).toMatchObject({
+			network: 'mainnet',
+			webUrl: 'http://localhost:5173',
+			timeoutMs: 1000,
+			maxBodyBytes: 2048,
+			noOpen: true,
+		});
+	});
+
+	it('rejects invalid bridge options for connection tools', () => {
+		expect(() => connectionInputSchema.parse({ webUrl: 'not-a-url' })).toThrow(
+			/Invalid URL/u,
+		);
+		expect(() => connectionInputSchema.parse({ timeoutMs: 0 })).toThrow(
+			/Too small/u,
+		);
+		expect(() => connectionInputSchema.parse({ maxBodyBytes: 1.5 })).toThrow(
+			/expected int/u,
 		);
 	});
 });
