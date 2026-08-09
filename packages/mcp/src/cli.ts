@@ -24,8 +24,8 @@ import {
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
 type BridgeArgs = ArgumentsCamelCase<{
-	bridgeTimeoutMs?: number;
-	bridgeMaxBodyBytes?: number;
+	timeoutMs?: number;
+	maxBodyBytes?: number;
 	open: boolean;
 	webUrl?: string;
 }>;
@@ -36,11 +36,11 @@ const JSON_OPTION = {
 };
 const addBridgeOptions = (command: Argv): Argv =>
 	command
-		.option('bridge-timeout-ms', {
+		.option('timeout-ms', {
 			type: 'number' as const,
 			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_ENV} or ${DEFAULT_TIMEOUT_MS}`,
 		})
-		.option('bridge-max-body-bytes', {
+		.option('max-body-bytes', {
 			type: 'number' as const,
 			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
 		})
@@ -55,8 +55,8 @@ const addBridgeOptions = (command: Argv): Argv =>
 				'Open the connection page in the default browser; use --no-open to only print its URL',
 		});
 const getBridgeOptions = (args: BridgeArgs): BridgeOptions => ({
-	timeoutMs: args.bridgeTimeoutMs,
-	maxBodyBytes: args.bridgeMaxBodyBytes,
+	timeoutMs: args.timeoutMs,
+	maxBodyBytes: args.maxBodyBytes,
 	open: args.open,
 });
 
