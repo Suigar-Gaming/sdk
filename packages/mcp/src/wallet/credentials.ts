@@ -76,7 +76,7 @@ export const readPersistedDefaultNetwork = (): SuigarNetwork => {
 		const value: unknown = JSON.parse(readFileSync(file, 'utf8'));
 		const network =
 			value && typeof value === 'object'
-				? (value as { defaultNetwork?: unknown }).defaultNetwork
+				? (value as Credentials).defaultNetwork
 				: undefined;
 		return isNetwork(network) ? network : 'testnet';
 	} catch {

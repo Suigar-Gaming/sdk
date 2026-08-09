@@ -8,6 +8,8 @@ Start paired-wallet login and logout from MCP tools through the local `npx -y @s
 
 Make local browser origins, bridge timeout, and callback body-size limits configurable with `SUIGAR_MCP_BRIDGE_WEB_URL`, `SUIGAR_MCP_BRIDGE_TIMEOUT_MS`, `SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES`, `--web-url`, `--timeout-ms`, and `--max-body-bytes`, and have bridge creation open its URL by default unless disabled.
 
+Open both mainnet and testnet browser logout pages for `logout --all` when using the default Suigar web origins.
+
 Update MCP package metadata and remove the static CLI tool catalog in favor of MCP protocol tool discovery.
 
 Wire the CLI `--version` output to the bundled MCP package version.

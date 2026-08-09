@@ -1,16 +1,35 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
 	createLoginBridge: vi.fn<
-		() => Promise<{
+		(input: {
+			network: 'mainnet' | 'testnet';
+			webOrigin: string;
+			timeoutMs?: number;
+			maxBodyBytes?: number;
+			open?: boolean;
+		}) => Promise<{
 			url: string;
 			done: Promise<{ address: string; walletType: string }>;
 		}>
 	>(),
-	createLogoutBridge: vi.fn<() => Promise<unknown>>(),
+	createLogoutBridge: vi.fn<
+		(input: {
+			network?: 'mainnet' | 'testnet';
+			all: boolean;
+			webOrigin: string;
+			timeoutMs?: number;
+			maxBodyBytes?: number;
+			open?: boolean;
+		}) => Promise<{
+			url: string;
+			done: Promise<{ network?: string; all: boolean }>;
+			close: () => void;
+		}>
+	>(),
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
 }));
 
@@ -39,6 +58,11 @@ vi.mock('../src/wallet/index.js', () => ({
 const { runSuigarCli } = await import('../src/cli.js');
 
 describe('suigar cli bridge options', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.unstubAllEnvs();
+	});
+
 	it('passes bridge timeout, body size, and open flags to login bridges', async () => {
 		mocks.createLoginBridge.mockResolvedValue({
 			url: 'https://mcp.testnet.suigar.com/connection',
@@ -80,5 +104,86 @@ describe('suigar cli bridge options', () => {
 			maxBodyBytes: 2048,
 			open: false,
 		});
+	});
+
+	it('opens both network logout pages for logout --all', async () => {
+		mocks.loadCredentials.mockResolvedValue({
+			defaultNetwork: 'testnet',
+			profiles: {},
+		});
+		mocks.createLogoutBridge.mockImplementation(async (input) => ({
+			url: `${input.webOrigin}/connection`,
+			done: Promise.resolve({ network: input.network, all: input.all }),
+			close: vi.fn<() => void>(),
+		}));
+		const stdout = vi
+			.spyOn(process.stdout, 'write')
+			.mockImplementation(() => true);
+		const stderr = vi
+			.spyOn(process.stderr, 'write')
+			.mockImplementation(() => true);
+
+		await runSuigarCli(['logout', '--all', '--json']);
+
+		expect(mocks.createLogoutBridge).toHaveBeenCalledTimes(2);
+		expect(mocks.createLogoutBridge).toHaveBeenNthCalledWith(1, {
+			network: 'mainnet',
+			all: true,
+			webOrigin: 'https://mcp.suigar.com',
+			timeoutMs: undefined,
+			maxBodyBytes: undefined,
+			open: true,
+		});
+		expect(mocks.createLogoutBridge).toHaveBeenNthCalledWith(2, {
+			network: 'testnet',
+			all: true,
+			webOrigin: 'https://mcp.testnet.suigar.com',
+			timeoutMs: undefined,
+			maxBodyBytes: undefined,
+			open: true,
+		});
+		expect(stderr).toHaveBeenCalledWith(
+			'Open these URLs to disconnect your wallet:\nhttps://mcp.suigar.com/connection\nhttps://mcp.testnet.suigar.com/connection\n',
+		);
+		stdout.mockRestore();
+		stderr.mockRestore();
+	});
+
+	it('uses one logout page for logout --all with a custom web URL', async () => {
+		mocks.loadCredentials.mockResolvedValue({
+			defaultNetwork: 'testnet',
+			profiles: {},
+		});
+		mocks.createLogoutBridge.mockResolvedValue({
+			url: 'http://localhost:5173/connection',
+			done: Promise.resolve({ all: true }),
+			close: vi.fn<() => void>(),
+		});
+		const stdout = vi
+			.spyOn(process.stdout, 'write')
+			.mockImplementation(() => true);
+		const stderr = vi
+			.spyOn(process.stderr, 'write')
+			.mockImplementation(() => true);
+
+		await runSuigarCli([
+			'logout',
+			'--all',
+			'--web-url',
+			'http://localhost:5173',
+			'--json',
+		]);
+
+		expect(mocks.createLogoutBridge).toHaveBeenCalledTimes(1);
+		expect(mocks.createLogoutBridge).toHaveBeenCalledWith({
+			network: undefined,
+			all: true,
+			webOrigin: 'http://localhost:5173',
+			timeoutMs: undefined,
+			maxBodyBytes: undefined,
+			open: true,
+		});
+		stdout.mockRestore();
+		stderr.mockRestore();
 	});
 });

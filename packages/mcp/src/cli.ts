@@ -20,6 +20,7 @@ import {
 	resolveWebOrigin,
 	setDefaultNetwork,
 	type BridgeOptions,
+	type LogoutBridge,
 } from './wallet/index.js';
 
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
@@ -110,31 +111,46 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					.option('all', {
 						type: 'boolean',
 						default: false,
-						description: 'Disconnect wallets on every network',
+						description:
+							'Disconnect wallets on every network; with default web origins, opens one page per network',
 					})
 					.option('json', JSON_OPTION),
 			async (args) => {
 				const bridgeArgs = args as unknown as BridgeArgs;
 				const credentials = await loadCredentials();
-				const network = args.all
-					? undefined
-					: (args.network ?? credentials.defaultNetwork);
-				const bridge = await createLogoutBridge({
-					network,
-					all: args.all,
-					webOrigin: resolveWebOrigin(
-						network ?? credentials.defaultNetwork,
-						bridgeArgs.webUrl,
-					),
-					...getBridgeOptions(bridgeArgs),
-				});
+				const network = args.network ?? credentials.defaultNetwork;
+				const bridgeOptions = getBridgeOptions(bridgeArgs);
+				const useNetworkOrigins =
+					args.all && !bridgeArgs.webUrl && !process.env[BRIDGE_WEB_URL_ENV];
+				const bridges: Array<LogoutBridge> = [];
+				if (useNetworkOrigins) {
+					for (const logoutNetwork of SUPPORTED_SUI_NETWORKS) {
+						bridges.push(
+							await createLogoutBridge({
+								network: logoutNetwork,
+								all: true,
+								webOrigin: resolveWebOrigin(logoutNetwork),
+								...bridgeOptions,
+							}),
+						);
+					}
+				} else {
+					bridges.push(
+						await createLogoutBridge({
+							network: args.all ? undefined : network,
+							all: args.all,
+							webOrigin: resolveWebOrigin(network, bridgeArgs.webUrl),
+							...bridgeOptions,
+						}),
+					);
+				}
 				process.stderr.write(
-					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,
+					`Open ${bridges.length === 1 ? 'this URL' : 'these URLs'} to disconnect your wallet:\n${bridges.map((bridge) => bridge.url).join('\n')}\n`,
 				);
-				await bridge.done;
+				await Promise.all(bridges.map((bridge) => bridge.done));
 				process.stdout.write(
 					args.json
-						? `${JSON.stringify({ network, all: args.all, loggedOut: true })}\n`
+						? `${JSON.stringify({ network: args.all ? undefined : network, all: args.all, loggedOut: true })}\n`
 						: args.all
 							? 'Logged out of every Suigar MCP wallet.\n'
 							: `Logged out of Suigar MCP on ${network}.\n`,
