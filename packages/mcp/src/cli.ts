@@ -7,17 +7,17 @@ import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
 import {
-	BRIDGE_TIMEOUT_ENV,
+	BRIDGE_MAX_BODY_BYTES_ENV,
+	BRIDGE_TIMEOUT_MS_ENV,
+	BRIDGE_WEB_URL_ENV,
 	clearCredentials,
 	createLoginBridge,
 	createLogoutBridge,
 	DEFAULT_MAX_BODY_BYTES,
 	DEFAULT_TIMEOUT_MS,
 	loadCredentials,
-	MAX_BODY_BYTES_ENV,
 	resolveWebOrigin,
 	setDefaultNetwork,
-	WEB_URL_ENV,
 	type BridgeOptions,
 } from './wallet/index.js';
 
@@ -38,15 +38,15 @@ const addBridgeOptions = (command: Argv): Argv =>
 	command
 		.option('timeout-ms', {
 			type: 'number' as const,
-			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_ENV} or ${DEFAULT_TIMEOUT_MS}`,
+			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_MS_ENV} or ${DEFAULT_TIMEOUT_MS}`,
 		})
 		.option('max-body-bytes', {
 			type: 'number' as const,
-			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
+			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${BRIDGE_MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
 		})
 		.option('web-url', {
 			type: 'string' as const,
-			description: `Browser app origin for wallet pairing and approval pages; defaults to ${WEB_URL_ENV} or the selected network origin`,
+			description: `Browser app origin for wallet pairing and approval pages; defaults to ${BRIDGE_WEB_URL_ENV} or the selected network origin`,
 		})
 		.option('open', {
 			type: 'boolean' as const,

@@ -21,8 +21,8 @@ import {
 
 export const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 export const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
-export const BRIDGE_TIMEOUT_ENV = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
-export const MAX_BODY_BYTES_ENV = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
+export const BRIDGE_TIMEOUT_MS_ENV = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
+export const BRIDGE_MAX_BODY_BYTES_ENV = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
 
 export type BridgeOptions = {
 	timeoutMs?: number;
@@ -71,12 +71,12 @@ const resolvePositiveInteger = (
 
 const resolveBridgeOptions = (options: BridgeOptions = {}) => ({
 	timeoutMs: resolvePositiveInteger(
-		options.timeoutMs ?? process.env[BRIDGE_TIMEOUT_ENV],
+		options.timeoutMs ?? process.env[BRIDGE_TIMEOUT_MS_ENV],
 		'Bridge timeout',
 		DEFAULT_TIMEOUT_MS,
 	),
 	maxBodyBytes: resolvePositiveInteger(
-		options.maxBodyBytes ?? process.env[MAX_BODY_BYTES_ENV],
+		options.maxBodyBytes ?? process.env[BRIDGE_MAX_BODY_BYTES_ENV],
 		'Maximum bridge request body size',
 		DEFAULT_MAX_BODY_BYTES,
 	),

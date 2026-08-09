@@ -24,7 +24,7 @@
 					"isRequired": false,
 					"format": "string",
 					"isSecret": false,
-					"name": "SUIGAR_MCP_WEB_URL"
+					"name": "SUIGAR_MCP_BRIDGE_WEB_URL"
 				},
 				{
 					"description": "Milliseconds before local browser login, logout, and approval bridges expire.",

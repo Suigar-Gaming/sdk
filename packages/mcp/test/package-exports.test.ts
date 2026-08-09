@@ -51,7 +51,7 @@ describe('package exports', () => {
 					transport: { type: 'stdio' },
 					environmentVariables: [
 						{
-							name: 'SUIGAR_MCP_WEB_URL',
+							name: 'SUIGAR_MCP_BRIDGE_WEB_URL',
 							isRequired: false,
 							format: 'string',
 							isSecret: false,
