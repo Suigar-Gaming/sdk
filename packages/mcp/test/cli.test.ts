@@ -27,11 +27,13 @@ vi.mock('../src/wallet/index.js', () => ({
 	DEFAULT_TIMEOUT_MS: 5 * 60_000,
 	loadCredentials: mocks.loadCredentials,
 	MAX_BODY_BYTES_ENV: 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES',
-	resolveWebOrigin: (network: 'mainnet' | 'testnet') =>
-		network === 'mainnet'
+	resolveWebOrigin: (network: 'mainnet' | 'testnet', webUrl?: string) =>
+		webUrl ??
+		(network === 'mainnet'
 			? 'https://mcp.suigar.com'
-			: 'https://mcp.testnet.suigar.com',
+			: 'https://mcp.testnet.suigar.com'),
 	setDefaultNetwork: vi.fn<() => void>(),
+	WEB_URL_ENV: 'SUIGAR_MCP_WEB_URL',
 }));
 
 const { runSuigarCli } = await import('../src/cli.js');
@@ -59,8 +61,10 @@ describe('suigar cli bridge options', () => {
 				'mainnet',
 				'--bridge-timeout-ms',
 				'1000',
-				'--max-body-bytes',
+				'--bridge-max-body-bytes',
 				'2048',
+				'--web-url',
+				'http://localhost:5173',
 				'--no-open',
 				'--json',
 			]);
@@ -71,7 +75,7 @@ describe('suigar cli bridge options', () => {
 
 		expect(mocks.createLoginBridge).toHaveBeenCalledWith({
 			network: 'mainnet',
-			webOrigin: 'https://mcp.suigar.com',
+			webOrigin: 'http://localhost:5173',
 			timeoutMs: 1000,
 			maxBodyBytes: 2048,
 			open: false,

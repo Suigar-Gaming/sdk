@@ -17,6 +17,7 @@ import {
 	MAX_BODY_BYTES_ENV,
 	resolveWebOrigin,
 	setDefaultNetwork,
+	WEB_URL_ENV,
 	type BridgeOptions,
 } from './wallet/index.js';
 
@@ -24,8 +25,9 @@ type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
 type BridgeArgs = ArgumentsCamelCase<{
 	bridgeTimeoutMs?: number;
-	maxBodyBytes?: number;
+	bridgeMaxBodyBytes?: number;
 	open: boolean;
+	webUrl?: string;
 }>;
 const JSON_OPTION = {
 	type: 'boolean' as const,
@@ -38,9 +40,13 @@ const addBridgeOptions = (command: Argv): Argv =>
 			type: 'number' as const,
 			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_ENV} or ${DEFAULT_TIMEOUT_MS}`,
 		})
-		.option('max-body-bytes', {
+		.option('bridge-max-body-bytes', {
 			type: 'number' as const,
 			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
+		})
+		.option('web-url', {
+			type: 'string' as const,
+			description: `Browser app origin for wallet pairing and approval pages; defaults to ${WEB_URL_ENV} or the selected network origin`,
 		})
 		.option('open', {
 			type: 'boolean' as const,
@@ -50,7 +56,7 @@ const addBridgeOptions = (command: Argv): Argv =>
 		});
 const getBridgeOptions = (args: BridgeArgs): BridgeOptions => ({
 	timeoutMs: args.bridgeTimeoutMs,
-	maxBodyBytes: args.maxBodyBytes,
+	maxBodyBytes: args.bridgeMaxBodyBytes,
 	open: args.open,
 });
 
@@ -75,7 +81,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const network = args.network as SuigarNetwork;
 				const bridge = await createLoginBridge({
 					network,
-					webOrigin: resolveWebOrigin(network),
+					webOrigin: resolveWebOrigin(network, bridgeArgs.webUrl),
 					...getBridgeOptions(bridgeArgs),
 				});
 				process.stderr.write(
@@ -115,7 +121,10 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 				const bridge = await createLogoutBridge({
 					network,
 					all: args.all,
-					webOrigin: resolveWebOrigin(network ?? credentials.defaultNetwork),
+					webOrigin: resolveWebOrigin(
+						network ?? credentials.defaultNetwork,
+						bridgeArgs.webUrl,
+					),
 					...getBridgeOptions(bridgeArgs),
 				});
 				process.stderr.write(

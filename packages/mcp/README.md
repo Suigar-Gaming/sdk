@@ -143,9 +143,9 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`), `status`, `logout`, or `clean`.
   - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
   - `status` inspects the current connection; `logout --all` disconnects every stored network; and `clean` removes the local credential file without opening a browser.
-  - Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
+  - Set `SUIGAR_MCP_WEB_URL` or pass `--web-url` to use a local or custom connection-page origin.
   - Set `SUIGAR_MCP_BRIDGE_TIMEOUT_MS` or pass `--bridge-timeout-ms` to control how long login, logout, and approval bridges wait before expiring. The default is `300000`.
-  - Set `SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES` or pass `--max-body-bytes` to control the maximum browser callback JSON body size. The default is `16384`.
+  - Set `SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES` or pass `--bridge-max-body-bytes` to control the maximum browser callback JSON body size. The default is `16384`.
   - Bridge URLs open automatically by default. Pass `--no-open` for CLI login or logout when you only want the URL printed.
   - Your MCP client discovers the available tools automatically through the MCP protocol.
 
