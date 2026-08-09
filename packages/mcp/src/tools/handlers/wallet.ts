@@ -1,13 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {
 	createSuigarClient,
 	type ToolTextResult,
 } from '../../runtime/index.js';
-import { formatBaseUnitAmount } from '../../utils/index.js';
+import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {
 	createSessionWalletSetup,
 	getExecutionStatus,
@@ -29,21 +28,6 @@ import {
 	resolveCoinDisplayMetadata,
 	resolveWalletOwner,
 } from './shared.js';
-
-const runSuigarNpxCommand = (...args: Array<string>) => {
-	const npxArgs = ['-y', '@suigar/mcp', ...args];
-	const child = spawn('npx', npxArgs, {
-		detached: true,
-		stdio: 'ignore',
-		env: process.env,
-	});
-	child.on('error', () => undefined);
-	child.unref();
-	return {
-		command: ['npx', ...npxArgs].join(' '),
-		pid: child.pid,
-	};
-};
 
 export const getWalletBalancesTool = async (
 	input: GetWalletBalancesInput,
@@ -157,7 +141,7 @@ export const suigarLoginTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const command = runSuigarNpxCommand('login', '--network', config.network);
+	const command = runSuigarCommand('login', '--network', config.network);
 	return asTextResponse({
 		network: config.network,
 		config,
@@ -174,7 +158,7 @@ export const suigarLogoutTool = async (
 	input: ConnectionInput,
 ): Promise<ToolTextResult> => {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const command = runSuigarNpxCommand('logout', '--network', config.network);
+	const command = runSuigarCommand('logout', '--network', config.network);
 	return asTextResponse({
 		network: config.network,
 		config,
