@@ -6,82 +6,24 @@ import { describe, expect, it, vi } from 'vitest';
 import type {
 	BuildTransactionResult,
 	ReadOnlyPlan,
-} from '../../src/runtime/types.js';
+} from '../../../src/runtime/types.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
-	buildNftV1MintTransactionTool,
 	buildPlinkoTransactionTool,
 	buildPvpCoinflipCancelTransactionTool,
 	buildPvpCoinflipCreateTransactionTool,
 	buildPvpCoinflipJoinTransactionTool,
 	buildRangeTransactionTool,
-	buildReferralCommissionClaimTransactionTool,
-	buildReferralLevelUpUsdRewardsClaimTransactionTool,
 	buildSoccerTransactionTool,
 	buildWheelTransactionTool,
-	listNftsTool,
-	readConfigTool,
-	readGameMetadataTool,
-} from '../../src/tools/handlers/index.js';
+} from '../../../src/tools/handlers/index.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
 
-describe('read tools', () => {
-	it('defaults read_config to testnet and returns SDK-shaped config', async () => {
-		const result = await readConfigTool({});
-		const content = result.structuredContent as Awaited<
-			ReturnType<typeof readConfigTool>
-		>['structuredContent'] & {
-			supportedGames: Array<{ id: string }>;
-			supportedFeatures: Array<{ id: string; tools: Array<string> }>;
-		};
-
-		expect(content.network).toBe('testnet');
-		expect(content.config.sdk.packageIds.coinflip).toMatch(/^0x/u);
-		expect(content.config.sdk.packageIds.soccer).toMatch(/^0x/u);
-		expect(content.config.sdk.objectIds.sweetHouse).toMatch(/^0x/u);
-		expect(content.config.sdk.coins.sui.coinType).toMatch(/::/u);
-		expect(content.supportedGames.map((game) => game.id)).toContain(
-			'pvp-coinflip',
-		);
-		expect(content.supportedFeatures).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					id: 'nfts',
-					tools: ['list_nfts', 'build_nft_v1_mint_transaction'],
-				}),
-				expect.objectContaining({
-					id: 'referrals',
-					tools: expect.arrayContaining([
-						'get_referral_commission',
-						'build_referral_commission_claim_transaction',
-					]),
-				}),
-			]),
-		);
-	});
-
-	it('requires one supported game when reading live game metadata', async () => {
-		await expect(readGameMetadataTool({})).rejects.toThrow(
-			'Missing required field: game.',
-		);
-		await expect(
-			readGameMetadataTool({ game: 'slots' as never }),
-		).rejects.toThrow(/Unsupported game/u);
-	});
-
-	it('requires an owner when listing NFTs', async () => {
-		await expect(listNftsTool({})).rejects.toThrow(
-			'Missing required field: owner.',
-		);
-	});
-});
-
-describe('read-only transaction tools', () => {
+describe('game transaction tools', () => {
 	it.each([
-		['NFT V1 mint', () => buildNftV1MintTransactionTool({ mode: 'read-only' })],
 		[
 			'coinflip',
 			() => buildCoinflipTransactionTool({ mode: 'read-only', side: 'heads' }),
@@ -142,17 +84,6 @@ describe('read-only transaction tools', () => {
 					gameId: '0x1',
 				}),
 		],
-		[
-			'referral commission claim',
-			() => buildReferralCommissionClaimTransactionTool({ mode: 'read-only' }),
-		],
-		[
-			'referral level-up USD rewards claim',
-			() =>
-				buildReferralLevelUpUsdRewardsClaimTransactionTool({
-					mode: 'read-only',
-				}),
-		],
 	])('returns a read-only plan for %s', async (_name, run) => {
 		const result = await run();
 		const content = result.structuredContent as ReadOnlyPlan;
@@ -161,76 +92,6 @@ describe('read-only transaction tools', () => {
 		expect(content.network).toBe('testnet');
 		expect(content.plan.target).toMatch(/^0x.*::/u);
 		expect(result.content[0].text).toContain('"read-only"');
-	});
-
-	it('returns an NFT V1 mint plan with its resolved configuration', async () => {
-		const result = await buildNftV1MintTransactionTool({
-			mode: 'read-only',
-		});
-		const content = result.structuredContent as {
-			plan: { target: string; requiredInputs: Array<string> };
-			nft: { packageId: string; factoryId: string };
-		};
-
-		expect(content.plan.target).toMatch(/::nft::mint_to_sender$/u);
-		expect(content.plan.requiredInputs).toEqual(['owner', 'specId']);
-		expect(content.nft.packageId).toMatch(/^0x/u);
-		expect(content.nft.factoryId).toMatch(/^0x/u);
-	});
-
-	it('uses the generated commission claim target in its referral plan', async () => {
-		const result = await buildReferralCommissionClaimTransactionTool({
-			mode: 'read-only',
-		});
-		const content = result.structuredContent as ReadOnlyPlan;
-
-		expect(content.plan.target).toContain('::claim_commission_balance');
-	});
-
-	it('uses the generated level-up USD claim target in its referral plan', async () => {
-		const result = await buildReferralLevelUpUsdRewardsClaimTransactionTool({
-			mode: 'read-only',
-		});
-		const content = result.structuredContent as ReadOnlyPlan;
-
-		expect(content.plan.target).toContain(
-			'::claim_referrer_level_up_usd_rewards',
-		);
-	});
-});
-
-describe('build transaction tools', () => {
-	it('builds SDK-backed referral commission and level-up USD reward claims', async () => {
-		const buildSpy = vi
-			.spyOn(Transaction.prototype, 'build')
-			.mockResolvedValue(new Uint8Array([1]));
-
-		try {
-			const [commission, levelUp] = await Promise.all([
-				buildReferralCommissionClaimTransactionTool({ mode: 'build', owner }),
-				buildReferralLevelUpUsdRewardsClaimTransactionTool({
-					mode: 'build',
-					owner,
-				}),
-			]);
-			const commissionSummary = (
-				commission.structuredContent as BuildTransactionResult
-			).summary;
-			const levelUpSummary = (
-				levelUp.structuredContent as BuildTransactionResult
-			).summary;
-
-			expect(commissionSummary.gameInputs).toEqual({
-				referralClaim: 'commission',
-			});
-			expect(levelUpSummary.gameInputs).toEqual({
-				referralClaim: 'level-up-usd-rewards',
-			});
-			expect(commissionSummary.commandCount).toBeGreaterThan(1);
-			expect(levelUpSummary.commandCount).toBeGreaterThan(1);
-		} finally {
-			buildSpy.mockRestore();
-		}
 	});
 
 	it('returns serialized base64 bytes and summary for an SDK-backed build', async () => {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { toolOutputSchema } from '../../src/tools/schemas/output.js';
+import { toolOutputSchema } from '../../../src/tools/schemas/output.js';
 
 const mocks = vi.hoisted(() => ({
 	createSessionWalletSetup: vi.fn<() => Promise<unknown>>(),
@@ -22,7 +22,7 @@ vi.mock('qrcode', () => ({
 	},
 }));
 
-vi.mock('../../src/runtime/index.js', () => ({
+vi.mock('../../../src/runtime/index.js', () => ({
 	createSuigarClient: (input: { network?: 'mainnet' | 'testnet' }) => ({
 		config: { network: input.network ?? 'testnet' },
 		client: {
@@ -33,7 +33,7 @@ vi.mock('../../src/runtime/index.js', () => ({
 	}),
 }));
 
-vi.mock('../../src/utils/index.js', () => ({
+vi.mock('../../../src/utils/index.js', () => ({
 	formatBaseUnitAmount: (value: string) =>
 		value === '1200000000'
 			? '1.2'
@@ -45,7 +45,7 @@ vi.mock('../../src/utils/index.js', () => ({
 	runSuigarCommand: mocks.runSuigarCommand,
 }));
 
-vi.mock('../../src/wallet/index.js', () => ({
+vi.mock('../../../src/wallet/index.js', () => ({
 	createSessionWalletSetup: mocks.createSessionWalletSetup,
 	getExecutionStatus: vi.fn<() => void>(),
 	listSessionWallets: mocks.listSessionWallets,
@@ -54,7 +54,7 @@ vi.mock('../../src/wallet/index.js', () => ({
 	resolveWebOrigin: () => 'https://mcp.testnet.suigar.com',
 }));
 
-vi.mock('../../src/tools/handlers/shared.js', () => ({
+vi.mock('../../../src/tools/handlers/shared.js', () => ({
 	asTextResponse: (structuredContent: unknown) => ({
 		content: [{ type: 'text', text: JSON.stringify(structuredContent) }],
 		structuredContent,
@@ -69,7 +69,7 @@ const {
 	getSessionWalletTool,
 	suigarLoginTool,
 	suigarLogoutTool,
-} = await import('../../src/tools/handlers/wallet.js');
+} = await import('../../../src/tools/handlers/wallet.js');
 
 const pairedAddress =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
