@@ -18,7 +18,29 @@
 			"transport": {
 				"type": "stdio"
 			},
-			"environmentVariables": []
+			"environmentVariables": [
+				{
+					"description": "Custom Suigar MCP browser app origin for wallet pairing and approval pages.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_WEB_URL"
+				},
+				{
+					"description": "Milliseconds before local browser login, logout, and approval bridges expire.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_BRIDGE_TIMEOUT_MS"
+				},
+				{
+					"description": "Maximum JSON callback body size in bytes for local browser bridges.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES"
+				}
+			]
 		}
 	]
 }

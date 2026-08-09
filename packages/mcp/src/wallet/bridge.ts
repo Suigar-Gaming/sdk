@@ -19,10 +19,10 @@ import {
 	type WalletType,
 } from './credentials.js';
 
-const DEFAULT_TIMEOUT_MS = 5 * 60_000;
-const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
-const BRIDGE_TIMEOUT_ENV = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
-const MAX_BODY_BYTES_ENV = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
+export const DEFAULT_TIMEOUT_MS = 5 * 60_000;
+export const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
+export const BRIDGE_TIMEOUT_ENV = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
+export const MAX_BODY_BYTES_ENV = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
 
 export type BridgeOptions = {
 	timeoutMs?: number;

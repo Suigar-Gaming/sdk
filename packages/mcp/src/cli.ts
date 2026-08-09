@@ -7,10 +7,14 @@ import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
 import {
+	BRIDGE_TIMEOUT_ENV,
 	clearCredentials,
 	createLoginBridge,
 	createLogoutBridge,
+	DEFAULT_MAX_BODY_BYTES,
+	DEFAULT_TIMEOUT_MS,
 	loadCredentials,
+	MAX_BODY_BYTES_ENV,
 	resolveWebOrigin,
 	setDefaultNetwork,
 	type BridgeOptions,
@@ -32,13 +36,11 @@ const addBridgeOptions = (command: Argv): Argv =>
 	command
 		.option('bridge-timeout-ms', {
 			type: 'number' as const,
-			description:
-				'Milliseconds before a local browser bridge expires; defaults to SUIGAR_MCP_BRIDGE_TIMEOUT_MS or 300000',
+			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_ENV} or ${DEFAULT_TIMEOUT_MS}`,
 		})
 		.option('max-body-bytes', {
 			type: 'number' as const,
-			description:
-				'Maximum JSON callback body size for the local browser bridge; defaults to SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES or 16384',
+			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
 		})
 		.option('open', {
 			type: 'boolean' as const,

@@ -49,7 +49,26 @@ describe('package exports', () => {
 					identifier: packageJson.name,
 					version: packageJson.version,
 					transport: { type: 'stdio' },
-					environmentVariables: [],
+					environmentVariables: [
+						{
+							name: 'SUIGAR_MCP_WEB_URL',
+							isRequired: false,
+							format: 'string',
+							isSecret: false,
+						},
+						{
+							name: 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS',
+							isRequired: false,
+							format: 'string',
+							isSecret: false,
+						},
+						{
+							name: 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES',
+							isRequired: false,
+							format: 'string',
+							isSecret: false,
+						},
+					],
 				},
 			],
 		});

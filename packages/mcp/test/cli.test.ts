@@ -19,10 +19,14 @@ vi.mock('../src/server/index.js', () => ({
 }));
 
 vi.mock('../src/wallet/index.js', () => ({
+	BRIDGE_TIMEOUT_ENV: 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS',
 	clearCredentials: vi.fn<() => void>(),
 	createLoginBridge: mocks.createLoginBridge,
 	createLogoutBridge: mocks.createLogoutBridge,
+	DEFAULT_MAX_BODY_BYTES: 16 * 1024,
+	DEFAULT_TIMEOUT_MS: 5 * 60_000,
 	loadCredentials: mocks.loadCredentials,
+	MAX_BODY_BYTES_ENV: 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES',
 	resolveWebOrigin: (network: 'mainnet' | 'testnet') =>
 		network === 'mainnet'
 			? 'https://mcp.suigar.com'
