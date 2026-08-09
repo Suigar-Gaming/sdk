@@ -211,7 +211,7 @@ export const resolveWalletOwner = async (
 	const profile = credentials.profiles[bundle.config.network];
 	if (!profile)
 		throw new Error(
-			`No wallet is connected for ${bundle.config.network}. Call suigar_login first.`,
+			`No wallet is connected for ${bundle.config.network}. Call "suigar_login" first.`,
 		);
 	return profile.address;
 };

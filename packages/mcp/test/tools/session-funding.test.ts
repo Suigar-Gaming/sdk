@@ -51,7 +51,7 @@ describe('fund_session_wallet', () => {
 		mocks.loadSessionWallet.mockResolvedValue({ address: sessionAddress });
 
 		await expect(fundSessionWalletTool({ network: 'testnet' })).rejects.toThrow(
-			'Call suigar_login first',
+			'Call "suigar_login" first',
 		);
 	});
 });

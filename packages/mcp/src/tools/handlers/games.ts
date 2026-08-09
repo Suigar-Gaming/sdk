@@ -405,7 +405,7 @@ const gameTransactionOptions = async (
 		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
 		if (!sessionWallet) {
 			throw new Error(
-				'No session wallet exists. Call setup_session_wallet first, then fund its address before executing games.',
+				'No session wallet exists. Call "setup_session_wallet" first, then fund its address before executing games.',
 			);
 		}
 		const sessionAddress = (
@@ -413,7 +413,7 @@ const gameTransactionOptions = async (
 		).toSuiAddress();
 		if (sessionWallet.address !== sessionAddress) {
 			throw new Error(
-				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with setup_session_wallet before executing games.',
+				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with "setup_session_wallet" before executing games.',
 			);
 		}
 		if (input.owner) {

@@ -301,7 +301,7 @@ export const getSessionWalletTool = async (
 				...(fundingUrl ? { fundingUrl } : {}),
 				note: fundingUrl
 					? 'Open the funding URL to select a coin and amount from the paired wallet, then approve the transfer in the browser.'
-					: `Pair a wallet on ${bundle.config.network} with suigar_login before opening the funding flow.`,
+					: `Pair a wallet on ${bundle.config.network} with "suigar_login" before opening the funding flow.`,
 			},
 		},
 	});
@@ -318,12 +318,12 @@ export const fundSessionWalletTool = async (
 	const profile = credentials.profiles[config.network];
 	if (!profile) {
 		throw new Error(
-			'No wallet is connected for this network. Call suigar_login first.',
+			'No wallet is connected for this network. Call "suigar_login" first.',
 		);
 	}
 	if (!sessionWallet) {
 		throw new Error(
-			'No session wallet exists. Call setup_session_wallet first.',
+			'No session wallet exists. Call "setup_session_wallet" first.',
 		);
 	}
 

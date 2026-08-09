@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import open from 'open';
 import type { ArgumentsCamelCase, Argv } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
@@ -14,15 +13,44 @@ import {
 	loadCredentials,
 	resolveWebOrigin,
 	setDefaultNetwork,
+	type BridgeOptions,
 } from './wallet/index.js';
 
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
+type BridgeArgs = ArgumentsCamelCase<{
+	bridgeTimeoutMs?: number;
+	maxBodyBytes?: number;
+	open: boolean;
+}>;
 const JSON_OPTION = {
 	type: 'boolean' as const,
 	default: false,
 	description: 'Output machine-readable JSON instead of human-readable text',
 };
+const addBridgeOptions = (command: Argv): Argv =>
+	command
+		.option('bridge-timeout-ms', {
+			type: 'number' as const,
+			description:
+				'Milliseconds before a local browser bridge expires; defaults to SUIGAR_MCP_BRIDGE_TIMEOUT_MS or 300000',
+		})
+		.option('max-body-bytes', {
+			type: 'number' as const,
+			description:
+				'Maximum JSON callback body size for the local browser bridge; defaults to SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES or 16384',
+		})
+		.option('open', {
+			type: 'boolean' as const,
+			default: true,
+			description:
+				'Open the connection page in the default browser; use --no-open to only print its URL',
+		});
+const getBridgeOptions = (args: BridgeArgs): BridgeOptions => ({
+	timeoutMs: args.bridgeTimeoutMs,
+	maxBodyBytes: args.maxBodyBytes,
+	open: args.open,
+});
 
 export async function runSuigarCli(argv = hideBin(process.argv)) {
 	const parser = yargs(argv)
@@ -33,35 +61,24 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'login',
 			'Connect a wallet in the Suigar browser app',
-			(command: Argv) =>
-				command
+			(command) =>
+				addBridgeOptions(command)
 					.option('network', {
 						choices: SUPPORTED_SUI_NETWORKS,
 						default: 'testnet',
 					})
-					.option('no-open', {
-						type: 'boolean',
-						default: false,
-						description:
-							'Do not open the connection page in the default browser; print its URL instead',
-					})
 					.option('json', JSON_OPTION),
-			async (
-				args: ArgumentsCamelCase<{
-					network: SuigarNetwork;
-					noOpen: boolean;
-					json: boolean;
-				}>,
-			) => {
-				const network = args.network;
+			async (args) => {
+				const bridgeArgs = args as unknown as BridgeArgs;
+				const network = args.network as SuigarNetwork;
 				const bridge = await createLoginBridge({
 					network,
 					webOrigin: resolveWebOrigin(network),
+					...getBridgeOptions(bridgeArgs),
 				});
 				process.stderr.write(
 					`Open this URL to connect your wallet:\n${bridge.url}\n`,
 				);
-				if (!args.noOpen) await open(bridge.url).catch(() => undefined);
 				const profile = await bridge.done;
 				const result = {
 					network,
@@ -78,29 +95,17 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'logout',
 			'Disconnect a wallet through the Suigar browser app',
-			(command: Argv) =>
-				command
+			(command) =>
+				addBridgeOptions(command)
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
 					.option('all', {
 						type: 'boolean',
 						default: false,
 						description: 'Disconnect wallets on every network',
 					})
-					.option('no-open', {
-						type: 'boolean',
-						default: false,
-						description:
-							'Do not open the connection page in the default browser; print its URL instead',
-					})
 					.option('json', JSON_OPTION),
-			async (
-				args: NetworkArgs &
-					JsonArgs &
-					ArgumentsCamelCase<{
-						all: boolean;
-						noOpen: boolean;
-					}>,
-			) => {
+			async (args) => {
+				const bridgeArgs = args as unknown as BridgeArgs;
 				const credentials = await loadCredentials();
 				const network = args.all
 					? undefined
@@ -109,11 +114,11 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					network,
 					all: args.all,
 					webOrigin: resolveWebOrigin(network ?? credentials.defaultNetwork),
+					...getBridgeOptions(bridgeArgs),
 				});
 				process.stderr.write(
 					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,
 				);
-				if (!args.noOpen) await open(bridge.url).catch(() => undefined);
 				await bridge.done;
 				process.stdout.write(
 					args.json
