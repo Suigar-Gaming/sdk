@@ -1,8 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { Transaction } from '@mysten/sui/transactions';
-import { describe, expect, it, vi } from 'vitest';
+import type { Transaction as SuiTransaction } from '@mysten/sui/transactions';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
 	BuildTransactionResult,
 	ReadOnlyPlan,
@@ -12,8 +12,33 @@ import {
 	buildReferralLevelUpUsdRewardsClaimTransactionTool,
 } from '../../../src/tools/handlers/index.js';
 
+const mocks = vi.hoisted(() => ({
+	buildTransactionBytes:
+		vi.fn<(...args: Array<unknown>) => Promise<Uint8Array>>(),
+}));
+
+vi.mock('@mysten/sui/transactions', async (importOriginal) => {
+	const actual =
+		await importOriginal<typeof import('@mysten/sui/transactions')>();
+
+	return {
+		...actual,
+		Transaction: class MockTransaction extends actual.Transaction {
+			override build = mocks.buildTransactionBytes as SuiTransaction['build'];
+		},
+	};
+});
+
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
+
+beforeEach(() => {
+	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));
+});
+
+afterEach(() => {
+	mocks.buildTransactionBytes.mockReset();
+});
 
 describe('referral transaction tools', () => {
 	it.each([
@@ -59,35 +84,26 @@ describe('referral transaction tools', () => {
 	});
 
 	it('builds SDK-backed commission and level-up USD reward claims', async () => {
-		const buildSpy = vi
-			.spyOn(Transaction.prototype, 'build')
-			.mockResolvedValue(new Uint8Array([1]));
+		const [commission, levelUp] = await Promise.all([
+			buildReferralCommissionClaimTransactionTool({ mode: 'build', owner }),
+			buildReferralLevelUpUsdRewardsClaimTransactionTool({
+				mode: 'build',
+				owner,
+			}),
+		]);
+		const commissionSummary = (
+			commission.structuredContent as BuildTransactionResult
+		).summary;
+		const levelUpSummary = (levelUp.structuredContent as BuildTransactionResult)
+			.summary;
 
-		try {
-			const [commission, levelUp] = await Promise.all([
-				buildReferralCommissionClaimTransactionTool({ mode: 'build', owner }),
-				buildReferralLevelUpUsdRewardsClaimTransactionTool({
-					mode: 'build',
-					owner,
-				}),
-			]);
-			const commissionSummary = (
-				commission.structuredContent as BuildTransactionResult
-			).summary;
-			const levelUpSummary = (
-				levelUp.structuredContent as BuildTransactionResult
-			).summary;
-
-			expect(commissionSummary.gameInputs).toEqual({
-				referralClaim: 'commission',
-			});
-			expect(levelUpSummary.gameInputs).toEqual({
-				referralClaim: 'level-up-usd-rewards',
-			});
-			expect(commissionSummary.commandCount).toBeGreaterThan(1);
-			expect(levelUpSummary.commandCount).toBeGreaterThan(1);
-		} finally {
-			buildSpy.mockRestore();
-		}
+		expect(commissionSummary.gameInputs).toEqual({
+			referralClaim: 'commission',
+		});
+		expect(levelUpSummary.gameInputs).toEqual({
+			referralClaim: 'level-up-usd-rewards',
+		});
+		expect(commissionSummary.commandCount).toBeGreaterThan(1);
+		expect(levelUpSummary.commandCount).toBeGreaterThan(1);
 	});
 });
