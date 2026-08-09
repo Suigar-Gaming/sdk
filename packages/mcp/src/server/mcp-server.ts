@@ -4,7 +4,7 @@
 import { registerAppResource } from '@modelcontextprotocol/ext-apps/server';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { SUIGAR_MCP_VERSION } from '../utils/index.js';
+import { VERSION } from '../utils/index.js';
 import {
 	createSuigarMcpAppResourceMeta,
 	createSuigarMcpAppResourceResult,
@@ -15,7 +15,7 @@ import { registerSuigarTools } from './tool-registration.js';
 export const createSuigarMcpServer = () => {
 	const server = new McpServer({
 		name: 'suigar',
-		version: SUIGAR_MCP_VERSION,
+		version: VERSION,
 		description:
 			'Stdio MCP server and MCP App for inspecting Suigar config and building unsigned Suigar transactions on Sui.',
 	});

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { spawn } from 'node:child_process';
-import { SUIGAR_MCP_VERSION } from './version.js';
+import { VERSION } from './version.js';
 
 export const runSuigarCommand = (...args: Array<string>) => {
-	const npxArgs = ['-y', `@suigar/mcp@${SUIGAR_MCP_VERSION}`, ...args];
+	const npxArgs = ['-y', `@suigar/mcp@${VERSION}`, ...args];
 	const child = spawn('npx', npxArgs, {
 		detached: true,
 		stdio: 'ignore',

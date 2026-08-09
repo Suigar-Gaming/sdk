@@ -6,6 +6,7 @@ import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
+import { VERSION } from './utils/index.js';
 import {
 	BRIDGE_MAX_BODY_BYTES_ENV,
 	BRIDGE_TIMEOUT_MS_ENV,
@@ -65,7 +66,7 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.scriptName('')
 		.strict()
 		.help()
-		.version()
+		.version(VERSION)
 		.command(
 			'login',
 			'Connect a wallet in the Suigar browser app',
