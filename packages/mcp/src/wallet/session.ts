@@ -175,7 +175,7 @@ const success = (wallet: SessionWallet, accountUrl?: string) => {
 		children: `<p class="eyebrow">SUIGAR MCP</p><div class="success" aria-hidden="true">✓</div><h1 class="heading">Session wallet ready</h1>
 <p class="lead">Your ${wallet.source === 'created' ? 'new' : wallet.source === 'imported' ? 'recovered' : 'imported'} session wallet is ready to use for both Suigar mainnet and testnet.</p>
 <div class="details"><p>Name</p><code class="inline">${escapeHtml(wallet.name)}</code><p>Address</p><code class="recovery">${escapeHtml(wallet.address)}</code><p>Session wallet details saved to <code class="inline">${escapeHtml(displayFile)}</code>.</p><p>The signing key is stored in your operating-system keychain, not in that file.</p></div>
-	<p class="lead">${destination ? `This wallet will be added to your account dashboard automatically. <a href="${escapeHtml(destination)}">Open account now</a>.` : 'You may close this window and return to your MCP client.'}</p>${destination ? `<script>window.setTimeout(()=>location.assign(${JSON.stringify(destination)}),900)</script>` : ''}`,
+	<p class="lead">${destination ? `This wallet will be added to your account dashboard automatically. <a id="account-link" href="${escapeHtml(destination)}">Open account now</a>.` : 'You may close this window and return to your MCP client.'}</p>${destination ? `<script>window.setTimeout(()=>{const link=document.getElementById('account-link');if(link instanceof HTMLAnchorElement) location.assign(link.href)},900)</script>` : ''}`,
 	});
 };
 
