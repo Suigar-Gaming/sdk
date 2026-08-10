@@ -25,8 +25,8 @@ import type {
 	BuilderMode,
 	BuildTransactionResult,
 	DryRunResult,
+	McpConfig,
 	RawDryRunResult,
-	ResolvedMcpConfig,
 	SuigarMcpConfigInput,
 	TransactionSummary,
 	TransactionSummaryContext,
@@ -64,7 +64,7 @@ export type SuigarClientBundle = {
 		},
 		SuiGrpcClient
 	>;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	resolveSuiNSName(name: string): Promise<string | null>;
 };
 
@@ -72,8 +72,9 @@ export function createSuigarClient(
 	input: SuigarMcpConfigInput = {},
 ): SuigarClientBundle {
 	const network = normalizeNetwork(input.network);
+	const providerUrl = getProviderUrl(network, input.providerUrl);
 	const baseClient = new SuiGrpcClient({
-		baseUrl: getProviderUrl(network, input.providerUrl),
+		baseUrl: providerUrl,
 		network,
 	});
 	const client = baseClient.$extend(
@@ -87,9 +88,9 @@ export function createSuigarClient(
 		client,
 		config: {
 			network,
-			providerUrl: getProviderUrl(network, input.providerUrl),
+			providerUrl,
 			sdk: client.suigar.getConfig(),
-		} satisfies ResolvedMcpConfig,
+		} satisfies McpConfig,
 		resolveSuiNSName: async (name) =>
 			(
 				await baseClient.nameService.lookupName({
@@ -100,7 +101,7 @@ export function createSuigarClient(
 }
 
 export function resolveDefaultCoinType(
-	config: ResolvedMcpConfig,
+	config: McpConfig,
 	coinType?: string,
 ): string {
 	return normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
@@ -218,7 +219,7 @@ export async function buildTransactionResult({
 }: {
 	mode: Exclude<BuilderMode, 'read-only' | 'execute'>;
 	transaction: Transaction;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	client: SuigarClientBundle['client'];
 	context: TransactionSummaryContext;
 }): Promise<BuildTransactionResult> {

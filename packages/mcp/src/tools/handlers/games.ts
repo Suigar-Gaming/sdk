@@ -14,8 +14,8 @@ import {
 	executeSessionTransaction,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
+	type McpConfig,
 	type ReadOnlyPlan,
-	type ResolvedMcpConfig,
 	type SuigarClientBundle,
 	type ToolTextResult,
 	type TransactionSummaryContext,
@@ -366,7 +366,7 @@ export function requireNumber(value: unknown, fieldName: string): number {
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
 }
 function getTarget(
-	config: ResolvedMcpConfig,
+	config: McpConfig,
 	game: Game,
 	action?: PvPCoinflipAction,
 ): string {

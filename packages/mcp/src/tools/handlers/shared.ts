@@ -7,9 +7,9 @@ import {
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	type BuilderMode,
+	type McpConfig,
 	type ReadConfigResult,
 	type ReferralClaimKind,
-	type ResolvedMcpConfig,
 	type SuigarClientBundle,
 	type ToolTextResult,
 } from '../../runtime/index.js';
@@ -35,7 +35,7 @@ const GAME_TO_PACKAGE_KEY = {
 	soccer: 'soccer',
 	wheel: 'wheel',
 	'pvp-coinflip': 'pvpCoinflip',
-} as const satisfies Record<Game, keyof ResolvedMcpConfig['sdk']['packageIds']>;
+} as const satisfies Record<Game, keyof McpConfig['sdk']['packageIds']>;
 
 const GAME_TO_TOOLS = {
 	coinflip: ['build_coinflip_transaction'],
@@ -69,7 +69,7 @@ export function asTextResponse<T extends ToolTextResult['structuredContent']>(
 }
 
 export function coinMetadataForAmount(
-	config: ResolvedMcpConfig,
+	config: McpConfig,
 	coinType?: string,
 ): { coinType: string; decimals: number } {
 	const resolvedCoinType = resolveDefaultCoinType(config, coinType);
@@ -80,7 +80,7 @@ export function coinMetadataForAmount(
 
 	if (!coin) {
 		throw new RangeError(
-			`Unable to resolve decimals for coin type ${resolvedCoinType}. Add the coin to config.coins before using currency-denominated amounts.`,
+			`Unable to resolve decimals for coin type ${resolvedCoinType}. Add the coin to config.sdk.coins before using currency-denominated amounts.`,
 		);
 	}
 
@@ -252,12 +252,12 @@ export function supportedFeatures(): ReadConfigResult['supportedFeatures'] {
 	];
 }
 
-export function getPackageId(config: ResolvedMcpConfig, game: Game): string {
+export function getPackageId(config: McpConfig, game: Game): string {
 	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
 }
 
 export function referralClaimTarget(
-	config: ResolvedMcpConfig,
+	config: McpConfig,
 	kind: ReferralClaimKind,
 ): string {
 	return `${config.sdk.packageIds.referral}::referral::${
