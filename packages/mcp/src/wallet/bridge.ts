@@ -168,15 +168,14 @@ export async function createLoginBridge({
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let preflight = false;
-	let resolveDone: (profile: WalletProfile) => void;
-	let rejectDone: (error: Error) => void;
-	const done = new Promise<WalletProfile>((resolve, reject) => {
-		resolveDone = resolve;
-		rejectDone = reject;
-	});
+	const {
+		promise: done,
+		resolve,
+		reject,
+	} = Promise.withResolvers<WalletProfile>();
 	const timeout = setTimeout(() => {
 		close();
-		rejectDone(new Error('Wallet login expired. Start login again.'));
+		reject(new Error('Wallet login expired. Start login again.'));
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
@@ -228,7 +227,7 @@ export async function createLoginBridge({
 			await saveProfile(network, profile);
 			clearTimeout(timeout);
 			respond(response, 200, { ok: true });
-			resolveDone(profile);
+			resolve(profile);
 			setTimeout(close, 100).unref();
 		} catch {
 			respond(response, 400, { error: 'Invalid request' });
@@ -355,17 +354,17 @@ export async function createLogoutBridge({
 	const state = randomBytes(32).toString('hex');
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
-	let resolveDone: (result: { network?: SuigarNetwork; all: boolean }) => void;
-	let rejectDone: (error: Error) => void;
-	const done = new Promise<{ network?: SuigarNetwork; all: boolean }>(
-		(resolve, reject) => {
-			resolveDone = resolve;
-			rejectDone = reject;
-		},
-	);
+	const {
+		promise: done,
+		resolve,
+		reject,
+	} = Promise.withResolvers<{
+		network?: SuigarNetwork;
+		all: boolean;
+	}>();
 	const timeout = setTimeout(() => {
 		close();
-		rejectDone(new Error('Wallet logout expired. Start logout again.'));
+		reject(new Error('Wallet logout expired. Start logout again.'));
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
@@ -402,7 +401,7 @@ export async function createLogoutBridge({
 			else if (network) await removeProfile(network);
 			clearTimeout(timeout);
 			respond(response, 200, { ok: true });
-			resolveDone({ network, all });
+			resolve({ network, all });
 			setTimeout(close, 100).unref();
 		} catch {
 			respond(response, 400, { error: 'Invalid request' });
