@@ -77,7 +77,20 @@ export const connectionInputSchema = configInputSchema
 				'Set true to pass --no-open to the login/logout CLI and only return the bridge URL.',
 			),
 	})
-	.strict();
+	.strict()
+	.superRefine((input, context) => {
+		if (
+			input.open !== undefined &&
+			input.noOpen !== undefined &&
+			input.open === input.noOpen
+		) {
+			context.addIssue({
+				code: 'custom',
+				path: ['noOpen'],
+				message: 'open and noOpen are mutually exclusive.',
+			});
+		}
+	});
 
 export const sessionWalletInputSchema = configInputSchema
 	.extend({
