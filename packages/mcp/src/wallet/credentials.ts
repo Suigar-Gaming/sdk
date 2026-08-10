@@ -26,7 +26,7 @@ export type Credentials = {
 	profiles: Partial<Record<SuigarNetwork, WalletProfile>>;
 };
 
-const file = join(suigarMcpDataDirectory, 'credentials.json');
+const CREDENTIALS_FILE = join(suigarMcpDataDirectory, 'credentials.json');
 const empty = (): Credentials => ({
 	version: 1,
 	defaultNetwork: 'testnet',
@@ -65,7 +65,7 @@ const isValid = (value: unknown): value is Credentials => {
 	);
 };
 
-export const credentialsPath = () => file;
+export const credentialsPath = () => CREDENTIALS_FILE;
 
 /**
  * Reads the configured network without requiring callers to load full credentials.
@@ -73,7 +73,7 @@ export const credentialsPath = () => file;
  */
 export const readPersistedDefaultNetwork = (): SuigarNetwork => {
 	try {
-		const value: unknown = JSON.parse(readFileSync(file, 'utf8'));
+		const value: unknown = JSON.parse(readFileSync(CREDENTIALS_FILE, 'utf8'));
 		const network =
 			value && typeof value === 'object'
 				? (value as Credentials).defaultNetwork
@@ -86,7 +86,9 @@ export const readPersistedDefaultNetwork = (): SuigarNetwork => {
 
 export async function loadCredentials(): Promise<Credentials> {
 	try {
-		const parsed: unknown = JSON.parse(await readFile(file, 'utf8'));
+		const parsed: unknown = JSON.parse(
+			await readFile(CREDENTIALS_FILE, 'utf8'),
+		);
 		return isValid(parsed) ? parsed : empty();
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return empty();
@@ -96,10 +98,14 @@ export async function loadCredentials(): Promise<Credentials> {
 
 export async function saveCredentials(credentials: Credentials) {
 	await ensureSuigarMcpDataDirectory();
-	await writeFile(file, `${JSON.stringify(credentials, null, 2)}\n`, {
-		mode: 0o600,
-	});
-	await chmod(file, 0o600);
+	await writeFile(
+		CREDENTIALS_FILE,
+		`${JSON.stringify(credentials, null, 2)}\n`,
+		{
+			mode: 0o600,
+		},
+	);
+	await chmod(CREDENTIALS_FILE, 0o600);
 }
 
 export async function saveProfile(
@@ -128,5 +134,5 @@ export async function removeProfile(network: SuigarNetwork) {
 }
 
 export async function clearCredentials() {
-	await rm(file, { force: true });
+	await rm(CREDENTIALS_FILE, { force: true });
 }

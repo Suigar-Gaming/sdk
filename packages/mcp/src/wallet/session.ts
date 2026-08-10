@@ -19,9 +19,12 @@ import {
 	suigarMcpDataDirectory,
 } from './storage.js';
 
-const service = 'com.suigar.mcp';
-const file = join(suigarMcpDataDirectory, 'session-wallets.json');
-const displayFile = `~/${relative(homedir(), file)}`;
+const KEYCHAIN_SERVICE = 'com.suigar.mcp';
+const SESSION_WALLETS_FILE = join(
+	suigarMcpDataDirectory,
+	'session-wallets.json',
+);
+const DISPLAY_FILE = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
 
 export type SessionWallet = {
 	id: string;
@@ -31,20 +34,25 @@ export type SessionWallet = {
 	source: 'created' | 'imported' | 'private-key';
 };
 
-const keychain = (id: string) => new Entry(service, `session-wallet:${id}`);
+const keychain = (id: string) =>
+	new Entry(KEYCHAIN_SERVICE, `session-wallet:${id}`);
 
 const saveWalletFile = async (wallets: Array<SessionWallet>) => {
 	await ensureSuigarMcpDataDirectory();
-	await writeFile(file, `${JSON.stringify(wallets, null, 2)}\n`, {
-		mode: 0o600,
-	});
-	await chmod(file, 0o600);
+	await writeFile(
+		SESSION_WALLETS_FILE,
+		`${JSON.stringify(wallets, null, 2)}\n`,
+		{
+			mode: 0o600,
+		},
+	);
+	await chmod(SESSION_WALLETS_FILE, 0o600);
 };
 
 export const listSessionWallets = async (): Promise<Array<SessionWallet>> => {
 	try {
 		const stored = JSON.parse(
-			await readFile(file, 'utf8'),
+			await readFile(SESSION_WALLETS_FILE, 'utf8'),
 		) as Array<SessionWallet>;
 		return Array.isArray(stored) ? stored : [];
 	} catch (error) {
@@ -174,7 +182,7 @@ const success = (wallet: SessionWallet, accountUrl?: string) => {
 		title: 'Session wallet ready',
 		children: `<p class="eyebrow">SUIGAR MCP</p><div class="success" aria-hidden="true">✓</div><h1 class="heading">Session wallet ready</h1>
 <p class="lead">Your ${wallet.source === 'created' ? 'new' : wallet.source === 'imported' ? 'recovered' : 'imported'} session wallet is ready to use for both Suigar mainnet and testnet.</p>
-<div class="details"><p>Name</p><code class="inline">${escapeHtml(wallet.name)}</code><p>Address</p><code class="recovery">${escapeHtml(wallet.address)}</code><p>Session wallet details saved to <code class="inline">${escapeHtml(displayFile)}</code>.</p><p>The signing key is stored in your operating-system keychain, not in that file.</p></div>
+<div class="details"><p>Name</p><code class="inline">${escapeHtml(wallet.name)}</code><p>Address</p><code class="recovery">${escapeHtml(wallet.address)}</code><p>Session wallet details saved to <code class="inline">${escapeHtml(DISPLAY_FILE)}</code>.</p><p>The signing key is stored in your operating-system keychain, not in that file.</p></div>
 	<p class="lead">${destination ? `This wallet will be added to your account dashboard automatically. <a id="account-link" href="${escapeHtml(destination)}">Open account now</a>.` : 'You may close this window and return to your MCP client.'}</p>${destination ? `<script>window.setTimeout(()=>{const link=document.getElementById('account-link');if(link instanceof HTMLAnchorElement) location.assign(link.href)},900)</script>` : ''}`,
 	});
 };
