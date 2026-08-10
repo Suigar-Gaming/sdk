@@ -87,7 +87,7 @@ export const connectionInputSchema = configInputSchema
 			context.addIssue({
 				code: 'custom',
 				path: ['noOpen'],
-				message: 'open and noOpen are mutually exclusive.',
+				message: '"open" and "noOpen" are mutually exclusive.',
 			});
 		}
 	});

@@ -41,17 +41,19 @@ describe('wallet input schemas', () => {
 		['invalid web URL', { webUrl: 'not-a-url' }, /Invalid URL/u],
 		['non-positive timeout', { timeoutMs: 0 }, /Too small/u],
 		['non-integer body size', { maxBodyBytes: 1.5 }, /expected int/u],
-		[
-			'open and no-open enabled',
-			{ open: true, noOpen: true },
-			/mutually exclusive/u,
-		],
-		[
-			'open and no-open disabled',
-			{ open: false, noOpen: false },
-			/mutually exclusive/u,
-		],
 	])('rejects %s for connection tools', (_name, input, error) => {
 		expect(() => connectionInputSchema.parse(input)).toThrow(error);
+	});
+
+	it.each([
+		['open and no-open enabled', { open: true, noOpen: true }],
+		['open and no-open disabled', { open: false, noOpen: false }],
+	])('rejects %s with the quoted mutual exclusion message', (_name, input) => {
+		const result = connectionInputSchema.safeParse(input);
+
+		expect(result.success).toBe(false);
+		expect(result.error?.issues[0]?.message).toBe(
+			'"open" and "noOpen" are mutually exclusive.',
+		);
 	});
 });
