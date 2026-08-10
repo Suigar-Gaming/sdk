@@ -22,7 +22,7 @@ runs:
   using: composite
   steps:
     - name: Setup pnpm
-      uses: pnpm/setup@v1.0.0
+      uses: pnpm/setup@v2.0.2
       with:
         cache: ${{ inputs.cache }}
         install: false
