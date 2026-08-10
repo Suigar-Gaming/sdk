@@ -68,6 +68,12 @@ describe('package exports', () => {
 							format: 'string',
 							isSecret: false,
 						},
+						{
+							name: 'SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS',
+							isRequired: false,
+							format: 'string',
+							isSecret: false,
+						},
 					],
 				},
 			],

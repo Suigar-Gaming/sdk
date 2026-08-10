@@ -3,9 +3,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { toolOutputSchema } from '../../../src/tools/schemas/output.js';
+import { loopbackOrigin } from '../../../src/wallet/loopback.js';
 
 const mocks = vi.hoisted(() => ({
-	createSessionWalletSetup: vi.fn<() => Promise<unknown>>(),
+	createSessionWalletSetup: vi.fn<(options?: unknown) => Promise<unknown>>(),
 	listBalances: vi.fn<() => Promise<unknown>>(),
 	listSessionWallets: vi.fn<() => Promise<unknown>>(),
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
@@ -67,6 +68,7 @@ vi.mock('../../../src/tools/handlers/shared.js', () => ({
 const {
 	fundSessionWalletTool,
 	getSessionWalletTool,
+	setupSessionWalletTool,
 	suigarLoginTool,
 	suigarLogoutTool,
 } = await import('../../../src/tools/handlers/wallet.js');
@@ -80,6 +82,7 @@ const sessionWallet = {
 	name: 'Daily bets',
 	address: sessionAddress,
 };
+const sessionSetupUrl = `${loopbackOrigin(12345)}/`;
 
 describe('wallet tools', () => {
 	beforeEach(() => {
@@ -148,6 +151,29 @@ describe('wallet tools', () => {
 				'2048',
 				'--no-open',
 			);
+		});
+	});
+
+	describe('setup_session_wallet', () => {
+		it('creates a local setup URL for the selected network', async () => {
+			mocks.createSessionWalletSetup.mockResolvedValue({
+				setupUrl: sessionSetupUrl,
+			});
+
+			const result = await setupSessionWalletTool({
+				network: 'testnet',
+			});
+
+			expect(mocks.createSessionWalletSetup).toHaveBeenCalledWith({
+				accountUrl: 'https://mcp.testnet.suigar.com/account',
+			});
+			expect(result.structuredContent).toMatchObject({
+				network: 'testnet',
+				sessionWallet: {
+					status: 'setup-pending',
+					setupUrl: sessionSetupUrl,
+				},
+			});
 		});
 	});
 
@@ -239,7 +265,7 @@ describe('wallet tools', () => {
 			mocks.loadSessionWallet.mockResolvedValue(null);
 			mocks.loadCredentials.mockResolvedValue({ profiles: {} });
 			mocks.createSessionWalletSetup.mockResolvedValue({
-				setupUrl: 'http://127.0.0.1:12345/',
+				setupUrl: sessionSetupUrl,
 			});
 
 			const result = await getSessionWalletTool({ network: 'testnet' });
@@ -247,7 +273,7 @@ describe('wallet tools', () => {
 			expect(result.structuredContent).toMatchObject({
 				sessionWallet: {
 					status: 'setup-required',
-					setupUrl: 'http://127.0.0.1:12345/',
+					setupUrl: sessionSetupUrl,
 					wallets: [sessionWallet],
 					note: expect.stringContaining('shared by mainnet and testnet'),
 				},

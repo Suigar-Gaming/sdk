@@ -14,10 +14,12 @@ import { Secp256r1Keypair } from '@mysten/sui/keypairs/secp256r1';
 import { Entry } from '@napi-rs/keyring';
 import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
+import { LOOPBACK_HOST, LOOPBACK_ORIGIN, loopbackOrigin } from './loopback.js';
 import {
 	ensureSuigarMcpDataDirectory,
 	SUIGAR_MCP_DATA_DIRECTORY,
 } from './storage.js';
+import { resolvePositiveInteger } from './utils.js';
 
 const KEYCHAIN_SERVICE: string = 'com.suigar.mcp';
 const SESSION_WALLETS_FILE: string = join(
@@ -25,6 +27,9 @@ const SESSION_WALLETS_FILE: string = join(
 	'session-wallets.json',
 );
 const DISPLAY_FILE: string = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
+export const DEFAULT_SESSION_SETUP_TIMEOUT_MS: number = 10 * 60_000;
+export const SESSION_SETUP_TIMEOUT_MS_ENV: string =
+	'SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS';
 
 export type SessionWallet = {
 	id: string;
@@ -32,6 +37,10 @@ export type SessionWallet = {
 	address: string;
 	createdAt: string;
 	source: 'created' | 'imported' | 'private-key';
+};
+
+export type SessionWalletSetupOptions = {
+	accountUrl?: string;
 };
 
 function keychain(id: string): Entry {
@@ -219,12 +228,17 @@ function readForm(request: IncomingMessage): Promise<URLSearchParams> {
 
 export async function createSessionWalletSetup({
 	accountUrl,
-}: { accountUrl?: string } = {}): Promise<{ setupUrl: string }> {
+}: SessionWalletSetupOptions = {}): Promise<{ setupUrl: string }> {
+	const resolvedTimeoutMs = resolvePositiveInteger(
+		process.env[SESSION_SETUP_TIMEOUT_MS_ENV],
+		'Session wallet setup timeout',
+		DEFAULT_SESSION_SETUP_TIMEOUT_MS,
+	);
 	const state = randomBytes(32).toString('hex');
 	const mnemonic = generateMnemonic(wordlist, 256);
 	const currentWallet = await loadSessionWallet();
 	const server = createServer(async (request, response) => {
-		const url = new URL(request.url ?? '/', 'http://127.0.0.1');
+		const url = new URL(request.url ?? '/', LOOPBACK_ORIGIN);
 		if (request.method === 'GET' && url.pathname === '/') {
 			response.writeHead(200, {
 				'content-type': 'text/html; charset=utf-8',
@@ -283,9 +297,11 @@ export async function createSessionWalletSetup({
 			);
 		}
 	});
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+	await new Promise<void>((resolve) =>
+		server.listen(0, LOOPBACK_HOST, resolve),
+	);
 	const port = (server.address() as AddressInfo).port;
-	const timeout = setTimeout(() => server.close(), 10 * 60_000).unref();
+	const timeout = setTimeout(() => server.close(), resolvedTimeoutMs).unref();
 	server.once('close', () => clearTimeout(timeout));
-	return { setupUrl: `http://127.0.0.1:${port}/` };
+	return { setupUrl: `${loopbackOrigin(port)}/` };
 }

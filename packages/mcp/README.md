@@ -131,6 +131,7 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
   - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
 - **Local session wallet**
   - `setup_session_wallet` opens a local, one-time setup page to create or recover one persistent session wallet shared by mainnet and testnet.
+  - Set `SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS` to control how long local setup pages remain available. The built-in default is `600000`.
   - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
   - The local setup page can also import a standard `suiprivkey...` export. It never passes through MCP or the session-wallet JSON file.
   - The signing key is persisted in the operating-system keychain. Do not use a custom encrypted file: OS keychain protection is safer and avoids managing an application passphrase. For the smallest blast radius, create a dedicated, low-funded session wallet instead of importing a primary wallet.

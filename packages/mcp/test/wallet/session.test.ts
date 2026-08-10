@@ -36,6 +36,8 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+	vi.unstubAllEnvs();
+	vi.restoreAllMocks();
 	await rm(testHome, { force: true, recursive: true });
 });
 
@@ -175,5 +177,34 @@ describe('session wallet setup', () => {
 		expect(
 			(await session.loadSessionSigner(wallets[1]!.id)).toSuiAddress(),
 		).toBe(secondSigner.toSuiAddress());
+	});
+
+	it('uses the setup timeout environment value', async () => {
+		vi.stubEnv(session.SESSION_SETUP_TIMEOUT_MS_ENV, '1234');
+		const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+		const { setupUrl } = await session.createSessionWalletSetup();
+		const page = await (await fetch(setupUrl)).text();
+		const state = page.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
+		const privateKey = Ed25519Keypair.generate().getSecretKey();
+
+		expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1234);
+
+		await fetch(`${setupUrl}import-private-key`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				state: state!,
+				privateKey,
+				name: 'Timeout test',
+			}),
+		});
+	});
+
+	it('rejects an invalid setup timeout environment value', async () => {
+		vi.stubEnv(session.SESSION_SETUP_TIMEOUT_MS_ENV, '0');
+
+		await expect(session.createSessionWalletSetup()).rejects.toThrow(
+			'Session wallet setup timeout must be a positive integer.',
+		);
 	});
 });

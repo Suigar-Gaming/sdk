@@ -19,6 +19,8 @@ import {
 	type WalletProfile,
 	type WalletType,
 } from './credentials.js';
+import { LOCALHOST_HOST, LOOPBACK_HOST, loopbackOrigin } from './loopback.js';
+import { resolvePositiveInteger } from './utils.js';
 
 export const DEFAULT_TIMEOUT_MS: number = 5 * 60_000;
 export const DEFAULT_MAX_BODY_BYTES: number = 16 * 1024;
@@ -58,18 +60,6 @@ function sameState(left: string, right: string): boolean {
 	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left))
 		return false;
 	return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
-}
-
-function resolvePositiveInteger(
-	value: number | string | undefined,
-	name: string,
-	defaultValue: number,
-): number {
-	if (value === undefined || value === '') return defaultValue;
-	const parsed = typeof value === 'number' ? value : Number(value);
-	if (!Number.isInteger(parsed) || parsed <= 0)
-		throw new RangeError(`${name} must be a positive integer.`);
-	return parsed;
 }
 
 function resolveBridgeOptions(
@@ -134,9 +124,14 @@ async function createLoopbackServer(webOrigin: string): Promise<{
 	authorize: (request: IncomingMessage, response: ServerResponse) => boolean;
 }> {
 	const server = createServer();
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+	await new Promise<void>((resolve) =>
+		server.listen(0, LOOPBACK_HOST, resolve),
+	);
 	const port = (server.address() as AddressInfo).port;
-	const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
+	const allowedHosts = new Set([
+		`${LOOPBACK_HOST}:${port}`,
+		`${LOCALHOST_HOST}:${port}`,
+	]);
 	const authorize = (request: IncomingMessage, response: ServerResponse) => {
 		response.setHeader('access-control-allow-origin', webOrigin);
 		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
@@ -186,7 +181,7 @@ export async function createLoginBridge({
 
 	server.on('request', async (request, response) => {
 		if (!loopback.authorize(request, response)) return;
-		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
+		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/handshake') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {
 				respond(response, 403, { ok: false, error: 'Invalid pairing state' });
@@ -278,7 +273,7 @@ export async function createExecutionBridge({
 		close();
 	}, options.timeoutMs).unref();
 	server.on('request', async (request, response) => {
-		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
+		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (!loopback.authorize(request, response)) return;
 		if (
 			!sameState(url.searchParams.get('state') ?? '', state) &&
@@ -375,7 +370,7 @@ export async function createLogoutBridge({
 
 	server.on('request', async (request, response) => {
 		if (!loopback.authorize(request, response)) return;
-		const url = new URL(request.url ?? '/', `http://127.0.0.1:${port}`);
+		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/request') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {
 				respond(response, 403, { error: 'Invalid logout state' });

@@ -39,6 +39,13 @@
 					"format": "string",
 					"isSecret": false,
 					"name": "SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES"
+				},
+				{
+					"description": "Milliseconds before local session-wallet setup pages expire.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS"
 				}
 			]
 		}

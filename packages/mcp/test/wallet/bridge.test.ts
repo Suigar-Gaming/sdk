@@ -16,6 +16,7 @@ vi.mock('open', () => ({ default: mocks.open }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const bridge = await import('../../src/wallet/bridge.js');
+const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
 const address =
@@ -24,7 +25,7 @@ const address =
 const bridgeOrigin = (url: string, portParameter: string) => {
 	const port = new URL(url).searchParams.get(portParameter);
 	if (!port) throw new Error(`Missing ${portParameter} in bridge URL`);
-	return `http://127.0.0.1:${port}`;
+	return loopback.loopbackOrigin(port);
 };
 
 const postJson = (url: string, body: unknown) =>
