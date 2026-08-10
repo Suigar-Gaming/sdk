@@ -12,7 +12,7 @@ import {
 } from './app-resource.js';
 import { registerSuigarTools } from './tool-registration.js';
 
-export const createSuigarMcpServer = () => {
+export function createSuigarMcpServer(): McpServer {
 	const server = new McpServer({
 		name: 'suigar',
 		version: VERSION,
@@ -42,10 +42,10 @@ export const createSuigarMcpServer = () => {
 	registerSuigarTools(server, APP_TOOL_META);
 
 	return server;
-};
+}
 
-export const startSuigarMcpServer = async () => {
+export async function startSuigarMcpServer(): Promise<void> {
 	const server = createSuigarMcpServer();
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
-};
+}

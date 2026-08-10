@@ -27,16 +27,19 @@ export type Credentials = {
 };
 
 const CREDENTIALS_FILE = join(suigarMcpDataDirectory, 'credentials.json');
-const empty = (): Credentials => ({
-	version: 1,
-	defaultNetwork: 'testnet',
-	profiles: {},
-});
+function empty(): Credentials {
+	return {
+		version: 1,
+		defaultNetwork: 'testnet',
+		profiles: {},
+	};
+}
 
-const isNetwork = (value: unknown): value is SuigarNetwork =>
-	value === 'mainnet' || value === 'testnet';
+function isNetwork(value: unknown): value is SuigarNetwork {
+	return value === 'mainnet' || value === 'testnet';
+}
 
-const isWalletProfile = (value: unknown): value is WalletProfile => {
+function isWalletProfile(value: unknown): value is WalletProfile {
 	if (!value || typeof value !== 'object') return false;
 	const profile = value as Record<string, unknown>;
 	return (
@@ -46,9 +49,9 @@ const isWalletProfile = (value: unknown): value is WalletProfile => {
 		typeof profile.frontendOrigin === 'string' &&
 		typeof profile.connectedAt === 'string'
 	);
-};
+}
 
-const isValid = (value: unknown): value is Credentials => {
+function isValid(value: unknown): value is Credentials {
 	if (!value || typeof value !== 'object') return false;
 	const credentials = value as Record<string, unknown>;
 	if (
@@ -63,15 +66,17 @@ const isValid = (value: unknown): value is Credentials => {
 	return Object.entries(credentials.profiles).every(
 		([network, profile]) => isNetwork(network) && isWalletProfile(profile),
 	);
-};
+}
 
-export const credentialsPath = () => CREDENTIALS_FILE;
+export function credentialsPath(): string {
+	return CREDENTIALS_FILE;
+}
 
 /**
  * Reads the configured network without requiring callers to load full credentials.
  * This is intentionally synchronous because runtime client creation is synchronous.
  */
-export const readPersistedDefaultNetwork = (): SuigarNetwork => {
+export function readPersistedDefaultNetwork(): SuigarNetwork {
 	try {
 		const value: unknown = JSON.parse(readFileSync(CREDENTIALS_FILE, 'utf8'));
 		const network =
@@ -82,7 +87,7 @@ export const readPersistedDefaultNetwork = (): SuigarNetwork => {
 	} catch {
 		return 'testnet';
 	}
-};
+}
 
 export async function loadCredentials(): Promise<Credentials> {
 	try {
@@ -96,7 +101,7 @@ export async function loadCredentials(): Promise<Credentials> {
 	}
 }
 
-export async function saveCredentials(credentials: Credentials) {
+export async function saveCredentials(credentials: Credentials): Promise<void> {
 	await ensureSuigarMcpDataDirectory();
 	await writeFile(
 		CREDENTIALS_FILE,
@@ -111,7 +116,7 @@ export async function saveCredentials(credentials: Credentials) {
 export async function saveProfile(
 	network: SuigarNetwork,
 	profile: WalletProfile,
-) {
+): Promise<Credentials> {
 	const credentials = await loadCredentials();
 	credentials.defaultNetwork = network;
 	credentials.profiles[network] = profile;
@@ -119,20 +124,24 @@ export async function saveProfile(
 	return credentials;
 }
 
-export async function setDefaultNetwork(network: SuigarNetwork) {
+export async function setDefaultNetwork(
+	network: SuigarNetwork,
+): Promise<Credentials> {
 	const credentials = await loadCredentials();
 	credentials.defaultNetwork = network;
 	await saveCredentials(credentials);
 	return credentials;
 }
 
-export async function removeProfile(network: SuigarNetwork) {
+export async function removeProfile(
+	network: SuigarNetwork,
+): Promise<Credentials> {
 	const credentials = await loadCredentials();
 	delete credentials.profiles[network];
 	await saveCredentials(credentials);
 	return credentials;
 }
 
-export async function clearCredentials() {
+export async function clearCredentials(): Promise<void> {
 	await rm(CREDENTIALS_FILE, { force: true });
 }

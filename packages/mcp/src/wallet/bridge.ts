@@ -5,6 +5,7 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import {
 	createServer,
 	type IncomingMessage,
+	type Server,
 	type ServerResponse,
 } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -48,47 +49,55 @@ export type ExecutionStatus = {
 };
 const executions = new Map<string, ExecutionStatus>();
 
-export const getExecutionStatus = (requestId: string) =>
-	executions.get(requestId) ?? null;
+export function getExecutionStatus(requestId: string): ExecutionStatus | null {
+	return executions.get(requestId) ?? null;
+}
 
-const sameState = (left: string, right: string) => {
+function sameState(left: string, right: string): boolean {
 	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left))
 		return false;
 	return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
-};
+}
 
-const resolvePositiveInteger = (
+function resolvePositiveInteger(
 	value: number | string | undefined,
 	name: string,
 	defaultValue: number,
-) => {
+): number {
 	if (value === undefined || value === '') return defaultValue;
 	const parsed = typeof value === 'number' ? value : Number(value);
 	if (!Number.isInteger(parsed) || parsed <= 0)
 		throw new RangeError(`${name} must be a positive integer.`);
 	return parsed;
-};
+}
 
-const resolveBridgeOptions = (options: BridgeOptions = {}) => ({
-	timeoutMs: resolvePositiveInteger(
-		options.timeoutMs ?? process.env[BRIDGE_TIMEOUT_MS_ENV],
-		'Bridge timeout',
-		DEFAULT_TIMEOUT_MS,
-	),
-	maxBodyBytes: resolvePositiveInteger(
-		options.maxBodyBytes ?? process.env[BRIDGE_MAX_BODY_BYTES_ENV],
-		'Maximum bridge request body size',
-		DEFAULT_MAX_BODY_BYTES,
-	),
-	open: options.open ?? true,
-});
+function resolveBridgeOptions(
+	options: BridgeOptions = {},
+): Required<BridgeOptions> {
+	return {
+		timeoutMs: resolvePositiveInteger(
+			options.timeoutMs ?? process.env[BRIDGE_TIMEOUT_MS_ENV],
+			'Bridge timeout',
+			DEFAULT_TIMEOUT_MS,
+		),
+		maxBodyBytes: resolvePositiveInteger(
+			options.maxBodyBytes ?? process.env[BRIDGE_MAX_BODY_BYTES_ENV],
+			'Maximum bridge request body size',
+			DEFAULT_MAX_BODY_BYTES,
+		),
+		open: options.open ?? true,
+	};
+}
 
-const openBridgeUrl = async (url: string, shouldOpen: boolean) => {
+async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
 	if (shouldOpen) await open(url).catch(() => undefined);
-};
+}
 
-const readBody = (request: IncomingMessage, maxBodyBytes: number) =>
-	new Promise<string>((resolve, reject) => {
+function readBody(
+	request: IncomingMessage,
+	maxBodyBytes: number,
+): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
 		const chunks: Array<Buffer> = [];
 		let length = 0;
 		request.on('data', (chunk: Buffer) => {
@@ -103,16 +112,26 @@ const readBody = (request: IncomingMessage, maxBodyBytes: number) =>
 		request.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
 		request.on('error', reject);
 	});
+}
 
-const respond = (response: ServerResponse, status: number, body: unknown) => {
+function respond(
+	response: ServerResponse,
+	status: number,
+	body: unknown,
+): void {
 	response.writeHead(status, {
 		'content-type': 'application/json',
 		'cache-control': 'no-store',
 	});
 	response.end(JSON.stringify(body));
-};
+}
 
-const createLoopbackServer = async (webOrigin: string) => {
+async function createLoopbackServer(webOrigin: string): Promise<{
+	server: Server;
+	port: number;
+	close: () => Server;
+	authorize: (request: IncomingMessage, response: ServerResponse) => boolean;
+}> {
 	const server = createServer();
 	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
 	const port = (server.address() as AddressInfo).port;
@@ -138,7 +157,7 @@ const createLoopbackServer = async (webOrigin: string) => {
 		return true;
 	};
 	return { server, port, close: () => server.close(), authorize };
-};
+}
 
 export async function createLoginBridge({
 	network,
@@ -240,7 +259,7 @@ export async function createExecutionBridge({
 	webOrigin: string;
 	transactionBytesBase64: string;
 	summary: unknown;
-} & BridgeOptions) {
+} & BridgeOptions): Promise<{ requestId: string; approvalUrl: string }> {
 	const options = resolveBridgeOptions(bridgeOptions);
 	const credentials = await loadCredentials();
 	const profile = credentials.profiles[network];

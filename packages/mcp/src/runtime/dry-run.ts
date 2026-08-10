@@ -21,17 +21,20 @@ const amountFieldNames = new Set([
 	'amount',
 ]);
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-	value !== null && typeof value === 'object';
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return value !== null && typeof value === 'object';
+}
 
-const getDryRunTransaction = (dryRun: RawDryRunResult) => {
+function getDryRunTransaction(
+	dryRun: RawDryRunResult,
+): RawDryRunResult['Transaction'] | undefined {
 	if (!isRecord(dryRun)) {
 		return undefined;
 	}
 	return dryRun.FailedTransaction ?? dryRun.Transaction;
-};
+}
 
-export const toJsonValue = (value: unknown): JsonValue | undefined => {
+export function toJsonValue(value: unknown): JsonValue | undefined {
 	if (
 		value == null ||
 		typeof value === 'string' ||
@@ -71,9 +74,9 @@ export const toJsonValue = (value: unknown): JsonValue | undefined => {
 		return jsonRecord;
 	}
 	return undefined;
-};
+}
 
-const collectStrings = (value: unknown, path: Array<string>): Array<string> => {
+function collectStrings(value: unknown, path: Array<string>): Array<string> {
 	if (!isRecord(value)) {
 		return [];
 	}
@@ -91,9 +94,9 @@ const collectStrings = (value: unknown, path: Array<string>): Array<string> => {
 		}
 		return [];
 	});
-};
+}
 
-export const extractDryRunErrors = (dryRun: RawDryRunResult): Array<string> => {
+export function extractDryRunErrors(dryRun: RawDryRunResult): Array<string> {
 	const source: unknown = getDryRunTransaction(dryRun) ?? dryRun;
 	const effects = isRecord(source) ? source.effects : undefined;
 	const status = isRecord(effects) ? effects.status : undefined;
@@ -103,21 +106,24 @@ export const extractDryRunErrors = (dryRun: RawDryRunResult): Array<string> => {
 		collectStrings(item, ['error', 'cleverError', 'message']),
 	);
 	return [...new Set(errors)];
-};
+}
 
-const stringField = (record: Record<string, unknown>, key: string) => {
+function stringField(
+	record: Record<string, unknown>,
+	key: string,
+): string | undefined {
 	const value = record[key];
 	return typeof value === 'string' ||
 		typeof value === 'number' ||
 		typeof value === 'bigint'
 		? String(value)
 		: undefined;
-};
+}
 
-const gasUsedSummary = (
+function gasUsedSummary(
 	effects: unknown,
 	decimals?: number,
-): DryRunSummary['gasUsed'] => {
+): DryRunSummary['gasUsed'] {
 	const gasUsed = isRecord(effects) ? effects.gasUsed : undefined;
 	if (!isRecord(gasUsed)) {
 		return {
@@ -148,12 +154,12 @@ const gasUsedSummary = (
 		nonRefundableStorageFee: formatAmount(nonRefundableStorageFee, decimals),
 		net: formatAmount(net, decimals),
 	};
-};
+}
 
-const eventFields = (
+function eventFields(
 	fields: Record<string, unknown>,
 	decimals?: number,
-): Record<string, JsonValue> => {
+): Record<string, JsonValue> {
 	const formattedFields: Record<string, JsonValue> = {};
 	for (const key in fields) {
 		if (!Object.hasOwn(fields, key)) {
@@ -175,12 +181,12 @@ const eventFields = (
 		}
 	}
 	return formattedFields;
-};
+}
 
-const parseDryRunEvent = (
+function parseDryRunEvent(
 	event: Record<string, unknown>,
 	eventType: string,
-): ReturnType<typeof parseGameEvent> => {
+): ReturnType<typeof parseGameEvent> {
 	const module =
 		typeof event.module === 'string'
 			? event.module
@@ -217,13 +223,13 @@ const parseDryRunEvent = (
 				eventName: 'BetResultEvent',
 			}
 		: null;
-};
+}
 
-const summarizeDryRunEvent = (
+function summarizeDryRunEvent(
 	event: unknown,
 	client: SuigarClientBundle['client'],
 	decimals?: number,
-): DryRunEventSummary | null => {
+): DryRunEventSummary | null {
 	if (!isRecord(event)) {
 		return null;
 	}
@@ -282,13 +288,13 @@ const summarizeDryRunEvent = (
 				fields: eventFields(json, decimals),
 			}
 		: null;
-};
+}
 
-export const summarizeDryRun = (
+export function summarizeDryRun(
 	dryRun: RawDryRunResult,
 	client: SuigarClientBundle['client'],
 	context: TransactionSummaryFormattingContext = {},
-): DryRunSummary => {
+): DryRunSummary {
 	const transaction = getDryRunTransaction(dryRun);
 	const transactionRecord: Record<string, unknown> = isRecord(transaction)
 		? transaction
@@ -354,4 +360,4 @@ export const summarizeDryRun = (
 		balanceChanges,
 		events,
 	};
-};
+}

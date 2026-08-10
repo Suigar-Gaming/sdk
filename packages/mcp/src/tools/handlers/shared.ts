@@ -7,6 +7,7 @@ import {
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
 	type BuilderMode,
+	type ReadConfigResult,
 	type ReferralClaimKind,
 	type ResolvedMcpConfig,
 	type SuigarClientBundle,
@@ -14,7 +15,7 @@ import {
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
 import { loadCredentials, loadSessionWallet } from '../../wallet/index.js';
-import type { ReadConfigInput } from '../schemas/index.js';
+import type { ConfigInput, ReadConfigInput } from '../schemas/index.js';
 
 export const GAME_LABELS = {
 	coinflip: 'Coinflip',
@@ -50,24 +51,27 @@ const GAME_TO_TOOLS = {
 	],
 } as const satisfies Record<Game, ReadonlyArray<string>>;
 
-const json = (value: unknown) =>
-	JSON.stringify(
+function json(value: unknown): string {
+	return JSON.stringify(
 		value,
 		(_key, item) => (typeof item === 'bigint' ? item.toString() : item),
 		2,
 	);
+}
 
-export const asTextResponse = <T extends ToolTextResult['structuredContent']>(
+export function asTextResponse<T extends ToolTextResult['structuredContent']>(
 	structuredContent: T,
-): ToolTextResult => ({
-	content: [{ type: 'text', text: json(structuredContent) }],
-	structuredContent,
-});
+): ToolTextResult {
+	return {
+		content: [{ type: 'text', text: json(structuredContent) }],
+		structuredContent,
+	};
+}
 
-export const coinMetadataForAmount = (
+export function coinMetadataForAmount(
 	config: ResolvedMcpConfig,
 	coinType?: string,
-) => {
+): { coinType: string; decimals: number } {
 	const resolvedCoinType = resolveDefaultCoinType(config, coinType);
 	const coin = Object.values(config.sdk.coins).find(
 		(metadata) =>
@@ -84,16 +88,16 @@ export const coinMetadataForAmount = (
 		coinType: resolvedCoinType,
 		decimals: coin.decimals,
 	};
-};
+}
 
-export const requireString = (value: unknown, fieldName: string): string => {
+export function requireString(value: unknown, fieldName: string): string {
 	if (typeof value === 'string' && value.trim()) {
 		return value.trim();
 	}
 	throw new TypeError(`Missing required field: ${fieldName}.`);
-};
+}
 
-export const requireGame = (value: unknown): Game => {
+export function requireGame(value: unknown): Game {
 	const game = requireString(value, 'game');
 	if (GAMES.includes(game as Game)) {
 		return game as Game;
@@ -101,16 +105,17 @@ export const requireGame = (value: unknown): Game => {
 	throw new RangeError(
 		`Unsupported game: ${game}. Use one of: ${GAMES.join(', ')}.`,
 	);
-};
+}
 
-const isAmountParameter = (key: string) =>
-	key === 'min_stake' || key === 'max_stake' || key === 'max_payout';
+function isAmountParameter(key: string): boolean {
+	return key === 'min_stake' || key === 'max_stake' || key === 'max_payout';
+}
 
-const formatGameParameterValue = (
+function formatGameParameterValue(
 	key: string,
 	value: unknown,
 	decimals: number,
-): unknown => {
+): unknown {
 	if (Array.isArray(value)) {
 		return value.map((item) => formatGameParameterValue(key, item, decimals));
 	}
@@ -126,12 +131,12 @@ const formatGameParameterValue = (
 				display: formatBaseUnitAmount(value, decimals),
 			}
 		: value;
-};
+}
 
-export const formatGameParameters = (
+export function formatGameParameters(
 	parameters: Record<string, unknown>,
 	decimals: number,
-) => {
+): Record<string, unknown> {
 	const formatted: Record<
 		string,
 		ReturnType<typeof formatGameParameterValue>
@@ -140,30 +145,33 @@ export const formatGameParameters = (
 		formatted[key] = formatGameParameterValue(key, parameters[key], decimals);
 	}
 	return formatted;
-};
+}
 
-export const getMode = (mode: BuilderMode | undefined): BuilderMode =>
-	mode ?? 'build';
+export function getMode(mode: BuilderMode | undefined): BuilderMode {
+	return mode ?? 'build';
+}
 
-export const getConfigInput = (input: ReadConfigInput) => ({
-	network: input.network,
-	providerUrl: input.providerUrl,
-	config: input.config,
-	partner: input.partner,
-});
+export function getConfigInput(input: ReadConfigInput): ConfigInput {
+	return {
+		network: input.network,
+		providerUrl: input.providerUrl,
+		config: input.config,
+		partner: input.partner,
+	};
+}
 
-const coinSymbol = (coinType: string) => {
+function coinSymbol(coinType: string): string {
 	try {
 		return parseStructTag(coinType).name;
 	} catch {
 		return coinType;
 	}
-};
+}
 
-export const resolveCoinDisplayMetadata = async (
+export async function resolveCoinDisplayMetadata(
 	coinType: string,
 	bundle: SuigarClientBundle,
-) => {
+): Promise<{ decimals: number | undefined; symbol: string }> {
 	const configuredCoin = Object.values(bundle.config.sdk.coins).find(
 		(coin) => coin.coinType === coinType,
 	);
@@ -189,16 +197,16 @@ export const resolveCoinDisplayMetadata = async (
 	}
 
 	return { decimals: undefined, symbol: coinSymbol(coinType) };
-};
+}
 
-export const resolveWalletOwner = async (
+export async function resolveWalletOwner(
 	input: {
 		owner?: string;
 		network?: 'mainnet' | 'testnet';
 		sessionWalletId?: string;
 	},
 	bundle: SuigarClientBundle,
-) => {
+): Promise<string> {
 	if (input.owner) return await resolveOwnerAddress(input.owner, bundle);
 	if (input.sessionWalletId) {
 		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
@@ -214,42 +222,47 @@ export const resolveWalletOwner = async (
 			`No wallet is connected for ${bundle.config.network}. Call "suigar_login" first.`,
 		);
 	return profile.address;
-};
+}
 
-export const supportedGames = () =>
-	GAMES.map((id) => ({
+export function supportedGames(): ReadConfigResult['supportedGames'] {
+	return GAMES.map((id) => ({
 		id,
 		label: GAME_LABELS[id],
 		tools: [...GAME_TO_TOOLS[id]],
 	}));
+}
 
-export const supportedFeatures = () => [
-	{
-		id: 'nfts' as const,
-		label: 'NFTs',
-		tools: ['list_nfts', 'build_nft_v1_mint_transaction'],
-	},
-	{
-		id: 'referrals' as const,
-		label: 'Referrals',
-		tools: [
-			'get_referral_commission',
-			'get_referral_level_up_usd_rewards',
-			'build_referral_commission_claim_transaction',
-			'build_referral_level_up_usd_rewards_claim_transaction',
-		],
-	},
-];
+export function supportedFeatures(): ReadConfigResult['supportedFeatures'] {
+	return [
+		{
+			id: 'nfts' as const,
+			label: 'NFTs',
+			tools: ['list_nfts', 'build_nft_v1_mint_transaction'],
+		},
+		{
+			id: 'referrals' as const,
+			label: 'Referrals',
+			tools: [
+				'get_referral_commission',
+				'get_referral_level_up_usd_rewards',
+				'build_referral_commission_claim_transaction',
+				'build_referral_level_up_usd_rewards_claim_transaction',
+			],
+		},
+	];
+}
 
-export const getPackageId = (config: ResolvedMcpConfig, game: Game) =>
-	config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
+export function getPackageId(config: ResolvedMcpConfig, game: Game): string {
+	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
+}
 
-export const referralClaimTarget = (
+export function referralClaimTarget(
 	config: ResolvedMcpConfig,
 	kind: ReferralClaimKind,
-) =>
-	`${config.sdk.packageIds.referral}::referral::${
+): string {
+	return `${config.sdk.packageIds.referral}::referral::${
 		kind === 'commission'
 			? 'claim_commission_balance'
 			: 'claim_referrer_level_up_usd_rewards'
 	}`;
+}

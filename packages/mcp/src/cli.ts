@@ -36,8 +36,8 @@ const JSON_OPTION = {
 	default: false,
 	description: 'Output machine-readable JSON instead of human-readable text',
 };
-const addBridgeOptions = (command: Argv): Argv =>
-	command
+function addBridgeOptions(command: Argv): Argv {
+	return command
 		.option('timeout-ms', {
 			type: 'number' as const,
 			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_MS_ENV} or ${DEFAULT_TIMEOUT_MS}`,
@@ -56,13 +56,18 @@ const addBridgeOptions = (command: Argv): Argv =>
 			description:
 				'Open the connection page in the default browser; use --no-open to only print its URL',
 		});
-const getBridgeOptions = (args: BridgeArgs): BridgeOptions => ({
-	timeoutMs: args.timeoutMs,
-	maxBodyBytes: args.maxBodyBytes,
-	open: args.open,
-});
+}
+function getBridgeOptions(args: BridgeArgs): BridgeOptions {
+	return {
+		timeoutMs: args.timeoutMs,
+		maxBodyBytes: args.maxBodyBytes,
+		open: args.open,
+	};
+}
 
-export async function runSuigarCli(argv = hideBin(process.argv)) {
+export async function runSuigarCli(
+	argv = hideBin(process.argv),
+): Promise<void> {
 	const parser = yargs(argv)
 		.scriptName('')
 		.strict()

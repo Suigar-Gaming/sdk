@@ -39,7 +39,7 @@ const DEFAULT_PROVIDER_URLS = {
 
 export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 
-export const normalizeNetwork = (network?: string): SuigarNetwork => {
+export function normalizeNetwork(network?: string): SuigarNetwork {
 	const resolvedNetwork = network ?? readPersistedDefaultNetwork();
 	if (resolvedNetwork === 'mainnet' || resolvedNetwork === 'testnet') {
 		return resolvedNetwork;
@@ -48,10 +48,14 @@ export const normalizeNetwork = (network?: string): SuigarNetwork => {
 	throw new RangeError(
 		`Unsupported network: ${resolvedNetwork}. Use "mainnet" or "testnet".`,
 	);
-};
+}
 
-export const getProviderUrl = (network: SuigarNetwork, providerUrl?: string) =>
-	providerUrl ?? DEFAULT_PROVIDER_URLS[network];
+export function getProviderUrl(
+	network: SuigarNetwork,
+	providerUrl?: string,
+): string {
+	return providerUrl ?? DEFAULT_PROVIDER_URLS[network];
+}
 
 export type SuigarClientBundle = {
 	client: ClientWithExtensions<
@@ -64,9 +68,9 @@ export type SuigarClientBundle = {
 	resolveSuiNSName(name: string): Promise<string | null>;
 };
 
-export const createSuigarClient = (
+export function createSuigarClient(
 	input: SuigarMcpConfigInput = {},
-): SuigarClientBundle => {
+): SuigarClientBundle {
 	const network = normalizeNetwork(input.network);
 	const baseClient = new SuiGrpcClient({
 		baseUrl: getProviderUrl(network, input.providerUrl),
@@ -93,17 +97,19 @@ export const createSuigarClient = (
 				})
 			).response.record?.targetAddress ?? null,
 	};
-};
+}
 
-export const resolveDefaultCoinType = (
+export function resolveDefaultCoinType(
 	config: ResolvedMcpConfig,
 	coinType?: string,
-) => normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
+): string {
+	return normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
+}
 
-export const resolveOwnerAddress = async (
+export async function resolveOwnerAddress(
 	owner: string,
 	bundle: SuigarClientBundle,
-): Promise<string> => {
+): Promise<string> {
 	try {
 		const normalizedAddress = normalizeSuiAddress(owner);
 		if (isValidSuiAddress(normalizedAddress)) {
@@ -128,13 +134,13 @@ export const resolveOwnerAddress = async (
 	}
 
 	return normalizeSuiAddress(resolvedAddress);
-};
+}
 
-const dryRunTransaction = async (
+async function dryRunTransaction(
 	transaction: Transaction,
 	client: SuigarClientBundle['client'],
-): Promise<RawDryRunResult> =>
-	client.core.simulateTransaction({
+): Promise<RawDryRunResult> {
+	return client.core.simulateTransaction({
 		transaction,
 		include: {
 			effects: true,
@@ -142,11 +148,12 @@ const dryRunTransaction = async (
 			balanceChanges: true,
 		},
 	});
+}
 
-const summarizeTransaction = (
+function summarizeTransaction(
 	transaction: Transaction,
 	context: TransactionSummaryContext = {},
-): TransactionSummary => {
+): TransactionSummary {
 	const data = transaction.getData();
 
 	const commands = (data.commands ?? []).map((command) => {
@@ -200,9 +207,9 @@ const summarizeTransaction = (
 			: { coinDecimals: context.coinDecimals }),
 		...(context.gameInputs ? { gameInputs: context.gameInputs } : {}),
 	};
-};
+}
 
-export const buildTransactionResult = async ({
+export async function buildTransactionResult({
 	mode,
 	transaction,
 	config,
@@ -214,7 +221,7 @@ export const buildTransactionResult = async ({
 	config: ResolvedMcpConfig;
 	client: SuigarClientBundle['client'];
 	context: TransactionSummaryContext;
-}): Promise<BuildTransactionResult> => {
+}): Promise<BuildTransactionResult> {
 	const summary = summarizeTransaction(transaction, context);
 	if (mode === 'dry-run') {
 		const rawDryRun = await dryRunTransaction(transaction, client);
@@ -240,10 +247,10 @@ export const buildTransactionResult = async ({
 		transactionBytesBase64:
 			await client.suigar.serializeTransactionToBase64(transaction),
 	};
-};
+}
 
 /** Sign and submit a transaction with a local session-wallet signer. */
-export const executeSessionTransaction = async ({
+export async function executeSessionTransaction({
 	transaction,
 	client,
 	signer,
@@ -251,7 +258,12 @@ export const executeSessionTransaction = async ({
 	transaction: Transaction;
 	client: SuigarClientBundle['client'];
 	signer: Signer;
-}) => {
+}): Promise<{
+	error?: string;
+	address: string;
+	digest: string;
+	status: 'success' | 'failed';
+}> {
 	const result = await client.signAndExecuteTransaction({
 		transaction,
 		signer,
@@ -270,4 +282,4 @@ export const executeSessionTransaction = async ({
 			: ('failed' as const),
 		...(error ? { error } : {}),
 	};
-};
+}

@@ -8,6 +8,7 @@ import {
 	type ReferralClaimKind,
 	type ReferralClaimReadOnlyPlan,
 	type ReferralClaimReadResult,
+	type ToolTextResult,
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
 import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
@@ -26,7 +27,7 @@ import {
 	requireString,
 } from './shared.js';
 
-const referralClaimReadResult = async ({
+async function referralClaimReadResult({
 	input,
 	kind,
 }: {
@@ -34,7 +35,7 @@ const referralClaimReadResult = async ({
 		| Partial<GetReferralCommissionInput>
 		| Partial<GetReferralLevelUpUsdRewardsInput>;
 	kind: ReferralClaimKind;
-}) => {
+}): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveOwnerAddress(
 		requireString(input.owner, 'owner'),
@@ -68,17 +69,21 @@ const referralClaimReadResult = async ({
 			],
 		},
 	} satisfies ReferralClaimReadResult);
-};
+}
 
-export const getReferralCommissionTool = async (
+export async function getReferralCommissionTool(
 	input: Partial<GetReferralCommissionInput> = {},
-) => referralClaimReadResult({ input, kind: 'commission' });
+): Promise<ToolTextResult> {
+	return referralClaimReadResult({ input, kind: 'commission' });
+}
 
-export const getReferralLevelUpUsdRewardsTool = async (
+export async function getReferralLevelUpUsdRewardsTool(
 	input: Partial<GetReferralLevelUpUsdRewardsInput> = {},
-) => referralClaimReadResult({ input, kind: 'level-up-usd-rewards' });
+): Promise<ToolTextResult> {
+	return referralClaimReadResult({ input, kind: 'level-up-usd-rewards' });
+}
 
-const referralReadOnlyPlan = ({
+function referralReadOnlyPlan({
 	input,
 	kind,
 }: {
@@ -86,7 +91,7 @@ const referralReadOnlyPlan = ({
 		| BuildReferralCommissionClaimTransactionInput
 		| BuildReferralLevelUpUsdRewardsClaimTransactionInput;
 	kind: ReferralClaimKind;
-}) => {
+}): ToolTextResult {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const coin =
 		kind === 'commission' && 'coinType' in input
@@ -111,9 +116,9 @@ const referralReadOnlyPlan = ({
 			packageId: config.sdk.packageIds.referral,
 		},
 	} satisfies ReferralClaimReadOnlyPlan);
-};
+}
 
-const buildReferralClaimTransactionTool = async ({
+async function buildReferralClaimTransactionTool({
 	input,
 	kind,
 }: {
@@ -121,7 +126,7 @@ const buildReferralClaimTransactionTool = async ({
 		| BuildReferralCommissionClaimTransactionInput
 		| BuildReferralLevelUpUsdRewardsClaimTransactionInput;
 	kind: ReferralClaimKind;
-}) => {
+}): Promise<ToolTextResult> {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
 		return referralReadOnlyPlan({ input, kind });
@@ -182,12 +187,19 @@ const buildReferralClaimTransactionTool = async ({
 			},
 		}),
 	);
-};
+}
 
-export const buildReferralCommissionClaimTransactionTool = async (
+export async function buildReferralCommissionClaimTransactionTool(
 	input: BuildReferralCommissionClaimTransactionInput = {},
-) => buildReferralClaimTransactionTool({ input, kind: 'commission' });
+): Promise<ToolTextResult> {
+	return buildReferralClaimTransactionTool({ input, kind: 'commission' });
+}
 
-export const buildReferralLevelUpUsdRewardsClaimTransactionTool = async (
+export async function buildReferralLevelUpUsdRewardsClaimTransactionTool(
 	input: BuildReferralLevelUpUsdRewardsClaimTransactionInput = {},
-) => buildReferralClaimTransactionTool({ input, kind: 'level-up-usd-rewards' });
+): Promise<ToolTextResult> {
+	return buildReferralClaimTransactionTool({
+		input,
+		kind: 'level-up-usd-rewards',
+	});
+}

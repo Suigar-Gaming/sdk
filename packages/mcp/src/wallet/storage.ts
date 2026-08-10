@@ -7,8 +7,8 @@ import { join } from 'node:path';
 
 export const suigarMcpDataDirectory = join(homedir(), '.suigar-mcp');
 
-export const ensureSuigarMcpDataDirectory = async () => {
+export async function ensureSuigarMcpDataDirectory(): Promise<string> {
 	await mkdir(suigarMcpDataDirectory, { recursive: true, mode: 0o700 });
 	await chmod(suigarMcpDataDirectory, 0o700);
 	return suigarMcpDataDirectory;
-};
+}

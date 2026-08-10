@@ -7,6 +7,7 @@ import {
 	toJsonValue,
 	type ListNftsResult,
 	type ReadGameMetadataResult,
+	type ToolTextResult,
 } from '../../runtime/index.js';
 import { formatBaseUnitAmount } from '../../utils/index.js';
 import type { ListNftsInput, ReadGameMetadataInput } from '../schemas/index.js';
@@ -23,9 +24,9 @@ import {
 	supportedGames,
 } from './shared.js';
 
-export const readGameMetadataTool = async (
+export async function readGameMetadataTool(
 	input: Partial<ReadGameMetadataInput> = {},
-) => {
+): Promise<ToolTextResult> {
 	const game = requireGame(input.game);
 	const { client, config } = createSuigarClient(getConfigInput(input));
 	const coin = coinMetadataForAmount(config, input.coinType);
@@ -56,9 +57,11 @@ export const readGameMetadataTool = async (
 			],
 		},
 	} satisfies ReadGameMetadataResult);
-};
+}
 
-export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
+export async function listNftsTool(
+	input: Partial<ListNftsInput> = {},
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveOwnerAddress(
 		requireString(input.owner, 'owner'),
@@ -114,4 +117,4 @@ export const listNftsTool = async (input: Partial<ListNftsInput> = {}) => {
 		})),
 		ownedNfts,
 	} satisfies ListNftsResult);
-};
+}

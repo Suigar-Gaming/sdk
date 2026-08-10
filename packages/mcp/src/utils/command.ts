@@ -4,7 +4,10 @@
 import { spawn } from 'node:child_process';
 import { VERSION } from './version.js';
 
-export const runSuigarCommand = (...args: Array<string>) => {
+export function runSuigarCommand(...args: Array<string>): {
+	command: string;
+	pid: number | undefined;
+} {
 	const npxArgs = ['-y', `@suigar/mcp@${VERSION}`, ...args];
 	const child = spawn('npx', npxArgs, {
 		detached: true,
@@ -17,4 +20,4 @@ export const runSuigarCommand = (...args: Array<string>) => {
 		command: ['npx', ...npxArgs].join(' '),
 		pid: child.pid,
 	};
-};
+}

@@ -34,10 +34,11 @@ export type SessionWallet = {
 	source: 'created' | 'imported' | 'private-key';
 };
 
-const keychain = (id: string) =>
-	new Entry(KEYCHAIN_SERVICE, `session-wallet:${id}`);
+function keychain(id: string): Entry {
+	return new Entry(KEYCHAIN_SERVICE, `session-wallet:${id}`);
+}
 
-const saveWalletFile = async (wallets: Array<SessionWallet>) => {
+async function saveWalletFile(wallets: Array<SessionWallet>): Promise<void> {
 	await ensureSuigarMcpDataDirectory();
 	await writeFile(
 		SESSION_WALLETS_FILE,
@@ -47,9 +48,9 @@ const saveWalletFile = async (wallets: Array<SessionWallet>) => {
 		},
 	);
 	await chmod(SESSION_WALLETS_FILE, 0o600);
-};
+}
 
-export const listSessionWallets = async (): Promise<Array<SessionWallet>> => {
+export async function listSessionWallets(): Promise<Array<SessionWallet>> {
 	try {
 		const stored = JSON.parse(
 			await readFile(SESSION_WALLETS_FILE, 'utf8'),
@@ -59,19 +60,19 @@ export const listSessionWallets = async (): Promise<Array<SessionWallet>> => {
 		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
 		throw error;
 	}
-};
+}
 
-export const loadSessionWallet = async (
+export async function loadSessionWallet(
 	id?: string,
-): Promise<SessionWallet | null> => {
+): Promise<SessionWallet | null> {
 	const wallets = await listSessionWallets();
 	return (
 		wallets.find((wallet) => wallet.id === id) ??
 		(id ? null : (wallets[0] ?? null))
 	);
-};
+}
 
-export const loadSessionSigner = async (id?: string) => {
+export async function loadSessionSigner(id?: string): Promise<Keypair> {
 	const wallet = await loadSessionWallet(id);
 	if (!wallet)
 		throw new Error(
@@ -84,9 +85,9 @@ export const loadSessionSigner = async (id?: string) => {
 		);
 	}
 	return signerFromPrivateKey(secret);
-};
+}
 
-const signerFromPrivateKey = (privateKey: string): Keypair => {
+function signerFromPrivateKey(privateKey: string): Keypair {
 	const { scheme, secretKey } = decodeSuiPrivateKey(privateKey);
 	switch (scheme) {
 		case 'ED25519':
@@ -98,13 +99,13 @@ const signerFromPrivateKey = (privateKey: string): Keypair => {
 		default:
 			throw new Error(`Unsupported Sui private-key scheme: ${scheme}.`);
 	}
-};
+}
 
-const persistSessionWallet = async (
+async function persistSessionWallet(
 	signer: Keypair,
 	source: SessionWallet['source'],
 	name: string,
-) => {
+): Promise<SessionWallet> {
 	const id = randomUUID();
 	keychain(id).setPassword(signer.getSecretKey());
 	const wallet: SessionWallet = {
@@ -116,35 +117,44 @@ const persistSessionWallet = async (
 	};
 	await saveWalletFile([...(await listSessionWallets()), wallet]);
 	return wallet;
-};
+}
 
-const persistMnemonicSessionWallet = (
+function persistMnemonicSessionWallet(
 	mnemonic: string,
 	source: Extract<SessionWallet['source'], 'created' | 'imported'>,
 	name: string,
-) => persistSessionWallet(Ed25519Keypair.deriveKeypair(mnemonic), source, name);
+): Promise<SessionWallet> {
+	return persistSessionWallet(
+		Ed25519Keypair.deriveKeypair(mnemonic),
+		source,
+		name,
+	);
+}
 
 const styles = `<style>
 :root{color-scheme:light dark;--background:#e4faff;--foreground:#072744;--card:#c8f1fb;--muted:#33546b;--accent:#a5e0f0;--primary:#ffbf49;--primary-foreground:#321c00;--secondary:#1fa8d8;--border:#7eb2c7;--success:#33b98d;--destructive:#de5978}@media(prefers-color-scheme:dark){:root{--background:#030914;--foreground:#edf4ff;--card:#0f1b2f;--muted:#9db3d6;--accent:#173155;--primary:#ffb547;--primary-foreground:#2d1500;--secondary:#4cc5ff;--border:#1f2d47;--success:#45c480;--destructive:#ff5f74}}*{box-sizing:border-box}body{min-height:100dvh;margin:0;background:radial-gradient(circle at top right,color-mix(in srgb,var(--secondary) 24%,transparent),transparent 38%),var(--background);color:var(--foreground);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.015em}.shell{width:min(100% - 32px,720px);margin:clamp(24px,8vh,88px) auto}.card{display:grid;gap:20px;padding:clamp(24px,5vw,44px);border:1px solid var(--border);border-radius:24px;background:color-mix(in srgb,var(--card) 92%,transparent);box-shadow:0 28px 70px color-mix(in srgb,var(--background) 75%,transparent)}.eyebrow{margin:0;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.16em}.heading{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0;font-size:clamp(28px,5vw,40px);line-height:1.08}.badge{padding:5px 10px;border:1px solid color-mix(in srgb,var(--secondary) 70%,var(--border));border-radius:999px;background:var(--accent);font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace}.lead{margin:0;color:var(--muted);font-weight:600}.notice{margin:0;padding:14px 16px;border:1px solid color-mix(in srgb,var(--destructive) 70%,var(--border));border-radius:14px;background:color-mix(in srgb,var(--destructive) 12%,transparent);font-weight:700}.recovery{display:block;overflow-wrap:anywhere;padding:18px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--background) 76%,transparent);font:600 15px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;word-spacing:5px}form{display:grid;gap:14px;margin:0}label{display:grid;gap:6px;font-weight:700}.confirmation{display:flex;align-items:flex-start;gap:10px;font-weight:650}.confirmation input{margin-top:5px;accent-color:var(--secondary)}.actions{display:flex;flex-wrap:wrap;gap:10px}button{min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:10px;background:var(--primary);color:var(--primary-foreground);cursor:pointer;font:800 15px/1 ui-sans-serif,system-ui,sans-serif}button.secondary{border-color:var(--border);background:var(--accent);color:var(--foreground)}button:hover{filter:brightness(1.04)}hr{width:100%;height:1px;margin:4px 0;border:0;background:var(--border)}h2{margin:0;font-size:20px}input[type=text],input:not([type]),textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--background) 76%,transparent);color:var(--foreground);font:14px/1.5 ui-sans-serif,system-ui,sans-serif}textarea{min-height:118px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}code.inline{padding:2px 5px;border-radius:5px;background:color-mix(in srgb,var(--background) 76%,transparent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.success{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--success);color:#03150a;font-size:23px;font-weight:900}.details{display:grid;gap:8px;padding:16px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--background) 58%,transparent)}.details p{margin:0;color:var(--muted)}@media(max-width:500px){.shell{width:min(100% - 20px,720px)}.card{padding:22px}.actions button{width:100%}}</style>`;
 
-const layout = ({
+function layout({
 	title,
 	children,
 }: {
 	title: string;
 	children: string;
-}) => `<!doctype html>
+}): string {
+	return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><title>${title}</title>${styles}</head>
 <body><main class="shell"><section class="card">${children}</section></main></body></html>`;
+}
 
-const escapeHtml = (value: string) =>
-	value
+function escapeHtml(value: string): string {
+	return value
 		.replace(/&/gu, '&amp;')
 		.replace(/</gu, '&lt;')
 		.replace(/>/gu, '&gt;')
 		.replace(/"/gu, '&quot;');
+}
 
-const page = ({
+function page({
 	state,
 	mnemonic,
 	currentWallet,
@@ -152,7 +162,7 @@ const page = ({
 	state: string;
 	mnemonic: string;
 	currentWallet: SessionWallet | null;
-}) => {
+}): string {
 	const existingWallets = currentWallet
 		? `<p class="lead">You already have a local session wallet at <code class="inline">${escapeHtml(currentWallet.address)}</code>. Creating or importing another wallet adds it to your local wallet list.</p>`
 		: '';
@@ -167,9 +177,9 @@ const page = ({
 <hr><h2>Recover an existing session wallet</h2><p class="lead">Use a recovery phrase you already saved. It stays on this local page.</p><form method="post" action="/recover"><input type="hidden" name="state" value="${escapeHtml(state)}"><label>Name <input required name="name" maxlength="80" placeholder="My recovered wallet" aria-label="Session wallet name"></label><textarea required name="mnemonic" placeholder="Enter the recovery phrase locally" aria-label="Recovery phrase"></textarea><div class="actions"><button class="secondary">Recover session wallet</button></div></form>
 <hr><h2>Import a Sui private key</h2><p class="lead">Paste a standard <code class="inline">suiprivkey…</code> export only if you intentionally want this MCP to sign directly for that wallet. The key stays on this local page and is stored only in your operating-system keychain.</p><form method="post" action="/import-private-key" autocomplete="off"><input type="hidden" name="state" value="${escapeHtml(state)}"><label>Name <input required name="name" maxlength="80" placeholder="My imported wallet" aria-label="Session wallet name"></label><textarea required name="privateKey" placeholder="suiprivkey..." aria-label="Sui private key" autocomplete="off" spellcheck="false"></textarea><div class="actions"><button class="secondary">Import private key</button></div></form>`,
 	});
-};
+}
 
-const success = (wallet: SessionWallet, accountUrl?: string) => {
+function success(wallet: SessionWallet, accountUrl?: string): string {
 	const destination = accountUrl
 		? (() => {
 				const url = new URL(accountUrl);
@@ -185,16 +195,17 @@ const success = (wallet: SessionWallet, accountUrl?: string) => {
 <div class="details"><p>Name</p><code class="inline">${escapeHtml(wallet.name)}</code><p>Address</p><code class="recovery">${escapeHtml(wallet.address)}</code><p>Session wallet details saved to <code class="inline">${escapeHtml(DISPLAY_FILE)}</code>.</p><p>The signing key is stored in your operating-system keychain, not in that file.</p></div>
 	<p class="lead">${destination ? `This wallet will be added to your account dashboard automatically. <a id="account-link" href="${escapeHtml(destination)}">Open account now</a>.` : 'You may close this window and return to your MCP client.'}</p>${destination ? `<script>window.setTimeout(()=>{const link=document.getElementById('account-link');if(link instanceof HTMLAnchorElement) location.assign(link.href)},900)</script>` : ''}`,
 	});
-};
+}
 
-const failure = (message: string) =>
-	layout({
+function failure(message: string): string {
+	return layout({
 		title: 'Unable to save session wallet',
 		children: `<p class="eyebrow">SUIGAR MCP</p><h1 class="heading">Unable to save session wallet</h1><p class="notice">${escapeHtml(message)}</p><p class="lead">Close this tab and start the setup flow again from your MCP client.</p>`,
 	});
+}
 
-const readForm = (request: IncomingMessage) =>
-	new Promise<URLSearchParams>((resolve, reject) => {
+function readForm(request: IncomingMessage): Promise<URLSearchParams> {
+	return new Promise<URLSearchParams>((resolve, reject) => {
 		let body = '';
 		request.setEncoding('utf8');
 		request.on('data', (chunk) => {
@@ -204,10 +215,11 @@ const readForm = (request: IncomingMessage) =>
 		request.on('end', () => resolve(new URLSearchParams(body)));
 		request.on('error', reject);
 	});
+}
 
-export const createSessionWalletSetup = async ({
+export async function createSessionWalletSetup({
 	accountUrl,
-}: { accountUrl?: string } = {}) => {
+}: { accountUrl?: string } = {}): Promise<{ setupUrl: string }> {
 	const state = randomBytes(32).toString('hex');
 	const mnemonic = generateMnemonic(wordlist, 256);
 	const currentWallet = await loadSessionWallet();
@@ -276,4 +288,4 @@ export const createSessionWalletSetup = async ({
 	const timeout = setTimeout(() => server.close(), 10 * 60_000).unref();
 	server.once('close', () => clearTimeout(timeout));
 	return { setupUrl: `http://127.0.0.1:${port}/` };
-};
+}

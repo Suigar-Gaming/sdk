@@ -59,12 +59,12 @@ import {
 	toolOutputSchema,
 } from '../tools/index.js';
 
-const errorText = (error: unknown) => {
+function errorText(error: unknown): string {
 	if (error instanceof Error) {
 		return `${error.name}: ${error.message}`;
 	}
 	return String(error);
-};
+}
 
 type ToolErrorResult = {
 	isError: true;

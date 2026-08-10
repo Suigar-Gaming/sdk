@@ -72,4 +72,5 @@ export const configInputSchema = z
 
 export const readConfigInputSchema = configInputSchema;
 
+export type ConfigInput = z.input<typeof configInputSchema>;
 export type ReadConfigInput = z.input<typeof readConfigInputSchema>;
