@@ -410,13 +410,10 @@ export function readOnlyPlan({
 async function gameTransactionOptions(
 	input: TransactionToolInput,
 	bundle: SuigarClientBundle,
-): Promise<{
-	owner: string;
-	coinType: string;
-	metadata: TransactionToolInput['metadata'];
-	gasBudget: TransactionToolInput['gasBudget'];
-	useGasCoin: TransactionToolInput['useGasCoin'];
-}> {
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
+> {
 	const sessionExecution =
 		getMode(input.mode) === 'execute' && input.executionWallet === 'session';
 	let owner: string;
@@ -500,16 +497,14 @@ async function enforceBetCountLimit(
 export async function stakeOptions(
 	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
-): Promise<{
-	betCount?: number | bigint;
-	cashStake?: bigint;
-	stake: bigint;
-	owner: string;
-	coinType: string;
-	metadata: TransactionToolInput['metadata'];
-	gasBudget: TransactionToolInput['gasBudget'];
-	useGasCoin: TransactionToolInput['useGasCoin'];
-}> {
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
+			betCount?: number | bigint;
+			cashStake?: bigint;
+			stake: bigint;
+		}
+> {
 	const { decimals } = coinMetadataForAmount(bundle.config, input.coinType);
 	return {
 		...(await gameTransactionOptions(input, bundle)),
