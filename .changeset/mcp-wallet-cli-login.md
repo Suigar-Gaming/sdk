@@ -13,3 +13,5 @@ Open both mainnet and testnet browser logout pages for `logout --all` when using
 Update MCP package metadata and remove the static CLI tool catalog in favor of MCP protocol tool discovery.
 
 Wire the CLI `--version` output to the bundled MCP package version.
+
+Share MCP amount field metadata across dry-run event formatting and game-parameter formatting.

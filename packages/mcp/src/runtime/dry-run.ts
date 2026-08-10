@@ -4,7 +4,7 @@
 import { SUI_DECIMALS } from '@mysten/sui/utils';
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
-import { formatAmount } from '../utils/index.js';
+import { formatAmount, isAmountFieldName } from '../utils/index.js';
 import type { SuigarClientBundle } from './client.js';
 import type {
 	DryRunEventSummary,
@@ -13,13 +13,6 @@ import type {
 	RawDryRunResult,
 	TransactionSummaryFormattingContext,
 } from './types.js';
-
-const amountFieldNames = new Set([
-	'stake_amount',
-	'outcome_amount',
-	'payout_amount',
-	'amount',
-]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object';
@@ -173,7 +166,7 @@ function eventFields(
 		}
 
 		formattedFields[key] = jsonValue;
-		if (amountFieldNames.has(key)) {
+		if (isAmountFieldName(key)) {
 			const displayValue = formatAmount(value, decimals);
 			if (displayValue) {
 				formattedFields[`${key}_display`] = displayValue.display;

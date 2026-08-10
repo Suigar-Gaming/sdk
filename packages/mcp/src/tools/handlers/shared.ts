@@ -13,7 +13,7 @@ import {
 	type SuigarClientBundle,
 	type ToolTextResult,
 } from '../../runtime/index.js';
-import { formatBaseUnitAmount } from '../../utils/index.js';
+import { formatBaseUnitAmount, isAmountFieldName } from '../../utils/index.js';
 import { loadCredentials, loadSessionWallet } from '../../wallet/index.js';
 import type { ConfigInput, ReadConfigInput } from '../schemas/index.js';
 
@@ -80,7 +80,7 @@ export function coinMetadataForAmount(
 
 	if (!coin) {
 		throw new RangeError(
-			`Unable to resolve decimals for coin type ${resolvedCoinType}. Add the coin to config.sdk.coins before using currency-denominated amounts.`,
+			`Unable to resolve decimals for coin type ${resolvedCoinType}. Use a coin type configured in the Suigar extension config under "coins.sui" or "coins.usdc" before using currency-denominated amounts.`,
 		);
 	}
 
@@ -107,10 +107,6 @@ export function requireGame(value: unknown): Game {
 	);
 }
 
-function isAmountParameter(key: string): boolean {
-	return key === 'min_stake' || key === 'max_stake' || key === 'max_payout';
-}
-
 function formatGameParameterValue(
 	key: string,
 	value: unknown,
@@ -122,7 +118,7 @@ function formatGameParameterValue(
 	if (value && typeof value === 'object') {
 		return formatGameParameters(value as Record<string, unknown>, decimals);
 	}
-	return isAmountParameter(key) &&
+	return isAmountFieldName(key) &&
 		(typeof value === 'string' ||
 			typeof value === 'number' ||
 			typeof value === 'bigint')

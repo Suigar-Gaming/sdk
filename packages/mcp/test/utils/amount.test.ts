@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { formatAmount, formatBaseUnitAmount } from '../../src/utils/index.js';
+import {
+	AMOUNT_FIELD_NAMES,
+	formatAmount,
+	formatBaseUnitAmount,
+	isAmountFieldName,
+} from '../../src/utils/index.js';
 
 describe('amount formatting', () => {
 	it.each([
@@ -41,5 +46,24 @@ describe('amount formatting', () => {
 		expect(formatAmount(null, 9)).toBeNull();
 		expect(formatAmount({ raw: '1000' }, 9)).toBeNull();
 		expect(formatAmount([1000], 9)).toBeNull();
+	});
+
+	it('defines amount field names used by parameter and event formatting', () => {
+		expect(Array.from(AMOUNT_FIELD_NAMES)).toEqual([
+			'amount',
+			'house_edge_amount',
+			'max_payout',
+			'max_stake',
+			'min_stake',
+			'outcome_amount',
+			'payout_amount',
+			'stake_amount',
+			'stake_per_player',
+		]);
+		expect(isAmountFieldName('min_stake')).toBe(true);
+		expect(isAmountFieldName('stake_amount')).toBe(true);
+		expect(isAmountFieldName('stake_per_player')).toBe(true);
+		expect(isAmountFieldName('house_edge')).toBe(false);
+		expect(isAmountFieldName('usd_amount')).toBe(false);
 	});
 });
