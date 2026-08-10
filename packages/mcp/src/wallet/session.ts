@@ -16,15 +16,15 @@ import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
 import {
 	ensureSuigarMcpDataDirectory,
-	suigarMcpDataDirectory,
+	SUIGAR_MCP_DATA_DIRECTORY,
 } from './storage.js';
 
-const KEYCHAIN_SERVICE = 'com.suigar.mcp';
-const SESSION_WALLETS_FILE = join(
-	suigarMcpDataDirectory,
+const KEYCHAIN_SERVICE: string = 'com.suigar.mcp';
+const SESSION_WALLETS_FILE: string = join(
+	SUIGAR_MCP_DATA_DIRECTORY,
 	'session-wallets.json',
 );
-const DISPLAY_FILE = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
+const DISPLAY_FILE: string = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
 
 export type SessionWallet = {
 	id: string;

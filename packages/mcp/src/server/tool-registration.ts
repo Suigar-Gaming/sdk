@@ -74,9 +74,10 @@ type ToolErrorResult = {
 	};
 };
 
-export const withToolErrors =
-	<TInput>(handler: (input: TInput) => Promise<ToolTextResult>) =>
-	async (input: TInput): Promise<ToolTextResult | ToolErrorResult> => {
+export function withToolErrors<TInput>(
+	handler: (input: TInput) => Promise<ToolTextResult>,
+): (input: TInput) => Promise<ToolTextResult | ToolErrorResult> {
+	return async (input: TInput): Promise<ToolTextResult | ToolErrorResult> => {
 		try {
 			return await handler(input);
 		} catch (error) {
@@ -95,6 +96,7 @@ export const withToolErrors =
 			};
 		}
 	};
+}
 
 export const readOnlyToolAnnotations = {
 	readOnlyHint: true,
@@ -414,11 +416,11 @@ const registerTool = (
 	server.registerTool(tool.name, config, handler);
 };
 
-export const registerSuigarTools = (
+export function registerSuigarTools(
 	server: McpServer,
 	appToolMeta: AppToolMeta,
-) => {
+): void {
 	for (const tool of toolDefinitions) {
 		registerTool(server, appToolMeta, tool);
 	}
-};
+}

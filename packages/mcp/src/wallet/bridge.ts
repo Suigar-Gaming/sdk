@@ -20,10 +20,11 @@ import {
 	type WalletType,
 } from './credentials.js';
 
-export const DEFAULT_TIMEOUT_MS = 5 * 60_000;
-export const DEFAULT_MAX_BODY_BYTES = 16 * 1024;
-export const BRIDGE_TIMEOUT_MS_ENV = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
-export const BRIDGE_MAX_BODY_BYTES_ENV = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
+export const DEFAULT_TIMEOUT_MS: number = 5 * 60_000;
+export const DEFAULT_MAX_BODY_BYTES: number = 16 * 1024;
+export const BRIDGE_TIMEOUT_MS_ENV: string = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
+export const BRIDGE_MAX_BODY_BYTES_ENV: string =
+	'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
 
 export type BridgeOptions = {
 	timeoutMs?: number;
@@ -47,10 +48,10 @@ export type ExecutionStatus = {
 	digest?: string;
 	error?: string;
 };
-const executions = new Map<string, ExecutionStatus>();
+const EXECUTIONS: Map<string, ExecutionStatus> = new Map();
 
 export function getExecutionStatus(requestId: string): ExecutionStatus | null {
-	return executions.get(requestId) ?? null;
+	return EXECUTIONS.get(requestId) ?? null;
 }
 
 function sameState(left: string, right: string): boolean {
@@ -269,11 +270,11 @@ export async function createExecutionBridge({
 		);
 	const state = randomBytes(32).toString('hex');
 	const requestId = randomBytes(16).toString('hex');
-	executions.set(requestId, { requestId, status: 'pending' });
+	EXECUTIONS.set(requestId, { requestId, status: 'pending' });
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	const expire = setTimeout(() => {
-		executions.set(requestId, { requestId, status: 'expired' });
+		EXECUTIONS.set(requestId, { requestId, status: 'expired' });
 		close();
 	}, options.timeoutMs).unref();
 	server.on('request', async (request, response) => {
@@ -329,7 +330,7 @@ export async function createExecutionBridge({
 										? payload.error
 										: 'Wallet approval failed',
 							};
-			executions.set(requestId, status);
+			EXECUTIONS.set(requestId, status);
 			clearTimeout(expire);
 			respond(response, 200, { ok: true });
 			setTimeout(close, 100).unref();

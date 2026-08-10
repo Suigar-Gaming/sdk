@@ -3,4 +3,4 @@
 
 declare const __SUIGAR_MCP_VERSION__: string;
 
-export const VERSION = __SUIGAR_MCP_VERSION__;
+export const VERSION: string = __SUIGAR_MCP_VERSION__;

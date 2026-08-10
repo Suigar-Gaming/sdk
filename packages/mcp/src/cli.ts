@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ArgumentsCamelCase, Argv } from 'yargs';
+import type { ArgumentsCamelCase, Argv, Options } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
@@ -31,27 +31,29 @@ type BridgeArgs = ArgumentsCamelCase<{
 	open: boolean;
 	webUrl?: string;
 }>;
+
 const JSON_OPTION = {
-	type: 'boolean' as const,
+	type: 'boolean',
 	default: false,
 	description: 'Output machine-readable JSON instead of human-readable text',
-};
+} satisfies Options;
+
 function addBridgeOptions(command: Argv): Argv {
 	return command
 		.option('timeout-ms', {
-			type: 'number' as const,
+			type: 'number',
 			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_MS_ENV} or ${DEFAULT_TIMEOUT_MS}`,
 		})
 		.option('max-body-bytes', {
-			type: 'number' as const,
+			type: 'number',
 			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${BRIDGE_MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
 		})
 		.option('web-url', {
-			type: 'string' as const,
+			type: 'string',
 			description: `Browser app origin for wallet pairing and approval pages; defaults to ${BRIDGE_WEB_URL_ENV} or the selected network origin`,
 		})
 		.option('open', {
-			type: 'boolean' as const,
+			type: 'boolean',
 			default: true,
 			description:
 				'Open the connection page in the default browser; use --no-open to only print its URL',

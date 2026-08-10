@@ -27,15 +27,16 @@ export const GAME_LABELS = {
 	'pvp-coinflip': 'PvP Coinflip',
 } as const satisfies Record<Game, string>;
 
-const GAME_TO_PACKAGE_KEY = {
-	coinflip: 'coinflip',
-	limbo: 'limbo',
-	plinko: 'plinko',
-	range: 'range',
-	soccer: 'soccer',
-	wheel: 'wheel',
-	'pvp-coinflip': 'pvpCoinflip',
-} as const satisfies Record<Game, keyof McpConfig['sdk']['packageIds']>;
+const GAME_TO_PACKAGE_KEY: Record<Game, keyof McpConfig['sdk']['packageIds']> =
+	{
+		coinflip: 'coinflip',
+		limbo: 'limbo',
+		plinko: 'plinko',
+		range: 'range',
+		soccer: 'soccer',
+		wheel: 'wheel',
+		'pvp-coinflip': 'pvpCoinflip',
+	};
 
 const GAME_TO_TOOLS = {
 	coinflip: ['build_coinflip_transaction'],

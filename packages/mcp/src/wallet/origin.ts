@@ -3,7 +3,7 @@
 
 import type { SuigarNetwork } from '@suigar/sdk';
 
-export const BRIDGE_WEB_URL_ENV = 'SUIGAR_MCP_BRIDGE_WEB_URL';
+export const BRIDGE_WEB_URL_ENV: string = 'SUIGAR_MCP_BRIDGE_WEB_URL';
 
 export function resolveWebOrigin(
 	network: SuigarNetwork,

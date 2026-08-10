@@ -8,7 +8,7 @@ import { isValidSuiAddress } from '@mysten/sui/utils';
 import type { SuigarNetwork } from '@suigar/sdk';
 import {
 	ensureSuigarMcpDataDirectory,
-	suigarMcpDataDirectory,
+	SUIGAR_MCP_DATA_DIRECTORY,
 } from './storage.js';
 
 export type WalletType = 'wallet' | 'zklogin';
@@ -26,7 +26,10 @@ export type Credentials = {
 	profiles: Partial<Record<SuigarNetwork, WalletProfile>>;
 };
 
-const CREDENTIALS_FILE = join(suigarMcpDataDirectory, 'credentials.json');
+const CREDENTIALS_FILE: string = join(
+	SUIGAR_MCP_DATA_DIRECTORY,
+	'credentials.json',
+);
 function empty(): Credentials {
 	return {
 		version: 1,

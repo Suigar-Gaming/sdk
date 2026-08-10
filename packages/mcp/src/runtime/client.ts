@@ -32,10 +32,10 @@ import type {
 	TransactionSummaryContext,
 } from './types.js';
 
-const DEFAULT_PROVIDER_URLS = {
+const DEFAULT_PROVIDER_URLS: Record<SuigarNetwork, string> = {
 	mainnet: 'https://fullnode.mainnet.sui.io:443',
 	testnet: 'https://fullnode.testnet.sui.io:443',
-} as const satisfies Record<SuigarNetwork, string>;
+};
 
 export const DEFAULT_NETWORK: SuigarNetwork = 'testnet';
 

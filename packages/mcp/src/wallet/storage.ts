@@ -5,10 +5,10 @@ import { chmod, mkdir } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-export const suigarMcpDataDirectory = join(homedir(), '.suigar-mcp');
+export const SUIGAR_MCP_DATA_DIRECTORY: string = join(homedir(), '.suigar-mcp');
 
 export async function ensureSuigarMcpDataDirectory(): Promise<string> {
-	await mkdir(suigarMcpDataDirectory, { recursive: true, mode: 0o700 });
-	await chmod(suigarMcpDataDirectory, 0o700);
-	return suigarMcpDataDirectory;
+	await mkdir(SUIGAR_MCP_DATA_DIRECTORY, { recursive: true, mode: 0o700 });
+	await chmod(SUIGAR_MCP_DATA_DIRECTORY, 0o700);
+	return SUIGAR_MCP_DATA_DIRECTORY;
 }

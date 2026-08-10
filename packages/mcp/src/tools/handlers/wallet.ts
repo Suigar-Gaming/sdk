@@ -40,9 +40,9 @@ function connectionBridgeArgs(input: ConnectionInput): Array<string> {
 	return args;
 }
 
-export const getWalletBalancesTool = async (
+export async function getWalletBalancesTool(
 	input: GetWalletBalancesInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 	const balances = [];
@@ -81,11 +81,11 @@ export const getWalletBalancesTool = async (
 			}),
 		},
 	});
-};
+}
 
-export const listWalletCoinsTool = async (
+export async function listWalletCoinsTool(
 	input: ListWalletCoinsInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 
@@ -115,11 +115,11 @@ export const listWalletCoinsTool = async (
 			hasNextPage: result.hasNextPage,
 		},
 	});
-};
+}
 
-export const getExecutionStatusTool = async (
+export async function getExecutionStatusTool(
 	input: GetExecutionStatusInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const execution = getExecutionStatus(input.requestId);
 	if (!execution)
 		throw new Error(
@@ -127,11 +127,11 @@ export const getExecutionStatusTool = async (
 		);
 	const { config } = createSuigarClient(getConfigInput(input));
 	return asTextResponse({ network: config.network, config, execution });
-};
+}
 
-export const getConnectionStatusTool = async (
+export async function getConnectionStatusTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const profile = (await loadCredentials()).profiles[config.network];
 	return asTextResponse({
@@ -146,11 +146,11 @@ export const getConnectionStatusTool = async (
 				}
 			: { connected: false, status: 'logged-out' },
 	});
-};
+}
 
-export const suigarLoginTool = async (
+export async function suigarLoginTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const command = runSuigarCommand(
 		'login',
@@ -168,11 +168,11 @@ export const suigarLoginTool = async (
 			note: 'Started the local Suigar MCP CLI login flow. It opens the correct network in the default browser and writes the paired wallet credentials locally.',
 		},
 	});
-};
+}
 
-export const suigarLogoutTool = async (
+export async function suigarLogoutTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const command = runSuigarCommand(
 		'logout',
@@ -190,11 +190,11 @@ export const suigarLogoutTool = async (
 			note: 'Started the local Suigar MCP CLI logout flow. It opens the correct network in the default browser and updates local wallet credentials after confirmation.',
 		},
 	});
-};
+}
 
-export const setupSessionWalletTool = async (
+export async function setupSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const setup = await createSessionWalletSetup({
 		accountUrl: new URL(
@@ -211,11 +211,11 @@ export const setupSessionWalletTool = async (
 			note: 'Open this local URL yourself to create or recover a named session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
 		},
 	});
-};
+}
 
-export const getSessionWalletTool = async (
+export async function getSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const [wallet, wallets, credentials] = await Promise.all([
 		loadSessionWallet(input.sessionWalletId),
@@ -310,11 +310,11 @@ export const getSessionWalletTool = async (
 			},
 		},
 	});
-};
+}
 
-export const fundSessionWalletTool = async (
+export async function fundSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const [credentials, sessionWallet] = await Promise.all([
 		loadCredentials(),
@@ -351,4 +351,4 @@ export const fundSessionWalletTool = async (
 			note: 'Open this URL to select a coin and amount from the connected wallet. The transfer is reviewed and signed in the browser.',
 		},
 	});
-};
+}
