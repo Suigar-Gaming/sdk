@@ -511,6 +511,14 @@ class TestClient extends CoreClient {
 				name: null,
 			},
 		}) satisfies SuiClientTypes.DefaultNameServiceNameResponse;
+
+	listTransactions: CoreClient['listTransactions'] = () => {
+		throw new Error('Not implemented.');
+	};
+
+	listEvents: CoreClient['listEvents'] = () => {
+		throw new Error('Not implemented.');
+	};
 }
 
 function createSuigarTestClient({

@@ -4,6 +4,7 @@
 import {
 	createSuigarClient,
 	type ReadConfigResult,
+	type ToolTextResult,
 } from '../../runtime/index.js';
 import type { ReadConfigInput } from '../schemas/index.js';
 import {
@@ -13,7 +14,9 @@ import {
 	supportedGames,
 } from './shared.js';
 
-export const readConfigTool = async (input: ReadConfigInput = {}) => {
+export async function readConfigTool(
+	input: ReadConfigInput = {},
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	return asTextResponse({
 		network: config.network,
@@ -21,4 +24,4 @@ export const readConfigTool = async (input: ReadConfigInput = {}) => {
 		supportedGames: supportedGames(),
 		supportedFeatures: supportedFeatures(),
 	} satisfies ReadConfigResult);
-};
+}

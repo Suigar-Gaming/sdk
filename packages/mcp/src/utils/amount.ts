@@ -3,20 +3,41 @@
 
 import { parseToUnits, SUI_DECIMALS } from '@mysten/sui/utils';
 
-export const BASE_UNIT_AMOUNT_PATTERN = /^\d+$/u;
-export const CURRENCY_AMOUNT_PATTERN = /^(?:\d+|\d+\.\d+|\.\d+)$/u;
-export const POSITIVE_INTEGER_PATTERN = /^[1-9]\d*$/u;
-const TRAILING_ZERO_PATTERN = /0+$/u;
+export const BASE_UNIT_AMOUNT_PATTERN: RegExp = /^\d+$/u;
+export const CURRENCY_AMOUNT_PATTERN: RegExp = /^(?:\d+|\d+\.\d+|\.\d+)$/u;
+export const POSITIVE_INTEGER_PATTERN: RegExp = /^[1-9]\d*$/u;
+const AMOUNT_FIELD_NAME_VALUES = [
+	'amount',
+	'house_edge_amount',
+	'max_payout',
+	'max_stake',
+	'min_stake',
+	'outcome_amount',
+	'payout_amount',
+	'stake_amount',
+	'stake_per_player',
+] as const;
+const TRAILING_ZERO_PATTERN: RegExp = /0+$/u;
 
 export type FormattedAmount = {
 	raw: string;
 	display: string;
 };
 
-export const formatBaseUnitAmount = (
+export type AmountFieldName = (typeof AMOUNT_FIELD_NAME_VALUES)[number];
+
+export const AMOUNT_FIELD_NAMES: ReadonlySet<AmountFieldName> = new Set(
+	AMOUNT_FIELD_NAME_VALUES,
+);
+
+export function isAmountFieldName(key: string): key is AmountFieldName {
+	return (AMOUNT_FIELD_NAMES as ReadonlySet<string>).has(key);
+}
+
+export function formatBaseUnitAmount(
 	value: string | number | bigint,
 	decimals = SUI_DECIMALS,
-): string => {
+): string {
 	const raw = String(value);
 	const negative = raw.startsWith('-');
 	const digits = negative ? raw.slice(1) : raw;
@@ -32,12 +53,12 @@ export const formatBaseUnitAmount = (
 	const whole = padded.slice(0, -decimals) || '0';
 	const fraction = padded.slice(-decimals).replace(TRAILING_ZERO_PATTERN, '');
 	return `${negative ? '-' : ''}${whole}${fraction ? `.${fraction}` : ''}`;
-};
+}
 
-export const formatAmount = (
+export function formatAmount(
 	value: unknown,
 	decimals?: number,
-): FormattedAmount | null => {
+): FormattedAmount | null {
 	if (
 		typeof value !== 'string' &&
 		typeof value !== 'number' &&
@@ -50,12 +71,12 @@ export const formatAmount = (
 		raw,
 		display: formatBaseUnitAmount(raw, decimals),
 	};
-};
+}
 
-export const toCurrencyAmountText = (
+export function toCurrencyAmountText(
 	value: unknown,
 	fieldName: string,
-): string => {
+): string {
 	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
 		return String(value);
 	}
@@ -65,13 +86,13 @@ export const toCurrencyAmountText = (
 	throw new TypeError(
 		`Missing or invalid ${fieldName}. Provide a non-negative currency amount such as 1, 2, or 1.5.`,
 	);
-};
+}
 
-export const toBaseUnits = (
+export function toBaseUnits(
 	value: unknown,
 	fieldName: string,
 	decimals: number,
-): bigint => {
+): bigint {
 	const amount = toCurrencyAmountText(value, fieldName);
 	try {
 		return parseToUnits(amount, decimals);
@@ -80,4 +101,4 @@ export const toBaseUnits = (
 			`Invalid ${fieldName}: ${error instanceof Error ? error.message : String(error)}`,
 		);
 	}
-};
+}

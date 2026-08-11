@@ -24,7 +24,7 @@ export type ResolvedAppView = {
 	View: ComponentType<AppViewProps>;
 };
 
-export const resolveAppView = (payload: unknown): ResolvedAppView => {
+export function resolveAppView(payload: unknown): ResolvedAppView {
 	const result = asRecord(payload);
 	if (result.sessionWallet) {
 		return {
@@ -59,4 +59,4 @@ export const resolveAppView = (payload: unknown): ResolvedAppView => {
 		};
 	}
 	return { coinBadge, title: 'Transaction Inspector', View: TransactionView };
-};
+}

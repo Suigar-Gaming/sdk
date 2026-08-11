@@ -14,9 +14,10 @@ import {
 	executeSessionTransaction,
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
+	type McpConfig,
 	type ReadOnlyPlan,
-	type ResolvedMcpConfig,
 	type SuigarClientBundle,
+	type ToolTextResult,
 	type TransactionSummaryContext,
 } from '../../runtime/index.js';
 import {
@@ -53,9 +54,9 @@ import {
 	requireString,
 } from './shared.js';
 
-export const buildCoinflipTransactionTool = async (
+export async function buildCoinflipTransactionTool(
 	input: CoinflipInput = {},
-) => {
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -81,9 +82,11 @@ export const buildCoinflipTransactionTool = async (
 				side,
 			}),
 	});
-};
+}
 
-export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
+export async function buildLimboTransactionTool(
+	input: LimboInput = {},
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -112,12 +115,12 @@ export const buildLimboTransactionTool = async (input: LimboInput = {}) => {
 				targetMultiplier,
 			}),
 	});
-};
+}
 
-const buildConfigIdTransactionTool = async (
+async function buildConfigIdTransactionTool(
 	input: ConfigIdInput,
 	game: Extract<StandardGame, 'plinko' | 'wheel'>,
-) => {
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -141,15 +144,23 @@ const buildConfigIdTransactionTool = async (
 				configId,
 			}),
 	});
-};
+}
 
-export const buildPlinkoTransactionTool = (input: ConfigIdInput = {}) =>
-	buildConfigIdTransactionTool(input, 'plinko');
+export function buildPlinkoTransactionTool(
+	input: ConfigIdInput = {},
+): Promise<ToolTextResult> {
+	return buildConfigIdTransactionTool(input, 'plinko');
+}
 
-export const buildWheelTransactionTool = (input: ConfigIdInput = {}) =>
-	buildConfigIdTransactionTool(input, 'wheel');
+export function buildWheelTransactionTool(
+	input: ConfigIdInput = {},
+): Promise<ToolTextResult> {
+	return buildConfigIdTransactionTool(input, 'wheel');
+}
 
-export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
+export async function buildRangeTransactionTool(
+	input: RangeInput = {},
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -179,9 +190,11 @@ export const buildRangeTransactionTool = async (input: RangeInput = {}) => {
 				outOfRange,
 			}),
 	});
-};
+}
 
-export const buildSoccerTransactionTool = async (input: SoccerInput = {}) => {
+export async function buildSoccerTransactionTool(
+	input: SoccerInput = {},
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -217,11 +230,11 @@ export const buildSoccerTransactionTool = async (input: SoccerInput = {}) => {
 				shotZoneId,
 			}),
 	});
-};
+}
 
-export const buildPvpCoinflipCreateTransactionTool = async (
+export async function buildPvpCoinflipCreateTransactionTool(
 	input: PvpCoinflipCreateInput = {},
-) => {
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -259,11 +272,11 @@ export const buildPvpCoinflipCreateTransactionTool = async (
 			});
 		},
 	});
-};
+}
 
-export const buildPvpCoinflipJoinTransactionTool = async (
+export async function buildPvpCoinflipJoinTransactionTool(
 	input: PvpCoinflipJoinInput = {},
-) => {
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -290,11 +303,11 @@ export const buildPvpCoinflipJoinTransactionTool = async (
 				gameId,
 			}),
 	});
-};
+}
 
-export const buildPvpCoinflipCancelTransactionTool = async (
+export async function buildPvpCoinflipCancelTransactionTool(
 	input: PvpCoinflipCancelInput = {},
-) => {
+): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -321,7 +334,7 @@ export const buildPvpCoinflipCancelTransactionTool = async (
 				gameId,
 			}),
 	});
-};
+}
 
 const BET_COUNT_LIMITS: Partial<
 	Record<Game, { parameter: string; label: string }>
@@ -332,10 +345,10 @@ const BET_COUNT_LIMITS: Partial<
 	soccer: { parameter: 'max_number_of_shots', label: 'shots' },
 	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
 };
-export const toPositiveInteger = (
+export function toPositiveInteger(
 	value: unknown,
 	fieldName: string,
-): number | bigint => {
+): number | bigint {
 	if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
 		return value;
 	}
@@ -345,26 +358,26 @@ export const toPositiveInteger = (
 	throw new TypeError(
 		`Missing or invalid ${fieldName}. Provide a positive integer.`,
 	);
-};
-export const requireNumber = (value: unknown, fieldName: string): number => {
+}
+export function requireNumber(value: unknown, fieldName: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) {
 		return value;
 	}
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
-};
-const getTarget = (
-	config: ResolvedMcpConfig,
+}
+function getTarget(
+	config: McpConfig,
 	game: Game,
 	action?: PvPCoinflipAction,
-) => {
+): string {
 	const packageId = getPackageId(config, game);
 	if (game === 'pvp-coinflip') {
 		const functionName = `${action?.toLowerCase() ?? 'create'}_game`;
 		return `${packageId}::${game}::${functionName}`;
 	}
 	return `${packageId}::${game}::play`;
-};
-export const readOnlyPlan = ({
+}
+export function readOnlyPlan({
 	input,
 	game,
 	action,
@@ -376,7 +389,7 @@ export const readOnlyPlan = ({
 	action?: PvPCoinflipAction;
 	requiredInputs: Array<string>;
 	notes: Array<string>;
-}): ReadOnlyPlan => {
+}): ReadOnlyPlan {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const coinType = resolveDefaultCoinType(config, input.coinType);
 	return {
@@ -392,26 +405,31 @@ export const readOnlyPlan = ({
 			notes,
 		},
 	};
-};
+}
 
-const gameTransactionOptions = async (
+async function gameTransactionOptions(
 	input: TransactionToolInput,
 	bundle: SuigarClientBundle,
-) => {
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
+> {
 	const sessionExecution =
 		getMode(input.mode) === 'execute' && input.executionWallet === 'session';
 	let owner: string;
 	if (sessionExecution) {
-		const sessionWallet = await loadSessionWallet();
+		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
 		if (!sessionWallet) {
 			throw new Error(
-				'No session wallet exists. Call setup_session_wallet first, then fund its address before executing games.',
+				'No session wallet exists. Call "setup_session_wallet" first, then fund its address before executing games.',
 			);
 		}
-		const sessionAddress = (await loadSessionSigner()).toSuiAddress();
+		const sessionAddress = (
+			await loadSessionSigner(input.sessionWalletId)
+		).toSuiAddress();
 		if (sessionWallet.address !== sessionAddress) {
 			throw new Error(
-				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with setup_session_wallet before executing games.',
+				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with "setup_session_wallet" before executing games.',
 			);
 		}
 		if (input.owner) {
@@ -436,13 +454,13 @@ const gameTransactionOptions = async (
 		gasBudget: input.gasBudget,
 		useGasCoin: input.useGasCoin,
 	};
-};
+}
 
-const enforceBetCountLimit = async (
+async function enforceBetCountLimit(
 	game: Game,
 	input: TransactionToolInput,
 	bundle: SuigarClientBundle,
-) => {
+): Promise<void> {
 	if (!('betCount' in input) || input.betCount == null) {
 		return;
 	}
@@ -474,12 +492,19 @@ const enforceBetCountLimit = async (
 			`betCount cannot exceed ${maximum.toString()} ${limit.label} per ${GAME_LABELS[game]} transaction.`,
 		);
 	}
-};
+}
 
-export const stakeOptions = async (
+export async function stakeOptions(
 	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
-) => {
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
+			betCount?: number | bigint;
+			cashStake?: bigint;
+			stake: bigint;
+		}
+> {
 	const { decimals } = coinMetadataForAmount(bundle.config, input.coinType);
 	return {
 		...(await gameTransactionOptions(input, bundle)),
@@ -493,9 +518,9 @@ export const stakeOptions = async (
 			? {}
 			: { betCount: toPositiveInteger(input.betCount, 'betCount') }),
 	};
-};
+}
 
-export const buildTransactionTool = async ({
+export async function buildTransactionTool({
 	input,
 	game,
 	action,
@@ -510,7 +535,7 @@ export const buildTransactionTool = async ({
 	Pick<
 		TransactionSummaryContext,
 		'action' | 'stake' | 'stakeDisplay' | 'gameInputs'
-	>) => {
+	>): Promise<ToolTextResult> {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
 		throw new Error(
@@ -548,7 +573,7 @@ export const buildTransactionTool = async ({
 			const execution = await executeSessionTransaction({
 				transaction,
 				client: bundle.client,
-				signer: await loadSessionSigner(),
+				signer: await loadSessionSigner(input.sessionWalletId),
 			});
 			return asTextResponse({
 				mode: 'execute',
@@ -588,4 +613,4 @@ export const buildTransactionTool = async ({
 			context,
 		}),
 	);
-};
+}

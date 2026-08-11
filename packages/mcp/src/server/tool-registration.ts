@@ -59,12 +59,12 @@ import {
 	toolOutputSchema,
 } from '../tools/index.js';
 
-const errorText = (error: unknown) => {
+function errorText(error: unknown): string {
 	if (error instanceof Error) {
 		return `${error.name}: ${error.message}`;
 	}
 	return String(error);
-};
+}
 
 type ToolErrorResult = {
 	isError: true;
@@ -74,9 +74,10 @@ type ToolErrorResult = {
 	};
 };
 
-export const withToolErrors =
-	<TInput>(handler: (input: TInput) => Promise<ToolTextResult>) =>
-	async (input: TInput): Promise<ToolTextResult | ToolErrorResult> => {
+export function withToolErrors<TInput>(
+	handler: (input: TInput) => Promise<ToolTextResult>,
+): (input: TInput) => Promise<ToolTextResult | ToolErrorResult> {
+	return async (input: TInput): Promise<ToolTextResult | ToolErrorResult> => {
 		try {
 			return await handler(input);
 		} catch (error) {
@@ -95,6 +96,7 @@ export const withToolErrors =
 			};
 		}
 	};
+}
 
 export const readOnlyToolAnnotations = {
 	readOnlyHint: true,
@@ -387,10 +389,10 @@ const toolDefinitions = [
 	},
 ] satisfies Array<ToolDefinition>;
 
-const registerTool = <TInput>(
+const registerTool = (
 	server: McpServer,
 	appToolMeta: AppToolMeta,
-	tool: ToolDefinition & { handler: ToolHandler<TInput> },
+	tool: ToolDefinition,
 ) => {
 	const config = {
 		title: tool.title,
@@ -414,11 +416,11 @@ const registerTool = <TInput>(
 	server.registerTool(tool.name, config, handler);
 };
 
-export const registerSuigarTools = (
+export function registerSuigarTools(
 	server: McpServer,
 	appToolMeta: AppToolMeta,
-) => {
+): void {
 	for (const tool of toolDefinitions) {
 		registerTool(server, appToolMeta, tool);
 	}
-};
+}

@@ -16,7 +16,7 @@ export type InspectorViewModel = {
 	errors: Array<string>;
 };
 
-const resultEventFields = (structuredContent: AnyRecord) => {
+function resultEventFields(structuredContent: AnyRecord): AnyRecord {
 	const dryRunSummary = asRecord(structuredContent.dryRunSummary);
 	const events = Array.isArray(dryRunSummary.events)
 		? dryRunSummary.events
@@ -35,9 +35,9 @@ const resultEventFields = (structuredContent: AnyRecord) => {
 		}) ??
 		eventRecords.find((item) => isRecord(item.fields));
 	return event ? asRecord(event.fields) : {};
-};
+}
 
-const targetsFor = (structuredContent: AnyRecord) => {
+function targetsFor(structuredContent: AnyRecord): Array<string> {
 	const summary = asRecord(structuredContent.summary);
 	const plan = asRecord(structuredContent.plan);
 	const commands = Array.isArray(summary.commands) ? summary.commands : [];
@@ -46,28 +46,30 @@ const targetsFor = (structuredContent: AnyRecord) => {
 		.map((command) => asRecord(command).target)
 		.filter((target): target is string => typeof target === 'string')
 		.concat(planTarget);
-};
+}
 
-const notesFor = (structuredContent: AnyRecord) => {
+function notesFor(structuredContent: AnyRecord): Array<string> {
 	const plan = asRecord(structuredContent.plan);
 	const game = asRecord(structuredContent.game);
 	return [
 		...(Array.isArray(plan.notes) ? plan.notes : []),
 		...(Array.isArray(game.notes) ? game.notes : []),
 	].filter((note): note is string => typeof note === 'string');
-};
+}
 
-const errorsFor = (structuredContent: AnyRecord) =>
-	Array.isArray(structuredContent.errors)
+function errorsFor(structuredContent: AnyRecord): Array<string> {
+	return Array.isArray(structuredContent.errors)
 		? structuredContent.errors.filter(
 				(error): error is string => typeof error === 'string' && error !== '',
 			)
 		: [];
+}
 
-const fallbackStructName = (coinType: string) =>
-	coinType.match(/::([^:<>,\s]+)(?:<.*>)?$/u)?.[1] ?? null;
+function fallbackStructName(coinType: string): string | null {
+	return coinType.match(/::([^:<>,\s]+)(?:<.*>)?$/u)?.[1] ?? null;
+}
 
-const coinBadgeFor = (coinType: unknown) => {
+function coinBadgeFor(coinType: unknown): string | null {
 	if (typeof coinType !== 'string' || coinType === '') {
 		return null;
 	}
@@ -77,20 +79,21 @@ const coinBadgeFor = (coinType: unknown) => {
 	} catch {
 		return fallbackStructName(coinType);
 	}
-};
+}
 
-const scalarText = (value: unknown) =>
-	typeof value === 'string' ||
-	typeof value === 'number' ||
-	typeof value === 'bigint' ||
-	typeof value === 'boolean'
+function scalarText(value: unknown): string {
+	return typeof value === 'string' ||
+		typeof value === 'number' ||
+		typeof value === 'bigint' ||
+		typeof value === 'boolean'
 		? String(value)
 		: '';
+}
 
-export const createInspectorViewModel = (
+export function createInspectorViewModel(
 	payload: unknown,
 	explicitErrors: Array<string>,
-): InspectorViewModel => {
+): InspectorViewModel {
 	const record = asRecord(payload);
 	const config = asRecord(record.config);
 	const summary = asRecord(record.summary);
@@ -161,4 +164,4 @@ export const createInspectorViewModel = (
 		notes: notesFor(record),
 		errors: explicitErrors.length > 0 ? explicitErrors : errorsFor(record),
 	};
-};
+}

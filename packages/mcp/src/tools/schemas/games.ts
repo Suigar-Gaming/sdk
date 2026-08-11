@@ -53,6 +53,12 @@ const commonBuildInputSchema = configInputSchema
 			.describe(
 				'For execute mode, use connected for browser approval or session to sign and submit with the local session wallet.',
 			),
+		sessionWalletId: z
+			.uuid()
+			.optional()
+			.describe(
+				'Named local session wallet used when executionWallet is session.',
+			),
 	})
 	.strict();
 

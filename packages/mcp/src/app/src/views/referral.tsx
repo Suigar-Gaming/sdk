@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { JSX } from 'react';
 import {
 	DefinitionList,
 	ListPanel,
@@ -8,14 +9,15 @@ import {
 } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 
-const claimLabel = (kind: unknown) =>
-	kind === 'commission'
+function claimLabel(kind: unknown): unknown {
+	return kind === 'commission'
 		? 'Commission'
 		: kind === 'level-up-usd-rewards'
 			? 'Level-up USD rewards'
 			: kind;
+}
 
-export function ReferralView({ payload }: { payload: unknown }) {
+export function ReferralView({ payload }: { payload: unknown }): JSX.Element {
 	const result = asRecord(payload);
 	const referral = asRecord(result.referral);
 	const plan = asRecord(result.plan);

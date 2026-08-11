@@ -11,7 +11,7 @@ import {
 	resolveOwnerAddress,
 	type SuigarClientBundle,
 } from '../../src/runtime/client.js';
-import type { ResolvedMcpConfig } from '../../src/runtime/types.js';
+import type { McpConfig } from '../../src/runtime/types.js';
 
 const owner =
 	'0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -49,6 +49,8 @@ describe('network resolution', () => {
 describe('coin type resolution', () => {
 	it('normalizes explicit and configured default coin types', () => {
 		const config = {
+			network: 'testnet',
+			providerUrl: 'https://example.com',
 			sdk: {
 				coins: {
 					sui: {
@@ -56,7 +58,7 @@ describe('coin type resolution', () => {
 					},
 				},
 			},
-		} as ResolvedMcpConfig;
+		} as McpConfig;
 
 		expect(resolveDefaultCoinType(config)).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',

@@ -11,25 +11,40 @@ export const NFT_IMAGE_RESOURCE_DOMAINS = [
 	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
 ] as const;
 
-export const createSuigarMcpAppResourceMeta = () => ({
+type SuigarMcpAppResourceMeta = {
 	ui: {
 		csp: {
-			connectDomains: [],
-			resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
-		},
-		prefersBorder: true,
-	},
-});
+			connectDomains: Array<string>;
+			resourceDomains: Array<(typeof NFT_IMAGE_RESOURCE_DOMAINS)[number]>;
+		};
+		prefersBorder: boolean;
+	};
+};
 
-const hasErrorCode = (
+export function createSuigarMcpAppResourceMeta(): SuigarMcpAppResourceMeta {
+	return {
+		ui: {
+			csp: {
+				connectDomains: [],
+				resourceDomains: [...NFT_IMAGE_RESOURCE_DOMAINS],
+			},
+			prefersBorder: true,
+		},
+	};
+}
+
+function hasErrorCode(
 	error: unknown,
 	code: string,
-): error is Error & { code: string } =>
-	error instanceof Error &&
-	'code' in error &&
-	(error as { code: unknown }).code === code;
+): error is Error & { code: string } {
+	return (
+		error instanceof Error &&
+		'code' in error &&
+		(error as { code: unknown }).code === code
+	);
+}
 
-const readSuigarMcpAppHtml = async () => {
+async function readSuigarMcpAppHtml(): Promise<string> {
 	try {
 		return await readFile(
 			new URL('../app/index.html', import.meta.url),
@@ -43,15 +58,24 @@ const readSuigarMcpAppHtml = async () => {
 			cause: error,
 		});
 	}
-};
+}
 
-export const createSuigarMcpAppResourceResult = async () => ({
-	contents: [
-		{
-			uri: SUIGAR_MCP_APP_RESOURCE_URI,
-			mimeType: RESOURCE_MIME_TYPE,
-			text: await readSuigarMcpAppHtml(),
-			_meta: createSuigarMcpAppResourceMeta(),
-		},
-	],
-});
+export async function createSuigarMcpAppResourceResult(): Promise<{
+	contents: Array<{
+		uri: string;
+		mimeType: string;
+		text: string;
+		_meta: SuigarMcpAppResourceMeta;
+	}>;
+}> {
+	return {
+		contents: [
+			{
+				uri: SUIGAR_MCP_APP_RESOURCE_URI,
+				mimeType: RESOURCE_MIME_TYPE,
+				text: await readSuigarMcpAppHtml(),
+				_meta: createSuigarMcpAppResourceMeta(),
+			},
+		],
+	};
+}

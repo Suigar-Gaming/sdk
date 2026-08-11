@@ -3,20 +3,23 @@
 
 import type { AnyRecord, DefinitionEntry } from './types.js';
 
-export const asRecord = (value: unknown): AnyRecord =>
-	value && typeof value === 'object' ? (value as AnyRecord) : {};
+export function asRecord(value: unknown): AnyRecord {
+	return value && typeof value === 'object' ? (value as AnyRecord) : {};
+}
 
-export const isRecord = (value: unknown): value is AnyRecord =>
-	value !== null && typeof value === 'object';
+export function isRecord(value: unknown): value is AnyRecord {
+	return value !== null && typeof value === 'object';
+}
 
-export const stringify = (value: unknown) =>
-	JSON.stringify(
+export function stringify(value: unknown): string {
+	return JSON.stringify(
 		value,
 		(_key, item) => (typeof item === 'bigint' ? item.toString() : item),
 		2,
 	);
+}
 
-export const formatValue = (value: unknown) => {
+export function formatValue(value: unknown): unknown {
 	if (Array.isArray(value)) {
 		return value.length > 0 ? value.join(', ') : null;
 	}
@@ -31,16 +34,17 @@ export const formatValue = (value: unknown) => {
 		return stringify(value);
 	}
 	return value;
-};
+}
 
-export const labelFor = (key: string) =>
-	key
+export function labelFor(key: string): string {
+	return key
 		.replace(/([a-z0-9])([A-Z])/gu, '$1 $2')
 		.replace(/_/gu, ' ')
 		.replace(/\b\w/gu, (character) => character.toUpperCase());
+}
 
-export const dynamicEntries = (record: AnyRecord): Array<DefinitionEntry> =>
-	Object.entries(record).reduce<Array<DefinitionEntry>>(
+export function dynamicEntries(record: AnyRecord): Array<DefinitionEntry> {
+	return Object.entries(record).reduce<Array<DefinitionEntry>>(
 		(entries, [key, value]) => {
 			if (
 				key.endsWith('_display') ||
@@ -60,28 +64,35 @@ export const dynamicEntries = (record: AnyRecord): Array<DefinitionEntry> =>
 		},
 		[],
 	);
+}
 
-export const amountText = (value: unknown) => {
+export function amountText(value: unknown): unknown {
 	const amount = asRecord(value);
 	if (typeof amount.display === 'string' && typeof amount.raw === 'string') {
 		return `${amount.display} (${amount.raw} base units)`;
 	}
 	return value;
-};
+}
 
-export const visibleDefinitionEntries = (entries: Array<DefinitionEntry>) =>
-	entries.reduce<Array<DefinitionEntry>>((visibleEntries, [label, value]) => {
-		const formattedValue = formatValue(value);
-		if (formattedValue != null && formattedValue !== '') {
-			visibleEntries.push([label, formattedValue]);
-		}
-		return visibleEntries;
-	}, []);
+export function visibleDefinitionEntries(
+	entries: Array<DefinitionEntry>,
+): Array<DefinitionEntry> {
+	return entries.reduce<Array<DefinitionEntry>>(
+		(visibleEntries, [label, value]) => {
+			const formattedValue = formatValue(value);
+			if (formattedValue != null && formattedValue !== '') {
+				visibleEntries.push([label, formattedValue]);
+			}
+			return visibleEntries;
+		},
+		[],
+	);
+}
 
-export const valueTone = (
+export function valueTone(
 	label: string,
 	value: unknown,
-): 'error' | 'success' | null => {
+): 'error' | 'success' | null {
 	const text = String(value).toLowerCase();
 	const lowerLabel = label.toLowerCase();
 	if (text === 'success') {
@@ -91,4 +102,4 @@ export const valueTone = (
 		return 'error';
 	}
 	return null;
-};
+}

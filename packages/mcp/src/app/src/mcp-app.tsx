@@ -8,7 +8,14 @@ import {
 	applyHostStyleVariables,
 } from '@modelcontextprotocol/ext-apps';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { StrictMode, useEffect, useReducer, useRef, useState } from 'react';
+import {
+	StrictMode,
+	useEffect,
+	useReducer,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { createRoot } from 'react-dom/client';
 import {
 	ExecutionApproval,
@@ -30,10 +37,13 @@ const initialState: InspectorState = {
 const shellClassName =
 	'mx-auto grid min-h-dvh max-w-6xl content-start gap-4 bg-background p-3.5 text-foreground sm:p-4.5';
 
-const textErrors = (result: CallToolResult) =>
-	result.content?.flatMap((item) =>
-		item.type === 'text' && item.text ? [item.text] : [],
-	) ?? [];
+function textErrors(result: CallToolResult): Array<string> {
+	return (
+		result.content?.flatMap((item) =>
+			item.type === 'text' && item.text ? [item.text] : [],
+		) ?? []
+	);
+}
 
 type McpUiHostContext = {
 	theme?: Parameters<typeof applyDocumentTheme>[0];
@@ -74,7 +84,7 @@ type AppViewAction =
 			payload: unknown;
 	  };
 
-const reducer = (state: AppViewState, action: AppViewAction): AppViewState => {
+function reducer(state: AppViewState, action: AppViewAction): AppViewState {
 	switch (action.type) {
 		case 'connection-error':
 			return { ...state, error: action.error };
@@ -107,9 +117,9 @@ const reducer = (state: AppViewState, action: AppViewAction): AppViewState => {
 				},
 			};
 	}
-};
+}
 
-function applyHostContext(context: McpUiHostContext | undefined) {
+function applyHostContext(context: McpUiHostContext | undefined): void {
 	if (!context) {
 		return;
 	}
@@ -124,7 +134,7 @@ function applyHostContext(context: McpUiHostContext | undefined) {
 	}
 }
 
-export function SuigarInspectorApp() {
+export function SuigarInspectorApp(): JSX.Element | null {
 	const [viewState, dispatch] = useReducer(reducer, {
 		error: null,
 		hostContext: undefined,

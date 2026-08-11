@@ -4,18 +4,50 @@
 	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
 	"repository": {
 		"url": "https://github.com/Suigar-Gaming/ts-sdks",
-		"source": "github"
+		"source": "github",
+		"subfolder": "packages/mcp"
 	},
 	"version": "1.0.0-beta.20",
+	"websiteUrl": "https://mcp.suigar.com",
 	"packages": [
 		{
 			"registryType": "npm",
 			"identifier": "@suigar/mcp",
 			"version": "1.0.0-beta.20",
+			"runtimeHint": "npx",
 			"transport": {
 				"type": "stdio"
 			},
-			"environmentVariables": []
+			"environmentVariables": [
+				{
+					"description": "Custom Suigar MCP browser app origin for wallet pairing and approval pages.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_BRIDGE_WEB_URL"
+				},
+				{
+					"description": "Milliseconds before local browser login, logout, and approval bridges expire.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_BRIDGE_TIMEOUT_MS"
+				},
+				{
+					"description": "Maximum JSON callback body size in bytes for local browser bridges.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES"
+				},
+				{
+					"description": "Milliseconds before local session-wallet setup pages expire.",
+					"isRequired": false,
+					"format": "string",
+					"isSecret": false,
+					"name": "SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS"
+				}
+			]
 		}
 	]
 }

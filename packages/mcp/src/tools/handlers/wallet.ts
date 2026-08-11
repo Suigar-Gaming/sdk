@@ -6,14 +6,13 @@ import {
 	createSuigarClient,
 	type ToolTextResult,
 } from '../../runtime/index.js';
-import { formatBaseUnitAmount } from '../../utils/index.js';
+import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {
-	createLoginBridge,
 	createSessionWalletSetup,
 	getExecutionStatus,
+	listSessionWallets,
 	loadCredentials,
 	loadSessionWallet,
-	removeProfile,
 	resolveWebOrigin,
 } from '../../wallet/index.js';
 import type {
@@ -30,9 +29,20 @@ import {
 	resolveWalletOwner,
 } from './shared.js';
 
-export const getWalletBalancesTool = async (
+function connectionBridgeArgs(input: ConnectionInput): Array<string> {
+	const args: Array<string> = [];
+	if (input.webUrl) args.push('--web-url', input.webUrl);
+	if (input.timeoutMs !== undefined)
+		args.push('--timeout-ms', String(input.timeoutMs));
+	if (input.maxBodyBytes !== undefined)
+		args.push('--max-body-bytes', String(input.maxBodyBytes));
+	if (input.noOpen === true || input.open === false) args.push('--no-open');
+	return args;
+}
+
+export async function getWalletBalancesTool(
 	input: GetWalletBalancesInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 	const balances = [];
@@ -71,11 +81,11 @@ export const getWalletBalancesTool = async (
 			}),
 		},
 	});
-};
+}
 
-export const listWalletCoinsTool = async (
+export async function listWalletCoinsTool(
 	input: ListWalletCoinsInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 
@@ -105,11 +115,11 @@ export const listWalletCoinsTool = async (
 			hasNextPage: result.hasNextPage,
 		},
 	});
-};
+}
 
-export const getExecutionStatusTool = async (
+export async function getExecutionStatusTool(
 	input: GetExecutionStatusInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const execution = getExecutionStatus(input.requestId);
 	if (!execution)
 		throw new Error(
@@ -117,11 +127,11 @@ export const getExecutionStatusTool = async (
 		);
 	const { config } = createSuigarClient(getConfigInput(input));
 	return asTextResponse({ network: config.network, config, execution });
-};
+}
 
-export const getConnectionStatusTool = async (
+export async function getConnectionStatusTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const profile = (await loadCredentials()).profiles[config.network];
 	return asTextResponse({
@@ -136,69 +146,99 @@ export const getConnectionStatusTool = async (
 				}
 			: { connected: false, status: 'logged-out' },
 	});
-};
+}
 
-export const suigarLoginTool = async (
+export async function suigarLoginTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const bridge = await createLoginBridge({
-		network: config.network,
-		webOrigin: resolveWebOrigin(config.network),
-	});
-	void bridge.done.catch(() => undefined);
+	const command = runSuigarCommand(
+		'login',
+		'--network',
+		config.network,
+		...connectionBridgeArgs(input),
+	);
 	return asTextResponse({
 		network: config.network,
 		config,
-		connection: { connected: false, loginUrl: bridge.url, status: 'pending' },
+		connection: {
+			connected: false,
+			status: 'pending',
+			...command,
+			note: 'Started the local Suigar MCP CLI login flow. It opens the correct network in the default browser and writes the paired wallet credentials locally.',
+		},
 	});
-};
+}
 
-export const suigarLogoutTool = async (
+export async function suigarLogoutTool(
 	input: ConnectionInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
-	await removeProfile(config.network);
+	const command = runSuigarCommand(
+		'logout',
+		'--network',
+		config.network,
+		...connectionBridgeArgs(input),
+	);
 	return asTextResponse({
 		network: config.network,
 		config,
-		connection: { connected: false, status: 'logged-out' },
+		connection: {
+			connected: false,
+			status: 'pending',
+			...command,
+			note: 'Started the local Suigar MCP CLI logout flow. It opens the correct network in the default browser and updates local wallet credentials after confirmation.',
+		},
 	});
-};
+}
 
-export const setupSessionWalletTool = async (
+export async function setupSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
-	const setup = await createSessionWalletSetup();
+	const setup = await createSessionWalletSetup({
+		accountUrl: new URL(
+			'/account',
+			resolveWebOrigin(config.network),
+		).toString(),
+	});
 	return asTextResponse({
 		network: config.network,
 		config,
 		sessionWallet: {
 			status: 'setup-pending',
 			setupUrl: setup.setupUrl,
-			note: 'Open this local URL yourself to create or recover the one session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
+			note: 'Open this local URL yourself to create or recover a named session wallet shared by mainnet and testnet. The recovery phrase is intentionally never returned through MCP.',
 		},
 	});
-};
+}
 
-export const getSessionWalletTool = async (
+export async function getSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
-	const [wallet, credentials] = await Promise.all([
-		loadSessionWallet(),
+	const [wallet, wallets, credentials] = await Promise.all([
+		loadSessionWallet(input.sessionWalletId),
+		listSessionWallets(),
 		loadCredentials(),
 	]);
 	if (!wallet) {
-		const setup = await createSessionWalletSetup();
+		const setup = await createSessionWalletSetup({
+			accountUrl: new URL(
+				'/account',
+				resolveWebOrigin(bundle.config.network),
+			).toString(),
+		});
 		return asTextResponse({
 			network: bundle.config.network,
 			config: bundle.config,
 			sessionWallet: {
 				status: 'setup-required',
 				setupUrl: setup.setupUrl,
-				note: 'Create or recover the one session wallet shared by mainnet and testnet. Its recovery phrase is shown only on the local setup page.',
+				wallets,
+				note: input.sessionWalletId
+					? 'No local session wallet exists with that ID. Create or recover a named session wallet, or call get_session_wallet without sessionWalletId to use the first wallet.'
+					: 'Create or recover a named session wallet shared by mainnet and testnet. Its recovery phrase is shown only on the local setup page.',
 			},
 		});
 	}
@@ -248,6 +288,9 @@ export const getSessionWalletTool = async (
 		network: bundle.config.network,
 		config: bundle.config,
 		sessionWallet: {
+			status: 'ready',
+			selectedSessionWalletId: wallet.id,
+			wallets,
 			...wallet,
 			balances: balances.map((balance) => {
 				const coin = metadata.get(balance.coinType)!;
@@ -260,32 +303,32 @@ export const getSessionWalletTool = async (
 			funding: {
 				address: wallet.address,
 				addressQrCodeDataUrl,
-				fundingUrl,
+				...(fundingUrl ? { fundingUrl } : {}),
 				note: fundingUrl
 					? 'Open the funding URL to select a coin and amount from the paired wallet, then approve the transfer in the browser.'
-					: `Pair a wallet on ${bundle.config.network} with suigar_login before opening the funding flow.`,
+					: `Pair a wallet on ${bundle.config.network} with "suigar_login" before opening the funding flow.`,
 			},
 		},
 	});
-};
+}
 
-export const fundSessionWalletTool = async (
+export async function fundSessionWalletTool(
 	input: SessionWalletInput,
-): Promise<ToolTextResult> => {
+): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const [credentials, sessionWallet] = await Promise.all([
 		loadCredentials(),
-		loadSessionWallet(),
+		loadSessionWallet(input.sessionWalletId),
 	]);
 	const profile = credentials.profiles[config.network];
 	if (!profile) {
 		throw new Error(
-			'No wallet is connected for this network. Call suigar_login first.',
+			'No wallet is connected for this network. Call "suigar_login" first.',
 		);
 	}
 	if (!sessionWallet) {
 		throw new Error(
-			'No session wallet exists. Call setup_session_wallet first.',
+			'No session wallet exists. Call "setup_session_wallet" first.',
 		);
 	}
 
@@ -301,9 +344,11 @@ export const fundSessionWalletTool = async (
 		network: config.network,
 		config,
 		sessionWallet: {
+			id: sessionWallet.id,
+			name: sessionWallet.name,
 			address: sessionWallet.address,
 			fundingUrl: fundingUrl.toString(),
 			note: 'Open this URL to select a coin and amount from the connected wallet. The transfer is reviewed and signed in the browser.',
 		},
 	});
-};
+}

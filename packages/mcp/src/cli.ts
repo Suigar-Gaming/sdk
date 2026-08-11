@@ -1,95 +1,101 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import open from 'open';
-import type { ArgumentsCamelCase, Argv } from 'yargs';
+import type { ArgumentsCamelCase, Argv, Options } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 import { SUPPORTED_SUI_NETWORKS, type SuigarNetwork } from '@suigar/sdk';
 import { startSuigarMcpServer } from './server/index.js';
+import { VERSION } from './utils/index.js';
 import {
+	BRIDGE_MAX_BODY_BYTES_ENV,
+	BRIDGE_TIMEOUT_MS_ENV,
+	BRIDGE_WEB_URL_ENV,
 	clearCredentials,
 	createLoginBridge,
 	createLogoutBridge,
+	DEFAULT_MAX_BODY_BYTES,
+	DEFAULT_TIMEOUT_MS,
 	loadCredentials,
 	resolveWebOrigin,
 	setDefaultNetwork,
+	type BridgeOptions,
+	type LogoutBridge,
 } from './wallet/index.js';
 
 type NetworkArgs = ArgumentsCamelCase<{ network?: SuigarNetwork }>;
 type JsonArgs = ArgumentsCamelCase<{ json: boolean }>;
+type BridgeArgs = ArgumentsCamelCase<{
+	timeoutMs?: number;
+	maxBodyBytes?: number;
+	open: boolean;
+	webUrl?: string;
+}>;
+
 const JSON_OPTION = {
-	type: 'boolean' as const,
+	type: 'boolean',
 	default: false,
 	description: 'Output machine-readable JSON instead of human-readable text',
-};
+} satisfies Options;
 
-const TOOL_CATALOG = [
-	'setup_session_wallet',
-	'get_session_wallet',
-	'suigar_login',
-	'suigar_logout',
-	'get_connection_status',
-	'get_execution_status',
-	'read_config',
-	'read_game_metadata',
-	'list_nfts',
-	'get_wallet_balances',
-	'list_wallet_coins',
-	'get_referral_commission',
-	'get_referral_level_up_usd_rewards',
-	'build_referral_commission_claim_transaction',
-	'build_referral_level_up_usd_rewards_claim_transaction',
-	'build_nft_v1_mint_transaction',
-	'build_coinflip_transaction',
-	'build_limbo_transaction',
-	'build_plinko_transaction',
-	'build_wheel_transaction',
-	'build_range_transaction',
-	'build_soccer_transaction',
-	'build_pvp_coinflip_create_transaction',
-	'build_pvp_coinflip_join_transaction',
-	'build_pvp_coinflip_cancel_transaction',
-] as const;
+function addBridgeOptions(command: Argv): Argv {
+	return command
+		.option('timeout-ms', {
+			type: 'number',
+			description: `Milliseconds before a local browser bridge expires; defaults to ${BRIDGE_TIMEOUT_MS_ENV} or ${DEFAULT_TIMEOUT_MS}`,
+		})
+		.option('max-body-bytes', {
+			type: 'number',
+			description: `Maximum JSON callback body size for the local browser bridge; defaults to ${BRIDGE_MAX_BODY_BYTES_ENV} or ${DEFAULT_MAX_BODY_BYTES}`,
+		})
+		.option('web-url', {
+			type: 'string',
+			description: `Browser app origin for wallet pairing and approval pages; defaults to ${BRIDGE_WEB_URL_ENV} or the selected network origin`,
+		})
+		.option('open', {
+			type: 'boolean',
+			default: true,
+			description:
+				'Open the connection page in the default browser; use --no-open to only print its URL',
+		});
+}
+function getBridgeOptions(args: BridgeArgs): BridgeOptions {
+	return {
+		timeoutMs: args.timeoutMs,
+		maxBodyBytes: args.maxBodyBytes,
+		open: args.open,
+	};
+}
 
-export async function runSuigarCli(argv = hideBin(process.argv)) {
+export async function runSuigarCli(
+	argv = hideBin(process.argv),
+): Promise<void> {
 	const parser = yargs(argv)
 		.scriptName('')
 		.strict()
 		.help()
-		.version()
+		.version(VERSION)
 		.command(
 			'login',
 			'Connect a wallet in the Suigar browser app',
-			(command: Argv) =>
-				command
+			(command) =>
+				addBridgeOptions(command)
 					.option('network', {
 						choices: SUPPORTED_SUI_NETWORKS,
 						default: 'testnet',
 					})
-					.option('no-open', {
-						type: 'boolean',
-						default: false,
-						description:
-							'Do not open the connection page in the default browser; print its URL instead',
-					})
 					.option('json', JSON_OPTION),
-			async (
-				args: ArgumentsCamelCase<{
-					network: SuigarNetwork;
-					noOpen: boolean;
-					json: boolean;
-				}>,
-			) => {
-				const network = args.network;
+			async (args) => {
+				const bridgeArgs = args as unknown as BridgeArgs;
+				const network = args.network as SuigarNetwork;
 				const bridge = await createLoginBridge({
 					network,
-					webOrigin: resolveWebOrigin(network),
+					webOrigin: resolveWebOrigin(network, bridgeArgs.webUrl),
+					...getBridgeOptions(bridgeArgs),
 				});
 				process.stderr.write(
 					`Open this URL to connect your wallet:\n${bridge.url}\n`,
 				);
-				if (!args.noOpen) await open(bridge.url).catch(() => undefined);
 				const profile = await bridge.done;
 				const result = {
 					network,
@@ -106,46 +112,52 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 		.command(
 			'logout',
 			'Disconnect a wallet through the Suigar browser app',
-			(command: Argv) =>
-				command
+			(command) =>
+				addBridgeOptions(command)
 					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
 					.option('all', {
 						type: 'boolean',
 						default: false,
-						description: 'Disconnect wallets on every network',
-					})
-					.option('no-open', {
-						type: 'boolean',
-						default: false,
 						description:
-							'Do not open the connection page in the default browser; print its URL instead',
+							'Disconnect wallets on every network; with default web origins, opens one page per network',
 					})
 					.option('json', JSON_OPTION),
-			async (
-				args: NetworkArgs &
-					JsonArgs &
-					ArgumentsCamelCase<{
-						all: boolean;
-						noOpen: boolean;
-					}>,
-			) => {
+			async (args) => {
+				const bridgeArgs = args as unknown as BridgeArgs;
 				const credentials = await loadCredentials();
-				const network = args.all
-					? undefined
-					: (args.network ?? credentials.defaultNetwork);
-				const bridge = await createLogoutBridge({
-					network,
-					all: args.all,
-					webOrigin: resolveWebOrigin(network ?? credentials.defaultNetwork),
-				});
+				const network = args.network ?? credentials.defaultNetwork;
+				const bridgeOptions = getBridgeOptions(bridgeArgs);
+				const useNetworkOrigins =
+					args.all && !bridgeArgs.webUrl && !process.env[BRIDGE_WEB_URL_ENV];
+				const bridges: Array<LogoutBridge> = [];
+				if (useNetworkOrigins) {
+					for (const logoutNetwork of SUPPORTED_SUI_NETWORKS) {
+						bridges.push(
+							await createLogoutBridge({
+								network: logoutNetwork,
+								all: true,
+								webOrigin: resolveWebOrigin(logoutNetwork),
+								...bridgeOptions,
+							}),
+						);
+					}
+				} else {
+					bridges.push(
+						await createLogoutBridge({
+							network: args.all ? undefined : network,
+							all: args.all,
+							webOrigin: resolveWebOrigin(network, bridgeArgs.webUrl),
+							...bridgeOptions,
+						}),
+					);
+				}
 				process.stderr.write(
-					`Open this URL to disconnect your wallet:\n${bridge.url}\n`,
+					`Open ${bridges.length === 1 ? 'this URL' : 'these URLs'} to disconnect your wallet:\n${bridges.map((bridge) => bridge.url).join('\n')}\n`,
 				);
-				if (!args.noOpen) await open(bridge.url).catch(() => undefined);
-				await bridge.done;
+				await Promise.all(bridges.map((bridge) => bridge.done));
 				process.stdout.write(
 					args.json
-						? `${JSON.stringify({ network, all: args.all, loggedOut: true })}\n`
+						? `${JSON.stringify({ network: args.all ? undefined : network, all: args.all, loggedOut: true })}\n`
 						: args.all
 							? 'Logged out of every Suigar MCP wallet.\n'
 							: `Logged out of Suigar MCP on ${network}.\n`,
@@ -187,18 +199,6 @@ export async function runSuigarCli(argv = hideBin(process.argv)) {
 					args.json
 						? `${JSON.stringify(result)}\n`
 						: `Suigar MCP status\n\nNetwork: ${network}\nWallet: ${profile ? `${profile.address} (${profile.walletType})` : 'Not connected'}\nDefault network: ${credentials.defaultNetwork}\n`,
-				);
-			},
-		)
-		.command(
-			'tools',
-			'Print the MCP tool catalog',
-			(command: Argv) => command.option('json', JSON_OPTION),
-			async (args: JsonArgs) => {
-				process.stdout.write(
-					args.json
-						? `${JSON.stringify({ tools: TOOL_CATALOG })}\n`
-						: `Suigar MCP tools\n\n${TOOL_CATALOG.map((tool) => `- ${tool}`).join('\n')}\n`,
 				);
 			},
 		)

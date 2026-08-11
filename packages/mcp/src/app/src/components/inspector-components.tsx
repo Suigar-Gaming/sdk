@@ -16,14 +16,14 @@ const panelClassName =
 const valueClassName =
 	'flex min-h-8 min-w-0 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-md border border-border/70 bg-background/75 px-2.5 py-1 font-mono text-xs leading-5 text-foreground';
 
-const LIST_ITEM_CLASS_NAMES = {
+const LIST_ITEM_CLASS_NAMES: Record<'errors' | 'notes' | 'targets', string> = {
 	errors:
 		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-xs font-semibold leading-5 text-foreground',
 	notes:
 		'rounded-lg border border-l-4 border-secondary/65 bg-secondary/12 px-3 py-2 text-xs font-semibold leading-5 text-foreground',
 	targets:
 		'min-w-0 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-lg border border-border/70 bg-background/75 px-3 py-2 font-mono text-xs leading-5 text-foreground',
-} as const;
+};
 
 export function Header({
 	coinBadge,

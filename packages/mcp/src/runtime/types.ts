@@ -36,7 +36,7 @@ export type SuigarMcpConfigInput = {
 	partner?: string;
 };
 
-export type ResolvedMcpConfig = {
+export type McpConfig = {
 	network: SuigarNetwork;
 	providerUrl: string;
 	sdk: SuigarConfig;
@@ -111,7 +111,7 @@ export type ReadOnlyPlan = {
 	network: SuigarNetwork;
 	game: Game;
 	action?: PvPCoinflipAction;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	plan: {
 		target: string | null;
 		typeArguments: Array<string>;
@@ -123,7 +123,7 @@ export type ReadOnlyPlan = {
 export type BuildTransactionResult = {
 	mode: 'build' | 'dry-run';
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	summary: TransactionSummary;
 	transactionBytesBase64?: string;
 	dryRun?: DryRunResult;
@@ -133,7 +133,7 @@ export type BuildTransactionResult = {
 
 export type ReadConfigResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	supportedGames: Array<{
 		id: Game;
 		label: string;
@@ -180,7 +180,7 @@ export type Nft = {
 
 export type ListNftsResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	owner: string;
 	nftType: string;
 	nftCatalog: Array<NftSpec>;
@@ -191,7 +191,7 @@ export type ReferralClaimKind = 'commission' | 'level-up-usd-rewards';
 
 export type ReferralClaimReadResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	owner: string;
 	referral: {
 		kind: ReferralClaimKind;
@@ -205,7 +205,7 @@ export type ReferralClaimReadResult = {
 export type ReferralClaimReadOnlyPlan = {
 	mode: 'read-only';
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	plan: ReadOnlyPlan['plan'];
 	referral: {
 		kind: ReferralClaimKind;
@@ -217,7 +217,7 @@ export type ReferralClaimReadOnlyPlan = {
 export type NftV1MintReadOnlyPlan = {
 	mode: 'read-only';
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	plan: ReadOnlyPlan['plan'];
 	nft: {
 		packageId: string;
@@ -227,7 +227,7 @@ export type NftV1MintReadOnlyPlan = {
 
 export type WalletReadResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	wallet: {
 		owner: string;
 		balances?: Array<
@@ -247,7 +247,7 @@ export type WalletReadResult = {
 export type ExecutionRequestResult = {
 	mode: 'execute';
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	summary: TransactionSummary;
 	execution:
 		| { requestId: string; approvalUrl: string; status: 'pending' }
@@ -262,7 +262,7 @@ export type ExecutionRequestResult = {
 
 export type ExecutionStatusResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	execution: {
 		requestId: string;
 		status: 'pending' | 'approved' | 'rejected' | 'failed' | 'expired';
@@ -273,19 +273,22 @@ export type ExecutionStatusResult = {
 
 export type ConnectionResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	connection: {
 		connected: boolean;
 		address?: string;
 		walletType?: string;
 		loginUrl?: string;
+		command?: string;
+		pid?: number;
+		note?: string;
 		status: 'connected' | 'pending' | 'logged-out';
 	};
 };
 
 export type SessionWalletResult = {
 	network: SuigarNetwork;
-	config: ResolvedMcpConfig;
+	config: McpConfig;
 	sessionWallet: Record<string, unknown>;
 };
 

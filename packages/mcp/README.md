@@ -125,10 +125,13 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
 
 - **Paired browser wallet**
   - `suigar_login`, `suigar_logout`, and `get_connection_status` manage the paired browser wallet.
+  - `suigar_login` and `suigar_logout` start the same local `npx -y @suigar/mcp ...` CLI flows used for command-line wallet management, so the correct mainnet or testnet pairing page opens in the default browser instead of requiring manual URL copy/paste.
+  - `suigar_login` and `suigar_logout` accept `webUrl`, `timeoutMs`, `maxBodyBytes`, `open`, and `noOpen` inputs matching the CLI bridge options.
   - `get_wallet_balances` and `list_wallet_coins` read aggregate balances or paginated coin objects. Both also accept an explicit address.
   - `get_execution_status` checks an `execute`-mode transaction's browser approval result.
 - **Local session wallet**
   - `setup_session_wallet` opens a local, one-time setup page to create or recover one persistent session wallet shared by mainnet and testnet.
+  - Set `SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS` to control how long local setup pages remain available. The built-in default is `600000`.
   - It does not require a paired browser wallet, and its recovery phrase never passes through MCP.
   - The local setup page can also import a standard `suiprivkey...` export. It never passes through MCP or the session-wallet JSON file.
   - The signing key is persisted in the operating-system keychain. Do not use a custom encrypted file: OS keychain protection is safer and avoids managing an application passphrase. For the smallest blast radius, create a dedicated, low-funded session wallet instead of importing a primary wallet.
@@ -141,9 +144,12 @@ All tools return `content` text plus `structuredContent`. App-capable hosts rend
 - **Command-line wallet management**
   - Run `npx -y @suigar/mcp login --network testnet` (or `mainnet`), `status`, `logout`, or `clean`.
   - Login uses a short-lived, localhost-only browser pairing flow and stores non-secret network-specific metadata in `~/.suigar-mcp/credentials.json` with owner-only permissions.
-  - `status` inspects the current connection; `logout --all` disconnects every stored network; and `clean` removes the local credential file without opening a browser.
-  - Set `SUIGAR_MCP_WEB_URL` to use a local or custom connection-page origin.
-  - Run `npx -y @suigar/mcp tools` to print the network-independent tool catalog.
+  - `status` inspects the current connection; `logout --all` disconnects every stored network and, with the default Suigar web origins, opens both the mainnet and testnet logout pages; and `clean` removes the local credential file without opening a browser.
+  - Set `SUIGAR_MCP_BRIDGE_WEB_URL` or pass `--web-url` to use a local or custom connection-page origin.
+  - Set `SUIGAR_MCP_BRIDGE_TIMEOUT_MS` or pass `--timeout-ms` to control how long login, logout, and approval bridges wait before expiring. The default is `300000`.
+  - Set `SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES` or pass `--max-body-bytes` to control the maximum browser callback JSON body size. The default is `16384`.
+  - Bridge URLs open automatically by default. Pass `--no-open` for CLI login or logout when you only want the URL or URLs printed.
+  - Your MCP client discovers the available tools automatically through the MCP protocol.
 
 ### Read tools
 

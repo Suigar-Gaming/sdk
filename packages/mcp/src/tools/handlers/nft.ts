@@ -6,6 +6,7 @@ import {
 	createSuigarClient,
 	resolveOwnerAddress,
 	type NftV1MintReadOnlyPlan,
+	type ToolTextResult,
 } from '../../runtime/index.js';
 import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
 import type { BuildNftV1MintTransactionInput } from '../schemas/index.js';
@@ -16,9 +17,9 @@ import {
 	requireString,
 } from './shared.js';
 
-export const buildNftV1MintTransactionTool = async (
+export async function buildNftV1MintTransactionTool(
 	input: BuildNftV1MintTransactionInput = {},
-) => {
+): Promise<ToolTextResult> {
 	const mode = getMode(input.mode);
 	const { config } = createSuigarClient(getConfigInput(input));
 
@@ -93,4 +94,4 @@ export const buildNftV1MintTransactionTool = async (
 			context,
 		}),
 	);
-};
+}

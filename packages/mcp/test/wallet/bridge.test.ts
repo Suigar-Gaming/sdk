@@ -7,11 +7,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const testHome = vi.hoisted(
 	() => `${process.env.TMPDIR ?? '/tmp'}/suigar-mcp-bridge-${process.pid}`,
 );
+const mocks = vi.hoisted(() => ({
+	open: vi.fn<() => Promise<void>>(() => Promise.resolve()),
+}));
 
 vi.mock('node:os', () => ({ homedir: () => testHome }));
+vi.mock('open', () => ({ default: mocks.open }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const bridge = await import('../../src/wallet/bridge.js');
+const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
 const address =
@@ -20,7 +25,7 @@ const address =
 const bridgeOrigin = (url: string, portParameter: string) => {
 	const port = new URL(url).searchParams.get(portParameter);
 	if (!port) throw new Error(`Missing ${portParameter} in bridge URL`);
-	return `http://127.0.0.1:${port}`;
+	return loopback.loopbackOrigin(port);
 };
 
 const postJson = (url: string, body: unknown) =>
@@ -35,10 +40,13 @@ const postJson = (url: string, body: unknown) =>
 
 beforeEach(async () => {
 	await rm(testHome, { force: true, recursive: true });
+	vi.unstubAllEnvs();
+	mocks.open.mockClear();
 });
 
 afterEach(async () => {
 	await rm(testHome, { force: true, recursive: true });
+	vi.unstubAllEnvs();
 });
 
 describe('wallet loopback bridges', () => {
@@ -46,6 +54,7 @@ describe('wallet loopback bridges', () => {
 		const login = await bridge.createLoginBridge({
 			network: 'testnet',
 			webOrigin,
+			open: false,
 		});
 		const url = new URL(login.url);
 		expect(url.pathname).toBe('/connection');
@@ -98,6 +107,7 @@ describe('wallet loopback bridges', () => {
 			webOrigin,
 			transactionBytesBase64: 'AA==',
 			summary: { game: 'coinflip' },
+			open: false,
 		});
 		const url = new URL(approval.approvalUrl);
 		expect(url.pathname).toBe('/approval');
@@ -138,6 +148,7 @@ describe('wallet loopback bridges', () => {
 			network: 'testnet',
 			all: false,
 			webOrigin,
+			open: false,
 		});
 		const url = new URL(logout.url);
 		expect(url.pathname).toBe('/connection');
@@ -166,5 +177,47 @@ describe('wallet loopback bridges', () => {
 		expect(
 			(await credentials.loadCredentials()).profiles.testnet,
 		).toBeUndefined();
+	});
+
+	it('opens bridge URLs by default and accepts explicit open opt-out', async () => {
+		const login = await bridge.createLoginBridge({
+			network: 'testnet',
+			webOrigin,
+		});
+		expect(mocks.open).toHaveBeenCalledWith(login.url);
+		login.close();
+
+		mocks.open.mockClear();
+		const logout = await bridge.createLogoutBridge({
+			network: 'testnet',
+			all: false,
+			webOrigin,
+			open: false,
+		});
+		expect(mocks.open).not.toHaveBeenCalled();
+		logout.close();
+	});
+
+	it('uses env and explicit bridge limits for expiration and request body size', async () => {
+		vi.stubEnv('SUIGAR_MCP_BRIDGE_TIMEOUT_MS', '1');
+		const login = await bridge.createLoginBridge({
+			network: 'testnet',
+			webOrigin,
+			open: false,
+		});
+		await expect(login.done).rejects.toThrow(
+			'Wallet login expired. Start login again.',
+		);
+
+		await expect(
+			bridge.createLoginBridge({
+				network: 'testnet',
+				webOrigin,
+				maxBodyBytes: 0,
+				open: false,
+			}),
+		).rejects.toThrow(
+			'Maximum bridge request body size must be a positive integer.',
+		);
 	});
 });

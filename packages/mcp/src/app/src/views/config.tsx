@@ -1,11 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { JSX } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord, dynamicEntries } from '../lib/format.js';
 import type { DefinitionEntry } from '../lib/types.js';
 
-export function ConfigView({ payload }: { payload: unknown }) {
+export function ConfigView({ payload }: { payload: unknown }): JSX.Element {
 	const result = asRecord(payload);
 	const config = asRecord(result.config);
 	const sdk = asRecord(config.sdk);
@@ -19,7 +20,12 @@ export function ConfigView({ payload }: { payload: unknown }) {
 	return (
 		<section className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
 			<Panel title="Context">
-				<DefinitionList entries={[['Network', result.network]]} />
+				<DefinitionList
+					entries={[
+						['Network', result.network],
+						['Provider URL', config.providerUrl],
+					]}
+				/>
 			</Panel>
 			<Panel title="SDK configuration">
 				<DefinitionList entries={dynamicEntries(sdk)} />

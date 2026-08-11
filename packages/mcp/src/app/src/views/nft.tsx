@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { formatAddress } from '@mysten/sui/utils';
-import type { ReactNode } from 'react';
+import type { JSX, ReactNode } from 'react';
 import { useState } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
@@ -13,7 +13,7 @@ function NftTable({
 }: {
 	children: ReactNode;
 	headers: Array<string>;
-}) {
+}): JSX.Element {
 	return (
 		<div className="overflow-x-auto rounded-md border border-border/70">
 			<table className="min-w-full border-collapse text-left text-xs leading-5">
@@ -32,16 +32,16 @@ function NftTable({
 	);
 }
 
-const isHttpUrl = (value: string) => {
+function isHttpUrl(value: string): boolean {
 	try {
 		const url = new URL(value);
 		return url.protocol === 'https:';
 	} catch {
 		return false;
 	}
-};
+}
 
-function NftImage({ name, url }: { name: string; url: unknown }) {
+function NftImage({ name, url }: { name: string; url: unknown }): JSX.Element {
 	const imageUrl = typeof url === 'string' ? url : '';
 	const [failed, setFailed] = useState(!isHttpUrl(imageUrl));
 
@@ -69,7 +69,7 @@ function NftImage({ name, url }: { name: string; url: unknown }) {
 	);
 }
 
-export function NftView({ payload }: { payload: unknown }) {
+export function NftView({ payload }: { payload: unknown }): JSX.Element {
 	const result = asRecord(payload);
 	const catalog = Array.isArray(result.nftCatalog) ? result.nftCatalog : [];
 	const ownedNfts = Array.isArray(result.ownedNfts) ? result.ownedNfts : [];
