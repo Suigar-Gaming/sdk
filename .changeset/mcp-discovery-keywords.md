@@ -1,5 +1,6 @@
 ---
+"@suigar/sdk": patch
 "@suigar/mcp": patch
 ---
 
-Refresh MCP discovery text with concise Suigar casino, AI agent, on-chain, and fair-game keywords.
+Refresh SDK and MCP discovery text with Suigar casino, AI agent, Sui, NFT, and referral keywords.

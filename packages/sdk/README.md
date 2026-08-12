@@ -1,6 +1,6 @@
 # `@suigar/sdk`
 
-TypeScript SDK for building Suigar v2 game transactions on Sui.
+TypeScript SDK for Suigar provably fair on-chain Sui casino game transactions.
 
 ## Documentation
 

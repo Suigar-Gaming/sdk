@@ -2,7 +2,7 @@
 	"name": "suigar-mcp",
 	"displayName": "Suigar MCP",
 	"version": "1.0.0-beta.21",
-	"description": "AI agent MCP tools for Suigar on-chain casino games, NFTs, referrals, and Sui transactions.",
+	"description": "AI agent MCP tools for Suigar provably fair on-chain Sui casino game transactions.",
 	"author": {
 		"name": "Suigar",
 		"email": "contact.suigar@gmail.com",
@@ -19,8 +19,18 @@
 		"ai-agent",
 		"games",
 		"casino",
+		"casino-games",
+		"sui-casino",
+		"crypto-casino",
 		"provably-fair",
 		"on-chain",
+		"gamblefi",
+		"betting",
+		"coinflip",
+		"slots",
+		"pvp",
+		"nft",
+		"referral",
 		"transactions"
 	],
 	"mcpServers": "./.mcp.json"
