@@ -15,20 +15,21 @@ import type {
 
 type WithoutConfig<T> = Omit<T, 'config'>;
 
-export type CreateGameBetOptions<TGame extends StandardGame = StandardGame> =
-	TGame extends 'coinflip'
-		? WithGame<WithoutConfig<CoinflipTransactionOptions>, TGame>
-		: TGame extends 'wheel'
-			? WithGame<WithoutConfig<WheelTransactionOptions>, TGame>
-			: TGame extends 'limbo'
-				? WithGame<WithoutConfig<LimboTransactionOptions>, TGame>
-				: TGame extends 'plinko'
-					? WithGame<WithoutConfig<PlinkoTransactionOptions>, TGame>
-					: TGame extends 'range'
-						? WithGame<WithoutConfig<RangeTransactionOptions>, TGame>
-						: TGame extends 'soccer'
-							? WithGame<WithoutConfig<SoccerTransactionOptions>, TGame>
-							: never;
+type StandardGameTransactionOptionsRegistry = {
+	coinflip: CoinflipTransactionOptions;
+	wheel: WheelTransactionOptions;
+	limbo: LimboTransactionOptions;
+	plinko: PlinkoTransactionOptions;
+	range: RangeTransactionOptions;
+	soccer: SoccerTransactionOptions;
+};
+
+export type CreateGameBetOptions<TGame extends StandardGame = StandardGame> = {
+	[Game in TGame]: WithGame<
+		WithoutConfig<StandardGameTransactionOptionsRegistry[Game]>,
+		Game
+	>;
+}[TGame];
 
 export type PvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
 	WithoutConfig<PvPCoinflipTransactionOptions<Action>>;
