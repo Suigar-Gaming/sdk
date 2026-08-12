@@ -120,7 +120,7 @@ function parseGameDetail<TValueType extends GameDetailValueType>(
  * `gameId` from the raw `SuiClientTypes.Event` before decoding
  * `decoded.game_details`.
  *
- * @param options Game plus game details from a decoded `BetResultEvent`.
+ * @param options Game and game details from a decoded `BetResultEvent`.
  * @returns A plain object with decoded values for the known keys of the selected game.
  */
 export function parseGameDetails<TGame extends Game>({
