@@ -1,6 +1,6 @@
 {
 	"name": "@suigar/sdk",
-	"version": "2.0.0-beta.35",
+	"version": "2.0.0-beta.36",
 	"description": "TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.",
 	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [

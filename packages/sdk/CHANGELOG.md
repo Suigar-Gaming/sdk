@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.36
+
+### Patch Changes
+
+- 0ef83b8: Refresh SDK and MCP discovery text with Suigar casino, AI agent, Sui, NFT, and referral keywords.
+
 ## 2.0.0-beta.35
 
 ### Patch Changes
