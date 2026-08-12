@@ -18,19 +18,17 @@ import type {
 	WithGame,
 } from '../types/index.js';
 
-export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
-
-export type ResolveSuigarConfigOptions = {
-	network: SuigarNetwork;
-	overrides?: SuigarConfigOverrides;
-};
+export const DEFAULT_CACHE_TTL_MS: number = 30 * 60 * 1000;
 
 type GamePackageIdOptions = WithGame<WithConfig<{}>>;
 
 export function resolveSuigarConfig({
 	network,
 	overrides = {},
-}: ResolveSuigarConfigOptions): SuigarConfig {
+}: {
+	network: SuigarNetwork;
+	overrides?: SuigarConfigOverrides;
+}): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const objectIds = OBJECT_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
