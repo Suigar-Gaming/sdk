@@ -1,6 +1,6 @@
 # `@suigar/mcp`
 
-MCP server and MCP App for Suigar transaction workflows on Sui.
+AI agent MCP server for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
 
 The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
