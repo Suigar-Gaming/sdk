@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.35
+
+### Patch Changes
+
+- d166e67: Refresh SDK dependency metadata for the latest Mysten package catalog updates.
+
 ## 2.0.0-beta.34
 
 ### Patch Changes
