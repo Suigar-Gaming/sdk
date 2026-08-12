@@ -52,8 +52,7 @@ export function parseCoinType(type: string): string {
  * resolve to the `pvp-coinflip` game id from their `pvp_coinflip` module.
  *
  * @param event Sui event returned by the core client.
- * @returns Parsed SDK game id and raw Move event name, or `null` when the event
- * name is unsupported or the game id cannot be resolved.
+ * @returns Parsed SDK game id and raw Move event name, or `null` when the event name is unsupported or the game id cannot be resolved.
  */
 export function parseGameEvent(
 	event: SuiClientTypes.Event,
@@ -121,10 +120,8 @@ function parseGameDetail<TValueType extends GameDetailValueType>(
  * `gameId` from the raw `SuiClientTypes.Event` before decoding
  * `decoded.game_details`.
  *
- * @param options Suigar game id plus raw `game_details` map from a decoded
- * `BetResultEvent`.
- * @returns A plain object with decoded values for the known keys of the
- * selected game.
+ * @param options Game plus game details from a decoded `BetResultEvent`.
+ * @returns A plain object with decoded values for the known keys of the selected game.
  */
 export function parseGameDetails<TGame extends Game>({
 	game,

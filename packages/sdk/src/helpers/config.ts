@@ -36,11 +36,11 @@ export function resolveSuigarConfig({
 
 	const resolvedCoins = getSupportedCoins(coins).reduce(
 		(result, supportedCoin) => {
-			result[supportedCoin] = resolveCoinMetadata(
+			result[supportedCoin] = resolveCoinMetadata({
 				supportedCoin,
-				coins[supportedCoin],
-				overrides.coins?.[supportedCoin],
-			);
+				defaultCoin: coins[supportedCoin],
+				override: overrides.coins?.[supportedCoin],
+			});
 			return result;
 		},
 		{} as SuigarConfig['coins'],
@@ -90,7 +90,10 @@ export function resolvePriceInfoObjectId({
 	coinType,
 }: WithConfig<{ coinType: string }>): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
-	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
+	const supportedCoin = resolveSupportedCoin({
+		config,
+		coinType: normalizedCoinType,
+	});
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;
 
 	if (!objectId) {
@@ -106,11 +109,15 @@ function getSupportedCoins(coins: SuigarConfig['coins']): Array<SuigarCoin> {
 	return Object.keys(coins) as Array<SuigarCoin>;
 }
 
-function resolveCoinMetadata(
-	supportedCoin: SuigarCoin,
-	defaultCoin: SuigarCoinMetadata,
-	override?: Partial<SuigarCoinMetadata>,
-): SuigarCoinMetadata {
+function resolveCoinMetadata({
+	supportedCoin,
+	defaultCoin,
+	override,
+}: {
+	supportedCoin: SuigarCoin;
+	defaultCoin: SuigarCoinMetadata;
+	override?: Partial<SuigarCoinMetadata>;
+}): SuigarCoinMetadata {
 	const coin = { ...defaultCoin, ...override };
 	if (
 		!coin.coinType ||
@@ -128,10 +135,10 @@ function resolveCoinMetadata(
 	};
 }
 
-function resolveSupportedCoin(
-	config: SuigarConfig,
-	coinType: string,
-): SuigarCoin {
+function resolveSupportedCoin({
+	config,
+	coinType,
+}: WithConfig<{ coinType: string }>): SuigarCoin {
 	const supportedCoin = getSupportedCoins(config.coins).find(
 		(coin) => config.coins[coin].coinType === coinType,
 	);

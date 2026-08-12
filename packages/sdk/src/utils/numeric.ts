@@ -113,8 +113,7 @@ function assertFiniteNumber(
  *
  * @param value Value to normalize.
  * @returns A non-negative `bigint`.
- * @throws When `value` is not a bigint, finite number, integer string, or
- * boolean.
+ * @throws When `value` is not a bigint, finite number, integer string, or boolean.
  * @throws When the normalized value is negative.
  */
 export function toBigInt(value: unknown): bigint {
@@ -158,14 +157,20 @@ export function toBigInt(value: unknown): bigint {
  * accepts stringified integers such as `'1'` for parsed values, but rejects
  * booleans, empty strings, fractional values, and out-of-range numbers.
  *
- * @param value Value to validate.
- * @param max Inclusive upper bound.
- * @param typeName Move integer label used in error messages.
+ * @param options Value, inclusive upper bound, and Move integer label used in error messages.
  * @returns The validated integer as a JavaScript `number`.
  * @throws When `value` is not a finite number or integer string.
  * @throws When `value` is not an integer between `0` and `max`.
  */
-function toBoundedInt(value: unknown, max: number, typeName: string): number {
+function toBoundedInt({
+	value,
+	max,
+	typeName,
+}: {
+	value: unknown;
+	max: number;
+	typeName: string;
+}): number {
 	const num =
 		typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
 
@@ -203,7 +208,7 @@ function toBoundedInt(value: unknown, max: number, typeName: string): number {
  * @throws When `value` is not an integer between `0` and `255`.
  */
 export function toU8(value: unknown): number {
-	return toBoundedInt(value, 255, 'u8');
+	return toBoundedInt({ value, max: 255, typeName: 'u8' });
 }
 
 /**
@@ -224,5 +229,5 @@ export function toU8(value: unknown): number {
  * @throws When `value` is not an integer between `0` and `65535`.
  */
 export function toU16(value: unknown): number {
-	return toBoundedInt(value, 65535, 'u16');
+	return toBoundedInt({ value, max: 65535, typeName: 'u16' });
 }
