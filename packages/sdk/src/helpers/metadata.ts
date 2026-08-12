@@ -17,7 +17,7 @@ const RESERVED_METADATA_KEYS: Set<string> = new Set([
 ]);
 const textEncoder: TextEncoder = new TextEncoder();
 
-function encodeString(value: string): Uint8Array {
+function encodeString(value: string): Uint8Array<ArrayBuffer> {
 	try {
 		return fromHex(value);
 	} catch {
