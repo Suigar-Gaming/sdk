@@ -35,11 +35,11 @@ export function resolveSuigarConfig({
 	const coins = COINS[network];
 
 	const resolvedCoins = getSupportedCoins(coins).reduce(
-		(result, supportedCoin) => {
-			result[supportedCoin] = resolveCoinMetadata({
-				supportedCoin,
-				defaultCoin: coins[supportedCoin],
-				override: config.coins?.[supportedCoin],
+		(result, coin) => {
+			result[coin] = resolveCoinMetadata({
+				coin,
+				coinMetadata: coins[coin],
+				configCoinMetadata: config.coins?.[coin],
 			});
 			return result;
 		},
@@ -110,28 +110,28 @@ function getSupportedCoins(coins: SuigarConfig['coins']): Array<SuigarCoin> {
 }
 
 function resolveCoinMetadata({
-	supportedCoin,
-	defaultCoin,
-	override,
+	coin,
+	coinMetadata,
+	configCoinMetadata,
 }: {
-	supportedCoin: SuigarCoin;
-	defaultCoin: SuigarCoinMetadata;
-	override?: Partial<SuigarCoinMetadata>;
+	coin: SuigarCoin;
+	coinMetadata: SuigarCoinMetadata;
+	configCoinMetadata?: Partial<SuigarCoinMetadata>;
 }): SuigarCoinMetadata {
-	const coin = { ...defaultCoin, ...override };
+	const metadata = { ...coinMetadata, ...configCoinMetadata };
 	if (
-		!coin.coinType ||
-		!Number.isSafeInteger(coin.decimals) ||
-		!coin.priceInfoObjectId
+		!metadata.coinType ||
+		!Number.isSafeInteger(metadata.decimals) ||
+		!metadata.priceInfoObjectId
 	) {
 		throw new Error(
-			`Missing coin metadata configuration for supported coin ${supportedCoin}`,
+			`Missing coin metadata configuration for supported coin ${coin}`,
 		);
 	}
 
 	return {
-		...coin,
-		coinType: normalizeStructTag(coin.coinType),
+		...metadata,
+		coinType: normalizeStructTag(metadata.coinType),
 	};
 }
 

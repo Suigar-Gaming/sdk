@@ -98,7 +98,7 @@ describe('resolveSuigarConfig', () => {
 	it('applies network config overrides for supported coins', () => {
 		const config = resolveSuigarConfig({
 			network: 'testnet',
-			overrides: {
+			config: {
 				packageIds: {
 					range: '0xoverride',
 				},
