@@ -65,7 +65,6 @@ export type SuigarClientBundle = {
 		SuiGrpcClient
 	>;
 	config: McpConfig;
-	resolveSuiNSName(name: string): Promise<string | null>;
 };
 
 export function createSuigarClient(
@@ -91,12 +90,6 @@ export function createSuigarClient(
 			providerUrl,
 			sdk: client.suigar.getConfig(),
 		} satisfies McpConfig,
-		resolveSuiNSName: async (name) =>
-			(
-				await baseClient.nameService.lookupName({
-					name,
-				})
-			).response.record?.targetAddress ?? null,
 	};
 }
 
@@ -127,14 +120,16 @@ export async function resolveOwnerAddress(
 	}
 
 	const normalizedName = normalizeSuiNSName(owner, 'dot');
-	const resolvedAddress = await bundle.resolveSuiNSName(normalizedName);
-	if (!resolvedAddress) {
+	const { address } = await bundle.client.core.resolveNameServiceAddress({
+		name: normalizedName,
+	});
+	if (!address) {
 		throw new Error(
 			`SuiNS name ${normalizedName} did not resolve to an address.`,
 		);
 	}
 
-	return normalizeSuiAddress(resolvedAddress);
+	return normalizeSuiAddress(address);
 }
 
 async function dryRunTransaction(
