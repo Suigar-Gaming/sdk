@@ -6,8 +6,7 @@ import type { MoveFloat } from '../types/index.js';
 /**
  * Checks whether a value is a generated Move `i64` wrapper.
  *
- * Generated bindings represent signed 64-bit integers as an object containing
- * a raw two's-complement `bits` string.
+ * Generated bindings represent signed 64-bit integers as an object containing a raw two's-complement `bits` string.
  *
  * @param value Value to inspect.
  * @returns Whether `value` has the generated Move `i64` shape.
@@ -45,8 +44,7 @@ export function isMoveFloat(value: unknown): value is MoveFloat {
 /**
  * Converts a generated Move `i64` wrapper into a JavaScript number.
  *
- * The generated bindings expose signed 64-bit integers through a `{ bits }`
- * field that stores the raw two's-complement bit pattern. This helper
+ * The generated bindings expose signed 64-bit integers through a `{ bits }` field that stores the raw two's-complement bit pattern. This helper
  * reinterprets those bits as a signed `i64` and returns a plain JS number.
  * Invalid or missing input falls back to `0`.
  *
@@ -64,8 +62,7 @@ export function fromMoveI64(i64: MoveFloat['exp']): number {
 /**
  * Converts a generated Move `Float` struct into a JavaScript number.
  *
- * Suigar float values are represented as a sign flag, an unsigned mantissa,
- * and a Move `i64` exponent. This helper rebuilds the numeric value using the
+ * Suigar float values are represented as a sign flag, an unsigned mantissa, and a Move `i64` exponent. This helper rebuilds the numeric value using the
  * same normalization expected by the on-chain format and applies the sign at
  * the end. Missing mantissas are treated as `0`, and a zero mantissa returns `0`.
  *
@@ -85,8 +82,7 @@ export function fromMoveFloat(float: MoveFloat): number {
 /**
  * Ensures a value is a finite JavaScript number.
  *
- * This is only used for helpers that accept raw `number` input before applying
- * additional integer or range validation.
+ * This is only used for helpers that accept raw `number` input before applying additional integer or range validation.
  */
 function assertFiniteNumber(
 	value: unknown,
@@ -108,8 +104,7 @@ function assertFiniteNumber(
  *
  * Number inputs are truncated toward zero before conversion, so `5.9` becomes
  * `5n`. String and boolean inputs are parsed through the native
- * `BigInt(...)` constructor, so `true` becomes `1n`, `false` becomes `0n`,
- * and only integer strings are accepted.
+ * `BigInt(...)` constructor, so `true` becomes `1n`, `false` becomes `0n`, and only integer strings are accepted.
  *
  * @param value Value to normalize.
  * @returns A non-negative `bigint`.
@@ -153,8 +148,7 @@ export function toBigInt(value: unknown): bigint {
  * - finite `number`
  * - base-10 integer `string`
  *
- * This internal helper powers the public `toU8()` and `toU16()` helpers. It
- * accepts stringified integers such as `'1'` for parsed values, but rejects
+ * This internal helper powers the public `toU8()` and `toU16()` helpers. It accepts stringified integers such as `'1'` for parsed values, but rejects
  * booleans, empty strings, fractional values, and out-of-range numbers.
  *
  * @param options Value, inclusive upper bound, and Move integer label used in error messages.
@@ -198,8 +192,7 @@ function toBoundedInt({
  * - finite `number`
  * - base-10 integer `string`
  *
- * String inputs are accepted for parsed values such as `'1'`, but only when
- * they are plain non-negative integer strings. This helper does not accept
+ * String inputs are accepted for parsed values such as `'1'`, but only when they are plain non-negative integer strings. This helper does not accept
  * booleans and does not truncate fractional values.
  *
  * @param value Value to validate.
@@ -219,8 +212,7 @@ export function toU8(value: unknown): number {
  * - finite `number`
  * - base-10 integer `string`
  *
- * String inputs are accepted for parsed values such as `'1'`, but only when
- * they are plain non-negative integer strings. This helper does not accept
+ * String inputs are accepted for parsed values such as `'1'`, but only when they are plain non-negative integer strings. This helper does not accept
  * booleans and does not truncate fractional values.
  *
  * @param value Value to validate.

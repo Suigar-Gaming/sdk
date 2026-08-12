@@ -38,8 +38,7 @@ type BuildPvPCoinflipTransactionOptions<
 /**
  * Creates the asynchronous coin-selection thunk used when joining a PvP game.
  *
- * The stake is read from the on-chain game when the transaction is built, which
- * keeps transaction construction compatible with wallet interaction flows.
+ * The stake is read from the on-chain game when the transaction is built, which keeps transaction construction compatible with wallet interaction flows.
  */
 export function buildPvPCoinflipJoinBetCoin(
 	options: WithClient<
@@ -70,8 +69,13 @@ export function buildPvPCoinflipTransaction(
 		...options,
 		game: 'pvp-coinflip',
 	});
+	const { config, metadata, partner } = options;
+
 	const normalizedCoinType = normalizeStructTag(options.coinType);
-	const encodedMetadata = encodeBetMetadata(options.metadata, options.partner);
+	const encodedMetadata = encodeBetMetadata({
+		metadata,
+		partner,
+	});
 
 	switch (options.action) {
 		case 'create': {
@@ -79,10 +83,10 @@ export function buildPvPCoinflipTransaction(
 
 			tx.add(
 				createGame({
-					package: options.config.packageIds.pvpCoinflip,
+					package: config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						options.config.objectIds.sweetHouse,
+						config.objectIds.sweetHouse,
 						coinWithBalance({
 							type: normalizedCoinType,
 							balance: stake,
@@ -100,17 +104,17 @@ export function buildPvPCoinflipTransaction(
 
 		case 'join': {
 			const priceInfoObjectId = resolvePriceInfoObjectId({
-				config: options.config,
+				config,
 				coinType: normalizedCoinType,
 			});
 
 			tx.add(
 				joinGame({
-					package: options.config.packageIds.pvpCoinflip,
+					package: config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
 						options.gameId,
-						options.config.objectIds.sweetHouse,
+						config.objectIds.sweetHouse,
 						options.betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
@@ -124,9 +128,9 @@ export function buildPvPCoinflipTransaction(
 		case 'cancel': {
 			tx.add(
 				cancelGame({
-					package: options.config.packageIds.pvpCoinflip,
+					package: config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
-					arguments: [options.gameId, options.config.objectIds.sweetHouse],
+					arguments: [options.gameId, config.objectIds.sweetHouse],
 				}),
 			);
 			return tx;

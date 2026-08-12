@@ -98,7 +98,7 @@ export function buildSharedStandardGameBetTransaction({
 	const resolvedStake = toBigInt(stake);
 	const resolvedCashStake = toBigInt(cashStake ?? stake);
 	const resolvedBetCount = toBigInt(betCount ?? 1);
-	const encodedMetadata = encodeBetMetadata(metadata, partner);
+	const encodedMetadata = encodeBetMetadata({ metadata, partner });
 	const priceInfoObjectId = resolvePriceInfoObjectId({
 		config,
 		coinType: normalizedCoinType,

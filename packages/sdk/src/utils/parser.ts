@@ -27,9 +27,7 @@ const textDecoder = new TextDecoder();
 /**
  * Extracts and normalizes the first generic coin type from a Move object type.
  *
- * PvP Coinflip game object types encode the wager coin as their first type parameter,
- * for example `Game<0x2::sui::SUI>`. This helper converts that generic type
- * argument into the SDK's canonical struct tag string.
+ * PvP Coinflip game object types encode the wager coin as their first type parameter, for example `Game<0x2::sui::SUI>`. This helper converts that generic type argument into the SDK's canonical struct tag string.
  *
  * @param type Fully qualified Move object type with the coin type as its first generic argument.
  * @returns Normalized coin type struct tag.
@@ -47,8 +45,7 @@ export function parseCoinType(type: string): string {
  * Resolves a supported Suigar event into its normalized SDK game id and event name.
  *
  * This helper recognizes all supported Suigar event names in `GAME_EVENTS`.
- * Standard `BetResultEvent` payloads encode the game family through the core
- * client event module or generic type parameter, while PvP coinflip events
+ * Standard `BetResultEvent` payloads encode the game family through the core client event module or generic type parameter, while PvP coinflip events
  * resolve to the `pvp-coinflip` game id from their `pvp_coinflip` module.
  *
  * @param event Sui event returned by the core client.
@@ -85,10 +82,13 @@ function parseStringGameDetail(value: Array<number>): string {
 	}
 }
 
-function parseGameDetail<TValueType extends GameDetailValueType>(
-	valueType: TValueType,
-	value: Array<number>,
-): GameDetail<TValueType> {
+function parseGameDetail<TValueType extends GameDetailValueType>({
+	valueType,
+	value,
+}: {
+	valueType: TValueType;
+	value: Array<number>;
+}): GameDetail<TValueType> {
 	if (valueType === 'string') {
 		return parseStringGameDetail(value) as GameDetail<TValueType>;
 	}
@@ -109,8 +109,7 @@ function parseGameDetail<TValueType extends GameDetailValueType>(
  * Decodes `BetResultEvent.game_details` into plain application values.
  *
  * Use this only with the `game_details` field from a decoded `BetResultEvent`.
- * Suigar stores those entries as `VecMap<string, vector<u8>>`, so raw BCS
- * decoding leaves each value as bytes. This helper uses the provided `gameId`
+ * Suigar stores those entries as `VecMap<string, vector<u8>>`, so raw BCS decoding leaves each value as bytes. This helper uses the provided `gameId`
  * to narrow the known detail schema, parses each byte array into the expected
  * runtime type, and preserves the original on-chain keys in the returned
  * object. Unknown keys fall back to string decoding so newer detail fields
@@ -137,7 +136,10 @@ export function parseGameDetails<TGame extends Game>({
 	const details = gameDetails.contents.reduce<Record<string, unknown>>(
 		(parsedDetails, entry) => {
 			const valueType = schema[entry.key] ?? 'string';
-			parsedDetails[entry.key] = parseGameDetail(valueType, entry.value);
+			parsedDetails[entry.key] = parseGameDetail({
+				valueType,
+				value: entry.value,
+			});
 			return parsedDetails;
 		},
 		{},

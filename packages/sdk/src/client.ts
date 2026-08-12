@@ -306,11 +306,15 @@ export class SuigarClient {
 		);
 	}
 
-	async #getSimulatedCommandReturnValue(
-		transaction: Transaction,
+	async #getSimulatedCommandReturnValue({
+		transaction,
 		commandIndex = 0,
 		returnValueIndex = 0,
-	): Promise<SuiClientTypes.CommandOutput['bcs']> {
+	}: {
+		transaction: Transaction;
+		commandIndex?: number;
+		returnValueIndex?: number;
+	}): Promise<SuiClientTypes.CommandOutput['bcs']> {
 		const result = await this.#client.core.simulateTransaction({
 			transaction,
 			include: { commandResults: true },
@@ -461,12 +465,12 @@ export class SuigarClient {
 				coinType,
 			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>) => {
 				try {
-					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-						this.tx.referral.claimCommission({
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
+						transaction: this.tx.referral.claimCommission({
 							owner,
 							coinType,
 						}),
-					);
+					});
 					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;
@@ -476,11 +480,11 @@ export class SuigarClient {
 				owner,
 			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>) => {
 				try {
-					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-						this.tx.referral.claimLevelUpUsdRewards({
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
+						transaction: this.tx.referral.claimLevelUpUsdRewards({
 							owner,
 						}),
-					);
+					});
 					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;

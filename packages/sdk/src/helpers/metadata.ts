@@ -6,6 +6,7 @@ import type {
 	BetMetadataInput,
 	BetMetadataValue,
 	EncodedBetMetadata,
+	WithPartner,
 } from '../types/index.js';
 
 const PARTNER_METADATA_KEY = 'partner';
@@ -36,10 +37,12 @@ function encodeMetadataValue(value: BetMetadataValue): Array<number> {
 	return Array.from(encodeString(String(value)));
 }
 
-export function encodeBetMetadata(
-	metadata?: BetMetadataInput,
-	partner?: string,
-): EncodedBetMetadata {
+export function encodeBetMetadata({
+	metadata,
+	partner,
+}: WithPartner<{
+	metadata?: BetMetadataInput;
+}> = {}): EncodedBetMetadata {
 	const keys: Array<string> = [];
 	const values: Array<Array<number>> = [];
 
