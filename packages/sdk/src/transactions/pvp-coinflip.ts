@@ -25,18 +25,15 @@ import type {
 import { toBigInt } from '../utils/numeric.js';
 import { createBaseGameTransaction } from './shared.js';
 
-type PvPCoinflipTransactionOptionsWithPartner<
-	Action extends PvPCoinflipAction,
-> = Action extends 'join'
-	? WithPartner<WithBetCoin<PvPCoinflipTransactionOptions<Action>>>
-	: WithPartner<PvPCoinflipTransactionOptions<Action>>;
-
-type PvPCoinflipTransactionOptionsWithAction =
-	| (PvPCoinflipTransactionOptionsWithPartner<'create'> & { action: 'create' })
-	| (PvPCoinflipTransactionOptionsWithPartner<'join'> & { action: 'join' })
-	| (PvPCoinflipTransactionOptionsWithPartner<'cancel'> & {
-			action: 'cancel';
-	  });
+type BuildPvPCoinflipTransactionOptions<
+	TAction extends PvPCoinflipAction = PvPCoinflipAction,
+> = {
+	[Action in PvPCoinflipAction]: (Action extends 'join'
+		? WithPartner<WithBetCoin<PvPCoinflipTransactionOptions<Action>>>
+		: WithPartner<PvPCoinflipTransactionOptions<Action>>) & {
+		action: Action;
+	};
+}[TAction];
 
 /**
  * Creates the asynchronous coin-selection thunk used when joining a PvP game.
@@ -67,7 +64,7 @@ export function buildPvPCoinflipJoinBetCoin(
 }
 
 export function buildPvPCoinflipTransaction(
-	options: PvPCoinflipTransactionOptionsWithAction,
+	options: BuildPvPCoinflipTransactionOptions,
 ): Transaction {
 	const tx = createBaseGameTransaction({
 		...options,

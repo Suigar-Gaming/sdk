@@ -10,10 +10,13 @@ import type {
 
 const PARTNER_METADATA_KEY = 'partner';
 
-const RESERVED_METADATA_KEYS = new Set([PARTNER_METADATA_KEY, 'referrer']);
-const textEncoder = new TextEncoder();
+const RESERVED_METADATA_KEYS: Set<string> = new Set([
+	PARTNER_METADATA_KEY,
+	'referrer',
+]);
+const textEncoder: TextEncoder = new TextEncoder();
 
-function encodeString(value: string) {
+function encodeString(value: string): Uint8Array {
 	try {
 		return fromHex(value);
 	} catch {
@@ -21,7 +24,7 @@ function encodeString(value: string) {
 	}
 }
 
-function encodeMetadataValue(value: BetMetadataValue) {
+function encodeMetadataValue(value: BetMetadataValue): Array<number> {
 	if (value instanceof Uint8Array) {
 		return Array.from(value);
 	}
