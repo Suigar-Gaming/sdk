@@ -80,7 +80,7 @@ describe('MCP server registration', () => {
 			});
 			expect(serverCapabilities?.resources).toEqual({ listChanged: true });
 			expect(serverVersion?.description).toContain(
-				'building unsigned Suigar transactions',
+				'AI agent MCP server for Suigar provably fair on-chain Sui casino game',
 			);
 
 			const readConfigTool = result.tools.find(
