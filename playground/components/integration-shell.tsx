@@ -1023,13 +1023,11 @@ function useIntegrationState({
 			});
 
 			try {
-				const parameters = await currentClient.suigar.getGameParameters(
-					standardGame,
-					{
-						coinType,
-						ignoreCache,
-					},
-				);
+				const parameters = await currentClient.suigar.getGameParameters({
+					game: standardGame,
+					coinType,
+					ignoreCache,
+				});
 
 				dispatchStandardParameters({
 					type: 'loaded',
@@ -1071,13 +1069,11 @@ function useIntegrationState({
 			});
 
 			try {
-				const parameters = await currentClient.suigar.getGameParameters(
-					pvpGame,
-					{
-						coinType,
-						ignoreCache,
-					},
-				);
+				const parameters = await currentClient.suigar.getGameParameters({
+					game: pvpGame,
+					coinType,
+					ignoreCache,
+				});
 
 				dispatchPvPParameters({
 					type: 'loaded',
@@ -1205,8 +1201,8 @@ function useIntegrationState({
 	);
 	const settingsCallPreview =
 		mode === 'standard'
-			? `client.suigar.getGameParameters('${standardGame}', { coinType: '${coinType}' })`
-			: `client.suigar.getGameParameters('${pvpGame}', { coinType: '${coinType}' })`;
+			? `client.suigar.getGameParameters({ game: '${standardGame}', coinType: '${coinType}' })`
+			: `client.suigar.getGameParameters({ game: '${pvpGame}', coinType: '${coinType}' })`;
 	const settingsSummary =
 		mode === 'standard' ? standardGameParameters : pvpGameParameters;
 	const settingsError =
