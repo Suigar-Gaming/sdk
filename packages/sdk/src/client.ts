@@ -47,24 +47,16 @@ import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	ClaimReferralCommissionOptions,
 	ClaimReferralLevelUpUsdRewardsOptions,
-	CoinflipTransactionOptions,
 	CreateGameBetOptions,
 	Game,
 	GameParameters,
 	GetGameParametersOptions,
-	LimboTransactionOptions,
 	MintNftV1Options,
 	OnChainGameParameters,
-	PlinkoTransactionOptions,
 	PvPCoinflipGameOptions,
-	RangeTransactionOptions,
-	SoccerTransactionOptions,
-	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
-	WheelTransactionOptions,
-	WithPartner,
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
@@ -341,55 +333,53 @@ export class SuigarClient {
 	 */
 	tx = {
 		/**
-		 * Creates a standard game transaction for the provided game id.
+		 * Creates a standard game transaction for the provided game.
 		 *
-		 * @param game Supported standard game identifier.
-		 * @param options Transaction builder options for the selected game.
+		 * @param options Supported standard game with transaction builder options.
 		 * @returns Prepared transaction for the selected game.
 		 */
-		createGameBet: <Game extends StandardGame>(
-			game: Game,
-			options: CreateGameBetOptions<Game>,
-		): Transaction => {
-			switch (game) {
+		createGameBet: (options: CreateGameBetOptions): Transaction => {
+			switch (options.game) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<CoinflipTransactionOptions>);
+					});
 				case 'limbo':
 					return buildLimboTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<LimboTransactionOptions>);
+					});
 				case 'plinko':
 					return buildPlinkoTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<PlinkoTransactionOptions>);
+					});
 				case 'range':
 					return buildRangeTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<RangeTransactionOptions>);
+					});
 				case 'soccer':
 					return buildSoccerTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<SoccerTransactionOptions>);
+					});
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<WheelTransactionOptions>);
+					});
 				default:
-					throw new RangeError(`Unsupported game: ${game}`);
+					throw new RangeError(
+						`Unsupported game: ${(options as { game?: string })?.game}`,
+					);
 			}
 		},
 		/** PvP coinflip transaction builders, grouped by game action. */
