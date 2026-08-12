@@ -124,7 +124,7 @@ export class SuigarClient {
 				});
 			});
 
-		this.#config = resolveSuigarConfig(network, config);
+		this.#config = resolveSuigarConfig({ network, overrides: config });
 	}
 
 	/**
@@ -147,14 +147,15 @@ export class SuigarClient {
 	 * instead of raw bytes. The SDK always injects the configured Sui client, so `options` accepts the standard
 	 * transaction build options except for `client`.
 	 *
-	 * @param transaction Transaction to build and serialize.
-	 * @param options Optional transaction build options forwarded to `transaction.build()`, excluding `client`.
+	 * @param options Transaction to build and optional build options forwarded to `transaction.build()`, excluding `client`.
 	 * @returns Base64-encoded transaction bytes ready to send over the wire.
 	 */
-	async serializeTransactionToBase64(
-		transaction: Transaction,
-		options?: Omit<BuildTransactionOptions, 'client'>,
-	): Promise<string> {
+	async serializeTransactionToBase64({
+		transaction,
+		...options
+	}: Omit<BuildTransactionOptions, 'client'> & {
+		transaction: Transaction;
+	}): Promise<string> {
 		const bytes = await transaction.build({ ...options, client: this.#client });
 		return toBase64(bytes);
 	}
@@ -169,14 +170,13 @@ export class SuigarClient {
 	 * value. Generated Move float fields are decoded into JavaScript numbers,
 	 * including floats nested in game configs.
 	 *
-	 * @param game Game whose parameters should be loaded.
-	 * @param options Required coin type, plus optional cache override and abort signal.
+	 * @param options Game id, required coin type, plus optional cache override and abort signal.
 	 * @returns Parsed game parameters typed for the requested game.
 	 */
-	async getGameParameters<TGame extends Game>(
-		game: TGame,
-		options: GetGameParametersOptions,
-	): Promise<GameParameters<TGame>> {
+	async getGameParameters<TGame extends Game>({
+		game,
+		...options
+	}: GetGameParametersOptions<TGame>): Promise<GameParameters<TGame>> {
 		const coinType = normalizeStructTag(options.coinType);
 		return this.#cache.read(
 			['getGameParameters', game, coinType],
@@ -190,7 +190,7 @@ export class SuigarClient {
 					parentId: this.#config.objectIds.sweetHouse,
 					name: {
 						type: gameDefinition.settingsKey.typeTag({
-							package: resolveGamePackageId(this.#config, game),
+							package: resolveGamePackageId({ config: this.#config, game }),
 						}),
 						bcs: gameDefinition.settingsKey
 							.serialize({ dummy_field: false })
@@ -310,7 +310,7 @@ export class SuigarClient {
 		transaction: Transaction,
 		commandIndex = 0,
 		returnValueIndex = 0,
-	): Promise<Uint8Array> {
+	): Promise<SuiClientTypes.CommandOutput['bcs']> {
 		const result = await this.#client.core.simulateTransaction({
 			transaction,
 			include: { commandResults: true },
@@ -321,7 +321,7 @@ export class SuigarClient {
 		}
 
 		const returnValue =
-			result.commandResults?.[commandIndex]?.returnValues[returnValueIndex]
+			result.commandResults?.[commandIndex]?.returnValues?.[returnValueIndex]
 				?.bcs;
 		if (!returnValue) {
 			throw new Error(
@@ -339,15 +339,15 @@ export class SuigarClient {
 		/**
 		 * Creates a standard game transaction for the provided game id.
 		 *
-		 * @param gameId Supported standard game identifier.
+		 * @param game Supported standard game identifier.
 		 * @param options Transaction builder options for the selected game.
 		 * @returns Prepared transaction for the selected game.
 		 */
-		createGameBet: <GameId extends StandardGame>(
-			gameId: GameId,
-			options: CreateGameBetOptions<GameId>,
+		createGameBet: <Game extends StandardGame>(
+			game: Game,
+			options: CreateGameBetOptions<Game>,
 		): Transaction => {
-			switch (gameId) {
+			switch (game) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
 						...options,
@@ -385,29 +385,35 @@ export class SuigarClient {
 						partner: this.#partner,
 					} as WithPartner<WheelTransactionOptions>);
 				default:
-					throw new RangeError(`Unsupported game: ${gameId}`);
+					throw new RangeError(`Unsupported game: ${game}`);
 			}
 		},
 		/** PvP coinflip transaction builders, grouped by game action. */
 		pvpCoinflip: {
 			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
-				return buildPvPCoinflipTransaction('create', {
+				return buildPvPCoinflipTransaction({
 					...options,
+					action: 'create',
 					config: this.#config,
 					partner: this.#partner,
 				});
 			},
 			joinGame: (options: PvPCoinflipGameOptions<'join'>): Transaction => {
-				return buildPvPCoinflipTransaction('join', {
+				return buildPvPCoinflipTransaction({
 					...options,
-					betCoin: buildPvPCoinflipJoinBetCoin(this.#client, options),
+					action: 'join',
+					betCoin: buildPvPCoinflipJoinBetCoin({
+						...options,
+						client: this.#client,
+					}),
 					config: this.#config,
 					partner: this.#partner,
 				});
 			},
 			cancelGame: (options: PvPCoinflipGameOptions<'cancel'>): Transaction => {
-				return buildPvPCoinflipTransaction('cancel', {
+				return buildPvPCoinflipTransaction({
 					...options,
+					action: 'cancel',
 					config: this.#config,
 					partner: this.#partner,
 				});
@@ -436,8 +442,9 @@ export class SuigarClient {
 			mint: (options: MintNftV1Options): Transaction => {
 				return buildMintNftV1Transaction({
 					...options,
-					paymentCoin: buildMintNftV1PaymentCoin(this.#client, {
+					paymentCoin: buildMintNftV1PaymentCoin({
 						...options,
+						client: this.#client,
 						config: this.#config,
 					}),
 					config: this.#config,

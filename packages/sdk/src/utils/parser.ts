@@ -18,6 +18,7 @@ import type {
 	GameEvent,
 	MoveFloat,
 	SuigarGameEvent,
+	WithGame,
 } from '../types/index.js';
 import { fromMoveFloat } from './numeric.js';
 
@@ -120,18 +121,22 @@ function parseGameDetail<TValueType extends GameDetailValueType>(
  * `gameId` from the raw `SuiClientTypes.Event` before decoding
  * `decoded.game_details`.
  *
- * @param gameId Suigar game id used to narrow the known detail keys and value
- * types for this bet result payload.
- * @param gameDetails Raw `game_details` map from a decoded `BetResultEvent`.
+ * @param options Suigar game id plus raw `game_details` map from a decoded
+ * `BetResultEvent`.
  * @returns A plain object with decoded values for the known keys of the
  * selected game.
  */
-export function parseGameDetails<TGame extends Game>(
-	gameId: TGame,
-	gameDetails: BetResultGameDetails,
-): GameDetails<TGame> {
+export function parseGameDetails<TGame extends Game>({
+	game,
+	gameDetails,
+}: WithGame<
+	{
+		gameDetails: BetResultGameDetails;
+	},
+	TGame
+>): GameDetails<TGame> {
 	const schema: Record<string, GameDetailValueType> =
-		GAME_DETAILS_SCHEMAS[gameId];
+		GAME_DETAILS_SCHEMAS[game];
 	const details = gameDetails.contents.reduce<Record<string, unknown>>(
 		(parsedDetails, entry) => {
 			const valueType = schema[entry.key] ?? 'string';

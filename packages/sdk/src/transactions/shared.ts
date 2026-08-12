@@ -4,7 +4,6 @@
 import {
 	coinWithBalance,
 	Transaction,
-	type TransactionArgument,
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -17,10 +16,11 @@ import type {
 	BaseTransactionOptions,
 	CoinTransactionOptions,
 	EncodedBetMetadata,
-	Game,
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	TransactionSenderOptions,
+	WithBetCoin,
+	WithGame,
 	WithPartner,
 } from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
@@ -38,23 +38,23 @@ type SharedBetTransactionContext = Pick<
 	'config' | 'owner'
 > &
 	Pick<CoinTransactionOptions, 'coinType'> &
-	StrictStakeTransactionOptions & {
-		metadata: EncodedBetMetadata;
-		priceInfoObjectId: string;
-		betCoin: TransactionArgument;
-	};
+	WithBetCoin<
+		StrictStakeTransactionOptions & {
+			metadata: EncodedBetMetadata;
+			priceInfoObjectId: string;
+		}
+	>;
 
-type CreateBaseGameTransactionOptions = BaseTransactionOptions & {
-	game: Game;
-};
+type CreateBaseGameTransactionOptions = WithGame<BaseTransactionOptions>;
 
 type StandardGameBetTransactionOptions = WithPartner<
-	SharedBetTransactionOptions & {
-		game: Game;
-		buildRewardCoin: (
-			context: SharedBetTransactionContext,
-		) => (tx: Transaction) => TransactionResult;
-	}
+	WithGame<
+		SharedBetTransactionOptions & {
+			buildRewardCoin: (
+				context: SharedBetTransactionContext,
+			) => (tx: Transaction) => TransactionResult;
+		}
+	>
 >;
 
 /** Creates a transaction with its sender and default gas budget configured. */
@@ -74,7 +74,7 @@ export function createBaseGameTransaction({
 	owner,
 	gasBudget,
 }: CreateBaseGameTransactionOptions): Transaction {
-	assertConfiguredBetGame(config, game);
+	assertConfiguredBetGame({ config, game });
 	return createBaseTransaction({ owner, gasBudget });
 }
 
@@ -99,10 +99,10 @@ export function buildSharedStandardGameBetTransaction({
 	const resolvedCashStake = toBigInt(cashStake ?? stake);
 	const resolvedBetCount = toBigInt(betCount ?? 1);
 	const encodedMetadata = encodeBetMetadata(metadata, partner);
-	const priceInfoObjectId = resolvePriceInfoObjectId(
+	const priceInfoObjectId = resolvePriceInfoObjectId({
 		config,
-		normalizedCoinType,
-	);
+		coinType: normalizedCoinType,
+	});
 
 	const rewardCoin = tx.add(
 		buildRewardCoin({

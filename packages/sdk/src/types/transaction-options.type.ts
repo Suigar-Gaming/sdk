@@ -1,9 +1,13 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Transaction } from '@mysten/sui/transactions';
+import type { ClientWithCoreApi } from '@mysten/sui/client';
+import type {
+	Transaction,
+	TransactionArgument,
+} from '@mysten/sui/transactions';
 import type { BetMetadataInput } from './bet-metadata.type.js';
-import type { CoinSide, PvPCoinflipAction } from './game.type.js';
+import type { CoinSide, Game, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
 
 export type WithPartner<T> = T & {
@@ -14,7 +18,21 @@ export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
-export type WithConfig<T> = T & Pick<BaseTransactionOptions, 'config'>;
+export type WithConfig<T> = T & {
+	config: SuigarConfig;
+};
+
+export type WithClient<T> = T & {
+	client: ClientWithCoreApi;
+};
+
+export type WithGame<T, TGame extends Game = Game> = T & {
+	game: TGame;
+};
+
+export type WithBetCoin<T, TBetCoin = TransactionArgument> = T & {
+	betCoin: TBetCoin;
+};
 
 /** Common sender and gas settings for every SDK-built transaction. */
 export type TransactionSenderOptions = {
@@ -22,8 +40,7 @@ export type TransactionSenderOptions = {
 	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
 };
 
-export type BaseTransactionOptions = TransactionSenderOptions & {
-	config: SuigarConfig;
+export type BaseTransactionOptions = WithConfig<TransactionSenderOptions> & {
 	metadata?: BetMetadataInput;
 };
 

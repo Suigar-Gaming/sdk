@@ -26,7 +26,7 @@ import {
 
 describe('resolveSuigarConfig', () => {
 	it('resolves internal package ids and default coin types', () => {
-		const config = resolveSuigarConfig('testnet');
+		const config = resolveSuigarConfig({ network: 'testnet' });
 
 		expect(config.coins.sui).toEqual({
 			coinType: normalizeStructTag(COINS.testnet.sui.coinType),
@@ -49,7 +49,7 @@ describe('resolveSuigarConfig', () => {
 	});
 
 	it('uses the selected network package map', () => {
-		const config = resolveSuigarConfig('mainnet');
+		const config = resolveSuigarConfig({ network: 'mainnet' });
 
 		expect(config.objectIds.sweetHouse).toBe(OBJECT_IDS.mainnet.sweetHouse);
 		expect(config.objectIds.nftV1Factory).toBe(OBJECT_IDS.mainnet.nftV1Factory);
@@ -65,45 +65,57 @@ describe('resolveSuigarConfig', () => {
 	});
 
 	it('resolves price info object ids through supported coins', () => {
-		const config = resolveSuigarConfig('testnet');
+		const config = resolveSuigarConfig({ network: 'testnet' });
 		config.coins.sui.priceInfoObjectId = '0xabc';
 
-		expect(resolvePriceInfoObjectId(config, COINS.testnet.sui.coinType)).toBe(
-			'0xabc',
-		);
+		expect(
+			resolvePriceInfoObjectId({
+				config,
+				coinType: COINS.testnet.sui.coinType,
+			}),
+		).toBe('0xabc');
 	});
 
 	it('maps configured coins to supported coin object ids', () => {
-		const config = resolveSuigarConfig('testnet');
+		const config = resolveSuigarConfig({ network: 'testnet' });
 		config.coins.sui.priceInfoObjectId = '0xsui';
 		config.coins.usdc.priceInfoObjectId = '0xusdc';
 
-		expect(resolvePriceInfoObjectId(config, COINS.testnet.sui.coinType)).toBe(
-			'0xsui',
-		);
-		expect(resolvePriceInfoObjectId(config, COINS.testnet.usdc.coinType)).toBe(
-			'0xusdc',
-		);
+		expect(
+			resolvePriceInfoObjectId({
+				config,
+				coinType: COINS.testnet.sui.coinType,
+			}),
+		).toBe('0xsui');
+		expect(
+			resolvePriceInfoObjectId({
+				config,
+				coinType: COINS.testnet.usdc.coinType,
+			}),
+		).toBe('0xusdc');
 	});
 
 	it('applies network config overrides for supported coins', () => {
-		const config = resolveSuigarConfig('testnet', {
-			packageIds: {
-				range: '0xoverride',
-			},
-			objectIds: {
-				sweetHouse: '0xoverride-sweet-house',
-			},
-			coins: {
-				sui: {
-					coinType: '0x2::sui::SUI',
-					decimals: SUI_DECIMALS,
-					priceInfoObjectId: '0xsui',
+		const config = resolveSuigarConfig({
+			network: 'testnet',
+			overrides: {
+				packageIds: {
+					range: '0xoverride',
 				},
-				usdc: {
-					coinType: '0x999::usdc::USDC',
-					decimals: 4,
-					priceInfoObjectId: '0xprice',
+				objectIds: {
+					sweetHouse: '0xoverride-sweet-house',
+				},
+				coins: {
+					sui: {
+						coinType: '0x2::sui::SUI',
+						decimals: SUI_DECIMALS,
+						priceInfoObjectId: '0xsui',
+					},
+					usdc: {
+						coinType: '0x999::usdc::USDC',
+						decimals: 4,
+						priceInfoObjectId: '0xprice',
+					},
 				},
 			},
 		});
@@ -120,16 +132,19 @@ describe('resolveSuigarConfig', () => {
 			decimals: 4,
 			priceInfoObjectId: '0xprice',
 		});
-		expect(resolvePriceInfoObjectId(config, '0x999::usdc::USDC')).toBe(
-			'0xprice',
-		);
+		expect(
+			resolvePriceInfoObjectId({
+				config,
+				coinType: '0x999::usdc::USDC',
+			}),
+		).toBe('0xprice');
 	});
 
 	it('resolves game package ids through the config record', () => {
-		const config = resolveSuigarConfig('testnet');
+		const config = resolveSuigarConfig({ network: 'testnet' });
 		config.packageIds.range = '0x123';
 
-		expect(resolveGamePackageId(config, 'range')).toBe('0x123');
+		expect(resolveGamePackageId({ config, game: 'range' })).toBe('0x123');
 	});
 
 	it('builds the SweetHouse settings key type with the generated typeTag helper', () => {
@@ -152,10 +167,13 @@ describe('resolveSuigarConfig', () => {
 	});
 
 	it('throws when no price info object id is configured for the requested coin type', () => {
-		const config = resolveSuigarConfig('testnet');
+		const config = resolveSuigarConfig({ network: 'testnet' });
 
 		expect(() =>
-			resolvePriceInfoObjectId(config, '0x999::custom::COIN'),
+			resolvePriceInfoObjectId({
+				config,
+				coinType: '0x999::custom::COIN',
+			}),
 		).toThrow('Unsupported coin type');
 	});
 });

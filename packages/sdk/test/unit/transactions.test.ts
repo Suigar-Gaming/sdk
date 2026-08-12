@@ -71,7 +71,8 @@ describe('transaction builders', () => {
 	});
 
 	it('builds pvp coinflip create and cancel transactions with the configured package id', () => {
-		const createTx = buildPvPCoinflipTransaction('create', {
+		const createTx = buildPvPCoinflipTransaction({
+			action: 'create',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1_000,
@@ -79,7 +80,8 @@ describe('transaction builders', () => {
 			isPrivate: true,
 			config: TEST_CONFIG,
 		});
-		const cancelTx = buildPvPCoinflipTransaction('cancel', {
+		const cancelTx = buildPvPCoinflipTransaction({
+			action: 'cancel',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
@@ -158,7 +160,8 @@ describe('transaction builders', () => {
 				},
 			},
 		} as never);
-		const paymentCoin = buildMintNftV1PaymentCoin(client, {
+		const paymentCoin = buildMintNftV1PaymentCoin({
+			client,
 			config: nftConfig,
 			specId: '0x999',
 			useGasCoin: true,
@@ -655,7 +658,8 @@ describe('pvp coinflip transaction wrapper', () => {
 			);
 		const partner = normalizeSuiAddress('0x456');
 
-		buildPvPCoinflipTransactionWithMock('create', {
+		buildPvPCoinflipTransactionWithMock({
+			action: 'create',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
@@ -701,7 +705,8 @@ describe('pvp coinflip transaction wrapper', () => {
 			);
 		const partner = normalizeSuiAddress('0x456');
 
-		buildPvPCoinflipTransactionWithMock('join', {
+		buildPvPCoinflipTransactionWithMock({
+			action: 'join',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
@@ -741,7 +746,8 @@ describe('pvp coinflip transaction wrapper', () => {
 				'../../src/transactions/pvp-coinflip.js',
 			);
 
-		buildPvPCoinflipTransactionWithMock('cancel', {
+		buildPvPCoinflipTransactionWithMock({
+			action: 'cancel',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',

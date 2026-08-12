@@ -9,20 +9,34 @@ import {
 	REGISTRY_IDS,
 } from '../configs/index.js';
 import type {
-	Game,
 	SuigarCoin,
 	SuigarCoinMetadata,
 	SuigarConfig,
 	SuigarConfigOverrides,
 	SuigarNetwork,
+	WithGame,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
 
-export function resolveSuigarConfig(
-	network: SuigarNetwork,
-	overrides: SuigarConfigOverrides = {},
-): SuigarConfig {
+export type ResolveSuigarConfigOptions = {
+	network: SuigarNetwork;
+	overrides?: SuigarConfigOverrides;
+};
+
+export type ResolveGamePackageIdOptions = WithGame<{
+	config: SuigarConfig;
+}>;
+
+export type ResolvePriceInfoObjectIdOptions = {
+	config: SuigarConfig;
+	coinType: string;
+};
+
+export function resolveSuigarConfig({
+	network,
+	overrides = {},
+}: ResolveSuigarConfigOptions): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const objectIds = OBJECT_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
@@ -48,16 +62,19 @@ export function resolveSuigarConfig(
 	};
 }
 
-export function assertConfiguredBetGame(
-	config: SuigarConfig,
-	game: Game,
-): void {
-	if (!resolveGamePackageId(config, game)) {
+export function assertConfiguredBetGame({
+	config,
+	game,
+}: ResolveGamePackageIdOptions): void {
+	if (!resolveGamePackageId({ config, game })) {
 		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
 }
 
-export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
+export function resolveGamePackageId({
+	config,
+	game,
+}: ResolveGamePackageIdOptions): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
@@ -76,10 +93,10 @@ export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 	}
 }
 
-export function resolvePriceInfoObjectId(
-	config: SuigarConfig,
-	coinType: string,
-): string {
+export function resolvePriceInfoObjectId({
+	config,
+	coinType,
+}: ResolvePriceInfoObjectIdOptions): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;

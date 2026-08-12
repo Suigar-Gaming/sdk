@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ClientWithCoreApi } from '@mysten/sui/client';
 import {
 	coinWithBalance,
 	Transaction,
@@ -19,6 +18,8 @@ import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	PvPCoinflipAction,
 	PvPCoinflipTransactionOptions,
+	WithBetCoin,
+	WithClient,
 	WithPartner,
 } from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
@@ -27,12 +28,15 @@ import { createBaseGameTransaction } from './shared.js';
 type PvPCoinflipTransactionOptionsWithPartner<
 	Action extends PvPCoinflipAction,
 > = Action extends 'join'
-	? WithPartner<
-			PvPCoinflipTransactionOptions<Action> & {
-				betCoin: TransactionArgument;
-			}
-		>
+	? WithPartner<WithBetCoin<PvPCoinflipTransactionOptions<Action>>>
 	: WithPartner<PvPCoinflipTransactionOptions<Action>>;
+
+type PvPCoinflipTransactionOptionsWithAction =
+	| (PvPCoinflipTransactionOptionsWithPartner<'create'> & { action: 'create' })
+	| (PvPCoinflipTransactionOptionsWithPartner<'join'> & { action: 'join' })
+	| (PvPCoinflipTransactionOptionsWithPartner<'cancel'> & {
+			action: 'cancel';
+	  });
 
 /**
  * Creates the asynchronous coin-selection thunk used when joining a PvP game.
@@ -41,15 +45,16 @@ type PvPCoinflipTransactionOptionsWithPartner<
  * keeps transaction construction compatible with wallet interaction flows.
  */
 export function buildPvPCoinflipJoinBetCoin(
-	client: ClientWithCoreApi,
-	options: Pick<
-		PvPCoinflipTransactionOptions<'join'>,
-		'gameId' | 'coinType' | 'useGasCoin'
+	options: WithClient<
+		Pick<
+			PvPCoinflipTransactionOptions<'join'>,
+			'gameId' | 'coinType' | 'useGasCoin'
+		>
 	>,
 ): TransactionArgument {
 	return async (tx: Transaction) => {
 		const { json } = await PvPCoinflipGame.get({
-			client,
+			client: options.client,
 			objectId: options.gameId,
 		});
 
@@ -61,9 +66,8 @@ export function buildPvPCoinflipJoinBetCoin(
 	};
 }
 
-export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
-	action: Action,
-	options: PvPCoinflipTransactionOptionsWithPartner<Action>,
+export function buildPvPCoinflipTransaction(
+	options: PvPCoinflipTransactionOptionsWithAction,
 ): Transaction {
 	const tx = createBaseGameTransaction({
 		...options,
@@ -72,25 +76,23 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 	const normalizedCoinType = normalizeStructTag(options.coinType);
 	const encodedMetadata = encodeBetMetadata(options.metadata, options.partner);
 
-	switch (action) {
+	switch (options.action) {
 		case 'create': {
-			const createOptions =
-				options as PvPCoinflipTransactionOptionsWithPartner<'create'>;
-			const stake = toBigInt(createOptions.stake);
+			const stake = toBigInt(options.stake);
 
 			tx.add(
 				createGame({
-					package: createOptions.config.packageIds.pvpCoinflip,
+					package: options.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						createOptions.config.objectIds.sweetHouse,
+						options.config.objectIds.sweetHouse,
 						coinWithBalance({
 							type: normalizedCoinType,
 							balance: stake,
-							useGasCoin: createOptions.useGasCoin,
+							useGasCoin: options.useGasCoin,
 						}),
-						createOptions.side === 'tails',
-						Boolean(createOptions.isPrivate),
+						options.side === 'tails',
+						Boolean(options.isPrivate),
 						encodedMetadata.keys,
 						encodedMetadata.values,
 					],
@@ -100,21 +102,19 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'join': {
-			const joinOptions =
-				options as PvPCoinflipTransactionOptionsWithPartner<'join'>;
-			const priceInfoObjectId = resolvePriceInfoObjectId(
-				joinOptions.config,
-				normalizedCoinType,
-			);
+			const priceInfoObjectId = resolvePriceInfoObjectId({
+				config: options.config,
+				coinType: normalizedCoinType,
+			});
 
 			tx.add(
 				joinGame({
-					package: joinOptions.config.packageIds.pvpCoinflip,
+					package: options.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [
-						joinOptions.gameId,
-						joinOptions.config.objectIds.sweetHouse,
-						joinOptions.betCoin,
+						options.gameId,
+						options.config.objectIds.sweetHouse,
+						options.betCoin,
 						encodedMetadata.keys,
 						encodedMetadata.values,
 						priceInfoObjectId,
@@ -125,23 +125,19 @@ export function buildPvPCoinflipTransaction<Action extends PvPCoinflipAction>(
 		}
 
 		case 'cancel': {
-			const cancelOptions =
-				options as PvPCoinflipTransactionOptionsWithPartner<'cancel'>;
-
 			tx.add(
 				cancelGame({
-					package: cancelOptions.config.packageIds.pvpCoinflip,
+					package: options.config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
-					arguments: [
-						cancelOptions.gameId,
-						cancelOptions.config.objectIds.sweetHouse,
-					],
+					arguments: [options.gameId, options.config.objectIds.sweetHouse],
 				}),
 			);
 			return tx;
 		}
 
 		default:
-			throw new RangeError(`Unsupported PvP coinflip action: ${action}`);
+			throw new RangeError(
+				`Unsupported PvP coinflip action: ${(options as { action: string }).action}`,
+			);
 	}
 }

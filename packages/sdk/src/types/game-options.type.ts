@@ -14,18 +14,18 @@ import type {
 
 type WithoutConfig<T> = Omit<T, 'config'>;
 
-export type CreateGameBetOptions<GameId extends StandardGame> =
-	GameId extends 'coinflip'
+export type CreateGameBetOptions<TGame extends StandardGame> =
+	TGame extends 'coinflip'
 		? WithoutConfig<CoinflipTransactionOptions>
-		: GameId extends 'wheel'
+		: TGame extends 'wheel'
 			? WithoutConfig<WheelTransactionOptions>
-			: GameId extends 'limbo'
+			: TGame extends 'limbo'
 				? WithoutConfig<LimboTransactionOptions>
-				: GameId extends 'plinko'
+				: TGame extends 'plinko'
 					? WithoutConfig<PlinkoTransactionOptions>
-					: GameId extends 'range'
+					: TGame extends 'range'
 						? WithoutConfig<RangeTransactionOptions>
-						: GameId extends 'soccer'
+						: TGame extends 'soccer'
 							? WithoutConfig<SoccerTransactionOptions>
 							: never;
 

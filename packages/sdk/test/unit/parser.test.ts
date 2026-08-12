@@ -209,14 +209,14 @@ describe('parseCoinType', () => {
 describe('parseGameDetails', () => {
 	it('parses known detail types and preserves unknown event keys', () => {
 		expect(
-			parseGameDetails(
-				'coinflip',
-				gameDetails([
+			parseGameDetails({
+				game: 'coinflip',
+				gameDetails: gameDetails([
 					{ key: 'player_bet', value: encodeString('heads') },
 					{ key: 'coin_outcome', value: encodeString('tails') },
 					{ key: 'custom_label', value: encodeString('vip') },
 				]),
-			),
+			}),
 		).toEqual({
 			player_bet: 'heads',
 			coin_outcome: 'tails',
@@ -225,16 +225,16 @@ describe('parseGameDetails', () => {
 	});
 
 	it('decodes numeric, boolean, float, and raw UTF-8 values', () => {
-		const rangeDetails = parseGameDetails(
-			'range',
-			gameDetails([
+		const rangeDetails = parseGameDetails({
+			game: 'range',
+			gameDetails: gameDetails([
 				{ key: 'roll_value', value: writeU64(42n) },
 				{ key: 'win', value: [1] },
 				{ key: 'range_mode', value: [2] },
 				{ key: 'payout_multiplier', value: encodeFloat(2.5) },
 				{ key: 'actual_rtp', value: encodeFloat(0.97) },
 			]),
-		);
+		});
 
 		expect(rangeDetails).toMatchObject({
 			roll_value: 42,
@@ -244,24 +244,26 @@ describe('parseGameDetails', () => {
 		});
 		expect(Number(rangeDetails.actual_rtp)).toBeCloseTo(0.97);
 		expect(
-			parseGameDetails(
-				'pvp-coinflip',
-				gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
-			),
+			parseGameDetails({
+				game: 'pvp-coinflip',
+				gameDetails: gameDetails([
+					{ key: 'pvp_result', value: [108, 111, 115, 115] },
+				]),
+			}),
 		).toEqual({ pvp_result: 'loss' });
 	});
 
 	it('decodes soccer-specific u8 and u16 detail values', () => {
 		expect(
-			parseGameDetails(
-				'soccer',
-				gameDetails([
+			parseGameDetails({
+				game: 'soccer',
+				gameDetails: gameDetails([
 					{ key: 'soccer_config', value: [9] },
 					{ key: 'country_id', value: [250, 0] },
 					{ key: 'shot_zone_id', value: [4] },
 					{ key: 'is_goal', value: [1] },
 				]),
-			),
+			}),
 		).toEqual({
 			soccer_config: 9,
 			country_id: 250,
@@ -271,13 +273,13 @@ describe('parseGameDetails', () => {
 	});
 
 	it('narrows parsed detail keys and value types by game id', () => {
-		const details = parseGameDetails(
-			'coinflip',
-			gameDetails([
+		const details = parseGameDetails({
+			game: 'coinflip',
+			gameDetails: gameDetails([
 				{ key: 'player_bet', value: encodeString('heads') },
 				{ key: 'coin_outcome', value: encodeString('tails') },
 			]),
-		);
+		});
 
 		expectTypeOf(details).toEqualTypeOf<{
 			player_bet: string;
