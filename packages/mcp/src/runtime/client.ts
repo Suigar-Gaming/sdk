@@ -240,8 +240,9 @@ export async function buildTransactionResult({
 		network: config.network,
 		config,
 		summary,
-		transactionBytesBase64:
-			await client.suigar.serializeTransactionToBase64(transaction),
+		transactionBytesBase64: await client.suigar.serializeTransactionToBase64({
+			transaction,
+		}),
 	};
 }
 

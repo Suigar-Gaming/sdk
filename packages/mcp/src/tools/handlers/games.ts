@@ -77,7 +77,8 @@ export async function buildCoinflipTransactionTool(
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		gameInputs: { side },
 		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createGameBet('coinflip', {
+			bundle.client.suigar.tx.createGameBet({
+				game: 'coinflip',
 				...(await stakeOptions(input, bundle)),
 				side,
 			}),
@@ -110,7 +111,8 @@ export async function buildLimboTransactionTool(
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		gameInputs: { targetMultiplier },
 		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createGameBet('limbo', {
+			bundle.client.suigar.tx.createGameBet({
+				game: 'limbo',
 				...(await stakeOptions(input, bundle)),
 				targetMultiplier,
 			}),
@@ -139,7 +141,8 @@ async function buildConfigIdTransactionTool(
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		gameInputs: { configId },
 		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createGameBet(game, {
+			bundle.client.suigar.tx.createGameBet({
+				game,
 				...(await stakeOptions(input, bundle)),
 				configId,
 			}),
@@ -183,7 +186,8 @@ export async function buildRangeTransactionTool(
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		gameInputs: { leftPoint, rightPoint, outOfRange },
 		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createGameBet('range', {
+			bundle.client.suigar.tx.createGameBet({
+				game: 'range',
 				...(await stakeOptions(input, bundle)),
 				leftPoint,
 				rightPoint,
@@ -223,7 +227,8 @@ export async function buildSoccerTransactionTool(
 		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
 		gameInputs: { configId, countryId, shotZoneId },
 		createTransaction: async (bundle) =>
-			bundle.client.suigar.tx.createGameBet('soccer', {
+			bundle.client.suigar.tx.createGameBet({
+				game: 'soccer',
 				...(await stakeOptions(input, bundle)),
 				configId,
 				countryId,
@@ -471,7 +476,8 @@ async function enforceBetCountLimit(
 	}
 
 	const requested = BigInt(toPositiveInteger(input.betCount, 'betCount'));
-	const parameters = await bundle.client.suigar.getGameParameters(game, {
+	const parameters = await bundle.client.suigar.getGameParameters({
+		game,
 		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
 	});
 	const max = (parameters as Record<string, unknown>)[limit.parameter];

@@ -242,10 +242,10 @@ function summarizeDryRunEvent(
 		parsedEvent = parseDryRunEvent(event, eventType);
 		if (parsedEvent && event.bcs instanceof Uint8Array) {
 			const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-			const details = parseGameDetails(
-				parsedEvent.gameId,
-				decoded.game_details,
-			);
+			const details = parseGameDetails({
+				game: parsedEvent.gameId,
+				gameDetails: decoded.game_details,
+			});
 			return {
 				...baseSummary,
 				game: parsedEvent.gameId,

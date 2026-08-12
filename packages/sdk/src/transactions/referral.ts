@@ -16,8 +16,7 @@ import { createBaseTransaction } from './shared.js';
 
 /**
  * Returns a composable Move-call thunk for claiming commission in `coinType`.
- * The caller must be the referrer; the Move contract derives the referrer from
- * the transaction sender.
+ * The caller must be the referrer; the Move contract derives the referrer from the transaction sender.
  */
 function claimReferralCommissionCall({
 	config,
@@ -32,10 +31,9 @@ function claimReferralCommissionCall({
 
 /**
  * Returns a composable Move-call thunk for claiming the configured USD reward.
- * The configured `usdc` metadata supplies both the dollar coin type and Pyth
- * price-info object required by the referral contract.
+ * The configured `usdc` metadata supplies both the dollar coin type and Pyth price-info object required by the referral contract.
  */
-function claimReferralLevelUpUsdRewardsCall({ config }: WithConfig<{}>) {
+function claimReferralLevelUpUsdRewardsCall({ config }: WithConfig) {
 	return claimReferrerLevelUpUsdRewards({
 		package: config.packageIds.referral,
 		typeArguments: [normalizeStructTag(config.coins.usdc.coinType)],

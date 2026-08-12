@@ -34,6 +34,7 @@ import {
 } from '../contracts/wheel/wheel.js';
 import type { Game } from './game.type.js';
 import type { MoveFloat } from './move-float.type.js';
+import type { WithCoinType, WithGame } from './transaction-options.type.js';
 
 export const GAME_SETTINGS = {
 	coinflip: {
@@ -90,8 +91,11 @@ export type GameParameters<TGame extends Game> = GameParameterValue<
 >;
 
 /** Options for reading parameters. `coinType` is required because parameters are coin-specific. */
-export type GetGameParametersOptions =
-	SuiClientTypes.CoreClientMethodOptions & {
-		coinType: string;
-		ignoreCache?: boolean;
-	};
+export type GetGameParametersOptions<TGame extends Game = Game> = WithGame<
+	WithCoinType<
+		SuiClientTypes.CoreClientMethodOptions & {
+			ignoreCache?: boolean;
+		}
+	>,
+	TGame
+>;

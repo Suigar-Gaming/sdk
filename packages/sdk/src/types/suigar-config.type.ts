@@ -3,18 +3,17 @@
 
 import type { SuigarNetwork } from './network.type.js';
 
+type DeepPartial<T> = T extends object
+	? { [P in keyof T]?: DeepPartial<T[P]> }
+	: T;
+
 export type SuigarCoinMetadata = {
 	coinType: string;
 	decimals: number;
 	priceInfoObjectId: string;
 };
 
-export type SuigarConfigOverrides = {
-	packageIds?: Partial<SuigarPackageIds>;
-	objectIds?: Partial<SuigarObjectIds>;
-	registryIds?: Partial<SuigarRegistryIds>;
-	coins?: Partial<Record<SuigarCoin, Partial<SuigarCoinMetadata>>>;
-};
+export type SuigarConfigOverrides = DeepPartial<SuigarConfig>;
 
 export interface SuigarExtensionOptions<Name = 'suigar'> {
 	name?: Name;

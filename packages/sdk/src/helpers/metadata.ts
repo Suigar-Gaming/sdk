@@ -6,14 +6,18 @@ import type {
 	BetMetadataInput,
 	BetMetadataValue,
 	EncodedBetMetadata,
+	WithPartner,
 } from '../types/index.js';
 
 const PARTNER_METADATA_KEY = 'partner';
 
-const RESERVED_METADATA_KEYS = new Set([PARTNER_METADATA_KEY, 'referrer']);
-const textEncoder = new TextEncoder();
+const RESERVED_METADATA_KEYS: Set<string> = new Set([
+	PARTNER_METADATA_KEY,
+	'referrer',
+]);
+const textEncoder: TextEncoder = new TextEncoder();
 
-function encodeString(value: string) {
+function encodeString(value: string): Uint8Array<ArrayBuffer> {
 	try {
 		return fromHex(value);
 	} catch {
@@ -21,7 +25,7 @@ function encodeString(value: string) {
 	}
 }
 
-function encodeMetadataValue(value: BetMetadataValue) {
+function encodeMetadataValue(value: BetMetadataValue): Array<number> {
 	if (value instanceof Uint8Array) {
 		return Array.from(value);
 	}
@@ -33,10 +37,12 @@ function encodeMetadataValue(value: BetMetadataValue) {
 	return Array.from(encodeString(String(value)));
 }
 
-export function encodeBetMetadata(
-	metadata?: BetMetadataInput,
-	partner?: string,
-): EncodedBetMetadata {
+export function encodeBetMetadata({
+	metadata,
+	partner,
+}: WithPartner<{
+	metadata?: BetMetadataInput;
+}> = {}): EncodedBetMetadata {
 	const keys: Array<string> = [];
 	const values: Array<Array<number>> = [];
 

@@ -77,7 +77,7 @@ Numeric helper behavior:
 - `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
 - `isMoveFloat(value)` checks whether an unknown value has the generated Move float shape
 - `parseCoinType(type)` extracts the normalized first generic coin type from a Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails(gameId, gameDetails)` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
+- `parseGameDetails({ game, gameDetails })` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -103,7 +103,7 @@ What you actually use at runtime is the registered extension instance:
 ```ts
 const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar());
 
-client.suigar.serializeTransactionToBase64(...);
+client.suigar.serializeTransactionToBase64({ transaction });
 client.suigar.getConfig();
 client.suigar.getPvPCoinflipGames(...);
 client.suigar.tx;
@@ -121,14 +121,17 @@ const client = new SuiGrpcClient({
 	network: 'testnet',
 }).$extend(suigar());
 
-const tx = client.suigar.tx.createGameBet('coinflip', {
+const tx = client.suigar.tx.createGameBet({
+	game: 'coinflip',
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	side: 'heads',
 });
 
-const base64 = await client.suigar.serializeTransactionToBase64(tx);
+const base64 = await client.suigar.serializeTransactionToBase64({
+	transaction: tx,
+});
 ```
 
 ## Extension Registration
@@ -219,8 +222,8 @@ If `partner` is configured, the SDK automatically writes that partner wallet add
 The registered extension instance exposes the main runtime surface:
 
 - `getConfig()`
-- `getGameParameters(game, { coinType, ...options })`
-- `serializeTransactionToBase64(transaction, options?)`
+- `getGameParameters({ game, coinType, ...options })`
+- `serializeTransactionToBase64({ transaction, ...options })`
 - `getPvPCoinflipGames(options?)`
 - `bcs`
 - `tx`
@@ -245,7 +248,7 @@ console.log(config.packageIds);
 console.log(config.coins.sui.coinType);
 ```
 
-### `getGameParameters(game, { coinType, ...options })`
+### `getGameParameters({ game, coinType, ...options })`
 
 Returns the on-chain `Parameters<T>` object for any supported game and coin type. The return type is inferred from `game`. `coinType` is required because each game has a distinct parameters object for every supported coin.
 
@@ -254,7 +257,8 @@ The SDK first reads the selected game's settings object from the configured Swee
 Float parameter fields such as `min_target_multiplier`, `max_target_multiplier`, `min_rtp`, and `max_rtp` are returned as normal JavaScript numbers. This also applies to float multipliers nested in Plinko and Wheel configs.
 
 ```ts
-const parameters = await client.suigar.getGameParameters('coinflip', {
+const parameters = await client.suigar.getGameParameters({
+	game: 'coinflip',
 	coinType: '0x2::sui::SUI',
 });
 
@@ -263,14 +267,16 @@ console.log(parameters.min_stake);
 
 Pass `ignoreCache: true` to refresh the on-chain read and replace the cached value.
 
-### `serializeTransactionToBase64(transaction, options?)`
+### `serializeTransactionToBase64({ transaction, ...options })`
 
 Builds a transaction with the configured Sui client and returns base64-encoded transaction bytes.
 
 Use this when you need a transport-safe payload for a wallet, API, or external signer.
 
 ```ts
-const base64 = await client.suigar.serializeTransactionToBase64(tx);
+const base64 = await client.suigar.serializeTransactionToBase64({
+	transaction: tx,
+});
 ```
 
 ### `getPvPCoinflipGames(options?)`
@@ -313,7 +319,7 @@ Transaction builders live under `client.suigar.tx`.
 
 ### Standard Games
 
-Use `createGameBet(gameId, options)` for:
+Use `createGameBet({ game, ...options })` for:
 
 - `coinflip`
 - `limbo`
@@ -323,7 +329,8 @@ Use `createGameBet(gameId, options)` for:
 - `wheel`
 
 ```ts
-const tx = client.suigar.tx.createGameBet('coinflip', {
+const tx = client.suigar.tx.createGameBet({
+	game: 'coinflip',
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -374,14 +381,16 @@ Per-game options:
 Examples:
 
 ```ts
-const limboTx = client.suigar.tx.createGameBet('limbo', {
+const limboTx = client.suigar.tx.createGameBet({
+	game: 'limbo',
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
 	targetMultiplier: 2.5,
 });
 
-const rangeTx = client.suigar.tx.createGameBet('range', {
+const rangeTx = client.suigar.tx.createGameBet({
+	game: 'range',
 	owner: '0x123',
 	coinType: '0x2::sui::SUI',
 	stake: 1_000_000_000n,
@@ -539,7 +548,7 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
-- `parseGameDetails(gameId, game_details)` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
+- `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
 
 ### Parse PvP Coinflip Game Object Data
 
@@ -604,19 +613,22 @@ Parsed fields include:
 - `game_details`
 - `metadata`
 
-`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameEvent(event)` from `@suigar/sdk/utils` to retrieve the normalized `gameId` and `eventName`, then pass that `gameId` to `parseGameDetails(gameId, decoded.game_details)` for game-specific key and value typing.
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameEvent(event)` from `@suigar/sdk/utils` to retrieve the normalized `gameId` and `eventName`, then pass that `gameId` to `parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` for game-specific key and value typing.
 
 ```ts
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 
 const { gameId, eventName } = parseGameEvent(event)!;
 const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails(gameId, decoded.game_details);
+const gameDetails = parseGameDetails({
+	game: gameId,
+	gameDetails: decoded.game_details,
+});
 ```
 
 `parseGameDetails` preserves the on-chain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
-`parseGameDetails(gameId, decoded.game_details)` narrows based on the parsed event game id. For example, when `gameId === 'coinflip'` it narrows to:
+`parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` narrows based on the parsed event game id. For example, when `gameId === 'coinflip'` it narrows to:
 
 - `{ player_bet: string; coin_outcome: string }`
 
@@ -634,7 +646,7 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 > - Unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
 > - Parse emitted events from the unwrapped transaction result
 > - Use `event.bcs` for consistent decoding across transports
-> - Use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails(gameId, decoded.game_details)` instead of hand-decoding standard game detail byte arrays
+> - Use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` instead of hand-decoding standard game detail byte arrays
 
 > **Tip:**
 >

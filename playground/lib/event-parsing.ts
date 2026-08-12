@@ -114,7 +114,10 @@ function createBetResultRow(
 	bytes: Uint8Array,
 ) {
 	const payload = bcsApi.BetResultEvent.parse(bytes);
-	const gameDetails = parseGameDetails(gameEvent.gameId, payload.game_details);
+	const gameDetails = parseGameDetails({
+		game: gameEvent.gameId,
+		gameDetails: payload.game_details,
+	});
 	const details = [
 		`game: ${gameEvent.gameId}`,
 		`coin: ${payload.coin_type.name ?? 'unknown'}`,

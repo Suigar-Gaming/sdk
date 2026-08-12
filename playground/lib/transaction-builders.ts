@@ -90,7 +90,11 @@ function buildStandardSharedOptions(
 }
 
 function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
-	const objectPrefix = factoryLine.endsWith(',') ? ' {' : '{';
+	const objectPrefix = factoryLine.endsWith('{')
+		? ''
+		: factoryLine.endsWith(',')
+			? ' {'
+			: '{';
 	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
@@ -187,11 +191,11 @@ export function buildStandardTransaction<K extends StandardGameId>(
 	}
 
 	return {
-		transaction: txApi.createGameBet(gameId, baseOptions as never),
-		code: toCodeBlock(
-			`const tx = client.suigar.tx.createGameBet('${gameId}',`,
-			codeLines,
-		),
+		transaction: txApi.createGameBet({ game: gameId, ...baseOptions } as never),
+		code: toCodeBlock(`const tx = client.suigar.tx.createGameBet({`, [
+			`game: '${gameId}',`,
+			...codeLines,
+		]),
 	};
 }
 

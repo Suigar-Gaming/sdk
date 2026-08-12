@@ -9,55 +9,65 @@ import {
 	REGISTRY_IDS,
 } from '../configs/index.js';
 import type {
-	Game,
 	SuigarCoin,
 	SuigarCoinMetadata,
 	SuigarConfig,
 	SuigarConfigOverrides,
 	SuigarNetwork,
+	WithCoinType,
+	WithConfig,
+	WithGame,
 } from '../types/index.js';
 
-export const DEFAULT_CACHE_TTL_MS = 30 * 60 * 1000;
+export const DEFAULT_CACHE_TTL_MS: number = 30 * 60 * 1000;
 
-export function resolveSuigarConfig(
-	network: SuigarNetwork,
-	overrides: SuigarConfigOverrides = {},
-): SuigarConfig {
+type GamePackageIdOptions = WithGame<WithConfig>;
+
+export function resolveSuigarConfig({
+	network,
+	config = {},
+}: {
+	network: SuigarNetwork;
+	config?: SuigarConfigOverrides;
+}): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const objectIds = OBJECT_IDS[network];
 	const registryIds = REGISTRY_IDS[network];
 	const coins = COINS[network];
 
 	const resolvedCoins = getSupportedCoins(coins).reduce(
-		(result, supportedCoin) => {
-			result[supportedCoin] = resolveCoinMetadata(
-				supportedCoin,
-				coins[supportedCoin],
-				overrides.coins?.[supportedCoin],
-			);
+		(result, coin) => {
+			result[coin] = resolveCoinMetadata({
+				coin,
+				coinMetadata: coins[coin],
+				configCoinMetadata: config.coins?.[coin],
+			});
 			return result;
 		},
 		{} as SuigarConfig['coins'],
 	);
 
 	return {
-		packageIds: { ...packageIds, ...overrides.packageIds },
-		objectIds: { ...objectIds, ...overrides.objectIds },
-		registryIds: { ...registryIds, ...overrides.registryIds },
+		packageIds: { ...packageIds, ...config.packageIds },
+		objectIds: { ...objectIds, ...config.objectIds },
+		registryIds: { ...registryIds, ...config.registryIds },
 		coins: resolvedCoins,
 	};
 }
 
-export function assertConfiguredBetGame(
-	config: SuigarConfig,
-	game: Game,
-): void {
-	if (!resolveGamePackageId(config, game)) {
+export function assertConfiguredBetGame({
+	config,
+	game,
+}: GamePackageIdOptions): void {
+	if (!resolveGamePackageId({ config, game })) {
 		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
 }
 
-export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
+export function resolveGamePackageId({
+	config,
+	game,
+}: GamePackageIdOptions): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
@@ -76,12 +86,15 @@ export function resolveGamePackageId(config: SuigarConfig, game: Game): string {
 	}
 }
 
-export function resolvePriceInfoObjectId(
-	config: SuigarConfig,
-	coinType: string,
-): string {
+export function resolvePriceInfoObjectId({
+	config,
+	coinType,
+}: WithConfig<WithCoinType>): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
-	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
+	const supportedCoin = resolveSupportedCoin({
+		config,
+		coinType: normalizedCoinType,
+	});
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;
 
 	if (!objectId) {
@@ -97,32 +110,36 @@ function getSupportedCoins(coins: SuigarConfig['coins']): Array<SuigarCoin> {
 	return Object.keys(coins) as Array<SuigarCoin>;
 }
 
-function resolveCoinMetadata(
-	supportedCoin: SuigarCoin,
-	defaultCoin: SuigarCoinMetadata,
-	override?: Partial<SuigarCoinMetadata>,
-): SuigarCoinMetadata {
-	const coin = { ...defaultCoin, ...override };
+function resolveCoinMetadata({
+	coin,
+	coinMetadata,
+	configCoinMetadata,
+}: {
+	coin: SuigarCoin;
+	coinMetadata: SuigarCoinMetadata;
+	configCoinMetadata?: Partial<SuigarCoinMetadata>;
+}): SuigarCoinMetadata {
+	const metadata = { ...coinMetadata, ...configCoinMetadata };
 	if (
-		!coin.coinType ||
-		!Number.isSafeInteger(coin.decimals) ||
-		!coin.priceInfoObjectId
+		!metadata.coinType ||
+		!Number.isSafeInteger(metadata.decimals) ||
+		!metadata.priceInfoObjectId
 	) {
 		throw new Error(
-			`Missing coin metadata configuration for supported coin ${supportedCoin}`,
+			`Missing coin metadata configuration for supported coin ${coin}`,
 		);
 	}
 
 	return {
-		...coin,
-		coinType: normalizeStructTag(coin.coinType),
+		...metadata,
+		coinType: normalizeStructTag(metadata.coinType),
 	};
 }
 
-function resolveSupportedCoin(
-	config: SuigarConfig,
-	coinType: string,
-): SuigarCoin {
+function resolveSupportedCoin({
+	config,
+	coinType,
+}: WithConfig<WithCoinType>): SuigarCoin {
 	const supportedCoin = getSupportedCoins(config.coins).find(
 		(coin) => config.coins[coin].coinType === coinType,
 	);

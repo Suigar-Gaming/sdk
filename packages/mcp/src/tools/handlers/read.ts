@@ -31,7 +31,8 @@ export async function readGameMetadataTool(
 	const { client, config } = createSuigarClient(getConfigInput(input));
 	const coin = coinMetadataForAmount(config, input.coinType);
 	const ignoreCache = input.ignoreCache ?? true;
-	const parameters = await client.suigar.getGameParameters(game, {
+	const parameters = await client.suigar.getGameParameters({
+		game,
 		coinType: coin.coinType,
 		ignoreCache,
 	});

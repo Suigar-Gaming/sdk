@@ -10,24 +10,26 @@ import type {
 	RangeTransactionOptions,
 	SoccerTransactionOptions,
 	WheelTransactionOptions,
+	WithGame,
 } from './transaction-options.type.js';
 
 type WithoutConfig<T> = Omit<T, 'config'>;
 
-export type CreateGameBetOptions<GameId extends StandardGame> =
-	GameId extends 'coinflip'
-		? WithoutConfig<CoinflipTransactionOptions>
-		: GameId extends 'wheel'
-			? WithoutConfig<WheelTransactionOptions>
-			: GameId extends 'limbo'
-				? WithoutConfig<LimboTransactionOptions>
-				: GameId extends 'plinko'
-					? WithoutConfig<PlinkoTransactionOptions>
-					: GameId extends 'range'
-						? WithoutConfig<RangeTransactionOptions>
-						: GameId extends 'soccer'
-							? WithoutConfig<SoccerTransactionOptions>
-							: never;
+type StandardGameTransactionOptionsRegistry = {
+	coinflip: CoinflipTransactionOptions;
+	wheel: WheelTransactionOptions;
+	limbo: LimboTransactionOptions;
+	plinko: PlinkoTransactionOptions;
+	range: RangeTransactionOptions;
+	soccer: SoccerTransactionOptions;
+};
+
+export type CreateGameBetOptions<TGame extends StandardGame = StandardGame> = {
+	[Game in TGame]: WithGame<
+		WithoutConfig<StandardGameTransactionOptionsRegistry[Game]>,
+		Game
+	>;
+}[TGame];
 
 export type PvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
 	WithoutConfig<PvPCoinflipTransactionOptions<Action>>;

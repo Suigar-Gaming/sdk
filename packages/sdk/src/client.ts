@@ -47,24 +47,16 @@ import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	ClaimReferralCommissionOptions,
 	ClaimReferralLevelUpUsdRewardsOptions,
-	CoinflipTransactionOptions,
 	CreateGameBetOptions,
 	Game,
 	GameParameters,
 	GetGameParametersOptions,
-	LimboTransactionOptions,
 	MintNftV1Options,
 	OnChainGameParameters,
-	PlinkoTransactionOptions,
 	PvPCoinflipGameOptions,
-	RangeTransactionOptions,
-	SoccerTransactionOptions,
-	StandardGame,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
-	WheelTransactionOptions,
-	WithPartner,
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
@@ -124,7 +116,7 @@ export class SuigarClient {
 				});
 			});
 
-		this.#config = resolveSuigarConfig(network, config);
+		this.#config = resolveSuigarConfig({ network, config });
 	}
 
 	/**
@@ -147,14 +139,15 @@ export class SuigarClient {
 	 * instead of raw bytes. The SDK always injects the configured Sui client, so `options` accepts the standard
 	 * transaction build options except for `client`.
 	 *
-	 * @param transaction Transaction to build and serialize.
-	 * @param options Optional transaction build options forwarded to `transaction.build()`, excluding `client`.
+	 * @param options Transaction to build and optional build options forwarded to `transaction.build()`, excluding `client`.
 	 * @returns Base64-encoded transaction bytes ready to send over the wire.
 	 */
-	async serializeTransactionToBase64(
-		transaction: Transaction,
-		options?: Omit<BuildTransactionOptions, 'client'>,
-	): Promise<string> {
+	async serializeTransactionToBase64({
+		transaction,
+		...options
+	}: Omit<BuildTransactionOptions, 'client'> & {
+		transaction: Transaction;
+	}): Promise<string> {
 		const bytes = await transaction.build({ ...options, client: this.#client });
 		return toBase64(bytes);
 	}
@@ -169,14 +162,13 @@ export class SuigarClient {
 	 * value. Generated Move float fields are decoded into JavaScript numbers,
 	 * including floats nested in game configs.
 	 *
-	 * @param game Game whose parameters should be loaded.
-	 * @param options Required coin type, plus optional cache override and abort signal.
+	 * @param options Game id, required coin type, plus optional cache override and abort signal.
 	 * @returns Parsed game parameters typed for the requested game.
 	 */
-	async getGameParameters<TGame extends Game>(
-		game: TGame,
-		options: GetGameParametersOptions,
-	): Promise<GameParameters<TGame>> {
+	async getGameParameters<TGame extends Game>({
+		game,
+		...options
+	}: GetGameParametersOptions<TGame>): Promise<GameParameters<TGame>> {
 		const coinType = normalizeStructTag(options.coinType);
 		return this.#cache.read(
 			['getGameParameters', game, coinType],
@@ -190,7 +182,7 @@ export class SuigarClient {
 					parentId: this.#config.objectIds.sweetHouse,
 					name: {
 						type: gameDefinition.settingsKey.typeTag({
-							package: resolveGamePackageId(this.#config, game),
+							package: resolveGamePackageId({ config: this.#config, game }),
 						}),
 						bcs: gameDefinition.settingsKey
 							.serialize({ dummy_field: false })
@@ -306,11 +298,15 @@ export class SuigarClient {
 		);
 	}
 
-	async #getSimulatedCommandReturnValue(
-		transaction: Transaction,
+	async #getSimulatedCommandReturnValue({
+		transaction,
 		commandIndex = 0,
 		returnValueIndex = 0,
-	): Promise<Uint8Array> {
+	}: {
+		transaction: Transaction;
+		commandIndex?: number;
+		returnValueIndex?: number;
+	}): Promise<SuiClientTypes.CommandOutput['bcs']> {
 		const result = await this.#client.core.simulateTransaction({
 			transaction,
 			include: { commandResults: true },
@@ -321,7 +317,7 @@ export class SuigarClient {
 		}
 
 		const returnValue =
-			result.commandResults?.[commandIndex]?.returnValues[returnValueIndex]
+			result.commandResults?.[commandIndex]?.returnValues?.[returnValueIndex]
 				?.bcs;
 		if (!returnValue) {
 			throw new Error(
@@ -337,77 +333,81 @@ export class SuigarClient {
 	 */
 	tx = {
 		/**
-		 * Creates a standard game transaction for the provided game id.
+		 * Creates a standard game transaction for the provided game.
 		 *
-		 * @param gameId Supported standard game identifier.
-		 * @param options Transaction builder options for the selected game.
+		 * @param options Supported standard game with transaction builder options.
 		 * @returns Prepared transaction for the selected game.
 		 */
-		createGameBet: <GameId extends StandardGame>(
-			gameId: GameId,
-			options: CreateGameBetOptions<GameId>,
-		): Transaction => {
-			switch (gameId) {
+		createGameBet: (options: CreateGameBetOptions): Transaction => {
+			switch (options.game) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<CoinflipTransactionOptions>);
+					});
 				case 'limbo':
 					return buildLimboTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<LimboTransactionOptions>);
+					});
 				case 'plinko':
 					return buildPlinkoTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<PlinkoTransactionOptions>);
+					});
 				case 'range':
 					return buildRangeTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<RangeTransactionOptions>);
+					});
 				case 'soccer':
 					return buildSoccerTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<SoccerTransactionOptions>);
+					});
 				case 'wheel':
 					return buildWheelTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
-					} as WithPartner<WheelTransactionOptions>);
+					});
 				default:
-					throw new RangeError(`Unsupported game: ${gameId}`);
+					throw new RangeError(
+						`Unsupported game: ${(options as { game?: string })?.game}`,
+					);
 			}
 		},
 		/** PvP coinflip transaction builders, grouped by game action. */
 		pvpCoinflip: {
 			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
-				return buildPvPCoinflipTransaction('create', {
+				return buildPvPCoinflipTransaction({
 					...options,
+					action: 'create',
 					config: this.#config,
 					partner: this.#partner,
 				});
 			},
 			joinGame: (options: PvPCoinflipGameOptions<'join'>): Transaction => {
-				return buildPvPCoinflipTransaction('join', {
+				return buildPvPCoinflipTransaction({
 					...options,
-					betCoin: buildPvPCoinflipJoinBetCoin(this.#client, options),
+					action: 'join',
+					betCoin: buildPvPCoinflipJoinBetCoin({
+						...options,
+						client: this.#client,
+					}),
 					config: this.#config,
 					partner: this.#partner,
 				});
 			},
 			cancelGame: (options: PvPCoinflipGameOptions<'cancel'>): Transaction => {
-				return buildPvPCoinflipTransaction('cancel', {
+				return buildPvPCoinflipTransaction({
 					...options,
+					action: 'cancel',
 					config: this.#config,
 					partner: this.#partner,
 				});
@@ -436,8 +436,9 @@ export class SuigarClient {
 			mint: (options: MintNftV1Options): Transaction => {
 				return buildMintNftV1Transaction({
 					...options,
-					paymentCoin: buildMintNftV1PaymentCoin(this.#client, {
+					paymentCoin: buildMintNftV1PaymentCoin({
 						...options,
+						client: this.#client,
 						config: this.#config,
 					}),
 					config: this.#config,
@@ -454,12 +455,12 @@ export class SuigarClient {
 				coinType,
 			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>) => {
 				try {
-					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-						this.tx.referral.claimCommission({
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
+						transaction: this.tx.referral.claimCommission({
 							owner,
 							coinType,
 						}),
-					);
+					});
 					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;
@@ -469,11 +470,11 @@ export class SuigarClient {
 				owner,
 			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>) => {
 				try {
-					const claimCoinBcs = await this.#getSimulatedCommandReturnValue(
-						this.tx.referral.claimLevelUpUsdRewards({
+					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
+						transaction: this.tx.referral.claimLevelUpUsdRewards({
 							owner,
 						}),
-					);
+					});
 					return BigInt(CoinStruct.parse(claimCoinBcs).balance);
 				} catch {
 					return 0n;

@@ -512,6 +512,12 @@ class TestClient extends CoreClient {
 			},
 		}) satisfies SuiClientTypes.DefaultNameServiceNameResponse;
 
+	resolveNameServiceAddress: CoreClient['resolveNameServiceAddress'] =
+		async () =>
+			({
+				address: null,
+			}) satisfies SuiClientTypes.ResolveNameServiceAddressResponse;
+
 	listTransactions: CoreClient['listTransactions'] = () => {
 		throw new Error('Not implemented.');
 	};
@@ -634,7 +640,8 @@ describe('SuigarClient', () => {
 			mockedSuigar({ partner }),
 		) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coins.sui.coinType;
-		client.suigar.tx.createGameBet('coinflip', {
+		client.suigar.tx.createGameBet({
+			game: 'coinflip',
 			owner: '0x123',
 			coinType,
 			stake: 1000,
@@ -728,7 +735,8 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('coinflip', {
+		const parameters = await client.suigar.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 		});
 
@@ -769,7 +777,8 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		const parameters = await client.suigar.getGameParameters('limbo', {
+		const parameters = await client.suigar.getGameParameters({
+			game: 'limbo',
 			coinType: COINS.testnet.sui.coinType,
 		});
 
@@ -801,7 +810,8 @@ describe('SuigarClient', () => {
 		});
 
 		await expect(
-			client.suigar.getGameParameters('coinflip', {
+			client.suigar.getGameParameters({
+				game: 'coinflip',
 				coinType: COINS.testnet.sui.coinType,
 			}),
 		).rejects.toThrow(
@@ -838,10 +848,12 @@ describe('SuigarClient', () => {
 			],
 		});
 
-		await client.suigar.getGameParameters('coinflip', {
+		await client.suigar.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 		});
-		await client.suigar.getGameParameters('coinflip', {
+		await client.suigar.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 		});
 
@@ -853,7 +865,8 @@ describe('SuigarClient', () => {
 			createCoinflipParametersObject({ objectId: '0x111', minStake: 50n }),
 		];
 
-		const refreshed = await client.suigar.getGameParameters('coinflip', {
+		const refreshed = await client.suigar.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 			ignoreCache: true,
 		});
@@ -900,10 +913,12 @@ describe('SuigarClient', () => {
 			shared: SuigarClient;
 		};
 
-		await first.shared.getGameParameters('coinflip', {
+		await first.shared.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 		});
-		await second.shared.getGameParameters('coinflip', {
+		await second.shared.getGameParameters({
+			game: 'coinflip',
 			coinType: COINS.testnet.sui.coinType,
 		});
 
