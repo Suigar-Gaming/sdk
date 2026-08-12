@@ -14,6 +14,7 @@ import type {
 	SuigarConfig,
 	SuigarConfigOverrides,
 	SuigarNetwork,
+	WithConfig,
 	WithGame,
 } from '../types/index.js';
 
@@ -24,14 +25,7 @@ export type ResolveSuigarConfigOptions = {
 	overrides?: SuigarConfigOverrides;
 };
 
-export type ResolveGamePackageIdOptions = WithGame<{
-	config: SuigarConfig;
-}>;
-
-export type ResolvePriceInfoObjectIdOptions = {
-	config: SuigarConfig;
-	coinType: string;
-};
+type GamePackageIdOptions = WithGame<WithConfig<{}>>;
 
 export function resolveSuigarConfig({
 	network,
@@ -65,7 +59,7 @@ export function resolveSuigarConfig({
 export function assertConfiguredBetGame({
 	config,
 	game,
-}: ResolveGamePackageIdOptions): void {
+}: GamePackageIdOptions): void {
 	if (!resolveGamePackageId({ config, game })) {
 		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
@@ -74,7 +68,7 @@ export function assertConfiguredBetGame({
 export function resolveGamePackageId({
 	config,
 	game,
-}: ResolveGamePackageIdOptions): string {
+}: GamePackageIdOptions): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
@@ -96,7 +90,7 @@ export function resolveGamePackageId({
 export function resolvePriceInfoObjectId({
 	config,
 	coinType,
-}: ResolvePriceInfoObjectIdOptions): string {
+}: WithConfig<{ coinType: string }>): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin(config, normalizedCoinType);
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;
