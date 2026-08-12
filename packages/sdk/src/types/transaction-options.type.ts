@@ -40,9 +40,11 @@ export type TransactionSenderOptions = {
 	gasBudget?: Parameters<Transaction['setGasBudgetIfNotSet']>[0];
 };
 
-export type BaseTransactionOptions = WithConfig<TransactionSenderOptions> & {
-	metadata?: BetMetadataInput;
-};
+export type BaseTransactionOptions = WithConfig<
+	TransactionSenderOptions & {
+		metadata?: BetMetadataInput;
+	}
+>;
 
 export type CoinTransactionOptions = {
 	coinType: string;

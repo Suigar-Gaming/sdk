@@ -50,9 +50,11 @@ export function buildMintNftV1Transaction({
 	gasBudget,
 	specId,
 	paymentCoin,
-}: WithConfig<MintNftV1Options> & {
-	paymentCoin: TransactionArgument;
-}): Transaction {
+}: WithConfig<
+	MintNftV1Options & {
+		paymentCoin: TransactionArgument;
+	}
+>): Transaction {
 	const tx = createBaseTransaction({ owner, gasBudget });
 
 	tx.add(
