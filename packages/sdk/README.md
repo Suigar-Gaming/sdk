@@ -1,6 +1,6 @@
 # `@suigar/sdk`
 
-TypeScript SDK for Suigar provably fair on-chain Sui casino game transactions.
+TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
 
 ## Documentation
 

@@ -11,7 +11,7 @@
 		{
 			"name": "suigar-mcp",
 			"source": "packages/mcp/plugin",
-			"description": "AI agent MCP tools for Suigar provably fair on-chain Sui casino game transactions.",
+			"description": "AI agent MCP tools for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.",
 			"category": "Developer Tools"
 		}
 	]
