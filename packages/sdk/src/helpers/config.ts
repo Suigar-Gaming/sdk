@@ -24,10 +24,10 @@ type GamePackageIdOptions = WithGame<WithConfig<{}>>;
 
 export function resolveSuigarConfig({
 	network,
-	overrides = {},
+	config = {},
 }: {
 	network: SuigarNetwork;
-	overrides?: SuigarConfigOverrides;
+	config?: SuigarConfigOverrides;
 }): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const objectIds = OBJECT_IDS[network];
@@ -39,7 +39,7 @@ export function resolveSuigarConfig({
 			result[supportedCoin] = resolveCoinMetadata({
 				supportedCoin,
 				defaultCoin: coins[supportedCoin],
-				override: overrides.coins?.[supportedCoin],
+				override: config.coins?.[supportedCoin],
 			});
 			return result;
 		},
@@ -47,9 +47,9 @@ export function resolveSuigarConfig({
 	);
 
 	return {
-		packageIds: { ...packageIds, ...overrides.packageIds },
-		objectIds: { ...objectIds, ...overrides.objectIds },
-		registryIds: { ...registryIds, ...overrides.registryIds },
+		packageIds: { ...packageIds, ...config.packageIds },
+		objectIds: { ...objectIds, ...config.objectIds },
+		registryIds: { ...registryIds, ...config.registryIds },
 		coins: resolvedCoins,
 	};
 }

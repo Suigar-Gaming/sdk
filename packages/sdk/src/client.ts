@@ -124,7 +124,7 @@ export class SuigarClient {
 				});
 			});
 
-		this.#config = resolveSuigarConfig({ network, overrides: config });
+		this.#config = resolveSuigarConfig({ network, config });
 	}
 
 	/**
