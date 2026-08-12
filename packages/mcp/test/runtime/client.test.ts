@@ -18,11 +18,18 @@ const owner =
 const resolvedOwner =
 	'0x0000000000000000000000000000000000000000000000000000000000000002';
 
+type ResolveNameServiceAddress =
+	SuigarClientBundle['client']['core']['resolveNameServiceAddress'];
+
 const createResolverBundle = (
-	resolveSuiNSName: SuigarClientBundle['resolveSuiNSName'],
+	resolveNameServiceAddress: ResolveNameServiceAddress,
 ) =>
 	({
-		resolveSuiNSName,
+		client: {
+			core: {
+				resolveNameServiceAddress,
+			},
+		},
 	}) as SuigarClientBundle;
 
 describe('network resolution', () => {
@@ -71,7 +78,7 @@ describe('coin type resolution', () => {
 
 describe('owner resolution', () => {
 	it('normalizes raw Sui addresses without a SuiNS lookup', async () => {
-		const lookup = vi.fn<SuigarClientBundle['resolveSuiNSName']>();
+		const lookup = vi.fn<ResolveNameServiceAddress>();
 
 		await expect(
 			resolveOwnerAddress('0x1', createResolverBundle(lookup)),
@@ -81,32 +88,32 @@ describe('owner resolution', () => {
 
 	it('resolves SuiNS names and subnames before transaction construction', async () => {
 		const lookup = vi
-			.fn<SuigarClientBundle['resolveSuiNSName']>()
-			.mockResolvedValue(resolvedOwner);
+			.fn<ResolveNameServiceAddress>()
+			.mockResolvedValue({ address: resolvedOwner });
 
 		await expect(
 			resolveOwnerAddress('furbor.sui', createResolverBundle(lookup)),
 		).resolves.toBe(resolvedOwner);
-		expect(lookup).toHaveBeenCalledWith('furbor.sui');
+		expect(lookup).toHaveBeenCalledWith({ name: 'furbor.sui' });
 
 		await expect(
 			resolveOwnerAddress('desk.furbor.sui', createResolverBundle(lookup)),
 		).resolves.toBe(resolvedOwner);
-		expect(lookup).toHaveBeenLastCalledWith('desk.furbor.sui');
+		expect(lookup).toHaveBeenLastCalledWith({ name: 'desk.furbor.sui' });
 	});
 
 	it('rejects invalid or unresolved SuiNS owners with actionable errors', async () => {
 		await expect(
 			resolveOwnerAddress(
 				'not a name',
-				createResolverBundle(async () => resolvedOwner),
+				createResolverBundle(async () => ({ address: resolvedOwner })),
 			),
 		).rejects.toThrow(/Sui address or SuiNS name/u);
 
 		await expect(
 			resolveOwnerAddress(
 				'missing.sui',
-				createResolverBundle(async () => null),
+				createResolverBundle(async () => ({ address: null })),
 			),
 		).rejects.toThrow(/did not resolve/u);
 	});
