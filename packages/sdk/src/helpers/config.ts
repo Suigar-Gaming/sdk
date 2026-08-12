@@ -14,13 +14,14 @@ import type {
 	SuigarConfig,
 	SuigarConfigOverrides,
 	SuigarNetwork,
+	WithCoinType,
 	WithConfig,
 	WithGame,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS: number = 30 * 60 * 1000;
 
-type GamePackageIdOptions = WithGame<WithConfig<{}>>;
+type GamePackageIdOptions = WithGame<WithConfig>;
 
 export function resolveSuigarConfig({
 	network,
@@ -88,7 +89,7 @@ export function resolveGamePackageId({
 export function resolvePriceInfoObjectId({
 	config,
 	coinType,
-}: WithConfig<{ coinType: string }>): string {
+}: WithConfig<WithCoinType>): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin({
 		config,
@@ -138,7 +139,7 @@ function resolveCoinMetadata({
 function resolveSupportedCoin({
 	config,
 	coinType,
-}: WithConfig<{ coinType: string }>): SuigarCoin {
+}: WithConfig<WithCoinType>): SuigarCoin {
 	const supportedCoin = getSupportedCoins(config.coins).find(
 		(coin) => config.coins[coin].coinType === coinType,
 	);

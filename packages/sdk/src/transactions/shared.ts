@@ -14,12 +14,12 @@ import {
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	BaseTransactionOptions,
-	CoinTransactionOptions,
 	EncodedBetMetadata,
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	TransactionSenderOptions,
 	WithBetCoin,
+	WithCoinType,
 	WithGame,
 	WithPartner,
 } from '../types/index.js';
@@ -33,17 +33,15 @@ type StrictStakeTransactionOptions = {
 	>;
 };
 
-type SharedBetTransactionContext = Pick<
-	BaseTransactionOptions,
-	'config' | 'owner'
-> &
-	Pick<CoinTransactionOptions, 'coinType'> &
-	WithBetCoin<
-		StrictStakeTransactionOptions & {
-			metadata: EncodedBetMetadata;
-			priceInfoObjectId: string;
-		}
-	>;
+type SharedBetTransactionContext = WithCoinType<
+	Pick<BaseTransactionOptions, 'config' | 'owner'> &
+		WithBetCoin<
+			StrictStakeTransactionOptions & {
+				metadata: EncodedBetMetadata;
+				priceInfoObjectId: string;
+			}
+		>
+>;
 
 type CreateBaseGameTransactionOptions = WithGame<BaseTransactionOptions>;
 

@@ -18,7 +18,7 @@ export type WithThrowOnError<T> = T & {
 	throwOnError?: boolean;
 };
 
-export type WithConfig<T> = T & {
+export type WithConfig<T = {}> = T & {
 	config: SuigarConfig;
 };
 
@@ -28,6 +28,10 @@ export type WithClient<T> = T & {
 
 export type WithGame<T, TGame extends Game = Game> = T & {
 	game: TGame;
+};
+
+export type WithCoinType<T = {}> = T & {
+	coinType: string;
 };
 
 export type WithBetCoin<T, TBetCoin = TransactionArgument> = T & {
@@ -46,10 +50,9 @@ export type BaseTransactionOptions = WithConfig<
 	}
 >;
 
-export type CoinTransactionOptions = {
-	coinType: string;
+export type CoinTransactionOptions = WithCoinType<{
 	useGasCoin?: boolean;
-};
+}>;
 
 export type StakeTransactionOptions = {
 	stake: number | bigint;
@@ -123,8 +126,8 @@ export type PvPCoinflipTransactionOptions<
 			? CancelPvPCoinflipTransactionOptions
 			: never;
 
-export type ClaimReferralCommissionOptions = TransactionSenderOptions &
-	Pick<CoinTransactionOptions, 'coinType'>;
+export type ClaimReferralCommissionOptions =
+	WithCoinType<TransactionSenderOptions>;
 
 export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
 

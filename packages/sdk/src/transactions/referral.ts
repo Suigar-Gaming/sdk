@@ -33,7 +33,7 @@ function claimReferralCommissionCall({
  * Returns a composable Move-call thunk for claiming the configured USD reward.
  * The configured `usdc` metadata supplies both the dollar coin type and Pyth price-info object required by the referral contract.
  */
-function claimReferralLevelUpUsdRewardsCall({ config }: WithConfig<{}>) {
+function claimReferralLevelUpUsdRewardsCall({ config }: WithConfig) {
 	return claimReferrerLevelUpUsdRewards({
 		package: config.packageIds.referral,
 		typeArguments: [normalizeStructTag(config.coins.usdc.coinType)],
