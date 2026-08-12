@@ -11,7 +11,7 @@
 		{
 			"name": "suigar-mcp",
 			"source": "packages/mcp/plugin",
-			"description": "Suigar MCP tools for reading Suigar data and building unsigned Sui game, NFT, and referral transactions.",
+			"description": "AI agent MCP tools for Suigar on-chain casino games, NFTs, referrals, and Sui transactions.",
 			"category": "Developer Tools"
 		}
 	]

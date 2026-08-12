@@ -17,7 +17,7 @@ export function createSuigarMcpServer(): McpServer {
 		name: 'suigar',
 		version: VERSION,
 		description:
-			'Stdio MCP server and MCP App for inspecting Suigar config and building unsigned Suigar transactions on Sui.',
+			'AI agent MCP server for Suigar provably fair on-chain casino game transactions on Sui.',
 	});
 
 	registerAppResource(

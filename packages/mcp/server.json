@@ -1,7 +1,7 @@
 {
 	"$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
 	"name": "io.github.Suigar-Gaming/mcp",
-	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
+	"description": "AI agent MCP server for Suigar provably fair on-chain casino game transactions on Sui.",
 	"repository": {
 		"url": "https://github.com/Suigar-Gaming/ts-sdks",
 		"source": "github",

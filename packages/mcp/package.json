@@ -1,17 +1,23 @@
 {
 	"name": "@suigar/mcp",
 	"version": "1.0.0-beta.21",
-	"description": "MCP server and MCP App for building and inspecting Suigar transactions on Sui.",
+	"description": "AI agent MCP server for Suigar provably fair on-chain casino game transactions on Sui.",
 	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
 		"suigar",
 		"sui",
 		"mcp",
 		"mcp-app",
+		"agent",
+		"ai-agent",
 		"typescript",
 		"move",
 		"web3",
-		"games"
+		"games",
+		"casino",
+		"provably-fair",
+		"on-chain",
+		"transactions"
 	],
 	"license": "Apache-2.0",
 	"mcpName": "io.github.Suigar-Gaming/mcp",
