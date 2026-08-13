@@ -1,5 +1,5 @@
 ---
-"@suigar/mcp": patch
+'@suigar/mcp': patch
 ---
 
 Refactor the bundled MCP App inspector into a React component app and reorganize the MCP package internals.
