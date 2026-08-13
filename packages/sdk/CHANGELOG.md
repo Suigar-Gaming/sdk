@@ -1,5 +1,19 @@
 # @suigar/sdk
 
+## 2.0.0-beta.37
+
+### Major Changes
+
+- [#147](https://github.com/Suigar-Gaming/ts-sdks/pull/147) [`0444640`](https://github.com/Suigar-Gaming/ts-sdks/commit/0444640b69aa7f3efa8e75adf90387ed181f8d68) - Convert public SDK helpers, including `createGameBet`, to single options object signatures for Mysten-style calls.
+  
+  Update MCP transaction and read tooling to call the new SDK object signatures.
+
+### Patch Changes
+
+- [#150](https://github.com/Suigar-Gaming/ts-sdks/pull/150) [`22b810f`](https://github.com/Suigar-Gaming/ts-sdks/commit/22b810f2208c9165cca3131d081d145a187c2cb8) - Refactor the internal on-chain game parameters registry type for clearer SDK game settings definitions.
+
+- [#149](https://github.com/Suigar-Gaming/ts-sdks/pull/149) [`a4a3772`](https://github.com/Suigar-Gaming/ts-sdks/commit/a4a377257285446714d73f0b3cb66b79671b7cac) - Keep NFT V1 mint and PvP coinflip join transaction builders responsible for resolving their own payment coins from the configured client.
+
 ## 2.0.0-beta.36
 
 ### Patch Changes
