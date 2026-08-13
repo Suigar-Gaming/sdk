@@ -39,7 +39,6 @@ jobs:
           publish-script: pnpm run release
           commit-message: 'ci: version packages'
           pr-title: 'ci: version packages'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   publish-mcp-registry:
     needs: release

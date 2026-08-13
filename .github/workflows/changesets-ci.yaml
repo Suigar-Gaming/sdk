@@ -66,6 +66,8 @@ jobs:
           retention-days: 1
 
       - name: Validate versioning
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           if ! find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | grep -q .; then
             echo "No changesets found; skipping version validation."
