@@ -2,57 +2,68 @@
 	"name": "@suigar/mcp",
 	"version": "1.0.0-beta.23",
 	"description": "AI agent MCP server for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.",
-	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
-		"suigar",
-		"sui",
-		"mcp",
-		"mcp-server",
-		"mcp-app",
 		"agent",
 		"ai-agent",
-		"typescript",
-		"move",
-		"move-contracts",
-		"web3",
-		"dapp",
-		"sui-blockchain",
-		"web3-gaming",
-		"games",
+		"betting",
 		"casino",
 		"casino-games",
-		"sui-casino",
-		"crypto-casino",
-		"provably-fair",
-		"on-chain",
-		"gamblefi",
-		"betting",
 		"coinflip",
-		"pvp-coinflip",
-		"limbo",
-		"plinko",
-		"range",
-		"wheel",
-		"soccer",
-		"pvp",
-		"nft",
-		"referral",
-		"wallet",
+		"crypto-casino",
+		"dapp",
 		"dry-run",
-		"unsigned-transactions",
+		"gamblefi",
+		"games",
+		"limbo",
+		"mcp",
+		"mcp-app",
+		"mcp-server",
+		"move",
+		"move-contracts",
+		"nft",
+		"on-chain",
+		"plinko",
+		"provably-fair",
+		"pvp",
+		"pvp-coinflip",
+		"range",
+		"referral",
+		"soccer",
+		"sui",
+		"sui-blockchain",
+		"sui-casino",
+		"suigar",
 		"transaction-builder",
-		"transactions"
+		"transactions",
+		"typescript",
+		"unsigned-transactions",
+		"wallet",
+		"web3",
+		"web3-gaming",
+		"wheel"
 	],
+	"homepage": "https://suigar.com/docs/mcp",
+	"bugs": {
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
+	},
 	"license": "Apache-2.0",
-	"mcpName": "io.github.Suigar-Gaming/mcp",
-	"type": "module",
-	"sideEffects": false,
+	"author": "Suigar Gaming <contact.suigar@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
+		"directory": "packages/mcp"
+	},
+	"bin": {
+		"suigar": "./dist/bin.mjs"
+	},
 	"files": [
 		"dist",
 		"plugin",
 		"CHANGELOG.md",
 		"README.md"
 	],
+	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.mjs",
 	"types": "./dist/index.d.mts",
 	"exports": {
@@ -62,11 +73,8 @@
 			"default": "./dist/index.mjs"
 		}
 	},
-	"bin": {
-		"suigar": "./dist/bin.mjs"
-	},
-	"engines": {
-		"node": "^22.18.0 || >=24.0.0"
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"build": "pnpm run clean && tsdown && vite build",
@@ -83,18 +91,6 @@
 		"lint": "pnpm run oxlint && pnpm run oxfmt",
 		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
-		"directory": "packages/mcp"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
-	},
-	"homepage": "https://suigar.com/docs/mcp",
 	"dependencies": {
 		"@modelcontextprotocol/ext-apps": "^1.7.5",
 		"@modelcontextprotocol/sdk": "^1.30.0",
@@ -126,5 +122,9 @@
 		"vite": "^8.2.1",
 		"vite-plugin-singlefile": "^2.3.3",
 		"vitest": "catalog:test"
-	}
+	},
+	"engines": {
+		"node": "^22.18.0 || >=24.0.0"
+	},
+	"mcpName": "io.github.Suigar-Gaming/mcp"
 }

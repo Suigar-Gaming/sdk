@@ -3,19 +3,6 @@
 	"private": true,
 	"license": "Apache-2.0",
 	"type": "module",
-	"packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
-	"devEngines": {
-		"runtime": {
-			"name": "node",
-			"version": "^24.18.0 || ^26.5.0",
-			"onFail": "warn"
-		},
-		"packageManager": {
-			"name": "pnpm",
-			"version": "11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
-			"onFail": "warn"
-		}
-	},
 	"scripts": {
 		"prepare": "husky",
 		"build": "turbo run build",
@@ -43,5 +30,18 @@
 		"oxlint": "^1.78.0",
 		"oxlint-tsgolint": "^7.0.2001",
 		"turbo": "^2.10.9"
-	}
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
+			"onFail": "warn"
+		},
+		"runtime": {
+			"name": "node",
+			"version": "^24.18.0 || ^26.5.0",
+			"onFail": "warn"
+		}
+	},
+	"packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
 }
