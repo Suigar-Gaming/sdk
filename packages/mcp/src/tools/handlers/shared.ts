@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { parseStructTag } from '@mysten/sui/utils';
+
 import { GAMES, type Game } from '@suigar/sdk/games';
+
 import {
 	resolveDefaultCoinType,
 	resolveOwnerAddress,
@@ -27,16 +29,15 @@ export const GAME_LABELS = {
 	'pvp-coinflip': 'PvP Coinflip',
 } as const satisfies Record<Game, string>;
 
-const GAME_TO_PACKAGE_KEY: Record<Game, keyof McpConfig['sdk']['packageIds']> =
-	{
-		coinflip: 'coinflip',
-		limbo: 'limbo',
-		plinko: 'plinko',
-		range: 'range',
-		soccer: 'soccer',
-		wheel: 'wheel',
-		'pvp-coinflip': 'pvpCoinflip',
-	};
+const GAME_TO_PACKAGE_KEY: Record<Game, keyof McpConfig['sdk']['packageIds']> = {
+	coinflip: 'coinflip',
+	limbo: 'limbo',
+	plinko: 'plinko',
+	range: 'range',
+	soccer: 'soccer',
+	wheel: 'wheel',
+	'pvp-coinflip': 'pvpCoinflip',
+};
 
 const GAME_TO_TOOLS = {
 	coinflip: ['build_coinflip_transaction'],
@@ -75,8 +76,7 @@ export function coinMetadataForAmount(
 ): { coinType: string; decimals: number } {
 	const resolvedCoinType = resolveDefaultCoinType(config, coinType);
 	const coin = Object.values(config.sdk.coins).find(
-		(metadata) =>
-			resolveDefaultCoinType(config, metadata.coinType) === resolvedCoinType,
+		(metadata) => resolveDefaultCoinType(config, metadata.coinType) === resolvedCoinType,
 	);
 
 	if (!coin) {
@@ -103,16 +103,10 @@ export function requireGame(value: unknown): Game {
 	if (GAMES.includes(game as Game)) {
 		return game as Game;
 	}
-	throw new RangeError(
-		`Unsupported game: ${game}. Use one of: ${GAMES.join(', ')}.`,
-	);
+	throw new RangeError(`Unsupported game: ${game}. Use one of: ${GAMES.join(', ')}.`);
 }
 
-function formatGameParameterValue(
-	key: string,
-	value: unknown,
-	decimals: number,
-): unknown {
+function formatGameParameterValue(key: string, value: unknown, decimals: number): unknown {
 	if (Array.isArray(value)) {
 		return value.map((item) => formatGameParameterValue(key, item, decimals));
 	}
@@ -120,9 +114,7 @@ function formatGameParameterValue(
 		return formatGameParameters(value as Record<string, unknown>, decimals);
 	}
 	return isAmountFieldName(key) &&
-		(typeof value === 'string' ||
-			typeof value === 'number' ||
-			typeof value === 'bigint')
+		(typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint')
 		? {
 				raw: String(value),
 				display: formatBaseUnitAmount(value, decimals),
@@ -134,10 +126,7 @@ export function formatGameParameters(
 	parameters: Record<string, unknown>,
 	decimals: number,
 ): Record<string, unknown> {
-	const formatted: Record<
-		string,
-		ReturnType<typeof formatGameParameterValue>
-	> = {};
+	const formatted: Record<string, ReturnType<typeof formatGameParameterValue>> = {};
 	for (const key of Object.keys(parameters)) {
 		formatted[key] = formatGameParameterValue(key, parameters[key], decimals);
 	}
@@ -253,13 +242,8 @@ export function getPackageId(config: McpConfig, game: Game): string {
 	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
 }
 
-export function referralClaimTarget(
-	config: McpConfig,
-	kind: ReferralClaimKind,
-): string {
+export function referralClaimTarget(config: McpConfig, kind: ReferralClaimKind): string {
 	return `${config.sdk.packageIds.referral}::referral::${
-		kind === 'commission'
-			? 'claim_commission_balance'
-			: 'claim_referrer_level_up_usd_rewards'
+		kind === 'commission' ? 'claim_commission_balance' : 'claim_referrer_level_up_usd_rewards'
 	}`;
 }

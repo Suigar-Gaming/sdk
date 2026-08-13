@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { toolOutputSchema } from '../../../src/tools/schemas/output.js';
 import { loopbackOrigin } from '../../../src/wallet/loopback.js';
 
@@ -11,15 +12,12 @@ const mocks = vi.hoisted(() => ({
 	listSessionWallets: vi.fn<() => Promise<unknown>>(),
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
 	loadSessionWallet: vi.fn<() => Promise<unknown>>(),
-	runSuigarCommand:
-		vi.fn<(...args: Array<string>) => { command: string; pid: number }>(),
+	runSuigarCommand: vi.fn<(...args: Array<string>) => { command: string; pid: number }>(),
 }));
 
 vi.mock('qrcode', () => ({
 	default: {
-		toDataURL: vi.fn<() => Promise<string>>(
-			async () => 'data:image/png;base64,qr',
-		),
+		toDataURL: vi.fn<() => Promise<string>>(async () => 'data:image/png;base64,qr'),
 	},
 }));
 
@@ -73,10 +71,8 @@ const {
 	suigarLogoutTool,
 } = await import('../../../src/tools/handlers/wallet.js');
 
-const pairedAddress =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
-const sessionAddress =
-	'0x0000000000000000000000000000000000000000000000000000000000000002';
+const pairedAddress = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const sessionAddress = '0x0000000000000000000000000000000000000000000000000000000000000002';
 const sessionWallet = {
 	id: 'wallet-1',
 	name: 'Daily bets',
@@ -112,11 +108,7 @@ describe('wallet tools', () => {
 				connection: { command: string; pid: number; status: string };
 			};
 
-			expect(mocks.runSuigarCommand).toHaveBeenCalledWith(
-				'login',
-				'--network',
-				'mainnet',
-			);
+			expect(mocks.runSuigarCommand).toHaveBeenCalledWith('login', '--network', 'mainnet');
 			expect(content.connection).toMatchObject({
 				command: 'npx -y @suigar/mcp@test login --network mainnet',
 				pid: 1234,
@@ -189,11 +181,7 @@ describe('wallet tools', () => {
 				connection: { command: string; pid: number; status: string };
 			};
 
-			expect(mocks.runSuigarCommand).toHaveBeenCalledWith(
-				'logout',
-				'--network',
-				'testnet',
-			);
+			expect(mocks.runSuigarCommand).toHaveBeenCalledWith('logout', '--network', 'testnet');
 			expect(content.connection).toMatchObject({
 				command: 'npx -y @suigar/mcp@test logout --network testnet',
 				pid: 5678,
@@ -330,9 +318,7 @@ describe('wallet tools', () => {
 
 			const result = await getSessionWalletTool({ network: 'testnet' });
 
-			expect(toolOutputSchema.safeParse(result.structuredContent).success).toBe(
-				true,
-			);
+			expect(toolOutputSchema.safeParse(result.structuredContent).success).toBe(true);
 		});
 	});
 
@@ -359,9 +345,9 @@ describe('wallet tools', () => {
 			mocks.loadCredentials.mockResolvedValue({ profiles: {} });
 			mocks.loadSessionWallet.mockResolvedValue(sessionWallet);
 
-			await expect(
-				fundSessionWalletTool({ network: 'testnet' }),
-			).rejects.toThrow('Call "suigar_login" first');
+			await expect(fundSessionWalletTool({ network: 'testnet' })).rejects.toThrow(
+				'Call "suigar_login" first',
+			);
 		});
 	});
 });

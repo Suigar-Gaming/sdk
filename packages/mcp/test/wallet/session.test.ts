@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { rm } from 'node:fs/promises';
+
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -81,12 +82,8 @@ describe('session wallet setup', () => {
 				address: expect.stringMatching(/^0x/u),
 			}),
 		);
-		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
-			wallet!.address,
-		);
-		expect([...keychainEntries.keys()]).toEqual([
-			`com.suigar.mcp:session-wallet:${wallet!.id}`,
-		]);
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(wallet!.address);
+		expect([...keychainEntries.keys()]).toEqual([`com.suigar.mcp:session-wallet:${wallet!.id}`]);
 	});
 
 	it('imports a standard Sui private key through the local setup page', async () => {
@@ -116,9 +113,7 @@ describe('session wallet setup', () => {
 				name: 'Imported wallet',
 			}),
 		);
-		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(
-			signer.toSuiAddress(),
-		);
+		expect((await session.loadSessionSigner()).toSuiAddress()).toBe(signer.toSuiAddress());
 	});
 
 	it('keeps multiple named wallets and selects each signer by ID', async () => {
@@ -126,9 +121,7 @@ describe('session wallet setup', () => {
 		const secondSigner = Ed25519Keypair.generate();
 		const firstSetup = await session.createSessionWalletSetup();
 		const firstPage = await (await fetch(firstSetup.setupUrl)).text();
-		const firstState = firstPage.match(
-			/name="state" value="([0-9a-f]+)"/u,
-		)?.[1];
+		const firstState = firstPage.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
 		await fetch(`${firstSetup.setupUrl}import-private-key`, {
 			method: 'POST',
 			headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -141,24 +134,19 @@ describe('session wallet setup', () => {
 
 		const secondSetup = await session.createSessionWalletSetup();
 		const secondPage = await (await fetch(secondSetup.setupUrl)).text();
-		const secondState = secondPage.match(
-			/name="state" value="([0-9a-f]+)"/u,
-		)?.[1];
+		const secondState = secondPage.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
 		expect(secondPage).toContain(firstSigner.toSuiAddress());
 		expect(secondPage).toContain('adds it to your local wallet list');
 
-		const secondResponse = await fetch(
-			`${secondSetup.setupUrl}import-private-key`,
-			{
-				method: 'POST',
-				headers: { 'content-type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams({
-					state: secondState!,
-					privateKey: secondSigner.getSecretKey(),
-					name: 'Second wallet',
-				}),
-			},
-		);
+		const secondResponse = await fetch(`${secondSetup.setupUrl}import-private-key`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				state: secondState!,
+				privateKey: secondSigner.getSecretKey(),
+				name: 'Second wallet',
+			}),
+		});
 		expect(secondResponse.ok).toBe(true);
 		const wallets = await session.listSessionWallets();
 		expect(wallets).toEqual([
@@ -171,12 +159,12 @@ describe('session wallet setup', () => {
 				address: secondSigner.toSuiAddress(),
 			}),
 		]);
-		expect(
-			(await session.loadSessionSigner(wallets[0]!.id)).toSuiAddress(),
-		).toBe(firstSigner.toSuiAddress());
-		expect(
-			(await session.loadSessionSigner(wallets[1]!.id)).toSuiAddress(),
-		).toBe(secondSigner.toSuiAddress());
+		expect((await session.loadSessionSigner(wallets[0]!.id)).toSuiAddress()).toBe(
+			firstSigner.toSuiAddress(),
+		);
+		expect((await session.loadSessionSigner(wallets[1]!.id)).toSuiAddress()).toBe(
+			secondSigner.toSuiAddress(),
+		);
 	});
 
 	it('uses the setup timeout environment value', async () => {

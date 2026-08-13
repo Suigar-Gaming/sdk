@@ -2,6 +2,7 @@
 
 import { Moon, SunMedium } from 'lucide-react';
 import * as React from 'react';
+
 import { useTheme } from '@/components/providers/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,10 +30,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 			onClick={() => setTheme(isDark ? 'light' : 'dark')}
 			aria-label="Toggle theme"
 			disabled={!mounted}
-			className={cn(
-				'border-border/70 bg-card/70 rounded-full backdrop-blur-sm',
-				className,
-			)}
+			className={cn('border-border/70 bg-card/70 rounded-full backdrop-blur-sm', className)}
 		>
 			{mounted ? (
 				isDark ? (

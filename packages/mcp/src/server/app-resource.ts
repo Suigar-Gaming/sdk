@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { readFile } from 'node:fs/promises';
+
 import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 
-export const SUIGAR_MCP_APP_RESOURCE_URI =
-	'ui://suigar/transaction-inspector.html';
+export const SUIGAR_MCP_APP_RESOURCE_URI = 'ui://suigar/transaction-inspector.html';
 
 export const NFT_IMAGE_RESOURCE_DOMAINS = [
 	'https://suigar-mainnet-nft.s3.eu-west-1.amazonaws.com',
@@ -33,23 +33,13 @@ export function createSuigarMcpAppResourceMeta(): SuigarMcpAppResourceMeta {
 	};
 }
 
-function hasErrorCode(
-	error: unknown,
-	code: string,
-): error is Error & { code: string } {
-	return (
-		error instanceof Error &&
-		'code' in error &&
-		(error as { code: unknown }).code === code
-	);
+function hasErrorCode(error: unknown, code: string): error is Error & { code: string } {
+	return error instanceof Error && 'code' in error && (error as { code: unknown }).code === code;
 }
 
 async function readSuigarMcpAppHtml(): Promise<string> {
 	try {
-		return await readFile(
-			new URL('../app/index.html', import.meta.url),
-			'utf8',
-		);
+		return await readFile(new URL('../app/index.html', import.meta.url), 'utf8');
 	} catch (error) {
 		if (!hasErrorCode(error, 'ENOENT')) {
 			throw error;

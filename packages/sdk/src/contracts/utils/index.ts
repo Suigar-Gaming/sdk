@@ -7,10 +7,7 @@ import {
 	type BcsType,
 	type TypeTag,
 } from '@mysten/sui/bcs';
-import {
-	type ClientWithCoreApi,
-	type SuiClientTypes,
-} from '@mysten/sui/client';
+import { type ClientWithCoreApi, type SuiClientTypes } from '@mysten/sui/client';
 import { isArgument, type TransactionArgument } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 
@@ -19,21 +16,14 @@ const SUI_FRAMEWORK_ADDRESS = normalizeSuiAddress('0x2');
 
 export type RawTransactionArgument<T> = T | TransactionArgument;
 
-export type GetOptions<
-	Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {},
-> = SuiClientTypes.GetObjectOptions<Include> & { client: ClientWithCoreApi };
+export type GetOptions<Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {}> =
+	SuiClientTypes.GetObjectOptions<Include> & { client: ClientWithCoreApi };
 
-export type GetManyOptions<
-	Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {},
-> = SuiClientTypes.GetObjectsOptions<Include> & { client: ClientWithCoreApi };
+export type GetManyOptions<Include extends Omit<SuiClientTypes.ObjectInclude, 'content'> = {}> =
+	SuiClientTypes.GetObjectsOptions<Include> & { client: ClientWithCoreApi };
 
-export function getPureBcsSchema(
-	typeTag: string | TypeTag,
-): BcsType<any> | null {
-	const parsedTag =
-		typeof typeTag === 'string'
-			? TypeTagSerializer.parseFromStr(typeTag)
-			: typeTag;
+export function getPureBcsSchema(typeTag: string | TypeTag): BcsType<any> | null {
+	const parsedTag = typeof typeTag === 'string' ? TypeTagSerializer.parseFromStr(typeTag) : typeTag;
 
 	if ('u8' in parsedTag) {
 		return bcs.U8;
@@ -182,10 +172,9 @@ export interface TypeTagOptions {
  * `phantom X` parameters (at any depth). Everything else — argument arity,
  * position contents, and tag validity — is validated at runtime.
  */
-type TypeTagParams<Name extends string> =
-	Name extends `${string}phantom ${string}`
-		? [options: TypeTagOptions & { typeArguments: ReadonlyArray<TypeArgument> }]
-		: [options?: TypeTagOptions];
+type TypeTagParams<Name extends string> = Name extends `${string}phantom ${string}`
+	? [options: TypeTagOptions & { typeArguments: ReadonlyArray<TypeArgument> }]
+	: [options?: TypeTagOptions];
 
 type ResolveTypeTagOptions<Name extends string> = {
 	client: ClientWithCoreApi;
@@ -213,10 +202,7 @@ function splitTopLevelTypeArgs(inner: string): Array<string> {
 	return parts;
 }
 
-function buildTypeTag(
-	name: string,
-	options: TypeTagOptions | undefined,
-): string {
+function buildTypeTag(name: string, options: TypeTagOptions | undefined): string {
 	const lt = name.indexOf('<');
 	const base = lt === -1 ? name : name.slice(0, lt);
 
@@ -227,17 +213,12 @@ function buildTypeTag(
 	let result = name;
 
 	if (options?.typeArguments) {
-		const baked =
-			lt === -1 ? [] : splitTopLevelTypeArgs(name.slice(lt + 1, -1));
+		const baked = lt === -1 ? [] : splitTopLevelTypeArgs(name.slice(lt + 1, -1));
 		const supplied = options.typeArguments.map((arg) => {
 			if (typeof arg === 'string') {
 				return arg;
 			}
-			if (
-				arg &&
-				typeof arg.serialize === 'function' &&
-				typeof arg.name === 'string'
-			) {
+			if (arg && typeof arg.serialize === 'function' && typeof arg.name === 'string') {
 				return arg.name;
 			}
 			throw new Error(`Invalid type argument ${stringify(arg)}`);
@@ -313,9 +294,7 @@ export class MoveStruct<
 		);
 	}
 
-	async get<
-		Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {},
-	>({
+	async get<Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {}>({
 		objectId,
 		...options
 	}: GetOptions<Include>): Promise<
@@ -335,9 +314,7 @@ export class MoveStruct<
 		return res;
 	}
 
-	async getMany<
-		Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {},
-	>({
+	async getMany<Include extends Omit<SuiClientTypes.ObjectInclude, 'content' | 'json'> = {}>({
 		client,
 		...options
 	}: GetManyOptions<Include>): Promise<

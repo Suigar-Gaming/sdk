@@ -1,17 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	Transaction,
-	type TransactionArgument,
-} from '@mysten/sui/transactions';
+import { Transaction, type TransactionArgument } from '@mysten/sui/transactions';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
+
 import { Factory, mintToSender } from '../contracts/nft-v1/nft.js';
-import type {
-	MintNftV1Options,
-	WithClient,
-	WithConfig,
-} from '../types/index.js';
+import type { MintNftV1Options, WithClient, WithConfig } from '../types/index.js';
 import { createBaseTransaction } from './shared.js';
 
 function buildMintNftV1PaymentCoin({
@@ -19,9 +13,7 @@ function buildMintNftV1PaymentCoin({
 	config,
 	specId,
 	useGasCoin,
-}: WithClient<
-	WithConfig<Pick<MintNftV1Options, 'specId' | 'useGasCoin'>>
->): TransactionArgument {
+}: WithClient<WithConfig<Pick<MintNftV1Options, 'specId' | 'useGasCoin'>>>): TransactionArgument {
 	return async (tx) => {
 		const { json: factory } = await Factory.get({
 			client,

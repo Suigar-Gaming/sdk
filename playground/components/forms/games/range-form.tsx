@@ -1,15 +1,11 @@
 'use client';
 
 import type * as React from 'react';
+
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
+
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
-import {
-	Field,
-	FieldCode,
-	FieldDescription,
-	FieldGroup,
-	FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldCode, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { getRangePointMax, parseOptionalNumber } from '@/lib/suigar-app';
@@ -52,9 +48,8 @@ export function RangeForm({
 						onChange={(event) => onChange({ leftPoint: event.target.value })}
 					/>
 					<FieldDescription size="sm">
-						Allowed range: <FieldCode>0</FieldCode> to{' '}
-						<FieldCode>{String(maxPoint)}</FieldCode> with scale{' '}
-						<FieldCode>{String(effectiveScale)}</FieldCode>
+						Allowed range: <FieldCode>0</FieldCode> to <FieldCode>{String(maxPoint)}</FieldCode>{' '}
+						with scale <FieldCode>{String(effectiveScale)}</FieldCode>
 					</FieldDescription>
 				</Field>
 				<Field>
@@ -70,8 +65,8 @@ export function RangeForm({
 						onChange={(event) => onChange({ rightPoint: event.target.value })}
 					/>
 					<FieldDescription size="sm">
-						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so
-						larger scales reduce the allowed frontend range
+						The SDK sends <FieldCode>Math.round(point * scale)</FieldCode>, so larger scales reduce
+						the allowed frontend range
 					</FieldDescription>
 				</Field>
 			</FieldGroup>
@@ -90,8 +85,8 @@ export function RangeForm({
 					/>
 					<FieldDescription size="sm">
 						Leave empty to use the SDK default scale of{' '}
-						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows
-						points from <FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>
+						<FieldCode>{String(DEFAULT_RANGE_SCALE)}</FieldCode>, which allows points from{' '}
+						<FieldCode>0</FieldCode> to <FieldCode>100</FieldCode>
 					</FieldDescription>
 				</Field>
 				<div className="flex h-full w-full items-start md:justify-start">
@@ -102,9 +97,7 @@ export function RangeForm({
 								id="range-out-of-range"
 								size="default"
 								checked={value.outOfRange}
-								onCheckedChange={(checked: boolean) =>
-									onChange({ outOfRange: checked })
-								}
+								onCheckedChange={(checked: boolean) => onChange({ outOfRange: checked })}
 							/>
 						</div>
 						<FieldDescription size="sm">

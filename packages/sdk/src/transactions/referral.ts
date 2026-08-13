@@ -3,6 +3,7 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
+
 import {
 	claimCommissionBalance,
 	claimReferrerLevelUpUsdRewards,
@@ -30,10 +31,7 @@ export function buildClaimReferralCommissionTransaction({
 		}),
 	);
 
-	tx.transferObjects(
-		[claimedCoin],
-		tx.pure.address(normalizeSuiAddress(owner)),
-	);
+	tx.transferObjects([claimedCoin], tx.pure.address(normalizeSuiAddress(owner)));
 
 	return tx;
 }
@@ -49,17 +47,11 @@ export function buildClaimReferralLevelUpUsdRewardsTransaction({
 		claimReferrerLevelUpUsdRewards({
 			package: config.packageIds.referral,
 			typeArguments: [normalizeStructTag(config.coins.usdc.coinType)],
-			arguments: [
-				config.objectIds.sweetHouse,
-				config.coins.usdc.priceInfoObjectId,
-			],
+			arguments: [config.objectIds.sweetHouse, config.coins.usdc.priceInfoObjectId],
 		}),
 	);
 
-	tx.transferObjects(
-		[claimedCoin],
-		tx.pure.address(normalizeSuiAddress(owner)),
-	);
+	tx.transferObjects([claimedCoin], tx.pure.address(normalizeSuiAddress(owner)));
 
 	return tx;
 }

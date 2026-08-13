@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+
 import { ReferralPage } from '@/components/referral-page';
 
 export const metadata: Metadata = {

@@ -3,32 +3,22 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
+
 import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
 import type { SuigarGameEvent } from '../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../src/types/game.type.js';
-import {
-	parseCoinType,
-	parseGameDetails,
-	parseGameEvent,
-} from '../../src/utils/index.js';
+import { parseCoinType, parseGameDetails, parseGameEvent } from '../../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from './utils.js';
 
-function gameDetails(
-	contents: Array<{ key: string; value: Array<number> }>,
-): BetResultGameDetails {
+function gameDetails(contents: Array<{ key: string; value: Array<number> }>): BetResultGameDetails {
 	return { contents };
 }
 
-function createEvent(options: {
-	eventType: string;
-	module: string;
-}): SuiClientTypes.Event {
+function createEvent(options: { eventType: string; module: string }): SuiClientTypes.Event {
 	return {
-		packageId:
-			'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea',
+		packageId: '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea',
 		module: options.module,
-		sender:
-			'0x0000000000000000000000000000000000000000000000000000000000000001',
+		sender: '0x0000000000000000000000000000000000000000000000000000000000000001',
 		eventType: options.eventType,
 		bcs: new Uint8Array(),
 		json: null,
@@ -39,8 +29,7 @@ describe('parseGameEvent', () => {
 	it('models valid game and event combinations as a discriminated union', () => {
 		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
 			| {
-					gameId:
-						'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
 					eventName: 'BetResultEvent';
 			  }
 			| {
@@ -70,9 +59,7 @@ describe('parseGameEvent', () => {
 	});
 
 	it('parses every supported pvp game event from GAME_EVENTS', () => {
-		for (const eventName of GAME_EVENTS.filter(
-			(eventName) => eventName !== 'BetResultEvent',
-		)) {
+		for (const eventName of GAME_EVENTS.filter((eventName) => eventName !== 'BetResultEvent')) {
 			expect(
 				parseGameEvent(
 					createEvent({
@@ -88,14 +75,7 @@ describe('parseGameEvent', () => {
 	});
 
 	it('parses every supported standard bet result game family', () => {
-		for (const gameId of [
-			'coinflip',
-			'limbo',
-			'plinko',
-			'range',
-			'soccer',
-			'wheel',
-		] as const) {
+		for (const gameId of ['coinflip', 'limbo', 'plinko', 'range', 'soccer', 'wheel'] as const) {
 			expect(
 				parseGameEvent(
 					createEvent({
@@ -194,15 +174,11 @@ describe('parseCoinType', () => {
 			parseCoinType(
 				'0x1::pvp_coinflip::Game<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
 			),
-		).toBe(
-			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
-		);
+		).toBe('0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI');
 	});
 
 	it('throws when the object type does not include a generic coin type', () => {
-		expect(() => parseCoinType('0x1::pvp_coinflip::Game')).toThrow(
-			'Unable to parse coin type',
-		);
+		expect(() => parseCoinType('0x1::pvp_coinflip::Game')).toThrow('Unable to parse coin type');
 	});
 });
 
@@ -246,9 +222,7 @@ describe('parseGameDetails', () => {
 		expect(
 			parseGameDetails({
 				game: 'pvp-coinflip',
-				gameDetails: gameDetails([
-					{ key: 'pvp_result', value: [108, 111, 115, 115] },
-				]),
+				gameDetails: gameDetails([{ key: 'pvp_result', value: [108, 111, 115, 115] }]),
 			}),
 		).toEqual({ pvp_result: 'loss' });
 	});

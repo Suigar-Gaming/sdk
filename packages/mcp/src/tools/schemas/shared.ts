@@ -1,12 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-export const BUILDER_MODES = [
-	'build',
-	'dry-run',
-	'read-only',
-	'execute',
-] as const;
+export const BUILDER_MODES = ['build', 'dry-run', 'read-only', 'execute'] as const;
 export const ADDRESS_DESCRIPTION: string =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
 export const COIN_TYPE_DESCRIPTION: string =

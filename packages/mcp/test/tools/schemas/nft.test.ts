@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import { buildNftV1MintTransactionInputSchema } from '../../../src/tools/schemas/nft.js';
 
 describe('NFT input schemas', () => {

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
+
 import { CoinSelectLabel } from '@/components/integration-shell/components/coin-select-label';
 import {
 	formatBalance,
@@ -15,17 +16,8 @@ import {
 } from '@/components/integration-shell/helpers/coin';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-} from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { withBasePath } from '@/lib/paths';
 import type { SupportedCoinKey } from '@/lib/suigar-types';
@@ -38,9 +30,7 @@ const ConnectButton = dynamic(
 		})),
 	{
 		ssr: false,
-		loading: () => (
-			<Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />
-		),
+		loading: () => <Skeleton className="wallet-connect h-10 min-w-[9.5rem] rounded-full" />,
 	},
 );
 
@@ -48,8 +38,7 @@ const links = [
 	{
 		href: '/standard?game=coinflip',
 		label: 'Games',
-		isActive: (pathname: string) =>
-			pathname.endsWith('/standard') || pathname.endsWith('/pvp'),
+		isActive: (pathname: string) => pathname.endsWith('/standard') || pathname.endsWith('/pvp'),
 	},
 	{
 		href: '/nft',
@@ -93,16 +82,15 @@ export function AppHeader({
 			>,
 		[client],
 	);
-	const [localSelectedCoin, setLocalSelectedCoin] =
-		React.useState<SupportedCoinKey>(coinEntries[0]?.[0] ?? 'sui');
+	const [localSelectedCoin, setLocalSelectedCoin] = React.useState<SupportedCoinKey>(
+		coinEntries[0]?.[0] ?? 'sui',
+	);
 	const [localBalances, setLocalBalances] = React.useState<
 		Partial<Record<SupportedCoinKey, CoinBalanceState>>
 	>({});
 	const activeCoin = selectedCoin ?? localSelectedCoin;
 	const activeBalances = coinBalances ?? localBalances;
-	const activeBalanceOwner = coinBalances
-		? (balanceOwner ?? null)
-		: (account?.address ?? null);
+	const activeBalanceOwner = coinBalances ? (balanceOwner ?? null) : (account?.address ?? null);
 
 	React.useEffect(() => {
 		if (coinBalances || !account) {
@@ -121,10 +109,7 @@ export function AppHeader({
 					return [
 						coinKey,
 						{
-							balance: formatBalance(
-								BigInt(response.balance.balance),
-								decimals,
-							),
+							balance: formatBalance(BigInt(response.balance.balance), decimals),
 							isLoading: false,
 							error: null,
 						},
@@ -228,9 +213,7 @@ export function AppHeader({
 						<Button
 							key={link.href}
 							asChild
-							variant={
-								link.isActive(activePathname) ? 'control-active' : 'control'
-							}
+							variant={link.isActive(activePathname) ? 'control-active' : 'control'}
 							size="sm"
 							className="rounded-full"
 						>
@@ -270,9 +253,7 @@ export function AppHeader({
 									</Link>
 								))}
 								<div className="flex items-center justify-between border-t border-border/70 px-2 pt-2">
-									<span className="text-sm font-medium text-foreground">
-										Theme
-									</span>
+									<span className="text-sm font-medium text-foreground">Theme</span>
 									<ThemeToggle className="size-9" />
 								</div>
 							</div>

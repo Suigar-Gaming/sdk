@@ -33,11 +33,9 @@
 		--border: #7eb2c7;
 		--ring: #ffbf49;
 		--font-sans:
-			ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-			sans-serif;
+			ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 		--font-mono:
-			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-			monospace;
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 		--tracking-normal: 0.015em;
 		--radius: 1rem;
 	}

@@ -10,10 +10,10 @@
 		"doctor": "react-doctor --yes",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
-		"prettier": "prettier --check --ignore-unknown .",
-		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run oxlint && pnpm run prettier",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
+		"oxfmt": "oxfmt . --check",
+		"oxfmt:fix": "oxfmt .",
+		"lint": "pnpm run oxlint && pnpm run oxfmt",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"dependencies": {
 		"@mysten/dapp-kit-core": "^1.6.14",
@@ -44,7 +44,6 @@
 		"@types/node": "catalog:typescript",
 		"@types/react": "catalog:typescript",
 		"@types/react-dom": "catalog:typescript",
-		"prettier": "catalog:tooling",
 		"react-doctor": "catalog:tooling",
 		"tailwindcss": "catalog:tooling",
 		"typescript": "catalog:typescript"

@@ -2,6 +2,7 @@
 
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -28,12 +29,7 @@ async function copyGameId(gameId: string) {
 	}
 }
 
-export function CopyableGameIdField({
-	id,
-	label,
-	placeholder,
-	value,
-}: CopyableGameIdFieldProps) {
+export function CopyableGameIdField({ id, label, placeholder, value }: CopyableGameIdFieldProps) {
 	return (
 		<Field>
 			<FieldLabel htmlFor={id}>{label}</FieldLabel>

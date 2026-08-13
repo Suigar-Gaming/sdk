@@ -1,0 +1,44 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "all",
+	"semi": true,
+	"proseWrap": "never",
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		"**/.turbo/**",
+		".changeset/**/*.md",
+		"**/.next/**",
+		"**/build/**",
+		"**/coverage/**",
+		"**/dist/**",
+		"**/out/**",
+		"**/CHANGELOG.md",
+		"**/package.json",
+		"pnpm-lock.yaml",
+		"npm-debug.log*",
+		"package-lock.json",
+		"yarn-debug.log*"
+	],
+	"sortImports": {
+		"customGroups": [
+			{
+				"groupName": "suigar",
+				"elementNamePattern": ["@suigar/**"]
+			},
+			{
+				"groupName": "app",
+				"elementNamePattern": ["@/**"]
+			}
+		],
+		"groups": [
+			["type-builtin", "value-builtin"],
+			["type-external", "value-external"],
+			"suigar",
+			"app",
+			["type-parent", "type-sibling", "type-index", "value-parent", "value-sibling", "value-index"],
+			"unknown"
+		]
+	}
+}

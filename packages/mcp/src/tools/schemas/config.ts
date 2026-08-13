@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
+
 import { SUPPORTED_SUI_NETWORKS } from '@suigar/sdk';
 
 const coinMetadataSchema = z
@@ -59,9 +60,7 @@ export const configInputSchema = z
 			.default('testnet')
 			.describe('Sui network. Only mainnet and testnet are supported.'),
 		providerUrl: z.url().optional().describe('Optional Sui gRPC endpoint URL.'),
-		config: configOverridesSchema
-			.optional()
-			.describe('SDK-style SuigarConfigOverrides.'),
+		config: configOverridesSchema.optional().describe('SDK-style SuigarConfigOverrides.'),
 		partner: z
 			.string()
 			.min(1)

@@ -3,9 +3,7 @@
 
 import type { SuigarNetwork } from './network.type.js';
 
-type DeepPartial<T> = T extends object
-	? { [P in keyof T]?: DeepPartial<T[P]> }
-	: T;
+type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 export type SuigarCoinMetadata = {
 	coinType: string;

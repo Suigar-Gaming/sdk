@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
+
 import { play } from '../contracts/range/range.js';
 import type { RangeTransactionOptions, WithPartner } from '../types/index.js';
 import { DEFAULT_RANGE_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
-export function buildRangeTransaction(
-	options: WithPartner<RangeTransactionOptions>,
-): Transaction {
+export function buildRangeTransaction(options: WithPartner<RangeTransactionOptions>): Transaction {
 	const scale = options.scale ?? DEFAULT_RANGE_SCALE;
 	const leftPoint = Math.round(options.leftPoint * scale);
 	const rightPoint = Math.round(options.rightPoint * scale);

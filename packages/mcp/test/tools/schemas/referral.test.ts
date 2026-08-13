@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import {
 	buildReferralCommissionClaimTransactionInputSchema,
 	getReferralCommissionInputSchema,
@@ -9,9 +10,7 @@ import {
 
 describe('referral input schemas', () => {
 	it('requires a referrer owner for claim reads and permits read-only claim planning', () => {
-		expect(() => getReferralCommissionInputSchema.parse({})).toThrow(
-			/expected string/u,
-		);
+		expect(() => getReferralCommissionInputSchema.parse({})).toThrow(/expected string/u);
 		expect(
 			buildReferralCommissionClaimTransactionInputSchema.parse({
 				mode: 'read-only',

@@ -3,16 +3,12 @@
  **************************************************************/
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
-import {
-	MoveStruct,
-	normalizeMoveArguments,
-	type RawTransactionArgument,
-} from '../utils/index.js';
+
+import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 
-const $moduleName =
-	'0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8::referral';
+const $moduleName = '0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8::referral';
 export const ReferrerClaimCommissionBalanceEvent = new MoveStruct({
 	name: `${$moduleName}::ReferrerClaimCommissionBalanceEvent<phantom T0>`,
 	fields: {
@@ -40,8 +36,7 @@ export interface ClaimCommissionBalanceOptions {
 }
 export function claimCommissionBalance(options: ClaimCommissionBalanceOptions) {
 	const packageAddress =
-		options.package ??
-		'0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8';
+		options.package ?? '0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8';
 	const argumentsTypes = [null] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
@@ -57,15 +52,10 @@ export interface ClaimReferrerLevelUpUsdRewardsOptions {
 	arguments: [RawTransactionArgument<string>, RawTransactionArgument<string>];
 	typeArguments: [string];
 }
-export function claimReferrerLevelUpUsdRewards(
-	options: ClaimReferrerLevelUpUsdRewardsOptions,
-) {
+export function claimReferrerLevelUpUsdRewards(options: ClaimReferrerLevelUpUsdRewardsOptions) {
 	const packageAddress =
-		options.package ??
-		'0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8';
-	const argumentsTypes = [null, null, '0x2::clock::Clock'] satisfies Array<
-		string | null
-	>;
+		options.package ?? '0x4dcb2a713610e870272860d2311fdf4f3c2de1021e6a4ae40a861d742a7502f8';
+	const argumentsTypes = [null, null, '0x2::clock::Clock'] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,

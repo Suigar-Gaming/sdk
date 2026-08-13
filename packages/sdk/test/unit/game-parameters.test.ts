@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import { normalizeGameParameterValues } from '../../src/helpers/index.js';
 
 describe('normalizeGameParameterValues', () => {
@@ -11,9 +12,7 @@ describe('normalizeGameParameterValues', () => {
 				min_stake: '1000',
 				configs: [
 					{
-						multipliers: [
-							{ mant: '1', exp: { bits: '52' }, is_negative: false },
-						],
+						multipliers: [{ mant: '1', exp: { bits: '52' }, is_negative: false }],
 					},
 				],
 			}),

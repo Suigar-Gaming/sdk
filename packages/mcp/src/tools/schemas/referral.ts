@@ -2,12 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
+
 import { configInputSchema } from './config.js';
-import {
-	ADDRESS_DESCRIPTION,
-	BUILDER_MODES,
-	COIN_TYPE_DESCRIPTION,
-} from './shared.js';
+import { ADDRESS_DESCRIPTION, BUILDER_MODES, COIN_TYPE_DESCRIPTION } from './shared.js';
 
 const referralClaimInputSchema = configInputSchema
 	.extend({
@@ -16,12 +13,7 @@ const referralClaimInputSchema = configInputSchema
 			.default('build')
 			.describe('Build, dry-run, or return a read-only plan.'),
 		owner: z.string().min(1).optional().describe(ADDRESS_DESCRIPTION),
-		gasBudget: z
-			.number()
-			.int()
-			.positive()
-			.optional()
-			.describe('Optional gas budget in MIST.'),
+		gasBudget: z.number().int().positive().optional().describe('Optional gas budget in MIST.'),
 	})
 	.strict();
 
@@ -38,19 +30,16 @@ export const getReferralLevelUpUsdRewardsInputSchema = configInputSchema
 	})
 	.strict();
 
-export const buildReferralCommissionClaimTransactionInputSchema =
-	referralClaimInputSchema
-		.extend({
-			coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
-		})
-		.strict();
+export const buildReferralCommissionClaimTransactionInputSchema = referralClaimInputSchema
+	.extend({
+		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
+	})
+	.strict();
 
 export const buildReferralLevelUpUsdRewardsClaimTransactionInputSchema =
 	referralClaimInputSchema.strict();
 
-export type GetReferralCommissionInput = z.input<
-	typeof getReferralCommissionInputSchema
->;
+export type GetReferralCommissionInput = z.input<typeof getReferralCommissionInputSchema>;
 export type GetReferralLevelUpUsdRewardsInput = z.input<
 	typeof getReferralLevelUpUsdRewardsInputSchema
 >;

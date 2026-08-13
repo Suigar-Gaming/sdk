@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ReactNode } from 'react';
-import {
-	stringify,
-	valueTone,
-	visibleDefinitionEntries,
-} from '../lib/format.js';
+
+import { stringify, valueTone, visibleDefinitionEntries } from '../lib/format.js';
 import type { DefinitionEntry } from '../lib/types.js';
 import { cn } from '../lib/utils.js';
 
@@ -40,9 +37,7 @@ export function Header({
 				<p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
 					Suigar MCP
 				</p>
-				<h1 className="text-2xl leading-tight font-extrabold text-foreground">
-					{title}
-				</h1>
+				<h1 className="text-2xl leading-tight font-extrabold text-foreground">{title}</h1>
 			</div>
 			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
 				{coinBadge ? (
@@ -67,12 +62,7 @@ export function ExecutionApproval({ url }: { url: string | null }) {
 	}
 
 	return (
-		<section
-			className={cn(
-				panelClassName,
-				'justify-items-center px-4 py-5 text-center',
-			)}
-		>
+		<section className={cn(panelClassName, 'justify-items-center px-4 py-5 text-center')}>
 			<div>
 				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">
 					Transaction approval
@@ -111,20 +101,14 @@ export function Panel({
 	return (
 		<section className={cn(panelClassName, className)}>
 			<div className="flex min-w-0 items-center justify-between gap-3">
-				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">
-					{title}
-				</h2>
+				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">{title}</h2>
 			</div>
 			{children}
 		</section>
 	);
 }
 
-export function DefinitionList({
-	entries,
-}: {
-	entries: Array<DefinitionEntry>;
-}) {
+export function DefinitionList({ entries }: { entries: Array<DefinitionEntry> }) {
 	const visibleEntries = visibleDefinitionEntries(entries);
 	if (visibleEntries.length === 0) {
 		return null;
@@ -143,10 +127,8 @@ export function DefinitionList({
 						<dd
 							className={cn(
 								valueClassName,
-								tone === 'success' &&
-									'border-success/70 bg-success/12 text-foreground',
-								tone === 'error' &&
-									'border-destructive/70 bg-destructive/10 text-foreground',
+								tone === 'success' && 'border-success/70 bg-success/12 text-foreground',
+								tone === 'error' && 'border-destructive/70 bg-destructive/10 text-foreground',
 							)}
 							title={text}
 						>

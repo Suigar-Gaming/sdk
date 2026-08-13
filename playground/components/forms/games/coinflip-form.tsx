@@ -1,6 +1,7 @@
 'use client';
 
 import type * as React from 'react';
+
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
@@ -29,9 +30,7 @@ export function CoinflipForm({
 				<FieldLabel>Side</FieldLabel>
 				<Select
 					value={value.side}
-					onValueChange={(side: CoinflipFormValues['side']) =>
-						onChange({ side })
-					}
+					onValueChange={(side: CoinflipFormValues['side']) => onChange({ side })}
 				>
 					<SelectTrigger
 						aria-label="Select coinflip side"

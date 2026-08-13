@@ -1,12 +1,7 @@
 import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withBasePath } from '@/lib/paths';
 
 const homeHref = withBasePath('/');
@@ -21,8 +16,8 @@ export default function NotFound() {
 							Page not found
 						</CardTitle>
 						<CardDescription className="max-w-md text-base leading-7 text-muted-foreground">
-							This page is not available in the playground. Return to the main
-							flow to keep exploring the SDK.
+							This page is not available in the playground. Return to the main flow to keep
+							exploring the SDK.
 						</CardDescription>
 					</div>
 				</CardHeader>

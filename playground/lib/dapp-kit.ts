@@ -1,5 +1,6 @@
 import { createDAppKit } from '@mysten/dapp-kit-core';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
+
 import { suigar, type SuigarNetwork } from '@suigar/sdk';
 
 type PlaygroundNetwork = Extract<SuigarNetwork, 'testnet'>;

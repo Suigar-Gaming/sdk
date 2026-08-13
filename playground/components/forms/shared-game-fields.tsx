@@ -1,19 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import {
-	Field,
-	FieldCode,
-	FieldDescription,
-	FieldLabel,
-} from '@/components/ui/field';
+
+import { Field, FieldCode, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import type {
-	BetCountLimitSummary,
-	SharedFields,
-	StandardSharedFields,
-} from '@/lib/suigar-types';
+import type { BetCountLimitSummary, SharedFields, StandardSharedFields } from '@/lib/suigar-types';
 
 type SharedGameFieldsProps<T extends SharedFields> = {
 	value: T;
@@ -29,18 +21,14 @@ type BetCountControl = {
 	isLoading?: boolean;
 };
 
-const BetCountControlContext = React.createContext<BetCountControl | null>(
-	null,
-);
+const BetCountControlContext = React.createContext<BetCountControl | null>(null);
 
 export function StandardGameBetCountProvider({
 	children,
 	...control
 }: React.PropsWithChildren<BetCountControl>) {
 	return (
-		<BetCountControlContext.Provider value={control}>
-			{children}
-		</BetCountControlContext.Provider>
+		<BetCountControlContext.Provider value={control}>{children}</BetCountControlContext.Provider>
 	);
 }
 
@@ -63,8 +51,7 @@ export function SharedGameFields<T extends SharedFields>({
 	);
 }
 
-type StandardGameFieldsProps<T extends StandardSharedFields> =
-	SharedGameFieldsProps<T>;
+type StandardGameFieldsProps<T extends StandardSharedFields> = SharedGameFieldsProps<T>;
 
 export function StandardGameFields<T extends StandardSharedFields>({
 	value,

@@ -13,10 +13,7 @@ import type { MoveFloat } from '../types/index.js';
  */
 export function isMoveI64(value: unknown): value is MoveFloat['exp'] {
 	return (
-		typeof value === 'object' &&
-		value !== null &&
-		'bits' in value &&
-		typeof value.bits === 'string'
+		typeof value === 'object' && value !== null && 'bits' in value && typeof value.bits === 'string'
 	);
 }
 
@@ -84,10 +81,7 @@ export function fromMoveFloat(float: MoveFloat): number {
  *
  * This is only used for helpers that accept raw `number` input before applying additional integer or range validation.
  */
-function assertFiniteNumber(
-	value: unknown,
-	errorMessage: string,
-): asserts value is number {
+function assertFiniteNumber(value: unknown, errorMessage: string): asserts value is number {
 	if (typeof value !== 'number' || !Number.isFinite(value)) {
 		throw new TypeError(`${errorMessage}: ${String(value)}`);
 	}
@@ -115,17 +109,10 @@ export function toBigInt(value: unknown): bigint {
 	let result: bigint;
 
 	try {
-		if (
-			typeof value === 'bigint' ||
-			typeof value === 'string' ||
-			typeof value === 'boolean'
-		) {
+		if (typeof value === 'bigint' || typeof value === 'string' || typeof value === 'boolean') {
 			result = BigInt(value);
 		} else {
-			assertFiniteNumber(
-				value,
-				'Value must be a bigint, number, integer string, or boolean',
-			);
+			assertFiniteNumber(value, 'Value must be a bigint, number, integer string, or boolean');
 			result = BigInt(Math.trunc(value));
 		}
 	} catch {
@@ -165,8 +152,7 @@ function toBoundedInt({
 	max: number;
 	typeName: string;
 }): number {
-	const num =
-		typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
+	const num = typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
 
 	assertFiniteNumber(num, 'Value must be a finite number or integer string');
 	if (
@@ -176,9 +162,7 @@ function toBoundedInt({
 		num < 0 ||
 		num > max
 	) {
-		throw new RangeError(
-			`Value must be a ${typeName} integer (0-${max}): ${String(value)}`,
-		);
+		throw new RangeError(`Value must be a ${typeName} integer (0-${max}): ${String(value)}`);
 	}
 
 	return num;

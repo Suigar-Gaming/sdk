@@ -16,13 +16,7 @@
 		"node",
 		"promise"
 	],
-	"ignorePatterns": [
-		"node_modules",
-		"dist",
-		"packages/*/dist",
-		"playground",
-		".changeset/*.md"
-	],
+	"ignorePatterns": ["node_modules", "dist", "packages/*/dist", "playground", ".changeset/*.md"],
 	"rules": {
 		"import/extensions": [
 			"error",

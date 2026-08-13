@@ -1,6 +1,7 @@
 'use client';
 
 import type * as React from 'react';
+
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -31,10 +32,8 @@ export function WheelForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 }) {
-	const selectedConfig =
-		configOptions?.find((option) => option.id === value.configId) ?? null;
-	const playableConfigOptions =
-		configOptions?.filter((option) => option.isPlayable) ?? [];
+	const selectedConfig = configOptions?.find((option) => option.id === value.configId) ?? null;
+	const playableConfigOptions = configOptions?.filter((option) => option.isPlayable) ?? [];
 
 	return (
 		<div className="space-y-6">

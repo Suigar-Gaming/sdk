@@ -3,11 +3,8 @@
  **************************************************************/
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
-import {
-	MoveStruct,
-	normalizeMoveArguments,
-	type RawTransactionArgument,
-} from '../utils/index.js';
+
+import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import * as balance from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/balance.js';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
@@ -98,8 +95,7 @@ export interface CreateGameOptions {
 }
 export function createGame(options: CreateGameOptions) {
 	const packageAddress =
-		options.package ??
-		'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
 	const argumentsTypes = [
 		null,
 		null,
@@ -131,8 +127,7 @@ export interface JoinGameOptions {
 }
 export function joinGame(options: JoinGameOptions) {
 	const packageAddress =
-		options.package ??
-		'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
 	const argumentsTypes = [
 		'0x2::object::ID',
 		null,
@@ -159,11 +154,8 @@ export interface CancelGameOptions {
 }
 export function cancelGame(options: CancelGameOptions) {
 	const packageAddress =
-		options.package ??
-		'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
-	const argumentsTypes = ['0x2::object::ID', null] satisfies Array<
-		string | null
-	>;
+		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+	const argumentsTypes = ['0x2::object::ID', null] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({
 			package: packageAddress,

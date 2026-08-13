@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { resolveWebOrigin } from '../../src/wallet/origin.js';
 
 afterEach(() => {
@@ -22,8 +23,6 @@ describe('MCP frontend origin', () => {
 
 	it('prefers an explicit web URL over env and network defaults', () => {
 		vi.stubEnv('SUIGAR_MCP_BRIDGE_WEB_URL', 'http://localhost:5173');
-		expect(resolveWebOrigin('mainnet', 'http://localhost:4173')).toBe(
-			'http://localhost:4173',
-		);
+		expect(resolveWebOrigin('mainnet', 'http://localhost:4173')).toBe('http://localhost:4173');
 	});
 });

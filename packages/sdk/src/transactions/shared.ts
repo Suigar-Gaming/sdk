@@ -8,10 +8,8 @@ import {
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
-import {
-	assertConfiguredBetGame,
-	resolvePriceInfoObjectId,
-} from '../helpers/config.js';
+
+import { assertConfiguredBetGame, resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	BaseTransactionOptions,
@@ -27,10 +25,7 @@ import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
 import { toBigInt } from '../utils/numeric.js';
 
 type StrictStakeTransactionOptions = {
-	[K in keyof StakeTransactionOptions]-?: Exclude<
-		StakeTransactionOptions[K],
-		number
-	>;
+	[K in keyof StakeTransactionOptions]-?: Exclude<StakeTransactionOptions[K], number>;
 };
 
 type SharedBetTransactionContext = WithCoinType<
@@ -55,10 +50,7 @@ type StandardGameBetTransactionOptions = WithPartner<
 >;
 
 /** Creates a transaction with its sender and default gas budget configured. */
-export function createBaseTransaction({
-	owner,
-	gasBudget,
-}: TransactionSenderOptions): Transaction {
+export function createBaseTransaction({ owner, gasBudget }: TransactionSenderOptions): Transaction {
 	const tx = new Transaction();
 	tx.setSenderIfNotSet(normalizeSuiAddress(owner));
 	tx.setGasBudgetIfNotSet(gasBudget ?? DEFAULT_GAS_BUDGET_MIST);

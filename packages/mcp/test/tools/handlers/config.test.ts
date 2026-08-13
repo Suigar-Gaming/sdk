@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import { readConfigTool } from '../../../src/tools/handlers/index.js';
 
 describe('read_config', () => {
@@ -19,9 +20,7 @@ describe('read_config', () => {
 		expect(content.config.sdk.packageIds.soccer).toMatch(/^0x/u);
 		expect(content.config.sdk.objectIds.sweetHouse).toMatch(/^0x/u);
 		expect(content.config.sdk.coins.sui.coinType).toMatch(/::/u);
-		expect(content.supportedGames.map((game) => game.id)).toContain(
-			'pvp-coinflip',
-		);
+		expect(content.supportedGames.map((game) => game.id)).toContain('pvp-coinflip');
 		expect(content.supportedFeatures).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({

@@ -28,21 +28,20 @@
 		"release": "turbo run build:ci --filter='./packages/*' && changeset publish",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
-		"prettier": "prettier --check --ignore-unknown .",
-		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run oxlint && pnpm run prettier",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
+		"oxfmt": "oxfmt . --check",
+		"oxfmt:fix": "oxfmt .",
+		"lint": "pnpm run oxlint && pnpm run oxfmt",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"devDependencies": {
 		"@changesets/changelog-github": "^1.0.0",
 		"@changesets/cli": "^3.0.0",
-		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@manypkg/cli": "^0.25.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.3.0",
+		"oxfmt": "catalog:tooling",
 		"oxlint": "^1.78.0",
 		"oxlint-tsgolint": "^7.0.2001",
-		"prettier": "catalog:tooling",
 		"turbo": "^2.10.9"
 	}
 }

@@ -10,12 +10,7 @@ import {
 } from '../../runtime/index.js';
 import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
 import type { BuildNftV1MintTransactionInput } from '../schemas/index.js';
-import {
-	asTextResponse,
-	getConfigInput,
-	getMode,
-	requireString,
-} from './shared.js';
+import { asTextResponse, getConfigInput, getMode, requireString } from './shared.js';
 
 export async function buildNftV1MintTransactionTool(
 	input: BuildNftV1MintTransactionInput = {},
@@ -44,10 +39,7 @@ export async function buildNftV1MintTransactionTool(
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
-	const owner = await resolveOwnerAddress(
-		requireString(input.owner, 'owner'),
-		bundle,
-	);
+	const owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
 	const specId = requireString(input.specId, 'specId');
 	const coin = bundle.config.sdk.coins.sui;
 	const transaction = bundle.client.suigar.tx.nftV1.mint({

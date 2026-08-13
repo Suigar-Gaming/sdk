@@ -46,9 +46,9 @@ export class TtlClientCache extends ClientCache {
 
 		super.clear(key);
 		return (
-			super.read<CacheEntry<T | Promise<T>>>(key, () =>
-				this.#loadEntry(key, load),
-			) as CacheEntry<T | Promise<T>>
+			super.read<CacheEntry<T | Promise<T>>>(key, () => this.#loadEntry(key, load)) as CacheEntry<
+				T | Promise<T>
+			>
 		).value as T | Promise<T>;
 	}
 
@@ -65,17 +65,14 @@ export class TtlClientCache extends ClientCache {
 			return load();
 		}
 
-		const cached = super.readSync<CacheEntry<T>>(key, () =>
-			this.#loadSyncEntry(load),
-		);
+		const cached = super.readSync<CacheEntry<T>>(key, () => this.#loadSyncEntry(load));
 
 		if (cached.expiresAt > Date.now()) {
 			return cached.value;
 		}
 
 		super.clear(key);
-		return super.readSync<CacheEntry<T>>(key, () => this.#loadSyncEntry(load))
-			.value;
+		return super.readSync<CacheEntry<T>>(key, () => this.#loadSyncEntry(load)).value;
 	}
 
 	#loadEntry<T>(
@@ -117,8 +114,6 @@ export class TtlClientCache extends ClientCache {
 
 function isPromiseLike<T>(value: T | Promise<T>): value is Promise<T> {
 	return (
-		(typeof value === 'object' || typeof value === 'function') &&
-		value !== null &&
-		'then' in value
+		(typeof value === 'object' || typeof value === 'function') && value !== null && 'then' in value
 	);
 }

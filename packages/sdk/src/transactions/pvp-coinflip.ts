@@ -1,12 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	coinWithBalance,
-	Transaction,
-	type TransactionArgument,
-} from '@mysten/sui/transactions';
+import { coinWithBalance, Transaction, type TransactionArgument } from '@mysten/sui/transactions';
 import { normalizeStructTag } from '@mysten/sui/utils';
+
 import {
 	cancelGame,
 	createGame,
@@ -24,9 +21,7 @@ import type {
 import { toBigInt } from '../utils/numeric.js';
 import { createBaseGameTransaction } from './shared.js';
 
-type BuildPvPCoinflipTransactionOptions<
-	TAction extends PvPCoinflipAction = PvPCoinflipAction,
-> = {
+type BuildPvPCoinflipTransactionOptions<TAction extends PvPCoinflipAction = PvPCoinflipAction> = {
 	[Action in PvPCoinflipAction]: (Action extends 'join'
 		? WithClient<WithPartner<PvPCoinflipTransactionOptions<Action>>>
 		: WithPartner<PvPCoinflipTransactionOptions<Action>>) & {
@@ -41,10 +36,7 @@ type BuildPvPCoinflipTransactionOptions<
  */
 function buildPvPCoinflipJoinBetCoin(
 	options: WithClient<
-		Pick<
-			PvPCoinflipTransactionOptions<'join'>,
-			'gameId' | 'coinType' | 'useGasCoin'
-		>
+		Pick<PvPCoinflipTransactionOptions<'join'>, 'gameId' | 'coinType' | 'useGasCoin'>
 	>,
 ): TransactionArgument {
 	return async (tx: Transaction) => {

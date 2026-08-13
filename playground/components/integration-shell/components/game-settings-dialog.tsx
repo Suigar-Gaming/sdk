@@ -1,6 +1,7 @@
 'use client';
 
 import { RefreshCw, SlidersHorizontal, X } from 'lucide-react';
+
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/integration-shell/components/game-settings-config-list';
@@ -21,11 +22,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { FieldCode } from '@/components/ui/field';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import type {
@@ -57,9 +54,7 @@ function SettingsSummaryCard({
 					{value}
 				</div>
 				{description ? (
-					<div className="text-sm mt-1 text-muted-foreground">
-						{description}
-					</div>
+					<div className="text-sm mt-1 text-muted-foreground">{description}</div>
 				) : null}
 			</CardContent>
 		</Card>
@@ -129,9 +124,7 @@ function GameSettingsDialogHeader({
 			</div>
 			<div className="space-y-1">
 				<div className="flex flex-wrap items-center justify-between gap-3">
-					<DialogTitle className="text-xl md:text-2xl">
-						{gameLabel} live settings
-					</DialogTitle>
+					<DialogTitle className="text-xl md:text-2xl">{gameLabel} live settings</DialogTitle>
 					{onRefresh ? (
 						<Button
 							type="button"
@@ -150,9 +143,7 @@ function GameSettingsDialogHeader({
 						</Button>
 					) : null}
 				</div>
-				<DialogDescription>
-					On-chain parameters for {gameLabel} game
-				</DialogDescription>
+				<DialogDescription>On-chain parameters for {gameLabel} game</DialogDescription>
 			</div>
 		</DialogHeader>
 	);
@@ -199,9 +190,7 @@ function GameSettingsOverview({
 							{isStakeMinimum ? null : (
 								<>
 									<span className="shrink-0">to</span>
-									<FieldCode className="shrink-0">
-										{activeStakeRange.max}
-									</FieldCode>
+									<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
 								</>
 							)}
 							<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-widest text-muted-foreground">
@@ -213,9 +202,7 @@ function GameSettingsOverview({
 						'--'
 					)
 				}
-				description={
-					isStakeMinimum ? 'Each player must stake at least this amount.' : null
-				}
+				description={isStakeMinimum ? 'Each player must stake at least this amount.' : null}
 			/>
 			<SettingsSummaryCard
 				title="Configs"
@@ -230,9 +217,7 @@ function GameSettingsOverview({
 						<FieldCode>0</FieldCode>
 					)
 				}
-				description={
-					hasConfigOptions ? null : 'This game uses top-level parameters only.'
-				}
+				description={hasConfigOptions ? null : 'This game uses top-level parameters only.'}
 			/>
 			<SettingsSummaryCard
 				title={hasConfigOptions ? 'Current config' : 'Top-level fields'}
@@ -255,9 +240,7 @@ function GameSettingsOverview({
 									<div className="space-y-3 text-sm">
 										<div className="min-w-0 overflow-x-auto">
 											<div className="flex w-max min-w-full flex-nowrap items-center gap-1 text-muted-foreground">
-												<span className="shrink-0 font-medium text-foreground">
-													Stake range:
-												</span>
+												<span className="shrink-0 font-medium text-foreground">Stake range:</span>
 												<FieldCode className="shrink-0">
 													{activeConfigOption.stakeRange.min}
 												</FieldCode>
@@ -294,10 +277,7 @@ function GameSettingsOverview({
 												</div>
 												<div className="flex flex-wrap gap-1.5">
 													{activeMultiplierValues.map((multiplier) => (
-														<FieldCode
-															key={multiplier.id}
-															className="shrink-0 justify-center"
-														>
+														<FieldCode key={multiplier.id} className="shrink-0 justify-center">
 															{multiplier.value}
 														</FieldCode>
 													))}
@@ -357,10 +337,7 @@ function GameSettingsPanels({
 			className="overflow-hidden rounded-2xl border border-border/70 bg-background/30"
 			defaultValue={['request']}
 		>
-			<AccordionItem
-				value="request"
-				className="border-b border-border/70 px-5 last:border-b-0"
-			>
+			<AccordionItem value="request" className="border-b border-border/70 px-5 last:border-b-0">
 				<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 					Lookup request
 				</AccordionTrigger>
@@ -375,10 +352,7 @@ function GameSettingsPanels({
 			</AccordionItem>
 
 			{configOptions?.length ? (
-				<AccordionItem
-					value="configs"
-					className="border-b border-border/70 px-5 last:border-b-0"
-				>
+				<AccordionItem value="configs" className="border-b border-border/70 px-5 last:border-b-0">
 					<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 						Config options
 					</AccordionTrigger>
@@ -395,10 +369,7 @@ function GameSettingsPanels({
 				</AccordionItem>
 			) : null}
 
-			<AccordionItem
-				value="payload"
-				className="border-b border-border/70 px-5 last:border-b-0"
-			>
+			<AccordionItem value="payload" className="border-b border-border/70 px-5 last:border-b-0">
 				<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 					Raw payload
 				</AccordionTrigger>
@@ -463,19 +434,14 @@ export function GameSettingsDialog({
 	settingsCallPreview: string;
 	topLevelDetails?: Array<GameSettingsDetail>;
 }) {
-	const playableConfigCount =
-		configOptions?.filter((option) => option.isPlayable).length ?? 0;
+	const playableConfigCount = configOptions?.filter((option) => option.isPlayable).length ?? 0;
 	const activeConfigDetails = activeConfigOption?.details?.slice(0, 3) ?? [];
 	const activeMultiplierValues = activeConfigOption?.multiplierValues ?? [];
 	const summarizedTopLevelDetails = topLevelDetails?.slice(0, 3) ?? [];
 	const hasConfigOptions = Boolean(configOptions?.length);
 	const isStakeMinimum = activeStakeRange?.kind === 'minimum';
 	const stakeTitle =
-		isLoading && !activeStakeRange
-			? 'Stake'
-			: isStakeMinimum
-				? 'Stake minimum'
-				: 'Stake range';
+		isLoading && !activeStakeRange ? 'Stake' : isStakeMinimum ? 'Stake minimum' : 'Stake range';
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

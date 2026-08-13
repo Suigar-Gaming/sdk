@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Bagel_Fat_One, IBM_Plex_Mono, Urbanist } from 'next/font/google';
+
 import { AppProviders } from '@/components/providers/app-providers';
 import { withBasePath } from '@/lib/paths';
+
 import './globals.css';
 
 const sans = Urbanist({

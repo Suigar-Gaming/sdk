@@ -31,16 +31,11 @@ async function referralClaimReadResult({
 	input,
 	kind,
 }: {
-	input:
-		| Partial<GetReferralCommissionInput>
-		| Partial<GetReferralLevelUpUsdRewardsInput>;
+	input: Partial<GetReferralCommissionInput> | Partial<GetReferralLevelUpUsdRewardsInput>;
 	kind: ReferralClaimKind;
 }): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
-	const owner = await resolveOwnerAddress(
-		requireString(input.owner, 'owner'),
-		bundle,
-	);
+	const owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
 	const coin =
 		kind === 'commission' && 'coinType' in input
 			? coinMetadataForAmount(bundle.config, input.coinType)
@@ -133,10 +128,7 @@ async function buildReferralClaimTransactionTool({
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
-	const owner = await resolveOwnerAddress(
-		requireString(input.owner, 'owner'),
-		bundle,
-	);
+	const owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
 	const coin =
 		kind === 'commission' && 'coinType' in input
 			? coinMetadataForAmount(bundle.config, input.coinType)

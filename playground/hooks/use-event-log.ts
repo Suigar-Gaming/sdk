@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+
 import { EventLogContext } from '@/components/providers/event-log-context';
 
 export function useEventLog() {

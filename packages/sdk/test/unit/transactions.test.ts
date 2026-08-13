@@ -4,6 +4,7 @@
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { Factory as NftV1Factory } from '../../src/contracts/nft-v1/nft.js';
 import {
 	buildClaimReferralCommissionTransaction,
@@ -13,21 +14,14 @@ import {
 	buildPvPCoinflipTransaction,
 	buildSoccerTransaction,
 } from '../../src/transactions/index.js';
-import {
-	createContractCallMock,
-	encodeUtf8,
-	getFirstMockArg,
-	TEST_CONFIG,
-} from './utils.js';
+import { createContractCallMock, encodeUtf8, getFirstMockArg, TEST_CONFIG } from './utils.js';
 
 afterEach(() => {
 	vi.resetModules();
 	vi.clearAllMocks();
 });
 
-export async function loadTransactionModuleWithMock<
-	TModule extends Record<string, unknown>,
->(
+export async function loadTransactionModuleWithMock<TModule extends Record<string, unknown>>(
 	contractPath: string,
 	mockExports: Record<string, unknown>,
 	transactionModulePath: string,
@@ -117,20 +111,12 @@ describe('transaction builders', () => {
 		const levelUpCall = levelUpTx.getData().commands[0].MoveCall!;
 
 		expect(commissionTx.getData().sender).toBe(normalizeSuiAddress('0x123'));
-		expect(commissionCall.package).toBe(
-			normalizeSuiAddress(TEST_CONFIG.packageIds.referral),
-		);
+		expect(commissionCall.package).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.referral));
 		expect(commissionCall.function).toBe('claim_commission_balance');
-		expect(commissionCall.typeArguments).toEqual([
-			normalizeStructTag('0x2::sui::SUI'),
-		]);
-		expect(levelUpCall.package).toBe(
-			normalizeSuiAddress(TEST_CONFIG.packageIds.referral),
-		);
+		expect(commissionCall.typeArguments).toEqual([normalizeStructTag('0x2::sui::SUI')]);
+		expect(levelUpCall.package).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.referral));
 		expect(levelUpCall.function).toBe('claim_referrer_level_up_usd_rewards');
-		expect(levelUpCall.typeArguments).toEqual([
-			TEST_CONFIG.coins.usdc.coinType,
-		]);
+		expect(levelUpCall.typeArguments).toEqual([TEST_CONFIG.coins.usdc.coinType]);
 		expect(levelUpCall.arguments).toHaveLength(3);
 	});
 
@@ -181,8 +167,7 @@ describe('transaction builders', () => {
 
 describe('shared transaction helpers', () => {
 	it('creates a base transaction with normalized owner address and configured gas budget', async () => {
-		const { createBaseTransaction } =
-			await import('../../src/transactions/shared.js');
+		const { createBaseTransaction } = await import('../../src/transactions/shared.js');
 
 		const tx = createBaseTransaction({
 			owner: '0xabc',
@@ -199,9 +184,7 @@ describe('shared transaction helpers', () => {
 			await import('../../src/transactions/shared.js');
 
 		type RewardContext = Parameters<
-			Parameters<
-				typeof buildSharedStandardGameBetTransaction
-			>[0]['buildRewardCoin']
+			Parameters<typeof buildSharedStandardGameBetTransaction>[0]['buildRewardCoin']
 		>[0];
 		let context: RewardContext | undefined;
 
@@ -233,15 +216,10 @@ describe('shared transaction helpers', () => {
 		expect(context!.stake).toBe(1000n);
 		expect(context!.cashStake).toBe(2500n);
 		expect(context!.betCount).toBe(3n);
-		expect(context!.priceInfoObjectId).toBe(
-			TEST_CONFIG.coins.sui.priceInfoObjectId,
-		);
+		expect(context!.priceInfoObjectId).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
 		expect(context!.metadata).toEqual({
 			keys: ['partner', 'label'],
-			values: [
-				Array.from(Buffer.from(partner.slice(2), 'hex')),
-				encodeUtf8('vip'),
-			],
+			values: [Array.from(Buffer.from(partner.slice(2), 'hex')), encodeUtf8('vip')],
 		});
 	});
 
@@ -250,8 +228,7 @@ describe('shared transaction helpers', () => {
 			({ type }: { type: string }) => ReturnType<typeof createZeroCoinThunk>
 		>(({ type }) => createZeroCoinThunk(type));
 		vi.doMock('@mysten/sui/transactions', async (importOriginal) => {
-			const actual =
-				await importOriginal<typeof import('@mysten/sui/transactions')>();
+			const actual = await importOriginal<typeof import('@mysten/sui/transactions')>();
 			return {
 				...actual,
 				coinWithBalance: coinWithBalanceMock,
@@ -352,10 +329,7 @@ describe('shared transaction helpers', () => {
 			buildRewardCoin: (resolvedContext) => {
 				expect(resolvedContext.metadata).toEqual({
 					keys: ['accountManager', 'label'],
-					values: [
-						Array.from(Buffer.from(accountManager.slice(2), 'hex')),
-						encodeUtf8('vip'),
-					],
+					values: [Array.from(Buffer.from(accountManager.slice(2), 'hex')), encodeUtf8('vip')],
 				});
 				return createZeroCoinThunk(resolvedContext.coinType);
 			},
@@ -395,9 +369,7 @@ describe('coinflip transaction wrapper', () => {
 		}>(play);
 
 		expect(options.package).toBe(TEST_CONFIG.packageIds.coinflip);
-		expect(options.typeArguments).toEqual([
-			normalizeStructTag('0x2::sui::SUI'),
-		]);
+		expect(options.typeArguments).toEqual([normalizeStructTag('0x2::sui::SUI')]);
 		expect(options.arguments[0]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments[1]).toBe(1000n);
 		expect(options.arguments[3]).toBe(2n);
@@ -418,11 +390,7 @@ describe('limbo transaction wrapper', () => {
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>(
-			'../../src/contracts/limbo/limbo.js',
-			{ play },
-			'../../src/transactions/limbo.js',
-		);
+		}>('../../src/contracts/limbo/limbo.js', { play }, '../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -445,11 +413,7 @@ describe('limbo transaction wrapper', () => {
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>(
-			'../../src/contracts/limbo/limbo.js',
-			{ play },
-			'../../src/transactions/limbo.js',
-		);
+		}>('../../src/contracts/limbo/limbo.js', { play }, '../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -475,11 +439,7 @@ describe('plinko transaction wrapper', () => {
 			buildPlinkoTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>(
-			'../../src/contracts/plinko/plinko.js',
-			{ play },
-			'../../src/transactions/plinko.js',
-		);
+		}>('../../src/contracts/plinko/plinko.js', { play }, '../../src/transactions/plinko.js');
 
 		buildPlinkoTransaction({
 			owner: '0x123',
@@ -496,8 +456,7 @@ describe('plinko transaction wrapper', () => {
 	});
 
 	it('rejects config ids outside the u8 range', async () => {
-		const { buildPlinkoTransaction } =
-			await import('../../src/transactions/plinko.js');
+		const { buildPlinkoTransaction } = await import('../../src/transactions/plinko.js');
 
 		expect(() =>
 			buildPlinkoTransaction({
@@ -518,11 +477,7 @@ describe('range transaction wrapper', () => {
 			buildRangeTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>(
-			'../../src/contracts/range/range.js',
-			{ play },
-			'../../src/transactions/range.js',
-		);
+		}>('../../src/contracts/range/range.js', { play }, '../../src/transactions/range.js');
 
 		buildRangeTransaction({
 			owner: '0x123',
@@ -550,11 +505,7 @@ describe('wheel transaction wrapper', () => {
 			buildWheelTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>(
-			'../../src/contracts/wheel/wheel.js',
-			{ play },
-			'../../src/transactions/wheel.js',
-		);
+		}>('../../src/contracts/wheel/wheel.js', { play }, '../../src/transactions/wheel.js');
 
 		buildWheelTransaction({
 			owner: '0x123',
@@ -571,8 +522,7 @@ describe('wheel transaction wrapper', () => {
 	});
 
 	it('rejects invalid wheel config ids', async () => {
-		const { buildWheelTransaction } =
-			await import('../../src/transactions/wheel.js');
+		const { buildWheelTransaction } = await import('../../src/transactions/wheel.js');
 
 		expect(() =>
 			buildWheelTransaction({
@@ -592,11 +542,7 @@ describe('soccer transaction wrapper', () => {
 		const { buildSoccerTransaction: buildSoccerTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildSoccerTransaction: typeof buildSoccerTransaction;
-			}>(
-				'../../src/contracts/soccer/soccer.js',
-				{ play },
-				'../../src/transactions/soccer.js',
-			);
+			}>('../../src/contracts/soccer/soccer.js', { play }, '../../src/transactions/soccer.js');
 
 		buildSoccerTransactionWithMock({
 			owner: '0x123',
@@ -666,9 +612,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			arguments: Array<unknown>;
 		}>(createGame);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
-		expect(options.typeArguments).toEqual([
-			normalizeStructTag('0x2::sui::SUI'),
-		]);
+		expect(options.typeArguments).toEqual([normalizeStructTag('0x2::sui::SUI')]);
 		expect(options.arguments[0]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments[2]).toBe(true);
 		expect(options.arguments[3]).toBe(true);
@@ -730,9 +674,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			encodeUtf8('vip'),
 		]);
 		expect(options.arguments[5]).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
-		await (options.arguments[2] as (tx: Transaction) => Promise<unknown>)(
-			new Transaction(),
-		);
+		await (options.arguments[2] as (tx: Transaction) => Promise<unknown>)(new Transaction());
 		expect(getGame).toHaveBeenCalledWith({
 			client,
 			objectId: '0x999',
@@ -765,9 +707,6 @@ describe('pvp coinflip transaction wrapper', () => {
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
 		}>(cancelGame);
-		expect(options.arguments).toEqual([
-			'0x999',
-			TEST_CONFIG.objectIds.sweetHouse,
-		]);
+		expect(options.arguments).toEqual(['0x999', TEST_CONFIG.objectIds.sweetHouse]);
 	});
 });

@@ -1,4 +1,5 @@
 import type { SuigarClient } from '@suigar/sdk';
+
 import { parseOptionalNumber, toAtomicAmount } from '@/lib/suigar-app';
 import type {
 	CoinflipFormValues,
@@ -70,12 +71,7 @@ function buildStandardSharedOptions(
 	coinDecimals: number,
 	fields: StandardSharedFields,
 ) {
-	const { baseOptions, codeLines } = buildSharedOptions(
-		owner,
-		coinType,
-		coinDecimals,
-		fields,
-	);
+	const { baseOptions, codeLines } = buildSharedOptions(owner, coinType, coinDecimals, fields);
 	const rawBetCount = getBetCountInput(fields);
 
 	if (rawBetCount) {
@@ -90,11 +86,7 @@ function buildStandardSharedOptions(
 }
 
 function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
-	const objectPrefix = factoryLine.endsWith('{')
-		? ''
-		: factoryLine.endsWith(',')
-			? ' {'
-			: '{';
+	const objectPrefix = factoryLine.endsWith('{') ? '' : factoryLine.endsWith(',') ? ' {' : '{';
 	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
@@ -141,9 +133,7 @@ export function buildStandardTransaction<K extends StandardGameId>(
 		case 'limbo': {
 			const typedForm = form as LimboFormValues;
 			baseOptions.targetMultiplier = Number(typedForm.targetMultiplier);
-			codeLines.push(
-				`targetMultiplier: ${Number(typedForm.targetMultiplier)},`,
-			);
+			codeLines.push(`targetMultiplier: ${Number(typedForm.targetMultiplier)},`);
 			const scale = parseOptionalNumber(typedForm.scale);
 			if (scale !== undefined) {
 				baseOptions.scale = scale;
@@ -215,12 +205,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 	switch (action) {
 		case 'create': {
 			const typedForm = form as PvPCoinflipCreateFormValues;
-			({ baseOptions, codeLines } = buildSharedOptions(
-				owner,
-				coinType,
-				coinDecimals,
-				typedForm,
-			));
+			({ baseOptions, codeLines } = buildSharedOptions(owner, coinType, coinDecimals, typedForm));
 			baseOptions.side = typedForm.side;
 			baseOptions.isPrivate = typedForm.isPrivate;
 			codeLines.push(`side: '${typedForm.side}',`);
@@ -235,11 +220,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 				coinType,
 				gameId,
 			};
-			codeLines = [
-				`owner: '${owner}',`,
-				`coinType: '${coinType}',`,
-				`gameId: '${gameId}',`,
-			];
+			codeLines = [`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '${gameId}',`];
 			break;
 		}
 		case 'cancel': {
@@ -250,11 +231,7 @@ export function buildPvPTransaction<K extends PvPAction>(
 				coinType,
 				gameId,
 			};
-			codeLines = [
-				`owner: '${owner}',`,
-				`coinType: '${coinType}',`,
-				`gameId: '${gameId}',`,
-			];
+			codeLines = [`owner: '${owner}',`, `coinType: '${coinType}',`, `gameId: '${gameId}',`];
 			break;
 		}
 	}
@@ -263,26 +240,17 @@ export function buildPvPTransaction<K extends PvPAction>(
 		case 'create':
 			return {
 				transaction: txApi.pvpCoinflip.createGame(baseOptions as never),
-				code: toCodeBlock(
-					'const tx = client.suigar.tx.pvpCoinflip.createGame(',
-					codeLines,
-				),
+				code: toCodeBlock('const tx = client.suigar.tx.pvpCoinflip.createGame(', codeLines),
 			};
 		case 'join':
 			return {
 				transaction: txApi.pvpCoinflip.joinGame(baseOptions as never),
-				code: toCodeBlock(
-					'const tx = client.suigar.tx.pvpCoinflip.joinGame(',
-					codeLines,
-				),
+				code: toCodeBlock('const tx = client.suigar.tx.pvpCoinflip.joinGame(', codeLines),
 			};
 		case 'cancel':
 			return {
 				transaction: txApi.pvpCoinflip.cancelGame(baseOptions as never),
-				code: toCodeBlock(
-					'const tx = client.suigar.tx.pvpCoinflip.cancelGame(',
-					codeLines,
-				),
+				code: toCodeBlock('const tx = client.suigar.tx.pvpCoinflip.cancelGame(', codeLines),
 			};
 	}
 }

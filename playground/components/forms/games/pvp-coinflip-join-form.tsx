@@ -3,11 +3,7 @@
 import { CopyableGameIdField } from '@/components/forms/copyable-game-id-field';
 import type { PvPCoinflipJoinFormValues } from '@/lib/suigar-types';
 
-export function PvPCoinflipJoinForm({
-	value,
-}: {
-	value: PvPCoinflipJoinFormValues;
-}) {
+export function PvPCoinflipJoinForm({ value }: { value: PvPCoinflipJoinFormValues }) {
 	return (
 		<div className="space-y-6">
 			<CopyableGameIdField

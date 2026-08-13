@@ -75,10 +75,10 @@
 		"typecheck": "tsc --noEmit",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
-		"prettier": "prettier --check --ignore-unknown .",
-		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run oxlint && pnpm run prettier",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
+		"oxfmt": "oxfmt . --check",
+		"oxfmt:fix": "oxfmt .",
+		"lint": "pnpm run oxlint && pnpm run oxfmt",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"repository": {
 		"type": "git",

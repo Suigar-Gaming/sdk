@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
+
 import { cn } from '@/lib/utils';
 
 const alertVariants = cva(
@@ -48,10 +49,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
 	);
 }
 
-function AlertDescription({
-	className,
-	...props
-}: React.ComponentProps<'div'>) {
+function AlertDescription({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="alert-description"
@@ -66,11 +64,7 @@ function AlertDescription({
 
 function AlertAction({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
-		<div
-			data-slot="alert-action"
-			className={cn('absolute top-2 right-2', className)}
-			{...props}
-		/>
+		<div data-slot="alert-action" className={cn('absolute top-2 right-2', className)} {...props} />
 	);
 }
 

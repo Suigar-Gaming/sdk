@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { JSX } from 'react';
+
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord, dynamicEntries } from '../lib/format.js';
 import type { DefinitionEntry } from '../lib/types.js';

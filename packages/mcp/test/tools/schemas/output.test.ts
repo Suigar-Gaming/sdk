@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import { toolOutputSchema } from '../../../src/tools/schemas/output.js';
 
 describe('tool output schema', () => {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+
 import { NftPage } from '@/components/nft-page';
 
 export const metadata: Metadata = {

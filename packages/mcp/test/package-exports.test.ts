@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { readFile } from 'node:fs/promises';
+
 import { describe, expect, it } from 'vitest';
+
 import packageJson from '../package.json' with { type: 'json' };
 
 describe('package exports', () => {
@@ -35,8 +37,7 @@ describe('package exports', () => {
 			await readFile(new URL('../server.json', import.meta.url), 'utf8'),
 		);
 		expect(serverManifest).toMatchObject({
-			$schema:
-				'https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json',
+			$schema: 'https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json',
 			name: packageJson.mcpName,
 			version: packageJson.version,
 			repository: {
@@ -111,20 +112,14 @@ describe('package exports', () => {
 		});
 
 		const codexManifest = JSON.parse(
-			await readFile(
-				new URL('../plugin/.codex-plugin/plugin.json', import.meta.url),
-				'utf8',
-			),
+			await readFile(new URL('../plugin/.codex-plugin/plugin.json', import.meta.url), 'utf8'),
 		);
 		expect(codexManifest.mcpServers).toBe('./.mcp.json');
 		expect(codexManifest.interface.composerIcon).toBe('./assets/logo.png');
 		expect(codexManifest.interface.logo).toBe('./assets/logo.svg');
 
 		const cursorManifest = JSON.parse(
-			await readFile(
-				new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url),
-				'utf8',
-			),
+			await readFile(new URL('../plugin/.cursor-plugin/plugin.json', import.meta.url), 'utf8'),
 		);
 		expect(cursorManifest.mcpServers).toBe('./.mcp.json');
 		expect(cursorManifest.logo).toBe('./assets/logo.svg');

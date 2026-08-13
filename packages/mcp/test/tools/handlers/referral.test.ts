@@ -3,23 +3,19 @@
 
 import type { Transaction as SuiTransaction } from '@mysten/sui/transactions';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type {
-	BuildTransactionResult,
-	ReadOnlyPlan,
-} from '../../../src/runtime/types.js';
+
+import type { BuildTransactionResult, ReadOnlyPlan } from '../../../src/runtime/types.js';
 import {
 	buildReferralCommissionClaimTransactionTool,
 	buildReferralLevelUpUsdRewardsClaimTransactionTool,
 } from '../../../src/tools/handlers/index.js';
 
 const mocks = vi.hoisted(() => ({
-	buildTransactionBytes:
-		vi.fn<(...args: Array<unknown>) => Promise<Uint8Array>>(),
+	buildTransactionBytes: vi.fn<(...args: Array<unknown>) => Promise<Uint8Array>>(),
 }));
 
 vi.mock('@mysten/sui/transactions', async (importOriginal) => {
-	const actual =
-		await importOriginal<typeof import('@mysten/sui/transactions')>();
+	const actual = await importOriginal<typeof import('@mysten/sui/transactions')>();
 
 	return {
 		...actual,
@@ -29,8 +25,7 @@ vi.mock('@mysten/sui/transactions', async (importOriginal) => {
 	};
 });
 
-const owner =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 beforeEach(() => {
 	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));
@@ -42,10 +37,7 @@ afterEach(() => {
 
 describe('referral transaction tools', () => {
 	it.each([
-		[
-			'commission claim',
-			() => buildReferralCommissionClaimTransactionTool({ mode: 'read-only' }),
-		],
+		['commission claim', () => buildReferralCommissionClaimTransactionTool({ mode: 'read-only' })],
 		[
 			'level-up USD rewards claim',
 			() =>
@@ -78,9 +70,7 @@ describe('referral transaction tools', () => {
 		});
 		const content = result.structuredContent as ReadOnlyPlan;
 
-		expect(content.plan.target).toContain(
-			'::claim_referrer_level_up_usd_rewards',
-		);
+		expect(content.plan.target).toContain('::claim_referrer_level_up_usd_rewards');
 	});
 
 	it('builds SDK-backed commission and level-up USD reward claims', async () => {
@@ -91,11 +81,8 @@ describe('referral transaction tools', () => {
 				owner,
 			}),
 		]);
-		const commissionSummary = (
-			commission.structuredContent as BuildTransactionResult
-		).summary;
-		const levelUpSummary = (levelUp.structuredContent as BuildTransactionResult)
-			.summary;
+		const commissionSummary = (commission.structuredContent as BuildTransactionResult).summary;
+		const levelUpSummary = (levelUp.structuredContent as BuildTransactionResult).summary;
 
 		expect(commissionSummary.gameInputs).toEqual({
 			referralClaim: 'commission',

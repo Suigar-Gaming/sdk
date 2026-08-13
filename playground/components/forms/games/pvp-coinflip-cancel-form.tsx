@@ -3,11 +3,7 @@
 import { CopyableGameIdField } from '@/components/forms/copyable-game-id-field';
 import type { PvPCoinflipCancelFormValues } from '@/lib/suigar-types';
 
-export function PvPCoinflipCancelForm({
-	value,
-}: {
-	value: PvPCoinflipCancelFormValues;
-}) {
+export function PvPCoinflipCancelForm({ value }: { value: PvPCoinflipCancelFormValues }) {
 	return (
 		<div className="space-y-6">
 			<CopyableGameIdField

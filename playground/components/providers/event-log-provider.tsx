@@ -4,6 +4,7 @@ import * as React from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+
 import {
 	EventLogContext,
 	type EventLogContextValue,
@@ -58,9 +59,5 @@ export function EventLogProvider({ children }: { children: React.ReactNode }) {
 		[addRows, clearRows, rows],
 	);
 
-	return (
-		<EventLogContext.Provider value={value}>
-			{children}
-		</EventLogContext.Provider>
-	);
+	return <EventLogContext.Provider value={value}>{children}</EventLogContext.Provider>;
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, expectTypeOf, it } from 'vitest';
+
 import packageJson from '../../package.json' with { type: 'json' };
 import type {
 	CancelPvPCoinflipTransactionOptions,
@@ -91,15 +92,9 @@ describe('public source subpath modules', () => {
 		expect(fromMoveI64({ bits: '0' })).toBe(0);
 		expect(isMoveI64({ bits: '0' })).toBe(true);
 		expect(isMoveI64({ bits: 0 })).toBe(false);
-		expect(
-			fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
-		).toBe(0);
-		expect(
-			isMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false }),
-		).toBe(true);
-		expect(
-			isMoveFloat({ mant: '0', exp: { bits: 0 }, is_negative: false }),
-		).toBe(false);
+		expect(fromMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false })).toBe(0);
+		expect(isMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false })).toBe(true);
+		expect(isMoveFloat({ mant: '0', exp: { bits: 0 }, is_negative: false })).toBe(false);
 		expect(parseGameEvent).toBeTypeOf('function');
 		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
@@ -114,11 +109,7 @@ describe('public source subpath modules', () => {
 	});
 
 	it('exposes only the intended package subpaths', () => {
-		expect(Object.keys(packageJson.exports).sort()).toEqual([
-			'.',
-			'./games',
-			'./utils',
-		]);
+		expect(Object.keys(packageJson.exports).sort()).toEqual(['.', './games', './utils']);
 
 		expect(packageJson.exports['./games']).toEqual({
 			types: './dist/games.d.mts',

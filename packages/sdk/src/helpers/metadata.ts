@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fromHex } from '@mysten/sui/utils';
+
 import type {
 	BetMetadataInput,
 	BetMetadataValue,
@@ -11,10 +12,7 @@ import type {
 
 const PARTNER_METADATA_KEY = 'partner';
 
-const RESERVED_METADATA_KEYS: Set<string> = new Set([
-	PARTNER_METADATA_KEY,
-	'referrer',
-]);
+const RESERVED_METADATA_KEYS: Set<string> = new Set([PARTNER_METADATA_KEY, 'referrer']);
 const textEncoder: TextEncoder = new TextEncoder();
 
 function encodeString(value: string): Uint8Array<ArrayBuffer> {
@@ -48,9 +46,7 @@ export function encodeBetMetadata({
 
 	for (const [key, value] of Object.entries(metadata ?? {})) {
 		if (RESERVED_METADATA_KEYS.has(key)) {
-			console.warn(
-				`Metadata key "${key}" is reserved and will be ignored when parsing metadata.`,
-			);
+			console.warn(`Metadata key "${key}" is reserved and will be ignored when parsing metadata.`);
 			continue;
 		}
 

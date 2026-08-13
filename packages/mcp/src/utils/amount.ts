@@ -26,9 +26,7 @@ export type FormattedAmount = {
 
 export type AmountFieldName = (typeof AMOUNT_FIELD_NAME_VALUES)[number];
 
-export const AMOUNT_FIELD_NAMES: ReadonlySet<AmountFieldName> = new Set(
-	AMOUNT_FIELD_NAME_VALUES,
-);
+export const AMOUNT_FIELD_NAMES: ReadonlySet<AmountFieldName> = new Set(AMOUNT_FIELD_NAME_VALUES);
 
 export function isAmountFieldName(key: string): key is AmountFieldName {
 	return (AMOUNT_FIELD_NAMES as ReadonlySet<string>).has(key);
@@ -48,22 +46,14 @@ export function formatBaseUnitAmount(
 		return `${negative ? '-' : ''}${digits}`;
 	}
 
-	const padded =
-		digits.length <= decimals ? digits.padStart(decimals + 1, '0') : digits;
+	const padded = digits.length <= decimals ? digits.padStart(decimals + 1, '0') : digits;
 	const whole = padded.slice(0, -decimals) || '0';
 	const fraction = padded.slice(-decimals).replace(TRAILING_ZERO_PATTERN, '');
 	return `${negative ? '-' : ''}${whole}${fraction ? `.${fraction}` : ''}`;
 }
 
-export function formatAmount(
-	value: unknown,
-	decimals?: number,
-): FormattedAmount | null {
-	if (
-		typeof value !== 'string' &&
-		typeof value !== 'number' &&
-		typeof value !== 'bigint'
-	) {
+export function formatAmount(value: unknown, decimals?: number): FormattedAmount | null {
+	if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'bigint') {
 		return null;
 	}
 	const raw = String(value);
@@ -73,10 +63,7 @@ export function formatAmount(
 	};
 }
 
-export function toCurrencyAmountText(
-	value: unknown,
-	fieldName: string,
-): string {
+export function toCurrencyAmountText(value: unknown, fieldName: string): string {
 	if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
 		return String(value);
 	}
@@ -88,11 +75,7 @@ export function toCurrencyAmountText(
 	);
 }
 
-export function toBaseUnits(
-	value: unknown,
-	fieldName: string,
-	decimals: number,
-): bigint {
+export function toBaseUnits(value: unknown, fieldName: string, decimals: number): bigint {
 	const amount = toCurrencyAmountText(value, fieldName);
 	try {
 		return parseToUnits(amount, decimals);

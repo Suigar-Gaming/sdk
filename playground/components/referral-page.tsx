@@ -3,6 +3,7 @@
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
 import { FileCode2, RefreshCw, SendHorizontal } from 'lucide-react';
 import * as React from 'react';
+
 import { AppHeader } from '@/components/app-header';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
@@ -10,13 +11,7 @@ import { formatBalance } from '@/components/integration-shell/helpers/coin';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
 	Dialog,
 	DialogContent,
@@ -209,12 +204,10 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
-							<h1 className="text-3xl leading-none md:text-5xl">
-								Rewards claim
-							</h1>
+							<h1 className="text-3xl leading-none md:text-5xl">Rewards claim</h1>
 							<p className="mt-3 max-w-2xl text-muted-foreground">
-								Amounts are simulated from the current on-chain referral state
-								before you sign a claim.
+								Amounts are simulated from the current on-chain referral state before you sign a
+								claim.
 							</p>
 						</div>
 						<div className="flex gap-2">
@@ -225,17 +218,12 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 										View code
 									</Button>
 								</DialogTrigger>
-								<DialogContent
-									className="max-h-[calc(100dvh-2rem)] overflow-y-auto"
-									size="xl"
-								>
+								<DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto" size="xl">
 									<DialogHeader>
-										<DialogTitle className="text-xl md:text-2xl">
-											Referral code
-										</DialogTitle>
+										<DialogTitle className="text-xl md:text-2xl">Referral code</DialogTitle>
 										<DialogDescription>
-											The preview shows the simulated reward reads and the
-											unsigned SDK claim builders used by this page.
+											The preview shows the simulated reward reads and the unsigned SDK claim
+											builders used by this page.
 										</DialogDescription>
 									</DialogHeader>
 									<CodeBlock
@@ -262,19 +250,14 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 					<Alert variant="success" className="mb-6">
 						<SendHorizontal />
 						<AlertTitle>Claim submitted</AlertTitle>
-						<AlertDescription className="font-mono text-xs break-all">
-							{status}
-						</AlertDescription>
+						<AlertDescription className="font-mono text-xs break-all">{status}</AlertDescription>
 					</Alert>
 				) : null}
 
 				<div className="grid gap-4 md:grid-cols-3">
 					{claimCards.map((card) => {
 						const claim = claims[card.kind];
-						const amount =
-							claim.amount === null
-								? '—'
-								: formatBalance(claim.amount, card.decimals);
+						const amount = claim.amount === null ? '—' : formatBalance(claim.amount, card.decimals);
 						return (
 							<Card key={card.kind}>
 								<CardHeader>
@@ -289,9 +272,7 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 								</CardHeader>
 								<CardContent className="space-y-4">
 									<div>
-										<p className="text-sm text-muted-foreground">
-											Claimable now
-										</p>
+										<p className="text-sm text-muted-foreground">Claimable now</p>
 										{isLoading ? (
 											<Skeleton className="mt-2 h-9 w-32" />
 										) : (
@@ -300,9 +281,7 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 											</p>
 										)}
 									</div>
-									{claim.error ? (
-										<p className="text-sm text-destructive">{claim.error}</p>
-									) : null}
+									{claim.error ? <p className="text-sm text-destructive">{claim.error}</p> : null}
 									<Button
 										className="w-full"
 										disabled={

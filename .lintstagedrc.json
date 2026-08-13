@@ -1,19 +1,7 @@
 {
-	"packages/*/{src,test,scripts}/**/*.{ts,tsx,js,mjs,cjs}": [
-		"oxlint --fix",
-		"prettier --write --ignore-unknown"
-	],
-	"packages/*/*.{ts,tsx,js,mjs,cjs}": [
-		"oxlint --fix",
-		"prettier --write --ignore-unknown"
-	],
-	"./*.{ts,tsx,js,mjs,cjs}": [
-		"oxlint --fix",
-		"prettier --write --ignore-unknown"
-	],
-	"playground/**/*.{ts,tsx,js,mjs,cjs}": [
-		"oxlint --fix",
-		"prettier --write --ignore-unknown"
-	],
-	"*.{json,md,yml,yaml}": "prettier --write --ignore-unknown"
+	"packages/*/{src,test,scripts}/**/*.{ts,tsx,js,mjs,cjs}": ["oxlint --fix", "oxfmt"],
+	"packages/*/*.{ts,tsx,js,mjs,cjs}": ["oxlint --fix", "oxfmt"],
+	"./*.{ts,tsx,js,mjs,cjs}": ["oxlint --fix", "oxfmt"],
+	"playground/**/*.{ts,tsx,js,mjs,cjs}": ["oxlint --fix", "oxfmt"],
+	"*.{json,md,yml,yaml}": "oxfmt"
 }

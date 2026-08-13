@@ -47,10 +47,7 @@ vi.mock('../src/wallet/index.js', () => ({
 	loadCredentials: mocks.loadCredentials,
 	BRIDGE_MAX_BODY_BYTES_ENV: 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES',
 	resolveWebOrigin: (network: 'mainnet' | 'testnet', webUrl?: string) =>
-		webUrl ??
-		(network === 'mainnet'
-			? 'https://mcp.suigar.com'
-			: 'https://mcp.testnet.suigar.com'),
+		webUrl ?? (network === 'mainnet' ? 'https://mcp.suigar.com' : 'https://mcp.testnet.suigar.com'),
 	setDefaultNetwork: vi.fn<() => void>(),
 	BRIDGE_WEB_URL_ENV: 'SUIGAR_MCP_BRIDGE_WEB_URL',
 }));
@@ -71,12 +68,8 @@ describe('suigar cli bridge options', () => {
 				walletType: 'wallet',
 			}),
 		});
-		const stdout = vi
-			.spyOn(process.stdout, 'write')
-			.mockImplementation(() => true);
-		const stderr = vi
-			.spyOn(process.stderr, 'write')
-			.mockImplementation(() => true);
+		const stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+		const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
 		try {
 			await runSuigarCli([
@@ -116,12 +109,8 @@ describe('suigar cli bridge options', () => {
 			done: Promise.resolve({ network: input.network, all: input.all }),
 			close: vi.fn<() => void>(),
 		}));
-		const stdout = vi
-			.spyOn(process.stdout, 'write')
-			.mockImplementation(() => true);
-		const stderr = vi
-			.spyOn(process.stderr, 'write')
-			.mockImplementation(() => true);
+		const stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+		const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
 		await runSuigarCli(['logout', '--all', '--json']);
 
@@ -159,20 +148,10 @@ describe('suigar cli bridge options', () => {
 			done: Promise.resolve({ all: true }),
 			close: vi.fn<() => void>(),
 		});
-		const stdout = vi
-			.spyOn(process.stdout, 'write')
-			.mockImplementation(() => true);
-		const stderr = vi
-			.spyOn(process.stderr, 'write')
-			.mockImplementation(() => true);
+		const stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+		const stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
-		await runSuigarCli([
-			'logout',
-			'--all',
-			'--web-url',
-			'http://localhost:5173',
-			'--json',
-		]);
+		await runSuigarCli(['logout', '--all', '--web-url', 'http://localhost:5173', '--json']);
 
 		expect(mocks.createLogoutBridge).toHaveBeenCalledTimes(1);
 		expect(mocks.createLogoutBridge).toHaveBeenCalledWith({

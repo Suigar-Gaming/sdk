@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
+
 import { configInputSchema } from './config.js';
 import { COIN_TYPE_DESCRIPTION } from './shared.js';
 
@@ -9,9 +10,7 @@ const walletOwnerSchema = z
 	.string()
 	.min(1)
 	.optional()
-	.describe(
-		'Optional Sui address or SuiNS name. Defaults to the connected MCP wallet.',
-	);
+	.describe('Optional Sui address or SuiNS name. Defaults to the connected MCP wallet.');
 
 const sessionWalletIdSchema = z
 	.uuid()
@@ -67,9 +66,7 @@ export const connectionInputSchema = configInputSchema
 		open: z
 			.boolean()
 			.optional()
-			.describe(
-				'Whether the login/logout CLI should open the bridge page. Defaults to true.',
-			),
+			.describe('Whether the login/logout CLI should open the bridge page. Defaults to true.'),
 		noOpen: z
 			.boolean()
 			.optional()
@@ -79,11 +76,7 @@ export const connectionInputSchema = configInputSchema
 	})
 	.strict()
 	.superRefine((input, context) => {
-		if (
-			input.open !== undefined &&
-			input.noOpen !== undefined &&
-			input.open === input.noOpen
-		) {
+		if (input.open !== undefined && input.noOpen !== undefined && input.open === input.noOpen) {
 			context.addIssue({
 				code: 'custom',
 				path: ['noOpen'],
@@ -98,12 +91,8 @@ export const sessionWalletInputSchema = configInputSchema
 	})
 	.strict();
 
-export type GetWalletBalancesInput = z.input<
-	typeof getWalletBalancesInputSchema
->;
+export type GetWalletBalancesInput = z.input<typeof getWalletBalancesInputSchema>;
 export type ListWalletCoinsInput = z.input<typeof listWalletCoinsInputSchema>;
-export type GetExecutionStatusInput = z.input<
-	typeof getExecutionStatusInputSchema
->;
+export type GetExecutionStatusInput = z.input<typeof getExecutionStatusInputSchema>;
 export type ConnectionInput = z.input<typeof connectionInputSchema>;
 export type SessionWalletInput = z.input<typeof sessionWalletInputSchema>;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
+
 import { connectionInputSchema } from '../../../src/tools/schemas/wallet.js';
 
 describe('wallet input schemas', () => {
@@ -23,16 +24,8 @@ describe('wallet input schemas', () => {
 				noOpen: true,
 			},
 		],
-		[
-			'explicit open',
-			{ open: true, noOpen: false },
-			{ open: true, noOpen: false },
-		],
-		[
-			'explicit no-open',
-			{ open: false, noOpen: true },
-			{ open: false, noOpen: true },
-		],
+		['explicit open', { open: true, noOpen: false }, { open: true, noOpen: false }],
+		['explicit no-open', { open: false, noOpen: true }, { open: false, noOpen: true }],
 	])('accepts %s for connection tools', (_name, input, expected) => {
 		expect(connectionInputSchema.parse(input)).toMatchObject(expected);
 	});
@@ -52,8 +45,6 @@ describe('wallet input schemas', () => {
 		const result = connectionInputSchema.safeParse(input);
 
 		expect(result.success).toBe(false);
-		expect(result.error?.issues[0]?.message).toBe(
-			'"open" and "noOpen" are mutually exclusive.',
-		);
+		expect(result.error?.issues[0]?.message).toBe('"open" and "noOpen" are mutually exclusive.');
 	});
 });

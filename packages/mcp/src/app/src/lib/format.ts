@@ -3,6 +3,15 @@
 
 import type { AnyRecord, DefinitionEntry } from './types.js';
 
+const HIDDEN_DYNAMIC_ENTRY_KEYS = new Set<string>([
+	'game_details',
+	'metadata',
+	'player',
+	'coin_type',
+	'unsafe_oracle_usd_coin_price',
+	'adjusted_oracle_usd_coin_price',
+]);
+
 export function asRecord(value: unknown): AnyRecord {
 	return value && typeof value === 'object' ? (value as AnyRecord) : {};
 }
@@ -44,26 +53,13 @@ export function labelFor(key: string): string {
 }
 
 export function dynamicEntries(record: AnyRecord): Array<DefinitionEntry> {
-	return Object.entries(record).reduce<Array<DefinitionEntry>>(
-		(entries, [key, value]) => {
-			if (
-				key.endsWith('_display') ||
-				[
-					'game_details',
-					'metadata',
-					'player',
-					'coin_type',
-					'unsafe_oracle_usd_coin_price',
-					'adjusted_oracle_usd_coin_price',
-				].includes(key)
-			) {
-				return entries;
-			}
-			entries.push([labelFor(key), record[`${key}_display`] ?? value]);
+	return Object.entries(record).reduce<Array<DefinitionEntry>>((entries, [key, value]) => {
+		if (key.endsWith('_display') || HIDDEN_DYNAMIC_ENTRY_KEYS.has(key)) {
 			return entries;
-		},
-		[],
-	);
+		}
+		entries.push([labelFor(key), record[`${key}_display`] ?? value]);
+		return entries;
+	}, []);
 }
 
 export function amountText(value: unknown): unknown {
@@ -74,25 +70,17 @@ export function amountText(value: unknown): unknown {
 	return value;
 }
 
-export function visibleDefinitionEntries(
-	entries: Array<DefinitionEntry>,
-): Array<DefinitionEntry> {
-	return entries.reduce<Array<DefinitionEntry>>(
-		(visibleEntries, [label, value]) => {
-			const formattedValue = formatValue(value);
-			if (formattedValue != null && formattedValue !== '') {
-				visibleEntries.push([label, formattedValue]);
-			}
-			return visibleEntries;
-		},
-		[],
-	);
+export function visibleDefinitionEntries(entries: Array<DefinitionEntry>): Array<DefinitionEntry> {
+	return entries.reduce<Array<DefinitionEntry>>((visibleEntries, [label, value]) => {
+		const formattedValue = formatValue(value);
+		if (formattedValue != null && formattedValue !== '') {
+			visibleEntries.push([label, formattedValue]);
+		}
+		return visibleEntries;
+	}, []);
 }
 
-export function valueTone(
-	label: string,
-	value: unknown,
-): 'error' | 'success' | null {
+export function valueTone(label: string, value: unknown): 'error' | 'success' | null {
 	const text = String(value).toLowerCase();
 	const lowerLabel = label.toLowerCase();
 	if (text === 'success') {

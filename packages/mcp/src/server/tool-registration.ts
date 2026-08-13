@@ -1,12 +1,10 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	registerAppTool,
-	type ToolConfig,
-} from '@modelcontextprotocol/ext-apps/server';
+import { registerAppTool, type ToolConfig } from '@modelcontextprotocol/ext-apps/server';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
+
 import type { ToolTextResult } from '../runtime/index.js';
 import {
 	buildCoinflipTransactionTool,
@@ -82,8 +80,7 @@ export function withToolErrors<TInput>(
 			return await handler(input);
 		} catch (error) {
 			const message = errorText(error);
-			const guidance =
-				'Check required fields, network, coin type, and SDK config overrides.';
+			const guidance = 'Check required fields, network, coin type, and SDK config overrides.';
 			return {
 				isError: true,
 				content: [
@@ -191,8 +188,7 @@ const toolDefinitions = [
 	{
 		name: 'get_execution_status',
 		title: 'Get Execution Status',
-		description:
-			'Check the browser approval status for an execute-mode transaction.',
+		description: 'Check the browser approval status for an execute-mode transaction.',
 		inputSchema: getExecutionStatusInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getExecutionStatusTool,
@@ -201,8 +197,7 @@ const toolDefinitions = [
 	{
 		name: 'get_wallet_balances',
 		title: 'Get Wallet Balances',
-		description:
-			'List aggregate balances for the connected wallet or an explicit address.',
+		description: 'List aggregate balances for the connected wallet or an explicit address.',
 		inputSchema: getWalletBalancesInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getWalletBalancesTool,
@@ -221,8 +216,7 @@ const toolDefinitions = [
 	{
 		name: 'read_config',
 		title: 'Read Suigar Config',
-		description:
-			'Resolve Suigar SDK config for mainnet or testnet. Defaults to testnet.',
+		description: 'Resolve Suigar SDK config for mainnet or testnet. Defaults to testnet.',
 		inputSchema: readConfigInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: readConfigTool,
@@ -231,8 +225,7 @@ const toolDefinitions = [
 	{
 		name: 'read_game_metadata',
 		title: 'Read Suigar Game Metadata',
-		description:
-			'Read live on-chain parameters for one selected Suigar game and coin type.',
+		description: 'Read live on-chain parameters for one selected Suigar game and coin type.',
 		inputSchema: readGameMetadataInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: readGameMetadataTool,
@@ -241,8 +234,7 @@ const toolDefinitions = [
 	{
 		name: 'list_nfts',
 		title: 'List Suigar NFTs',
-		description:
-			'List the Suigar NFT catalog and the matching NFTs owned by one address.',
+		description: 'List the Suigar NFT catalog and the matching NFTs owned by one address.',
 		inputSchema: listNftsInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: listNftsTool,
@@ -251,8 +243,7 @@ const toolDefinitions = [
 	{
 		name: 'get_referral_commission',
 		title: 'Get Referral Commission',
-		description:
-			'Simulate the commission a referrer can claim for one configured coin type.',
+		description: 'Simulate the commission a referrer can claim for one configured coin type.',
 		inputSchema: getReferralCommissionInputSchema,
 		annotations: readOnlyToolAnnotations,
 		handler: getReferralCommissionTool,
@@ -270,8 +261,7 @@ const toolDefinitions = [
 	{
 		name: 'build_referral_commission_claim_transaction',
 		title: 'Build Referral Commission Claim',
-		description:
-			'Build, dry-run, or inspect an unsigned referral commission claim transaction.',
+		description: 'Build, dry-run, or inspect an unsigned referral commission claim transaction.',
 		inputSchema: buildReferralCommissionClaimTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildReferralCommissionClaimTransactionTool,
@@ -290,8 +280,7 @@ const toolDefinitions = [
 	{
 		name: 'build_nft_v1_mint_transaction',
 		title: 'Build NFT V1 Mint Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned NFT V1 mint transaction.',
+		description: 'Build, dry-run, or inspect an unsigned NFT V1 mint transaction.',
 		inputSchema: buildNftV1MintTransactionInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildNftV1MintTransactionTool,
@@ -300,8 +289,7 @@ const toolDefinitions = [
 	{
 		name: 'build_coinflip_transaction',
 		title: 'Build Coinflip Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar coinflip transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar coinflip transaction.',
 		inputSchema: coinflipInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildCoinflipTransactionTool,
@@ -310,8 +298,7 @@ const toolDefinitions = [
 	{
 		name: 'build_limbo_transaction',
 		title: 'Build Limbo Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar limbo transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar limbo transaction.',
 		inputSchema: limboInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildLimboTransactionTool,
@@ -320,8 +307,7 @@ const toolDefinitions = [
 	{
 		name: 'build_plinko_transaction',
 		title: 'Build Plinko Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar plinko transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar plinko transaction.',
 		inputSchema: configIdInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPlinkoTransactionTool,
@@ -330,8 +316,7 @@ const toolDefinitions = [
 	{
 		name: 'build_wheel_transaction',
 		title: 'Build Wheel Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar wheel transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar wheel transaction.',
 		inputSchema: configIdInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildWheelTransactionTool,
@@ -340,8 +325,7 @@ const toolDefinitions = [
 	{
 		name: 'build_range_transaction',
 		title: 'Build Range Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar range transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar range transaction.',
 		inputSchema: rangeInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildRangeTransactionTool,
@@ -350,8 +334,7 @@ const toolDefinitions = [
 	{
 		name: 'build_soccer_transaction',
 		title: 'Build Soccer Transaction',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar Soccer transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar Soccer transaction.',
 		inputSchema: soccerInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildSoccerTransactionTool,
@@ -370,8 +353,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_join_transaction',
 		title: 'Build PvP Coinflip Join',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar PvP coinflip join transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip join transaction.',
 		inputSchema: pvpCoinflipJoinInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipJoinTransactionTool,
@@ -380,8 +362,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_cancel_transaction',
 		title: 'Build PvP Coinflip Cancel',
-		description:
-			'Build, dry-run, or inspect an unsigned Suigar PvP coinflip cancel transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip cancel transaction.',
 		inputSchema: pvpCoinflipCancelInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,
@@ -389,11 +370,7 @@ const toolDefinitions = [
 	},
 ] satisfies Array<ToolDefinition>;
 
-const registerTool = (
-	server: McpServer,
-	appToolMeta: AppToolMeta,
-	tool: ToolDefinition,
-) => {
+const registerTool = (server: McpServer, appToolMeta: AppToolMeta, tool: ToolDefinition) => {
 	const config = {
 		title: tool.title,
 		description: tool.description,
@@ -404,22 +381,14 @@ const registerTool = (
 	const handler = withToolErrors(tool.handler);
 
 	if (tool.isAppTool) {
-		registerAppTool(
-			server,
-			tool.name,
-			{ ...config, _meta: appToolMeta },
-			handler,
-		);
+		registerAppTool(server, tool.name, { ...config, _meta: appToolMeta }, handler);
 		return;
 	}
 
 	server.registerTool(tool.name, config, handler);
 };
 
-export function registerSuigarTools(
-	server: McpServer,
-	appToolMeta: AppToolMeta,
-): void {
+export function registerSuigarTools(server: McpServer, appToolMeta: AppToolMeta): void {
 	for (const tool of toolDefinitions) {
 		registerTool(server, appToolMeta, tool);
 	}

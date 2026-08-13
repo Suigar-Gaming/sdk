@@ -1,10 +1,8 @@
 import { formatAddress, parseToUnits } from '@mysten/sui/utils';
+
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
-import type {
-	PvPCoinflipForms,
-	SharedFields,
-	StandardForms,
-} from '@/lib/suigar-types';
+
+import type { PvPCoinflipForms, SharedFields, StandardForms } from '@/lib/suigar-types';
 import { DECIMAL_AMOUNT_PATTERN } from '@/lib/validation';
 
 const DEFAULT_SHARED_FIELDS: SharedFields = {
@@ -69,8 +67,7 @@ export function parseOptionalNumber(value?: string) {
 }
 
 export function getRangePointMax(scale?: number) {
-	const effectiveScale =
-		scale && Number.isFinite(scale) && scale > 0 ? scale : DEFAULT_RANGE_SCALE;
+	const effectiveScale = scale && Number.isFinite(scale) && scale > 0 ? scale : DEFAULT_RANGE_SCALE;
 	return RANGE_POINT_LIMIT / effectiveScale;
 }
 
@@ -87,13 +84,8 @@ export function toAtomicAmount(value: string | undefined, decimals: number) {
 	try {
 		return parseToUnits(trimmed, decimals);
 	} catch (error) {
-		if (
-			error instanceof Error &&
-			error.message.startsWith('Too many decimal')
-		) {
-			throw new Error(
-				`Stake supports up to ${decimals} decimal places for this coin.`,
-			);
+		if (error instanceof Error && error.message.startsWith('Too many decimal')) {
+			throw new Error(`Stake supports up to ${decimals} decimal places for this coin.`);
 		}
 		throw error;
 	}

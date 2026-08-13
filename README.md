@@ -99,7 +99,7 @@ pnpm turbo run typecheck
 
 ### Linting
 
-This repo uses Oxlint and Prettier for linting.
+This repo uses Oxlint and Oxfmt for linting and formatting.
 
 ```bash
 pnpm run lint
@@ -111,11 +111,11 @@ You can automatically fix many lint issues by running:
 pnpm run lint:fix
 ```
 
-To run Oxlint and Prettier individually, use:
+To run Oxlint and Oxfmt individually, use:
 
 ```bash
 pnpm run oxlint
-pnpm run prettier
+pnpm run oxfmt
 pnpm run oxlint:fix
-pnpm run prettier:fix
+pnpm run oxfmt:fix
 ```

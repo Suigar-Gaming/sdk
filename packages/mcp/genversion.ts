@@ -17,9 +17,7 @@ const pluginManifestPaths = [
 	new URL('./plugin/.cursor-plugin/plugin.json', import.meta.url),
 ];
 
-const packageJson = JSON.parse(
-	await readFile(packageJsonPath, 'utf8'),
-) as PackageJson;
+const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8')) as PackageJson;
 const versionPattern = /^(\s*"version"\s*:\s*")[^"]+(")/m;
 const mcpPackagePattern = /("@suigar\/mcp)(?:@[^"]+)?(")/;
 const serverPackageVersionPattern =

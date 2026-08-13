@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SuiClientTypes } from '@mysten/sui/client';
+
 import type { suigar, SuigarClient, SuigarNetwork } from '@suigar/sdk';
 import type { Game, PvPCoinflipAction } from '@suigar/sdk/games';
+
 import type { FormattedAmount } from '../utils/index.js';
 
 export type SuigarConfig = ReturnType<SuigarClient['getConfig']>;
-export type SuigarConfigOverrides = NonNullable<
-	Parameters<typeof suigar>[0]
->['config'];
+export type SuigarConfigOverrides = NonNullable<Parameters<typeof suigar>[0]>['config'];
 export type RawDryRunResult = SuiClientTypes.SimulateTransactionResult<{
 	effects: true;
 	events: true;
@@ -58,17 +58,11 @@ export type TransactionSummaryDetails = {
 	gameInputs?: Record<string, JsonValue>;
 };
 
-export type TransactionSummaryContext = Omit<
-	TransactionSummaryDetails,
-	'stake'
-> & {
+export type TransactionSummaryContext = Omit<TransactionSummaryDetails, 'stake'> & {
 	stake?: TransactionSummaryDetails['stake'] | bigint | number;
 };
 
-export type TransactionSummaryFormattingContext = Pick<
-	TransactionSummaryDetails,
-	'coinDecimals'
->;
+export type TransactionSummaryFormattingContext = Pick<TransactionSummaryDetails, 'coinDecimals'>;
 
 export type TransactionSummary = {
 	sender: string | null;
@@ -230,9 +224,7 @@ export type WalletReadResult = {
 	config: McpConfig;
 	wallet: {
 		owner: string;
-		balances?: Array<
-			SuiClientTypes.Balance & { balanceDisplay: string; symbol: string }
-		>;
+		balances?: Array<SuiClientTypes.Balance & { balanceDisplay: string; symbol: string }>;
 		coins?: Array<
 			SuiClientTypes.Coin & {
 				balanceDisplay: string;
