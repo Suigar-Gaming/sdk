@@ -33,7 +33,6 @@ import {
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
 	buildLimboTransaction,
-	buildMintNftV1PaymentCoin,
 	buildMintNftV1Transaction,
 	buildPlinkoTransaction,
 	buildPvPCoinflipJoinBetCoin,
@@ -436,11 +435,7 @@ export class SuigarClient {
 			mint: (options: MintNftV1Options): Transaction => {
 				return buildMintNftV1Transaction({
 					...options,
-					paymentCoin: buildMintNftV1PaymentCoin({
-						...options,
-						client: this.#client,
-						config: this.#config,
-					}),
+					client: this.#client,
 					config: this.#config,
 				});
 			},

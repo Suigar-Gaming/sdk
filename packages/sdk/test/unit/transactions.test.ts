@@ -9,7 +9,6 @@ import {
 	buildClaimReferralCommissionTransaction,
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
-	buildMintNftV1PaymentCoin,
 	buildMintNftV1Transaction,
 	buildPvPCoinflipTransaction,
 	buildSoccerTransaction,
@@ -160,21 +159,12 @@ describe('transaction builders', () => {
 				},
 			},
 		} as never);
-		const paymentCoin = buildMintNftV1PaymentCoin({
-			client,
-			config: nftConfig,
-			specId: '0x999',
-			useGasCoin: true,
-		});
-		await (paymentCoin as (tx: Transaction) => Promise<unknown>)(
-			new Transaction(),
-		);
 		const tx = buildMintNftV1Transaction({
 			owner: '0x123',
 			specId: '0x999',
 			useGasCoin: true,
+			client,
 			config: nftConfig,
-			paymentCoin,
 		});
 		const call = tx.getData().commands[1].MoveCall!;
 
