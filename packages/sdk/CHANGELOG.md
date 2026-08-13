@@ -5,7 +5,7 @@
 ### Major Changes
 
 - [#147](https://github.com/Suigar-Gaming/ts-sdks/pull/147) [`0444640`](https://github.com/Suigar-Gaming/ts-sdks/commit/0444640b69aa7f3efa8e75adf90387ed181f8d68) - Convert public SDK helpers, including `createGameBet`, to single options object signatures for Mysten-style calls.
-  
+
   Update MCP transaction and read tooling to call the new SDK object signatures.
 
 ### Patch Changes
