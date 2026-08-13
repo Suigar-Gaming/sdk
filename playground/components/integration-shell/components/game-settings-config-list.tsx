@@ -41,16 +41,12 @@ export function GameSettingsConfigList({
 								<div className="min-w-0 space-y-1">
 									<Badge
 										variant={isSelected ? 'secondary' : 'ghost'}
-										className={`px-2.5 py-1 text-sm ${
-											isSelected ? 'font-semibold' : ''
-										}`}
+										className={`px-2.5 py-1 text-sm ${isSelected ? 'font-semibold' : ''}`}
 									>
 										{option.label}
 									</Badge>
 									{option.description ? (
-										<p className="text-xs text-muted-foreground">
-											{option.description}
-										</p>
+										<p className="text-xs text-muted-foreground">{option.description}</p>
 									) : null}
 								</div>
 								<div className="flex items-center gap-2">
@@ -61,9 +57,7 @@ export function GameSettingsConfigList({
 										{option.isPlayable ? 'Playable' : 'Disabled'}
 									</Badge>
 									<AccordionTrigger className="flex size-8 flex-none items-center justify-center **:data-[slot=accordion-trigger-icon]:ml-0 border-border/70 hover:bg-foreground/10 rounded-full border cursor-pointer">
-										<span className="sr-only">
-											Toggle {option.label} details
-										</span>
+										<span className="sr-only">Toggle {option.label} details</span>
 									</AccordionTrigger>
 								</div>
 							</div>
@@ -71,10 +65,7 @@ export function GameSettingsConfigList({
 							{option.details?.length ? (
 								<div className="flex flex-wrap text-sm mt-2.5 gap-x-3 gap-y-1 text-muted-foreground">
 									{option.details.map((detail) => (
-										<div
-											key={`${option.id}-${detail.label}`}
-											className="shrink-0"
-										>
+										<div key={`${option.id}-${detail.label}`} className="shrink-0">
 											<span>{detail.label}: </span>
 											<FieldCode>{detail.value}</FieldCode>
 										</div>
@@ -84,13 +75,9 @@ export function GameSettingsConfigList({
 
 							<div className="flex flex-nowrap items-center overflow-x-auto text-sm mt-2.5 gap-2 text-muted-foreground">
 								<span className="shrink-0">Stake range:</span>
-								<FieldCode className="shrink-0">
-									{option.stakeRange.min}
-								</FieldCode>
+								<FieldCode className="shrink-0">{option.stakeRange.min}</FieldCode>
 								<span className="shrink-0">to</span>
-								<FieldCode className="shrink-0">
-									{option.stakeRange.max}
-								</FieldCode>
+								<FieldCode className="shrink-0">{option.stakeRange.max}</FieldCode>
 								<span className="inline-flex shrink-0 items-center whitespace-nowrap uppercase tracking-widest gap-1">
 									<CoinIcon coinKey={coinKey} className="size-4" />
 									{coinKey}
@@ -101,8 +88,7 @@ export function GameSettingsConfigList({
 								{option.multiplierValues?.length ? (
 									<>
 										<div className="text-sm font-medium mb-2 text-muted-foreground">
-											Multipliers:{' '}
-											<FieldCode>{option.multiplierValues.length}</FieldCode>
+											Multipliers: <FieldCode>{option.multiplierValues.length}</FieldCode>
 										</div>
 										<div className="flex flex-wrap gap-1.5">
 											{option.multiplierValues.map((multiplier) => (
@@ -114,8 +100,7 @@ export function GameSettingsConfigList({
 									</>
 								) : (
 									<p className="text-xs text-muted-foreground">
-										No additional per-config details are available for this
-										entry.
+										No additional per-config details are available for this entry.
 									</p>
 								)}
 							</AccordionContent>

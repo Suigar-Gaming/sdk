@@ -26,23 +26,16 @@ export function resolveCoinKeyForType(
 
 	return (
 		(Object.entries(coinTypes) as Array<[SupportedCoinKey, string]>).find(
-			([, configuredCoinType]) =>
-				normalizeStructTag(configuredCoinType) === normalizedCoinType,
+			([, configuredCoinType]) => normalizeStructTag(configuredCoinType) === normalizedCoinType,
 		)?.[0] ?? null
 	);
 }
 
-export function parseCoinKey(
-	coinType: string,
-	coinTypes: Record<SupportedCoinKey, string>,
-) {
+export function parseCoinKey(coinType: string, coinTypes: Record<SupportedCoinKey, string>) {
 	return resolveCoinKeyForType(coinType, coinTypes);
 }
 
-export function parseCoinTypeLabel(
-	coinType: string,
-	coinTypes: Record<SupportedCoinKey, string>,
-) {
+export function parseCoinTypeLabel(coinType: string, coinTypes: Record<SupportedCoinKey, string>) {
 	const matchingCoinKey = resolveCoinKeyForType(coinType, coinTypes);
 	if (matchingCoinKey) {
 		return matchingCoinKey.toUpperCase();

@@ -2,23 +2,10 @@
 
 import { FileCode2 } from 'lucide-react';
 import { CodeBlock } from '@/components/code-block';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const SKELETON_LINE_WIDTHS = [
-	'92%',
-	'86%',
-	'78%',
-	'88%',
-	'64%',
-	'72%',
-] as const;
+const SKELETON_LINE_WIDTHS = ['92%', '86%', '78%', '88%', '64%', '72%'] as const;
 
 function CodeSampleCard({
 	children,

@@ -18,8 +18,6 @@ export function withBasePath(assetPath: string): string {
 		return assetPath;
 	}
 
-	const normalizedPath = assetPath.startsWith('/')
-		? assetPath
-		: `/${assetPath}`;
+	const normalizedPath = assetPath.startsWith('/') ? assetPath : `/${assetPath}`;
 	return `${basePath}${normalizedPath}`;
 }

@@ -4,10 +4,7 @@
 import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
-import {
-	GAME_DETAIL_BCS,
-	GAME_DETAILS_SCHEMAS,
-} from '../types/game-details.type.js';
+import { GAME_DETAIL_BCS, GAME_DETAILS_SCHEMAS } from '../types/game-details.type.js';
 import { GAME_EVENTS, GAMES } from '../types/game.type.js';
 import type {
 	BetResultGameDetails,
@@ -51,9 +48,7 @@ export function parseCoinType(type: string): string {
  * @param event Sui event returned by the core client.
  * @returns Parsed SDK game id and raw Move event name, or `null` when the event name is unsupported or the game id cannot be resolved.
  */
-export function parseGameEvent(
-	event: SuiClientTypes.Event,
-): SuigarGameEvent | null {
+export function parseGameEvent(event: SuiClientTypes.Event): SuigarGameEvent | null {
 	const { name: eventName, typeParams } = parseStructTag(event.eventType);
 	const module = event.module.replaceAll('_', '-');
 	const gameId = GAMES.includes(module as Game) ? module : typeParams[0];
@@ -131,19 +126,15 @@ export function parseGameDetails<TGame extends Game>({
 	},
 	TGame
 >): GameDetails<TGame> {
-	const schema: Record<string, GameDetailValueType> =
-		GAME_DETAILS_SCHEMAS[game];
-	const details = gameDetails.contents.reduce<Record<string, unknown>>(
-		(parsedDetails, entry) => {
-			const valueType = schema[entry.key] ?? 'string';
-			parsedDetails[entry.key] = parseGameDetail({
-				valueType,
-				value: entry.value,
-			});
-			return parsedDetails;
-		},
-		{},
-	);
+	const schema: Record<string, GameDetailValueType> = GAME_DETAILS_SCHEMAS[game];
+	const details = gameDetails.contents.reduce<Record<string, unknown>>((parsedDetails, entry) => {
+		const valueType = schema[entry.key] ?? 'string';
+		parsedDetails[entry.key] = parseGameDetail({
+			valueType,
+			value: entry.value,
+		});
+		return parsedDetails;
+	}, {});
 
 	return details as GameDetails<TGame>;
 }

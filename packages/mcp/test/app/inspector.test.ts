@@ -37,15 +37,9 @@ describe('createInspectorViewModel', () => {
 		);
 
 		expect(view.coinBadge).toBe('SUI');
-		expect(view.transactionEntries).toContainEqual([
-			'Stake',
-			'1 SUI (1000000000 base units)',
-		]);
+		expect(view.transactionEntries).toContainEqual(['Stake', '1 SUI (1000000000 base units)']);
 		expect(view.dryRunEntries).toContainEqual(['Coin Outcome', 'tails']);
-		expect(view.targets).toEqual([
-			'0x1::coinflip::play',
-			'0x1::coinflip::play',
-		]);
+		expect(view.targets).toEqual(['0x1::coinflip::play', '0x1::coinflip::play']);
 		expect(view.notes).toEqual(['Review before approving.']);
 	});
 

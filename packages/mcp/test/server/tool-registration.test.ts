@@ -106,12 +106,8 @@ describe('MCP tool registration', () => {
 			}
 		)._registeredTools;
 
-		expect(Object.keys(registeredTools).sort()).toEqual(
-			registeredToolNames.sort(),
-		);
-		expect([...appToolNames, ...nonAppToolNames].sort()).toEqual(
-			registeredToolNames.sort(),
-		);
+		expect(Object.keys(registeredTools).sort()).toEqual(registeredToolNames.sort());
+		expect([...appToolNames, ...nonAppToolNames].sort()).toEqual(registeredToolNames.sort());
 		expect(registeredTools.read_config).toMatchObject({
 			title: 'Read Suigar Config',
 			annotations: readOnlyToolAnnotations,
@@ -137,13 +133,11 @@ describe('MCP tool registration', () => {
 			annotations: transactionToolAnnotations,
 			_meta: appToolMeta,
 		});
-		expect(registeredTools.build_pvp_coinflip_create_transaction).toMatchObject(
-			{
-				title: 'Build PvP Coinflip Create',
-				annotations: transactionToolAnnotations,
-				_meta: appToolMeta,
-			},
-		);
+		expect(registeredTools.build_pvp_coinflip_create_transaction).toMatchObject({
+			title: 'Build PvP Coinflip Create',
+			annotations: transactionToolAnnotations,
+			_meta: appToolMeta,
+		});
 		for (const name of appToolNames) {
 			expect(registeredTools[name]?._meta).toMatchObject(appToolMeta);
 		}

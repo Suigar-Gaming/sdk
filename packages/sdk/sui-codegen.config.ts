@@ -4,21 +4,21 @@
 import type { SuiCodegenConfig } from '@mysten/codegen';
 import { SUIGAR_PACKAGES } from './suigar-packages.ts';
 
-const packagesConfiguration: SuiCodegenConfig['packages'] = Object.entries(
-	SUIGAR_PACKAGES,
-).map(([module, packageInfo]) => ({
-	package: packageInfo.package,
-	packageName: packageInfo.packageName,
-	network: 'testnet',
-	generate: {
-		modules: {
-			[module]: {
-				types: packageInfo.types ?? false,
-				functions: packageInfo.functions ?? { private: 'entry' },
+const packagesConfiguration: SuiCodegenConfig['packages'] = Object.entries(SUIGAR_PACKAGES).map(
+	([module, packageInfo]) => ({
+		package: packageInfo.package,
+		packageName: packageInfo.packageName,
+		network: 'testnet',
+		generate: {
+			modules: {
+				[module]: {
+					types: packageInfo.types ?? false,
+					functions: packageInfo.functions ?? { private: 'entry' },
+				},
 			},
 		},
-	},
-}));
+	}),
+);
 
 const config: SuiCodegenConfig = {
 	output: './src/contracts',

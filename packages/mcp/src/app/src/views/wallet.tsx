@@ -5,13 +5,7 @@ import type { ReactNode } from 'react';
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 
-function WalletTable({
-	children,
-	headers,
-}: {
-	children: ReactNode;
-	headers: Array<string>;
-}) {
+function WalletTable({ children, headers }: { children: ReactNode; headers: Array<string> }) {
 	return (
 		<div className="overflow-x-auto rounded-md border border-border/70">
 			<table className="min-w-full border-collapse text-left text-xs leading-5">
@@ -90,10 +84,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 										{String(coin.balanceDisplay ?? coin.balance)}{' '}
 										{typeof coin.symbol === 'string' ? coin.symbol : ''}
 									</td>
-									<td
-										className="max-w-72 truncate px-3 py-2 font-mono"
-										title={String(coin.type)}
-									>
+									<td className="max-w-72 truncate px-3 py-2 font-mono" title={String(coin.type)}>
 										{String(coin.symbol ?? coin.type)}
 									</td>
 								</tr>

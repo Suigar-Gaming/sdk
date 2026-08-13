@@ -14,9 +14,7 @@ import {
 describe('app format helpers', () => {
 	it('formats display values and omits SDK-only companion fields', () => {
 		expect(labelFor('gasBudgetMist')).toBe('Gas Budget Mist');
-		expect(formatValue({ label: 'Coinflip', id: 'coinflip' })).toBe(
-			'Coinflip (coinflip)',
-		);
+		expect(formatValue({ label: 'Coinflip', id: 'coinflip' })).toBe('Coinflip (coinflip)');
 		expect(
 			dynamicEntries({
 				stake: '1000000',

@@ -10,10 +10,7 @@ import { SuiGrpcClient } from '@mysten/sui/grpc';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 
-const NETWORKS = [
-	'testnet',
-	'mainnet',
-] as const satisfies ReadonlyArray<SuiClientTypes.Network>;
+const NETWORKS = ['testnet', 'mainnet'] as const satisfies ReadonlyArray<SuiClientTypes.Network>;
 type Network = (typeof NETWORKS)[number];
 
 const REGISTRY_PACKAGE_NAMES = {
@@ -39,9 +36,7 @@ type CoinKey = 'sui' | 'usdc';
 type CoinMetadataSources = Record<CoinKey, CoinMetadataSource>;
 
 function extractObjectValue(source: string, objectName: string, key: string) {
-	const blockPattern = new RegExp(
-		`${objectName}[\\s\\S]*?=\\s*\\{([\\s\\S]*?)\\n\\};`,
-	);
+	const blockPattern = new RegExp(`${objectName}[\\s\\S]*?=\\s*\\{([\\s\\S]*?)\\n\\};`);
 	const blockMatch = source.match(blockPattern);
 
 	if (!blockMatch) {
@@ -58,14 +53,8 @@ function extractObjectValue(source: string, objectName: string, key: string) {
 	return valueMatch[1];
 }
 
-function extractCoinMetadata(
-	source: string,
-	objectName: string,
-	key: string,
-): CoinMetadataSource {
-	const blockPattern = new RegExp(
-		`${objectName}[\\s\\S]*?=\\s*\\{([\\s\\S]*?)\\n\\};`,
-	);
+function extractCoinMetadata(source: string, objectName: string, key: string): CoinMetadataSource {
+	const blockPattern = new RegExp(`${objectName}[\\s\\S]*?=\\s*\\{([\\s\\S]*?)\\n\\};`);
 	const blockMatch = source.match(blockPattern);
 
 	if (!blockMatch) {
@@ -115,9 +104,7 @@ async function assertObjectType({
 	const { object } = await client.core.getObject({ objectId });
 
 	if (object.type !== expectedType) {
-		throw new Error(
-			`Expected ${objectId} to have type ${expectedType}, received ${object.type}`,
-		);
+		throw new Error(`Expected ${objectId} to have type ${expectedType}, received ${object.type}`);
 	}
 }
 
@@ -218,21 +205,13 @@ async function updateNetworkConfig(network: Network) {
 		wheel: '',
 	};
 	const objectIds: ObjectIds = {
-		sweetHouse: extractObjectValue(
-			objectSource,
-			currentObjectObjectName,
-			'sweetHouse',
-		),
-		nftV1Factory: extractObjectValue(
-			objectSource,
-			currentObjectObjectName,
-			'nftV1Factory',
-		),
+		sweetHouse: extractObjectValue(objectSource, currentObjectObjectName, 'sweetHouse'),
+		nftV1Factory: extractObjectValue(objectSource, currentObjectObjectName, 'nftV1Factory'),
 	};
 
-	for (const [packageKey, packageName] of Object.entries(
-		REGISTRY_PACKAGE_NAMES,
-	) as Array<[keyof typeof REGISTRY_PACKAGE_NAMES, string]>) {
+	for (const [packageKey, packageName] of Object.entries(REGISTRY_PACKAGE_NAMES) as Array<
+		[keyof typeof REGISTRY_PACKAGE_NAMES, string]
+	>) {
 		packageIds[packageKey] = (
 			await client.core.mvr.resolvePackage({ package: packageName })
 		).package;
@@ -262,10 +241,7 @@ async function updateNetworkConfig(network: Network) {
 
 	await mkdir(configDirectoryPath, { recursive: true });
 	await Promise.all([
-		writeFile(
-			path.join(configDirectoryPath, 'packages.ts'),
-			nextFiles.packages,
-		),
+		writeFile(path.join(configDirectoryPath, 'packages.ts'), nextFiles.packages),
 		writeFile(path.join(configDirectoryPath, 'objects.ts'), nextFiles.objects),
 		writeFile(path.join(configDirectoryPath, 'coins.ts'), nextFiles.coins),
 	]);

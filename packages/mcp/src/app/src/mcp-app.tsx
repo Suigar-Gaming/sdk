@@ -8,14 +8,7 @@ import {
 	applyHostStyleVariables,
 } from '@modelcontextprotocol/ext-apps';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import {
-	StrictMode,
-	useEffect,
-	useReducer,
-	useRef,
-	useState,
-	type JSX,
-} from 'react';
+import { StrictMode, useEffect, useReducer, useRef, useState, type JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
 	ExecutionApproval,
@@ -39,9 +32,7 @@ const shellClassName =
 
 function textErrors(result: CallToolResult): Array<string> {
 	return (
-		result.content?.flatMap((item) =>
-			item.type === 'text' && item.text ? [item.text] : [],
-		) ?? []
+		result.content?.flatMap((item) => (item.type === 'text' && item.text ? [item.text] : [])) ?? []
 	);
 }
 
@@ -177,9 +168,7 @@ export function SuigarInspectorApp(): JSX.Element | null {
 
 			const payload = result.structuredContent ?? {};
 			const record =
-				payload && typeof payload === 'object'
-					? (payload as Record<string, unknown>)
-					: {};
+				payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
 			const execution = asRecord(record.execution);
 			dispatch({
 				type: 'tool-result',
@@ -209,10 +198,7 @@ export function SuigarInspectorApp(): JSX.Element | null {
 			.catch((connectError: unknown) => {
 				dispatch({
 					type: 'connection-error',
-					error:
-						connectError instanceof Error
-							? connectError
-							: new Error(String(connectError)),
+					error: connectError instanceof Error ? connectError : new Error(String(connectError)),
 				});
 			});
 	}, [app]);
@@ -220,18 +206,13 @@ export function SuigarInspectorApp(): JSX.Element | null {
 	const inspector = viewState.inspector ?? initialState;
 	const { coinBadge, title, View } = resolveAppView(inspector.payload);
 	const execution = asRecord(asRecord(inspector.payload).execution);
-	const approvalUrl =
-		typeof execution.approvalUrl === 'string' ? execution.approvalUrl : null;
+	const approvalUrl = typeof execution.approvalUrl === 'string' ? execution.approvalUrl : null;
 
 	if (viewState.error) {
 		return (
 			<main className={shellClassName}>
 				<Header status="Error" title={title} />
-				<ListPanel
-					className="errors"
-					items={[viewState.error.message]}
-					title="Errors"
-				/>
+				<ListPanel className="errors" items={[viewState.error.message]} title="Errors" />
 			</main>
 		);
 	}
@@ -259,11 +240,7 @@ export function SuigarInspectorApp(): JSX.Element | null {
 		return (
 			<main className={shellClassName}>
 				<Header status="Error" title="Tool Error" />
-				<ListPanel
-					className="errors"
-					items={inspector.errors}
-					title="Unable to complete request"
-				/>
+				<ListPanel className="errors" items={inspector.errors} title="Unable to complete request" />
 			</main>
 		);
 	}

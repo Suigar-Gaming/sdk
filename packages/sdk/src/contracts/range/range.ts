@@ -3,15 +3,10 @@
  **************************************************************/
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
-import {
-	MoveStruct,
-	normalizeMoveArguments,
-	type RawTransactionArgument,
-} from '../utils/index.js';
+import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 
-const $moduleName =
-	'0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416::range';
+const $moduleName = '0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416::range';
 export const RangeSettingsKey = new MoveStruct({
 	name: `${$moduleName}::RangeSettingsKey`,
 	fields: {
@@ -49,8 +44,7 @@ export interface PlayOptions {
 }
 export function play(options: PlayOptions) {
 	const packageAddress =
-		options.package ??
-		'0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416';
+		options.package ?? '0x096a4cf18b3661e76b2c62b90785418345d52f45b272448794f123a4cb6b6416';
 	const argumentsTypes = [
 		null,
 		'u64',

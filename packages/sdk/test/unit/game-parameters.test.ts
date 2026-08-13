@@ -11,9 +11,7 @@ describe('normalizeGameParameterValues', () => {
 				min_stake: '1000',
 				configs: [
 					{
-						multipliers: [
-							{ mant: '1', exp: { bits: '52' }, is_negative: false },
-						],
+						multipliers: [{ mant: '1', exp: { bits: '52' }, is_negative: false }],
 					},
 				],
 			}),

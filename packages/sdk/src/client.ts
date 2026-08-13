@@ -8,10 +8,7 @@ import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
 import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
-import {
-	Nft as NftV1,
-	Factory as NftV1Factory,
-} from './contracts/nft-v1/nft.js';
+import { Nft as NftV1, Factory as NftV1Factory } from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
@@ -106,13 +103,11 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache
-			.scope('@suigar/sdk')
-			.readSync([name, 'ttl-cache'], () => {
-				return new TtlClientCache({
-					ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
-				});
+		this.#cache = client.cache.scope('@suigar/sdk').readSync([name, 'ttl-cache'], () => {
+			return new TtlClientCache({
+				ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
 			});
+		});
 
 		this.#config = resolveSuigarConfig({ network, config });
 	}
@@ -182,9 +177,7 @@ export class SuigarClient {
 						type: gameDefinition.settingsKey.typeTag({
 							package: resolveGamePackageId({ config: this.#config, game }),
 						}),
-						bcs: gameDefinition.settingsKey
-							.serialize({ dummy_field: false })
-							.toBytes(),
+						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
 					},
 					signal,
 				});
@@ -208,9 +201,7 @@ export class SuigarClient {
 				}
 
 				return normalizeGameParameterValues(
-					gameDefinition.parameters.parse(
-						object.content,
-					) as OnChainGameParameters<TGame>,
+					gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
 				);
 			},
 			{ ignoreCache: options.ignoreCache },
@@ -239,14 +230,10 @@ export class SuigarClient {
 	 * or parse are omitted from the returned array.
 	 */
 	async getPvPCoinflipGames(
-		options: WithThrowOnError<
-			Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>
-		> = {
+		options: WithThrowOnError<Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>> = {
 			limit: DEFAULT_QUERY_LIMIT,
 		},
-	): Promise<
-		Array<InferBcsType<typeof PvPCoinflipGame> & { coin_type: string }>
-	> {
+	): Promise<Array<InferBcsType<typeof PvPCoinflipGame> & { coin_type: string }>> {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
@@ -268,17 +255,13 @@ export class SuigarClient {
 				}
 
 				if (!object.content) {
-					throw new Error(
-						'Unable to resolve PvP coinflip game from retrieved object',
-					);
+					throw new Error('Unable to resolve PvP coinflip game from retrieved object');
 				}
 
 				return {
 					...PvPCoinflipGame.parse(object.content),
 					coin_type: parseCoinType(object.type),
-				} satisfies Awaited<
-					ReturnType<SuigarClient['getPvPCoinflipGames']>
-				>[number];
+				} satisfies Awaited<ReturnType<SuigarClient['getPvPCoinflipGames']>>[number];
 			} catch (error) {
 				return error instanceof Error ? error : new Error(String(error));
 			}
@@ -291,9 +274,7 @@ export class SuigarClient {
 			}
 		}
 
-		return resolvedGames.flatMap((game) =>
-			game instanceof Error ? [] : [game],
-		);
+		return resolvedGames.flatMap((game) => (game instanceof Error ? [] : [game]));
 	}
 
 	async #getSimulatedCommandReturnValue({
@@ -315,8 +296,7 @@ export class SuigarClient {
 		}
 
 		const returnValue =
-			result.commandResults?.[commandIndex]?.returnValues?.[returnValueIndex]
-				?.bcs;
+			result.commandResults?.[commandIndex]?.returnValues?.[returnValueIndex]?.bcs;
 		if (!returnValue) {
 			throw new Error(
 				`Transaction simulation did not return a value at command ${commandIndex}, return value ${returnValueIndex}.`,
@@ -375,9 +355,7 @@ export class SuigarClient {
 						partner: this.#partner,
 					});
 				default:
-					throw new RangeError(
-						`Unsupported game: ${(options as { game?: string })?.game}`,
-					);
+					throw new RangeError(`Unsupported game: ${(options as { game?: string })?.game}`);
 			}
 		},
 		/** PvP coinflip transaction builders, grouped by game action. */
@@ -410,17 +388,13 @@ export class SuigarClient {
 		},
 		/** Referral transaction builders. Each transaction returns its claimed coin to `owner`. */
 		referral: {
-			claimCommission: (
-				options: ClaimReferralCommissionOptions,
-			): Transaction => {
+			claimCommission: (options: ClaimReferralCommissionOptions): Transaction => {
 				return buildClaimReferralCommissionTransaction({
 					...options,
 					config: this.#config,
 				});
 			},
-			claimLevelUpUsdRewards: (
-				options: ClaimReferralLevelUpUsdRewardsOptions,
-			): Transaction => {
+			claimLevelUpUsdRewards: (options: ClaimReferralLevelUpUsdRewardsOptions): Transaction => {
 				return buildClaimReferralLevelUpUsdRewardsTransaction({
 					...options,
 					config: this.#config,

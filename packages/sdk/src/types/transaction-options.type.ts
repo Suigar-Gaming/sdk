@@ -87,40 +87,32 @@ export type WheelTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };
 
-type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions &
-	CoinTransactionOptions;
+type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions & CoinTransactionOptions;
 
-export type CreatePvPCoinflipTransactionOptions = Pick<
-	StakeTransactionOptions,
-	'stake'
-> &
+export type CreatePvPCoinflipTransactionOptions = Pick<StakeTransactionOptions, 'stake'> &
 	SharedPvPCoinflipTransactionOptions & {
 		side: CoinSide;
 		isPrivate?: boolean;
 	};
 
-export type JoinPvPCoinflipTransactionOptions =
-	SharedPvPCoinflipTransactionOptions & {
-		gameId: string;
-	};
+export type JoinPvPCoinflipTransactionOptions = SharedPvPCoinflipTransactionOptions & {
+	gameId: string;
+};
 
-export type CancelPvPCoinflipTransactionOptions =
-	SharedPvPCoinflipTransactionOptions & {
-		gameId: string;
-	};
+export type CancelPvPCoinflipTransactionOptions = SharedPvPCoinflipTransactionOptions & {
+	gameId: string;
+};
 
-export type PvPCoinflipTransactionOptions<
-	Action extends PvPCoinflipAction = PvPCoinflipAction,
-> = Action extends 'create'
-	? CreatePvPCoinflipTransactionOptions
-	: Action extends 'join'
-		? JoinPvPCoinflipTransactionOptions
-		: Action extends 'cancel'
-			? CancelPvPCoinflipTransactionOptions
-			: never;
+export type PvPCoinflipTransactionOptions<Action extends PvPCoinflipAction = PvPCoinflipAction> =
+	Action extends 'create'
+		? CreatePvPCoinflipTransactionOptions
+		: Action extends 'join'
+			? JoinPvPCoinflipTransactionOptions
+			: Action extends 'cancel'
+				? CancelPvPCoinflipTransactionOptions
+				: never;
 
-export type ClaimReferralCommissionOptions =
-	WithCoinType<TransactionSenderOptions>;
+export type ClaimReferralCommissionOptions = WithCoinType<TransactionSenderOptions>;
 
 export type ClaimReferralLevelUpUsdRewardsOptions = TransactionSenderOptions;
 

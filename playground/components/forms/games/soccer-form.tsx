@@ -12,11 +12,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type {
-	GameConfigOption,
-	GameSelectionOption,
-	SoccerFormValues,
-} from '@/lib/suigar-types';
+import type { GameConfigOption, GameSelectionOption, SoccerFormValues } from '@/lib/suigar-types';
 
 export function SoccerForm({
 	value,
@@ -37,10 +33,8 @@ export function SoccerForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 }) {
-	const selectedConfig =
-		configOptions?.find((option) => option.id === value.configId) ?? null;
-	const playableConfigOptions =
-		configOptions?.filter((option) => option.isPlayable) ?? [];
+	const selectedConfig = configOptions?.find((option) => option.id === value.configId) ?? null;
+	const playableConfigOptions = configOptions?.filter((option) => option.isPlayable) ?? [];
 	const shotZoneOptions = selectedConfig?.multiplierValues ?? [];
 
 	return (

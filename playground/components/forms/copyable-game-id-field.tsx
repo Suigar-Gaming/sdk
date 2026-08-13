@@ -28,12 +28,7 @@ async function copyGameId(gameId: string) {
 	}
 }
 
-export function CopyableGameIdField({
-	id,
-	label,
-	placeholder,
-	value,
-}: CopyableGameIdFieldProps) {
+export function CopyableGameIdField({ id, label, placeholder, value }: CopyableGameIdFieldProps) {
 	return (
 		<Field>
 			<FieldLabel htmlFor={id}>{label}</FieldLabel>

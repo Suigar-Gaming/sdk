@@ -13,17 +13,12 @@ import {
 } from '../../src/runtime/client.js';
 import type { McpConfig } from '../../src/runtime/types.js';
 
-const owner =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
-const resolvedOwner =
-	'0x0000000000000000000000000000000000000000000000000000000000000002';
+const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const resolvedOwner = '0x0000000000000000000000000000000000000000000000000000000000000002';
 
-type ResolveNameServiceAddress =
-	SuigarClientBundle['client']['core']['resolveNameServiceAddress'];
+type ResolveNameServiceAddress = SuigarClientBundle['client']['core']['resolveNameServiceAddress'];
 
-const createResolverBundle = (
-	resolveNameServiceAddress: ResolveNameServiceAddress,
-) =>
+const createResolverBundle = (resolveNameServiceAddress: ResolveNameServiceAddress) =>
 	({
 		client: {
 			core: {
@@ -44,12 +39,8 @@ describe('network resolution', () => {
 	});
 
 	it('uses default provider URLs unless one is provided', () => {
-		expect(getProviderUrl('testnet')).toBe(
-			'https://fullnode.testnet.sui.io:443',
-		);
-		expect(getProviderUrl('mainnet', 'https://example.com')).toBe(
-			'https://example.com',
-		);
+		expect(getProviderUrl('testnet')).toBe('https://fullnode.testnet.sui.io:443');
+		expect(getProviderUrl('mainnet', 'https://example.com')).toBe('https://example.com');
 	});
 });
 
@@ -80,20 +71,16 @@ describe('owner resolution', () => {
 	it('normalizes raw Sui addresses without a SuiNS lookup', async () => {
 		const lookup = vi.fn<ResolveNameServiceAddress>();
 
-		await expect(
-			resolveOwnerAddress('0x1', createResolverBundle(lookup)),
-		).resolves.toBe(owner);
+		await expect(resolveOwnerAddress('0x1', createResolverBundle(lookup))).resolves.toBe(owner);
 		expect(lookup).not.toHaveBeenCalled();
 	});
 
 	it('resolves SuiNS names and subnames before transaction construction', async () => {
-		const lookup = vi
-			.fn<ResolveNameServiceAddress>()
-			.mockResolvedValue({ address: resolvedOwner });
+		const lookup = vi.fn<ResolveNameServiceAddress>().mockResolvedValue({ address: resolvedOwner });
 
-		await expect(
-			resolveOwnerAddress('furbor.sui', createResolverBundle(lookup)),
-		).resolves.toBe(resolvedOwner);
+		await expect(resolveOwnerAddress('furbor.sui', createResolverBundle(lookup))).resolves.toBe(
+			resolvedOwner,
+		);
 		expect(lookup).toHaveBeenCalledWith({ name: 'furbor.sui' });
 
 		await expect(

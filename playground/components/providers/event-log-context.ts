@@ -9,6 +9,4 @@ export type EventLogContextValue = {
 	clearRows: () => void;
 };
 
-export const EventLogContext = React.createContext<EventLogContextValue | null>(
-	null,
-);
+export const EventLogContext = React.createContext<EventLogContextValue | null>(null);

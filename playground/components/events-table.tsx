@@ -29,10 +29,7 @@ function toTitleCase(value: string) {
 const explorerBaseUrl = 'https://testnet.suivision.xyz';
 
 function toExplorerUrl(path: string, identifier: string, search?: string) {
-	const url = new URL(
-		`${path}/${encodeURIComponent(identifier)}`,
-		explorerBaseUrl,
-	);
+	const url = new URL(`${path}/${encodeURIComponent(identifier)}`, explorerBaseUrl);
 	if (search) {
 		url.search = search;
 	}
@@ -100,9 +97,7 @@ function CopyableValue({
 
 	return (
 		<div className="flex items-center gap-2">
-			<span className="font-mono text-muted-foreground">
-				{compactAddress(displayValue)}
-			</span>
+			<span className="font-mono text-muted-foreground">{compactAddress(displayValue)}</span>
 			<Button
 				type="button"
 				variant="outline"
@@ -148,8 +143,8 @@ export function EventsTable() {
 						Decoded events
 					</CardTitle>
 					<CardDescription>
-						Event history stays available when you switch games. Clear it
-						whenever you want a fresh log.
+						Event history stays available when you switch games. Clear it whenever you want a fresh
+						log.
 					</CardDescription>
 				</div>
 				<CardAction className="absolute top-6 right-6">
@@ -165,46 +160,25 @@ export function EventsTable() {
 						<Table className="min-w-[44rem] md:min-w-full bg-background">
 							<TableHeader className="bg-accent">
 								<TableRow className="hover:bg-transparent">
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Type
-									</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Date
-									</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Digest
-									</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Game ID
-									</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Player
-									</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">
-										Details
-									</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Type</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Date</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Digest</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Game ID</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Player</TableHead>
+									<TableHead className="sticky top-0 z-10 bg-accent">Details</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{rows.length === 0 ? (
 									<TableRow>
-										<TableCell
-											colSpan={6}
-											className="py-10 text-center text-muted-foreground"
-										>
-											Execute a transaction to start filling the shared event
-											log.
+										<TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+											Execute a transaction to start filling the shared event log.
 										</TableCell>
 									</TableRow>
 								) : (
 									rows.map((row) => (
-										<TableRow
-											key={row.id}
-											className="align-top odd:bg-accent/35 even:bg-card/55"
-										>
-											<TableCell className="font-medium">
-												{row.eventType}
-											</TableCell>
+										<TableRow key={row.id} className="align-top odd:bg-accent/35 even:bg-card/55">
+											<TableCell className="font-medium">{row.eventType}</TableCell>
 											<TableCell className="text-muted-foreground">
 												{formatEventTimestamp(row.timestamp)}
 											</TableCell>
@@ -217,19 +191,13 @@ export function EventsTable() {
 												/>
 											</TableCell>
 											<TableCell className="text-xs">
-												<CopyableValue
-													label="game id"
-													value={row.gameId}
-													onCopied={handleCopied}
-												/>
+												<CopyableValue label="game id" value={row.gameId} onCopied={handleCopied} />
 											</TableCell>
 											<TableCell className="text-xs text-muted-foreground">
 												<CopyableValue
 													label="player"
 													value={row.actor}
-													explorerHref={
-														row.actor ? toAccountUrl(row.actor) : undefined
-													}
+													explorerHref={row.actor ? toAccountUrl(row.actor) : undefined}
 													onCopied={handleCopied}
 												/>
 											</TableCell>

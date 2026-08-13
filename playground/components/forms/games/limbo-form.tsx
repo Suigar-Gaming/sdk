@@ -3,13 +3,7 @@
 import type * as React from 'react';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '@suigar/sdk/utils';
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
-import {
-	Field,
-	FieldCode,
-	FieldDescription,
-	FieldGroup,
-	FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldCode, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { parseOptionalNumber } from '@/lib/suigar-app';
 import type { LimboFormValues } from '@/lib/suigar-types';
@@ -44,17 +38,13 @@ export function LimboForm({
 						step="any"
 						className="h-11 px-4 bg-background/55 rounded-2xl"
 						value={value.targetMultiplier}
-						onChange={(event) =>
-							onChange({ targetMultiplier: event.target.value })
-						}
+						onChange={(event) => onChange({ targetMultiplier: event.target.value })}
 					/>
 					<FieldDescription size="sm">
-						The SDK sends{' '}
-						<FieldCode>Math.round(targetMultiplier * scale)</FieldCode>. With
-						scale <FieldCode>{String(effectiveScale)}</FieldCode>, a target
-						multiplier of <FieldCode>2.5</FieldCode> becomes{' '}
-						<FieldCode>{String(Math.round(2.5 * effectiveScale))}</FieldCode>{' '}
-						on-chain
+						The SDK sends <FieldCode>Math.round(targetMultiplier * scale)</FieldCode>. With scale{' '}
+						<FieldCode>{String(effectiveScale)}</FieldCode>, a target multiplier of{' '}
+						<FieldCode>2.5</FieldCode> becomes{' '}
+						<FieldCode>{String(Math.round(2.5 * effectiveScale))}</FieldCode> on-chain
 					</FieldDescription>
 					{targetMultiplierDescription}
 				</Field>

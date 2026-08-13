@@ -49,23 +49,20 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 	);
 }
 
-const fieldVariants = cva(
-	'flex w-full gap-2 data-[invalid=true]:text-destructive group/field',
-	{
-		variants: {
-			orientation: {
-				vertical: 'flex-col *:w-full [&>.sr-only]:w-auto',
-				horizontal:
-					'flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
-				responsive:
-					'flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
-			},
-		},
-		defaultVariants: {
-			orientation: 'vertical',
+const fieldVariants = cva('flex w-full gap-2 data-[invalid=true]:text-destructive group/field', {
+	variants: {
+		orientation: {
+			vertical: 'flex-col *:w-full [&>.sr-only]:w-auto',
+			horizontal:
+				'flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
+			responsive:
+				'flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px',
 		},
 	},
-);
+	defaultVariants: {
+		orientation: 'vertical',
+	},
+});
 
 function Field({
 	className,
@@ -86,19 +83,13 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="field-content"
-			className={cn(
-				'flex flex-1 flex-col leading-snug gap-0.5 group/field-content',
-				className,
-			)}
+			className={cn('flex flex-1 flex-col leading-snug gap-0.5 group/field-content', className)}
 			{...props}
 		/>
 	);
 }
 
-function FieldLabel({
-	className,
-	...props
-}: React.ComponentProps<typeof Label>) {
+function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>) {
 	return (
 		<Label
 			data-slot="field-label"
@@ -211,9 +202,7 @@ function FieldError({
 		return null;
 	}
 
-	const uniqueErrors = [
-		...new Map(errors.map((error) => [error?.message, error])).values(),
-	];
+	const uniqueErrors = [...new Map(errors.map((error) => [error?.message, error])).values()];
 
 	const content =
 		uniqueErrors.length === 1 ? (
@@ -221,8 +210,7 @@ function FieldError({
 		) : (
 			<ul className="flex flex-col list-disc ml-4 gap-1">
 				{uniqueErrors.map(
-					(error) =>
-						error?.message && <li key={error.message}>{error.message}</li>,
+					(error) => error?.message && <li key={error.message}>{error.message}</li>,
 				)}
 			</ul>
 		);

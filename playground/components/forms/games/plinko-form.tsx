@@ -31,10 +31,8 @@ export function PlinkoForm({
 	configError?: string | null;
 	stakeDescription?: React.ReactNode;
 }) {
-	const selectedConfig =
-		configOptions?.find((option) => option.id === value.configId) ?? null;
-	const playableConfigOptions =
-		configOptions?.filter((option) => option.isPlayable) ?? [];
+	const selectedConfig = configOptions?.find((option) => option.id === value.configId) ?? null;
+	const playableConfigOptions = configOptions?.filter((option) => option.isPlayable) ?? [];
 
 	return (
 		<div className="space-y-6">

@@ -18,13 +18,9 @@ export function isPvPGame(value: string | null): value is PvPGameId {
 }
 
 export function getStandardGameLabel(game: StandardGameId) {
-	return (
-		STANDARD_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game
-	);
+	return STANDARD_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game;
 }
 
 export function getPvPGameLabel(game: PvPGameId) {
-	return (
-		PVP_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game
-	);
+	return PVP_GAME_OPTIONS.find((option) => option.value === game)?.label ?? game;
 }

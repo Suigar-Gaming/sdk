@@ -21,14 +21,11 @@ export default function GlobalError({
 							</div>
 							<div className="min-w-0 flex-1 space-y-4">
 								<div className="space-y-2">
-									<h1 className="text-2xl font-semibold">
-										Something went wrong
-									</h1>
+									<h1 className="text-2xl font-semibold">Something went wrong</h1>
 									<p className="text-sm leading-6 text-muted-foreground">
-										An unexpected error interrupted the playground. Try
-										reloading this part of the app, and if the problem persists,
-										check the browser console or server logs for the full stack
-										trace.
+										An unexpected error interrupted the playground. Try reloading this part of the
+										app, and if the problem persists, check the browser console or server logs for
+										the full stack trace.
 									</p>
 								</div>
 

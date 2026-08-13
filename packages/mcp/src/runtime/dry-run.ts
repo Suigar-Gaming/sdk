@@ -18,9 +18,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object';
 }
 
-function getDryRunTransaction(
-	dryRun: RawDryRunResult,
-): RawDryRunResult['Transaction'] | undefined {
+function getDryRunTransaction(dryRun: RawDryRunResult): RawDryRunResult['Transaction'] | undefined {
 	if (!isRecord(dryRun)) {
 		return undefined;
 	}
@@ -28,11 +26,7 @@ function getDryRunTransaction(
 }
 
 export function toJsonValue(value: unknown): JsonValue | undefined {
-	if (
-		value == null ||
-		typeof value === 'string' ||
-		typeof value === 'boolean'
-	) {
+	if (value == null || typeof value === 'string' || typeof value === 'boolean') {
 		return value ?? null;
 	}
 	if (typeof value === 'number') {
@@ -101,22 +95,14 @@ export function extractDryRunErrors(dryRun: RawDryRunResult): Array<string> {
 	return [...new Set(errors)];
 }
 
-function stringField(
-	record: Record<string, unknown>,
-	key: string,
-): string | undefined {
+function stringField(record: Record<string, unknown>, key: string): string | undefined {
 	const value = record[key];
-	return typeof value === 'string' ||
-		typeof value === 'number' ||
-		typeof value === 'bigint'
+	return typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint'
 		? String(value)
 		: undefined;
 }
 
-function gasUsedSummary(
-	effects: unknown,
-	decimals?: number,
-): DryRunSummary['gasUsed'] {
+function gasUsedSummary(effects: unknown, decimals?: number): DryRunSummary['gasUsed'] {
 	const gasUsed = isRecord(effects) ? effects.gasUsed : undefined;
 	if (!isRecord(gasUsed)) {
 		return {
@@ -131,10 +117,7 @@ function gasUsedSummary(
 	const computation = stringField(gasUsed, 'computationCost');
 	const storage = stringField(gasUsed, 'storageCost');
 	const rebate = stringField(gasUsed, 'storageRebate');
-	const nonRefundableStorageFee = stringField(
-		gasUsed,
-		'nonRefundableStorageFee',
-	);
+	const nonRefundableStorageFee = stringField(gasUsed, 'nonRefundableStorageFee');
 	const net =
 		computation && storage && rebate
 			? String(-(BigInt(computation) + BigInt(storage) - BigInt(rebate)))
@@ -206,9 +189,7 @@ function parseDryRunEvent(
 		// Fall back to string matching below for JSON-only simulated events.
 	}
 
-	const standardBetResult = /::BetResultEvent<[^>]+::([^:<>,]+)::Game>/u.exec(
-		eventType,
-	);
+	const standardBetResult = /::BetResultEvent<[^>]+::([^:<>,]+)::Game>/u.exec(eventType);
 	const gameId = standardBetResult?.[1]?.replaceAll('_', '-');
 	return gameId && GAMES.includes(gameId as Game)
 		? {
@@ -289,9 +270,7 @@ export function summarizeDryRun(
 	context: TransactionSummaryFormattingContext = {},
 ): DryRunSummary {
 	const transaction = getDryRunTransaction(dryRun);
-	const transactionRecord: Record<string, unknown> = isRecord(transaction)
-		? transaction
-		: {};
+	const transactionRecord: Record<string, unknown> = isRecord(transaction) ? transaction : {};
 	const effects = transactionRecord.effects;
 	const status = isRecord(effects) ? effects.status : undefined;
 	const success = isRecord(status) ? status.success === true : false;
@@ -309,8 +288,7 @@ export function summarizeDryRun(
 						const rawAmount = toJsonValue(change.amount);
 						changes.push({
 							address: typeof change.address === 'string' ? change.address : '',
-							coinType:
-								typeof change.coinType === 'string' ? change.coinType : '',
+							coinType: typeof change.coinType === 'string' ? change.coinType : '',
 							amount:
 								formatAmount(change.amount, context.coinDecimals) ??
 								({
@@ -330,20 +308,13 @@ export function summarizeDryRun(
 			)
 		: [];
 	const events = Array.isArray(transactionRecord.events)
-		? transactionRecord.events.reduce<Array<DryRunEventSummary>>(
-				(summaries, event) => {
-					const summary = summarizeDryRunEvent(
-						event,
-						client,
-						context.coinDecimals,
-					);
-					if (summary) {
-						summaries.push(summary);
-					}
-					return summaries;
-				},
-				[],
-			)
+		? transactionRecord.events.reduce<Array<DryRunEventSummary>>((summaries, event) => {
+				const summary = summarizeDryRunEvent(event, client, context.coinDecimals);
+				if (summary) {
+					summaries.push(summary);
+				}
+				return summaries;
+			}, [])
 		: [];
 
 	return {

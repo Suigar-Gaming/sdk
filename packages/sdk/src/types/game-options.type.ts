@@ -25,11 +25,9 @@ type StandardGameTransactionOptionsRegistry = {
 };
 
 export type CreateGameBetOptions<TGame extends StandardGame = StandardGame> = {
-	[Game in TGame]: WithGame<
-		WithoutConfig<StandardGameTransactionOptionsRegistry[Game]>,
-		Game
-	>;
+	[Game in TGame]: WithGame<WithoutConfig<StandardGameTransactionOptionsRegistry[Game]>, Game>;
 }[TGame];
 
-export type PvPCoinflipGameOptions<Action extends PvPCoinflipAction> =
-	WithoutConfig<PvPCoinflipTransactionOptions<Action>>;
+export type PvPCoinflipGameOptions<Action extends PvPCoinflipAction> = WithoutConfig<
+	PvPCoinflipTransactionOptions<Action>
+>;

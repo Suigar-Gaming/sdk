@@ -1,6 +1,6 @@
 ---
-"@suigar/sdk": major
-"@suigar/mcp": patch
+'@suigar/sdk': major
+'@suigar/mcp': patch
 ---
 
 Convert public SDK helpers, including `createGameBet`, to single options object signatures for Mysten-style calls.

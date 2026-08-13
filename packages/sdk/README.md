@@ -159,9 +159,7 @@ Do not pass a partner slug, label, or display name here. Use the wallet address 
 You can rename the extension:
 
 ```ts
-const client = new SuiGrpcClient({ baseUrl, network }).$extend(
-	suigar({ name: 'games' }),
-);
+const client = new SuiGrpcClient({ baseUrl, network }).$extend(suigar({ name: 'games' }));
 
 client.games.tx;
 client.games.bcs;
@@ -500,10 +498,9 @@ const commissionAmount = await client.suigar.view.referral.getCommission({
 	owner: '0xREFERRER',
 	coinType: '0x2::sui::SUI',
 });
-const levelUpUsdcAmount =
-	await client.suigar.view.referral.getLevelUpUsdRewards({
-		owner: '0xREFERRER',
-	});
+const levelUpUsdcAmount = await client.suigar.view.referral.getLevelUpUsdRewards({
+	owner: '0xREFERRER',
+});
 ```
 
 The deployed referral contract does not expose public balance getters. These simulated reads execute the same pool and oracle checks as a real claim, so they can fail for the same reasons and can change before execution.

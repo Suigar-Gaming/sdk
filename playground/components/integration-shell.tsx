@@ -1,10 +1,6 @@
 'use client';
 
-import {
-	useCurrentAccount,
-	useCurrentClient,
-	useDAppKit,
-} from '@mysten/dapp-kit-react';
+import { useCurrentAccount, useCurrentClient, useDAppKit } from '@mysten/dapp-kit-react';
 import { BookOpenText, Cog, Gamepad2, Swords } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -46,10 +42,7 @@ import {
 	getPvPGameLabel,
 	getStandardGameLabel,
 } from '@/components/integration-shell/helpers/games';
-import {
-	clampNumber,
-	formatInputNumber,
-} from '@/components/integration-shell/helpers/numbers';
+import { clampNumber, formatInputNumber } from '@/components/integration-shell/helpers/numbers';
 import {
 	getPvPActionFromParams,
 	getPvPGameFromParams,
@@ -61,12 +54,7 @@ import {
 	STANDARD_GAME_OPTIONS,
 } from '@/components/integration-shell/options';
 import { Button } from '@/components/ui/button';
-import {
-	FieldCode,
-	FieldDescription,
-	FieldGroup,
-	FieldLabel,
-} from '@/components/ui/field';
+import { FieldCode, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import {
 	Select,
 	SelectContent,
@@ -127,10 +115,7 @@ type CoinBalancesState = {
 	balanceOwner: string | null;
 };
 
-function clampBetCount<T extends StandardSharedFields>(
-	form: T,
-	max: bigint,
-): T {
+function clampBetCount<T extends StandardSharedFields>(form: T, max: bigint): T {
 	const betCount = form.betCount.trim();
 	const nextBetCount =
 		max === BigInt(1)
@@ -139,9 +124,7 @@ function clampBetCount<T extends StandardSharedFields>(
 				? max.toString()
 				: form.betCount;
 
-	return nextBetCount === form.betCount
-		? form
-		: { ...form, betCount: nextBetCount };
+	return nextBetCount === form.betCount ? form : { ...form, betCount: nextBetCount };
 }
 type LobbyState = {
 	games: Array<PvPCoinflipLobbyGame>;
@@ -341,11 +324,7 @@ function clampStakeValue(stake: string, stakeRange?: StakeRangeSummary) {
 	const minStake = parseOptionalNumber(stakeRange.min);
 	const maxStake = parseOptionalNumber(stakeRange.max);
 
-	if (
-		currentStake === undefined ||
-		minStake === undefined ||
-		maxStake === undefined
-	) {
+	if (currentStake === undefined || minStake === undefined || maxStake === undefined) {
 		return stake;
 	}
 
@@ -369,9 +348,7 @@ function resolvePlayableConfigId(
 	}
 
 	const nextConfig =
-		configOptions.find(
-			(option) => option.id === currentConfigId && option.isPlayable,
-		) ??
+		configOptions.find((option) => option.id === currentConfigId && option.isPlayable) ??
 		configOptions.find((option) => option.isPlayable) ??
 		configOptions[0];
 
@@ -380,10 +357,7 @@ function resolvePlayableConfigId(
 
 const floatingActionNode = (
 	<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
-		<Button
-			asChild
-			className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5"
-		>
+		<Button asChild className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5">
 			<a
 				href="https://suigar.com/docs/sdk"
 				target="_blank"
@@ -429,8 +403,8 @@ function IntegrationHero({
 							Suigar SDK playground
 						</h1>
 						<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-							Build standard and PvP transactions, inspect the exact builder
-							call, execute it, and keep a shared decoded event log.
+							Build standard and PvP transactions, inspect the exact builder call, execute it, and
+							keep a shared decoded event log.
 						</p>
 					</div>
 
@@ -442,11 +416,7 @@ function IntegrationHero({
 								size="sm"
 								className="h-10 rounded-full px-4"
 							>
-								<Link
-									href="/standard?game=coinflip"
-									scroll={false}
-									prefetch={false}
-								>
+								<Link href="/standard?game=coinflip" scroll={false} prefetch={false}>
 									Standard
 								</Link>
 							</Button>
@@ -456,11 +426,7 @@ function IntegrationHero({
 								size="sm"
 								className="h-10 rounded-full px-4"
 							>
-								<Link
-									href="/pvp?game=pvp-coinflip&action=create"
-									scroll={false}
-									prefetch={false}
-								>
+								<Link href="/pvp?game=pvp-coinflip&action=create" scroll={false} prefetch={false}>
 									PvP
 								</Link>
 							</Button>
@@ -469,10 +435,7 @@ function IntegrationHero({
 						<div className="flex flex-wrap items-center gap-2">
 							{mode === 'standard' ? (
 								<div className="w-full sm:w-[12rem]">
-									<Select
-										value={standardGame}
-										onValueChange={onStandardGameChange}
-									>
+									<Select value={standardGame} onValueChange={onStandardGameChange}>
 										<SelectTrigger
 											aria-label="Select standard game"
 											className="h-11 rounded-full border-border/70 bg-background/55 px-4"
@@ -513,11 +476,7 @@ function IntegrationHero({
 												key={action.value}
 												type="button"
 												size="sm"
-												variant={
-													pvpAction === action.value
-														? 'control-active'
-														: 'control'
-												}
+												variant={pvpAction === action.value ? 'control-active' : 'control'}
 												onClick={() => onPvPActionChange(action.value)}
 												className={cn(
 													'h-10 justify-start rounded-full px-4',
@@ -536,10 +495,9 @@ function IntegrationHero({
 				</div>
 
 				<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
-					Stake inputs use human values like{' '}
-					<span className="font-medium text-foreground">1</span> or{' '}
-					<span className="font-medium text-foreground">2.5</span> and are
-					converted to atomic units in the generated transaction.
+					Stake inputs use human values like <span className="font-medium text-foreground">1</span>{' '}
+					or <span className="font-medium text-foreground">2.5</span> and are converted to atomic
+					units in the generated transaction.
 				</div>
 			</div>
 		</section>
@@ -626,20 +584,11 @@ function IntegrationControls({
 	coinTypes: Record<SupportedCoinKey, string>;
 	coinDecimals: Record<SupportedCoinKey, number>;
 	onRefreshPvPLobbies: () => void;
-	onSelectPvPLobby: (
-		action: 'join' | 'cancel',
-		game: PvPCoinflipLobbyGame,
-	) => void;
+	onSelectPvPLobby: (action: 'join' | 'cancel', game: PvPCoinflipLobbyGame) => void;
 	onStandardStakeBlur: (game: StandardGameId) => void;
 	onPvPCreateStakeBlur: () => void;
-	updateStandardForm: <K extends StandardGameId>(
-		game: K,
-		patch: Partial<StandardForms[K]>,
-	) => void;
-	updatePvPForm: <K extends PvPAction>(
-		action: K,
-		patch: Partial<PvPCoinflipForms[K]>,
-	) => void;
+	updateStandardForm: <K extends StandardGameId>(game: K, patch: Partial<StandardForms[K]>) => void;
+	updatePvPForm: <K extends PvPAction>(action: K, patch: Partial<PvPCoinflipForms[K]>) => void;
 	openSettings: () => void;
 }) {
 	const controlsIcon =
@@ -685,9 +634,7 @@ function IntegrationControls({
 					{mode === 'standard' ? (
 						<StandardGameBetCountProvider
 							value={effectiveStandardForms[standardGame].betCount}
-							onChange={(betCount) =>
-								updateStandardForm(standardGame, { betCount })
-							}
+							onChange={(betCount) => updateStandardForm(standardGame, { betCount })}
 							betCountLimit={standardGameParameters?.betCountLimit}
 							isLoading={isStandardGameParametersLoading}
 						>
@@ -767,12 +714,10 @@ function IntegrationControls({
 									<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
 										<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 											<div className="min-w-0 space-y-1">
-												<FieldLabel htmlFor="join-private-lobbies">
-													Show private lobbies
-												</FieldLabel>
+												<FieldLabel htmlFor="join-private-lobbies">Show private lobbies</FieldLabel>
 												<FieldDescription size="sm">
-													Public unresolved lobbies stay visible even when the
-													wallet is disconnected
+													Public unresolved lobbies stay visible even when the wallet is
+													disconnected
 												</FieldDescription>
 											</div>
 											<Switch
@@ -795,13 +740,8 @@ function IntegrationControls({
 										coinTypes={coinTypes}
 										formatAmount={formatBalance}
 										getCoinDecimals={(value) => {
-											const matchingCoinKey = resolveCoinKeyForType(
-												value,
-												coinTypes,
-											);
-											return matchingCoinKey
-												? coinDecimals[matchingCoinKey]
-												: 9;
+											const matchingCoinKey = resolveCoinKeyForType(value, coinTypes);
+											return matchingCoinKey ? coinDecimals[matchingCoinKey] : 9;
 										}}
 										onRefresh={onRefreshPvPLobbies}
 										onSelectGame={(game) => onSelectPvPLobby('join', game)}
@@ -826,13 +766,8 @@ function IntegrationControls({
 										coinTypes={coinTypes}
 										formatAmount={formatBalance}
 										getCoinDecimals={(value) => {
-											const matchingCoinKey = resolveCoinKeyForType(
-												value,
-												coinTypes,
-											);
-											return matchingCoinKey
-												? coinDecimals[matchingCoinKey]
-												: 9;
+											const matchingCoinKey = resolveCoinKeyForType(value, coinTypes);
+											return matchingCoinKey ? coinDecimals[matchingCoinKey] : 9;
 										}}
 										onRefresh={onRefreshPvPLobbies}
 										onSelectGame={(game) => onSelectPvPLobby('cancel', game)}
@@ -900,12 +835,11 @@ function useIntegrationState({
 		coinBalancesReducer,
 		initialCoinBalancesState,
 	);
-	const [lobbyState, dispatchLobby] = React.useReducer(
-		lobbyReducer,
-		initialLobbyState,
+	const [lobbyState, dispatchLobby] = React.useReducer(lobbyReducer, initialLobbyState);
+	const [standardParametersState, dispatchStandardParameters] = React.useReducer(
+		standardParametersReducer,
+		initialStandardParametersState,
 	);
-	const [standardParametersState, dispatchStandardParameters] =
-		React.useReducer(standardParametersReducer, initialStandardParametersState);
 	const [pvpParametersState, dispatchPvPParameters] = React.useReducer(
 		pvpParametersReducer,
 		initialPvPParametersState,
@@ -936,11 +870,7 @@ function useIntegrationState({
 	const previewOwner = currentAccount?.address ?? PREVIEW_PLAYER_ADDRESS;
 	const visibleStatus = currentAccount ? status : null;
 	const { coinBalances, balanceOwner } = coinBalancesState;
-	const {
-		games: pvpLobbyGames,
-		error: pvpLobbyError,
-		isLoading: isPvPLobbyLoading,
-	} = lobbyState;
+	const { games: pvpLobbyGames, error: pvpLobbyError, isLoading: isPvPLobbyLoading } = lobbyState;
 	const {
 		summary: standardGameParameters,
 		payload: standardGameParametersPayload,
@@ -968,37 +898,33 @@ function useIntegrationState({
 			coinKeys: coinOptions.map(([coinKey]) => coinKey),
 		});
 
-		const results: Array<[SupportedCoinKey, CoinBalanceState]> =
-			await Promise.all(
-				coinOptions.map(async ([coinKey, value]) => {
-					try {
-						const response = await currentClient.getBalance({
-							owner: currentAccount.address,
-							coinType: value,
-						});
-						return [
-							coinKey,
-							{
-								balance: formatBalance(
-									BigInt(response.balance.balance),
-									coinDecimals[coinKey],
-								),
-								isLoading: false,
-								error: null,
-							},
-						];
-					} catch (balanceError) {
-						return [
-							coinKey,
-							{
-								balance: null,
-								isLoading: false,
-								error: parseError(balanceError),
-							},
-						];
-					}
-				}),
-			);
+		const results: Array<[SupportedCoinKey, CoinBalanceState]> = await Promise.all(
+			coinOptions.map(async ([coinKey, value]) => {
+				try {
+					const response = await currentClient.getBalance({
+						owner: currentAccount.address,
+						coinType: value,
+					});
+					return [
+						coinKey,
+						{
+							balance: formatBalance(BigInt(response.balance.balance), coinDecimals[coinKey]),
+							isLoading: false,
+							error: null,
+						},
+					];
+				} catch (balanceError) {
+					return [
+						coinKey,
+						{
+							balance: null,
+							isLoading: false,
+							error: parseError(balanceError),
+						},
+					];
+				}
+			}),
+		);
 
 		dispatchCoinBalances({
 			type: 'loaded',
@@ -1032,11 +958,7 @@ function useIntegrationState({
 				dispatchStandardParameters({
 					type: 'loaded',
 					payload: parameters,
-					summary: summarizeStandardGameParameters(
-						standardGame,
-						parameters,
-						coinDecimal,
-					),
+					summary: summarizeStandardGameParameters(standardGame, parameters, coinDecimal),
 				});
 			} catch (parametersError) {
 				dispatchStandardParameters({
@@ -1117,33 +1039,21 @@ function useIntegrationState({
 		void refreshPvPLobbies();
 	}, [refreshPvPLobbies]);
 
-	const normalizedCurrentAccount =
-		currentAccount?.address.toLowerCase() ?? null;
-	const selectedStandardForm =
-		standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
+	const normalizedCurrentAccount = currentAccount?.address.toLowerCase() ?? null;
+	const selectedStandardForm = standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
 	const activeConfigId =
-		standardGame === 'plinko' ||
-		standardGame === 'soccer' ||
-		standardGame === 'wheel'
+		standardGame === 'plinko' || standardGame === 'soccer' || standardGame === 'wheel'
 			? resolvePlayableConfigId(
 					(selectedStandardForm as { configId: string }).configId,
 					standardGameParameters?.configOptions,
 				)
 			: undefined;
 	const activeConfigOption = React.useMemo(
-		() =>
-			activeConfigId
-				? findGameConfigOption(standardGameParameters, activeConfigId)
-				: null,
+		() => (activeConfigId ? findGameConfigOption(standardGameParameters, activeConfigId) : null),
 		[activeConfigId, standardGameParameters],
 	);
 	const activeStakeRange = React.useMemo(
-		() =>
-			resolveStakeRangeForGame(
-				standardGame,
-				standardGameParameters,
-				activeConfigId,
-			),
+		() => resolveStakeRangeForGame(standardGame, standardGameParameters, activeConfigId),
 		[activeConfigId, standardGame, standardGameParameters],
 	);
 	const stakeDescription = React.useMemo(
@@ -1153,9 +1063,7 @@ function useIntegrationState({
 				isLoading={isStandardGameParametersLoading}
 				error={standardGameParametersError}
 				effectiveSelectedCoin={effectiveSelectedCoin}
-				activeConfigDisabled={Boolean(
-					activeConfigOption && !activeConfigOption.isPlayable,
-				)}
+				activeConfigDisabled={Boolean(activeConfigOption && !activeConfigOption.isPlayable)}
 			/>
 		),
 		[
@@ -1203,18 +1111,13 @@ function useIntegrationState({
 		mode === 'standard'
 			? `client.suigar.getGameParameters({ game: '${standardGame}', coinType: '${coinType}' })`
 			: `client.suigar.getGameParameters({ game: '${pvpGame}', coinType: '${coinType}' })`;
-	const settingsSummary =
-		mode === 'standard' ? standardGameParameters : pvpGameParameters;
-	const settingsError =
-		mode === 'standard' ? standardGameParametersError : pvpGameParametersError;
+	const settingsSummary = mode === 'standard' ? standardGameParameters : pvpGameParameters;
+	const settingsError = mode === 'standard' ? standardGameParametersError : pvpGameParametersError;
 	const isSettingsLoading =
-		mode === 'standard'
-			? isStandardGameParametersLoading
-			: isPvPGameParametersLoading;
+		mode === 'standard' ? isStandardGameParametersLoading : isPvPGameParametersLoading;
 	const settingsConfigOptions =
 		mode === 'standard' ? standardGameParameters?.configOptions : undefined;
-	const settingsGameLabel =
-		mode === 'standard' ? standardGameLabel : pvpGameLabel;
+	const settingsGameLabel = mode === 'standard' ? standardGameLabel : pvpGameLabel;
 	const settingsStakeRange =
 		mode === 'standard'
 			? (settingsSummary?.stakeRange ?? activeStakeRange)
@@ -1228,23 +1131,16 @@ function useIntegrationState({
 		void refreshPvPGameParameters(true);
 	}, [mode, refreshPvPGameParameters, refreshStandardGameParameters]);
 	const limboTargetMultiplierDescription = React.useMemo(() => {
-		if (
-			standardGame !== 'limbo' ||
-			!standardGameParameters?.targetMultiplierRange
-		) {
+		if (standardGame !== 'limbo' || !standardGameParameters?.targetMultiplierRange) {
 			return null;
 		}
 
 		return (
 			<FieldDescription size="sm">
 				On-chain target multiplier range:{' '}
-				<FieldCode>
-					{formatInputNumber(standardGameParameters.targetMultiplierRange.min)}
-				</FieldCode>{' '}
+				<FieldCode>{formatInputNumber(standardGameParameters.targetMultiplierRange.min)}</FieldCode>{' '}
 				to{' '}
-				<FieldCode>
-					{formatInputNumber(standardGameParameters.targetMultiplierRange.max)}
-				</FieldCode>
+				<FieldCode>{formatInputNumber(standardGameParameters.targetMultiplierRange.max)}</FieldCode>
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters]);
@@ -1263,24 +1159,15 @@ function useIntegrationState({
 			<FieldDescription size="sm">
 				On-chain zone size:{' '}
 				<FieldCode>
-					{formatInputNumber(
-						standardGameParameters.rangeBounds.minZoneSize / effectiveScale,
-					)}
+					{formatInputNumber(standardGameParameters.rangeBounds.minZoneSize / effectiveScale)}
 				</FieldCode>{' '}
 				to{' '}
 				<FieldCode>
-					{formatInputNumber(
-						standardGameParameters.rangeBounds.maxZoneSize / effectiveScale,
-					)}
+					{formatInputNumber(standardGameParameters.rangeBounds.maxZoneSize / effectiveScale)}
 				</FieldCode>{' '}
 				with RTP from{' '}
-				<FieldCode>
-					{formatInputNumber(standardGameParameters.rangeBounds.minRtp)}
-				</FieldCode>{' '}
-				to{' '}
-				<FieldCode>
-					{formatInputNumber(standardGameParameters.rangeBounds.maxRtp)}
-				</FieldCode>
+				<FieldCode>{formatInputNumber(standardGameParameters.rangeBounds.minRtp)}</FieldCode> to{' '}
+				<FieldCode>{formatInputNumber(standardGameParameters.rangeBounds.maxRtp)}</FieldCode>
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
@@ -1362,34 +1249,26 @@ function useIntegrationState({
 		}
 
 		if (standardGameParameters?.targetMultiplierRange) {
-			const targetMultiplier = parseOptionalNumber(
-				standardForms.limbo.targetMultiplier,
-			);
+			const targetMultiplier = parseOptionalNumber(standardForms.limbo.targetMultiplier);
 			if (targetMultiplier !== undefined) {
 				const clampedTargetMultiplier = clampNumber(
 					targetMultiplier,
 					standardGameParameters.targetMultiplierRange.min,
 					standardGameParameters.targetMultiplierRange.max,
 				);
-				nextForms.limbo.targetMultiplier = formatInputNumber(
-					clampedTargetMultiplier,
-				);
+				nextForms.limbo.targetMultiplier = formatInputNumber(clampedTargetMultiplier);
 			}
 		}
 
 		if (standardGameParameters?.rangeBounds) {
 			const configuredScale = parseOptionalNumber(standardForms.range.scale);
 			const effectiveScale =
-				configuredScale &&
-				Number.isFinite(configuredScale) &&
-				configuredScale > 0
+				configuredScale && Number.isFinite(configuredScale) && configuredScale > 0
 					? configuredScale
 					: DEFAULT_RANGE_SCALE;
 			const maxPoint = getRangePointMax(configuredScale);
-			const minZoneSize =
-				standardGameParameters.rangeBounds.minZoneSize / effectiveScale;
-			const maxZoneSize =
-				standardGameParameters.rangeBounds.maxZoneSize / effectiveScale;
+			const minZoneSize = standardGameParameters.rangeBounds.minZoneSize / effectiveScale;
+			const maxZoneSize = standardGameParameters.rangeBounds.maxZoneSize / effectiveScale;
 			const leftPoint = parseOptionalNumber(standardForms.range.leftPoint);
 			const rightPoint = parseOptionalNumber(standardForms.range.rightPoint);
 
@@ -1449,9 +1328,7 @@ function useIntegrationState({
 	const cancelLobbyGames = React.useMemo(
 		() =>
 			normalizedCurrentAccount
-				? pvpLobbyGames.filter(
-						(game) => game.creator.toLowerCase() === normalizedCurrentAccount,
-					)
+				? pvpLobbyGames.filter((game) => game.creator.toLowerCase() === normalizedCurrentAccount)
 				: [],
 		[pvpLobbyGames, normalizedCurrentAccount],
 	);
@@ -1504,10 +1381,7 @@ function useIntegrationState({
 		[pathname, routeParams, router, setRouteSearch],
 	);
 
-	function updateStandardForm<K extends StandardGameId>(
-		game: K,
-		patch: Partial<StandardForms[K]>,
-	) {
+	function updateStandardForm<K extends StandardGameId>(game: K, patch: Partial<StandardForms[K]>) {
 		dispatchUi({ type: 'clear-feedback' });
 		setStandardForms((current) => ({
 			...current,
@@ -1515,10 +1389,7 @@ function useIntegrationState({
 		}));
 	}
 
-	function updatePvPForm<K extends PvPAction>(
-		action: K,
-		patch: Partial<PvPCoinflipForms[K]>,
-	) {
+	function updatePvPForm<K extends PvPAction>(action: K, patch: Partial<PvPCoinflipForms[K]>) {
 		dispatchUi({ type: 'clear-feedback' });
 		setPvpForms((current) => ({
 			...current,
@@ -1533,10 +1404,7 @@ function useIntegrationState({
 
 		setStandardForms((current) => {
 			const currentGameForm = current[game];
-			const nextStake = clampStakeValue(
-				currentGameForm.stake,
-				activeStakeRange,
-			);
+			const nextStake = clampStakeValue(currentGameForm.stake, activeStakeRange);
 
 			if (nextStake === currentGameForm.stake) {
 				return current;
@@ -1558,10 +1426,7 @@ function useIntegrationState({
 		}
 
 		setPvpForms((current) => {
-			const nextStake = clampStakeValue(
-				current.create.stake,
-				pvpGameParameters.stakeRange,
-			);
+			const nextStake = clampStakeValue(current.create.stake, pvpGameParameters.stakeRange);
 
 			if (nextStake === current.create.stake) {
 				return current;
@@ -1577,10 +1442,7 @@ function useIntegrationState({
 		});
 	}
 
-	function handleSelectPvPLobby(
-		action: 'join' | 'cancel',
-		game: PvPCoinflipLobbyGame,
-	) {
+	function handleSelectPvPLobby(action: 'join' | 'cancel', game: PvPCoinflipLobbyGame) {
 		updatePvPForm(action, { gameId: game.id });
 		const matchingCoinKey = resolveCoinKeyForType(game.coin_type, coinTypes);
 		if (matchingCoinKey) {
@@ -1603,9 +1465,7 @@ function useIntegrationState({
 
 		try {
 			if (mode === 'pvp' && isMissingPvPGameSelection) {
-				throw new Error(
-					`Select a PvP lobby card before trying to ${pvpAction} a game.`,
-				);
+				throw new Error(`Select a PvP lobby card before trying to ${pvpAction} a game.`);
 			}
 
 			const owner = currentAccount.address;
@@ -1650,11 +1510,7 @@ function useIntegrationState({
 				throw new Error(finalResult.FailedTransaction.status.error?.message);
 			}
 
-			const rows = parseSuigarEvents(
-				currentClient,
-				digest,
-				finalResult.Transaction.events,
-			);
+			const rows = parseSuigarEvents(currentClient, digest, finalResult.Transaction.events);
 			if (rows.length > 0) {
 				addRows(rows);
 			}
@@ -1677,9 +1533,7 @@ function useIntegrationState({
 		() => (
 			<AppHeader
 				selectedCoin={effectiveSelectedCoin}
-				onSelectedCoinChange={(value) =>
-					dispatchUi({ type: 'set-selected-coin', value })
-				}
+				onSelectedCoinChange={(value) => dispatchUi({ type: 'set-selected-coin', value })}
 				coinBalances={coinBalances}
 				balanceOwner={balanceOwner}
 			/>
@@ -1837,10 +1691,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 		};
 	}, [isMounted]);
 
-	const routeParams = React.useMemo(
-		() => new URLSearchParams(routeSearch),
-		[routeSearch],
-	);
+	const routeParams = React.useMemo(() => new URLSearchParams(routeSearch), [routeSearch]);
 	const integration = useIntegrationState({
 		mode,
 		routeParams,
@@ -1861,9 +1712,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					standardGame={integration.standardGame}
 					pvpGame={integration.pvpGame}
 					pvpAction={integration.pvpAction}
-					onStandardGameChange={(value) =>
-						integration.updateQuery({ game: value })
-					}
+					onStandardGameChange={(value) => integration.updateQuery({ game: value })}
 					onPvPGameChange={(value) => integration.updateQuery({ game: value })}
 					onPvPActionChange={(value) => {
 						integration.updateQuery({
@@ -1882,14 +1731,10 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					effectiveStandardForms={integration.effectiveStandardForms}
 					effectivePvpForms={integration.effectivePvpForms}
 					standardGameParameters={integration.standardGameParameters}
-					isStandardGameParametersLoading={
-						integration.isStandardGameParametersLoading
-					}
+					isStandardGameParametersLoading={integration.isStandardGameParametersLoading}
 					standardGameParametersError={integration.standardGameParametersError}
 					stakeDescription={integration.stakeDescription}
-					limboTargetMultiplierDescription={
-						integration.limboTargetMultiplierDescription
-					}
+					limboTargetMultiplierDescription={integration.limboTargetMultiplierDescription}
 					rangeBoundsDescription={integration.rangeBoundsDescription}
 					pvpStakeDescription={integration.pvpStakeDescription}
 					showPrivateJoinLobbies={integration.showPrivateJoinLobbies}

@@ -7,31 +7,16 @@ import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,
 } from '../contracts/coinflip/coinflip.js';
-import {
-	Parameters as LimboParameters,
-	LimboSettingsKey,
-} from '../contracts/limbo/limbo.js';
-import {
-	Parameters as PlinkoParameters,
-	PlinkoSettingsKey,
-} from '../contracts/plinko/plinko.js';
+import { Parameters as LimboParameters, LimboSettingsKey } from '../contracts/limbo/limbo.js';
+import { Parameters as PlinkoParameters, PlinkoSettingsKey } from '../contracts/plinko/plinko.js';
 import {
 	Parameters as PvPCoinflipParameters,
 	PvpCoinflipSettingsKey,
 } from '../contracts/pvp-coinflip/pvp_coinflip.js';
-import {
-	Parameters as RangeParameters,
-	RangeSettingsKey,
-} from '../contracts/range/range.js';
-import {
-	Parameters as SoccerParameters,
-	SoccerSettingsKey,
-} from '../contracts/soccer/soccer.js';
+import { Parameters as RangeParameters, RangeSettingsKey } from '../contracts/range/range.js';
+import { Parameters as SoccerParameters, SoccerSettingsKey } from '../contracts/soccer/soccer.js';
 import type { MoveStruct } from '../contracts/utils/index.js';
-import {
-	Parameters as WheelParameters,
-	WheelSettingsKey,
-} from '../contracts/wheel/wheel.js';
+import { Parameters as WheelParameters, WheelSettingsKey } from '../contracts/wheel/wheel.js';
 import type { Game } from './game.type.js';
 import type { MoveFloat } from './move-float.type.js';
 import type { WithCoinType, WithGame } from './transaction-options.type.js';
@@ -65,10 +50,7 @@ export const GAME_SETTINGS = {
 		settingsKey: WheelSettingsKey,
 		parameters: WheelParameters,
 	},
-} as const satisfies Record<
-	Game,
-	{ settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }
->;
+} as const satisfies Record<Game, { settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }>;
 
 type OnChainGameParametersRegistry = {
 	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;
@@ -82,13 +64,10 @@ export type GameParameterValue<TValue> = TValue extends MoveFloat
 			? { [TKey in keyof TValue]: GameParameterValue<TValue[TKey]> }
 			: TValue;
 
-export type OnChainGameParameters<TGame extends Game> =
-	OnChainGameParametersRegistry[TGame];
+export type OnChainGameParameters<TGame extends Game> = OnChainGameParametersRegistry[TGame];
 
 /** Consumer-ready parameters with generated Move float values decoded to numbers. */
-export type GameParameters<TGame extends Game> = GameParameterValue<
-	OnChainGameParameters<TGame>
->;
+export type GameParameters<TGame extends Game> = GameParameterValue<OnChainGameParameters<TGame>>;
 
 /** Options for reading parameters. `coinType` is required because parameters are coin-specific. */
 export type GetGameParametersOptions<TGame extends Game = Game> = WithGame<

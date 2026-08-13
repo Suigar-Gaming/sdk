@@ -13,8 +13,7 @@ vi.mock('node:os', () => ({ homedir: () => testHome }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const frontendOrigin = 'http://localhost:5173';
-const address =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 beforeEach(async () => {
 	await rm(testHome, { force: true, recursive: true });
@@ -52,8 +51,7 @@ describe('wallet credentials', () => {
 			connectedAt: '2026-01-01T00:00:00.000Z',
 		});
 		await credentials.saveProfile('testnet', {
-			address:
-				'0x0000000000000000000000000000000000000000000000000000000000000002',
+			address: '0x0000000000000000000000000000000000000000000000000000000000000002',
 			walletType: 'zklogin',
 			frontendOrigin,
 			connectedAt: '2026-01-02T00:00:00.000Z',
@@ -63,12 +61,8 @@ describe('wallet credentials', () => {
 		expect(saved.defaultNetwork).toBe('testnet');
 		expect(saved.profiles.mainnet?.walletType).toBe('wallet');
 		expect(saved.profiles.testnet?.walletType).toBe('zklogin');
-		expect((await stat(join(testHome, '.suigar-mcp'))).mode & 0o777).toBe(
-			0o700,
-		);
-		expect((await stat(credentials.credentialsPath())).mode & 0o777).toBe(
-			0o600,
-		);
+		expect((await stat(join(testHome, '.suigar-mcp'))).mode & 0o777).toBe(0o700);
+		expect((await stat(credentials.credentialsPath())).mode & 0o777).toBe(0o600);
 
 		await credentials.removeProfile('testnet');
 		expect((await credentials.loadCredentials()).profiles).toEqual({

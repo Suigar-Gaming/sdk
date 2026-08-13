@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { normalizeStructTag } from '@mysten/sui/utils';
-import {
-	COINS,
-	OBJECT_IDS,
-	PACKAGE_IDS,
-	REGISTRY_IDS,
-} from '../configs/index.js';
+import { COINS, OBJECT_IDS, PACKAGE_IDS, REGISTRY_IDS } from '../configs/index.js';
 import type {
 	SuigarCoin,
 	SuigarCoinMetadata,
@@ -55,19 +50,13 @@ export function resolveSuigarConfig({
 	};
 }
 
-export function assertConfiguredBetGame({
-	config,
-	game,
-}: GamePackageIdOptions): void {
+export function assertConfiguredBetGame({ config, game }: GamePackageIdOptions): void {
 	if (!resolveGamePackageId({ config, game })) {
 		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
 	}
 }
 
-export function resolveGamePackageId({
-	config,
-	game,
-}: GamePackageIdOptions): string {
+export function resolveGamePackageId({ config, game }: GamePackageIdOptions): string {
 	switch (game) {
 		case 'coinflip':
 			return config.packageIds.coinflip;
@@ -86,10 +75,7 @@ export function resolveGamePackageId({
 	}
 }
 
-export function resolvePriceInfoObjectId({
-	config,
-	coinType,
-}: WithConfig<WithCoinType>): string {
+export function resolvePriceInfoObjectId({ config, coinType }: WithConfig<WithCoinType>): string {
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin({
 		config,
@@ -98,9 +84,7 @@ export function resolvePriceInfoObjectId({
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;
 
 	if (!objectId) {
-		throw new Error(
-			`Missing price info object configuration for coin type ${coinType}`,
-		);
+		throw new Error(`Missing price info object configuration for coin type ${coinType}`);
 	}
 
 	return objectId;
@@ -125,9 +109,7 @@ function resolveCoinMetadata({
 		!Number.isSafeInteger(metadata.decimals) ||
 		!metadata.priceInfoObjectId
 	) {
-		throw new Error(
-			`Missing coin metadata configuration for supported coin ${coin}`,
-		);
+		throw new Error(`Missing coin metadata configuration for supported coin ${coin}`);
 	}
 
 	return {
@@ -136,19 +118,14 @@ function resolveCoinMetadata({
 	};
 }
 
-function resolveSupportedCoin({
-	config,
-	coinType,
-}: WithConfig<WithCoinType>): SuigarCoin {
+function resolveSupportedCoin({ config, coinType }: WithConfig<WithCoinType>): SuigarCoin {
 	const supportedCoin = getSupportedCoins(config.coins).find(
 		(coin) => config.coins[coin].coinType === coinType,
 	);
 
 	if (!supportedCoin) {
 		throw new RangeError(
-			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(
-				config.coins,
-			)
+			`Unsupported coin type ${coinType}. Supported coin types: ${Object.values(config.coins)
 				.map(({ coinType }) => coinType)
 				.join(', ')}`,
 		);

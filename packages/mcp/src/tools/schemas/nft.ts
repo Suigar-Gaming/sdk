@@ -13,12 +13,7 @@ export const buildNftV1MintTransactionInputSchema = configInputSchema
 			.describe('Build, dry-run, or return a read-only plan.'),
 		owner: z.string().min(1).optional().describe(ADDRESS_DESCRIPTION),
 		specId: z.string().min(1).optional().describe('NFT V1 specification id.'),
-		gasBudget: z
-			.number()
-			.int()
-			.positive()
-			.optional()
-			.describe('Optional gas budget in MIST.'),
+		gasBudget: z.number().int().positive().optional().describe('Optional gas budget in MIST.'),
 		useGasCoin: z
 			.boolean()
 			.optional()
@@ -26,6 +21,4 @@ export const buildNftV1MintTransactionInputSchema = configInputSchema
 	})
 	.strict();
 
-export type BuildNftV1MintTransactionInput = z.input<
-	typeof buildNftV1MintTransactionInputSchema
->;
+export type BuildNftV1MintTransactionInput = z.input<typeof buildNftV1MintTransactionInputSchema>;

@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { JSX } from 'react';
-import {
-	DefinitionList,
-	ListPanel,
-	Panel,
-} from '../components/inspector-components.js';
+import { DefinitionList, ListPanel, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 
 function claimLabel(kind: unknown): unknown {

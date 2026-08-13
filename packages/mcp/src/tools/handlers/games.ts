@@ -85,9 +85,7 @@ export async function buildCoinflipTransactionTool(
 	});
 }
 
-export async function buildLimboTransactionTool(
-	input: LimboInput = {},
-): Promise<ToolTextResult> {
+export async function buildLimboTransactionTool(input: LimboInput = {}): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
@@ -101,10 +99,7 @@ export async function buildLimboTransactionTool(
 		);
 	}
 
-	const targetMultiplier = requireNumber(
-		input.targetMultiplier,
-		'targetMultiplier',
-	);
+	const targetMultiplier = requireNumber(input.targetMultiplier, 'targetMultiplier');
 	return buildTransactionTool({
 		input,
 		game: 'limbo',
@@ -149,30 +144,22 @@ async function buildConfigIdTransactionTool(
 	});
 }
 
-export function buildPlinkoTransactionTool(
-	input: ConfigIdInput = {},
-): Promise<ToolTextResult> {
+export function buildPlinkoTransactionTool(input: ConfigIdInput = {}): Promise<ToolTextResult> {
 	return buildConfigIdTransactionTool(input, 'plinko');
 }
 
-export function buildWheelTransactionTool(
-	input: ConfigIdInput = {},
-): Promise<ToolTextResult> {
+export function buildWheelTransactionTool(input: ConfigIdInput = {}): Promise<ToolTextResult> {
 	return buildConfigIdTransactionTool(input, 'wheel');
 }
 
-export async function buildRangeTransactionTool(
-	input: RangeInput = {},
-): Promise<ToolTextResult> {
+export async function buildRangeTransactionTool(input: RangeInput = {}): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
 				input,
 				game: 'range',
 				requiredInputs: ['owner', 'stake', 'leftPoint', 'rightPoint'],
-				notes: [
-					'Range points are normalized by @suigar/sdk before Move call construction.',
-				],
+				notes: ['Range points are normalized by @suigar/sdk before Move call construction.'],
 			}),
 		);
 	}
@@ -196,24 +183,14 @@ export async function buildRangeTransactionTool(
 	});
 }
 
-export async function buildSoccerTransactionTool(
-	input: SoccerInput = {},
-): Promise<ToolTextResult> {
+export async function buildSoccerTransactionTool(input: SoccerInput = {}): Promise<ToolTextResult> {
 	if (getMode(input.mode) === 'read-only') {
 		return asTextResponse(
 			readOnlyPlan({
 				input,
 				game: 'soccer',
-				requiredInputs: [
-					'owner',
-					'stake',
-					'configId',
-					'countryId',
-					'shotZoneId',
-				],
-				notes: [
-					'Config, country, and shot zone ids select the on-chain Soccer game settings.',
-				],
+				requiredInputs: ['owner', 'stake', 'configId', 'countryId', 'shotZoneId'],
+				notes: ['Config, country, and shot zone ids select the on-chain Soccer game settings.'],
 			}),
 		);
 	}
@@ -254,10 +231,7 @@ export async function buildPvpCoinflipCreateTransactionTool(
 		);
 	}
 
-	const creatorSide = requireString(
-		input.creatorSide,
-		'creatorSide',
-	) as CoinSide;
+	const creatorSide = requireString(input.creatorSide, 'creatorSide') as CoinSide;
 	return buildTransactionTool({
 		input,
 		game: 'pvp-coinflip',
@@ -320,9 +294,7 @@ export async function buildPvpCoinflipCancelTransactionTool(
 				game: 'pvp-coinflip',
 				action: 'cancel',
 				requiredInputs: ['owner', 'gameId'],
-				notes: [
-					'Cancel only prepares the unsigned cancellation transaction for the game creator.',
-				],
+				notes: ['Cancel only prepares the unsigned cancellation transaction for the game creator.'],
 			}),
 		);
 	}
@@ -341,28 +313,21 @@ export async function buildPvpCoinflipCancelTransactionTool(
 	});
 }
 
-const BET_COUNT_LIMITS: Partial<
-	Record<Game, { parameter: string; label: string }>
-> = {
+const BET_COUNT_LIMITS: Partial<Record<Game, { parameter: string; label: string }>> = {
 	limbo: { parameter: 'max_number_of_games', label: 'games' },
 	plinko: { parameter: 'max_number_of_balls', label: 'balls' },
 	range: { parameter: 'max_number_of_games', label: 'games' },
 	soccer: { parameter: 'max_number_of_shots', label: 'shots' },
 	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
 };
-export function toPositiveInteger(
-	value: unknown,
-	fieldName: string,
-): number | bigint {
+export function toPositiveInteger(value: unknown, fieldName: string): number | bigint {
 	if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
 		return value;
 	}
 	if (typeof value === 'string' && POSITIVE_INTEGER_PATTERN.test(value)) {
 		return BigInt(value);
 	}
-	throw new TypeError(
-		`Missing or invalid ${fieldName}. Provide a positive integer.`,
-	);
+	throw new TypeError(`Missing or invalid ${fieldName}. Provide a positive integer.`);
 }
 export function requireNumber(value: unknown, fieldName: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) {
@@ -370,11 +335,7 @@ export function requireNumber(value: unknown, fieldName: string): number {
 	}
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
 }
-function getTarget(
-	config: McpConfig,
-	game: Game,
-	action?: PvPCoinflipAction,
-): string {
+function getTarget(config: McpConfig, game: Game, action?: PvPCoinflipAction): string {
 	const packageId = getPackageId(config, game);
 	if (game === 'pvp-coinflip') {
 		const functionName = `${action?.toLowerCase() ?? 'create'}_game`;
@@ -419,8 +380,7 @@ async function gameTransactionOptions(
 	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
 		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
 > {
-	const sessionExecution =
-		getMode(input.mode) === 'execute' && input.executionWallet === 'session';
+	const sessionExecution = getMode(input.mode) === 'execute' && input.executionWallet === 'session';
 	let owner: string;
 	if (sessionExecution) {
 		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
@@ -429,9 +389,7 @@ async function gameTransactionOptions(
 				'No session wallet exists. Call "setup_session_wallet" first, then fund its address before executing games.',
 			);
 		}
-		const sessionAddress = (
-			await loadSessionSigner(input.sessionWalletId)
-		).toSuiAddress();
+		const sessionAddress = (await loadSessionSigner(input.sessionWalletId)).toSuiAddress();
 		if (sessionWallet.address !== sessionAddress) {
 			throw new Error(
 				'The saved session wallet address does not match its keychain signer. Recover the intended wallet with "setup_session_wallet" before executing games.',
@@ -447,10 +405,7 @@ async function gameTransactionOptions(
 		}
 		owner = sessionAddress;
 	} else {
-		owner = await resolveOwnerAddress(
-			requireString(input.owner, 'owner'),
-			bundle,
-		);
+		owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
 	}
 	return {
 		owner,
@@ -482,9 +437,7 @@ async function enforceBetCountLimit(
 	});
 	const max = (parameters as Record<string, unknown>)[limit.parameter];
 	if (
-		(typeof max !== 'bigint' &&
-			typeof max !== 'number' &&
-			typeof max !== 'string') ||
+		(typeof max !== 'bigint' && typeof max !== 'number' && typeof max !== 'string') ||
 		!BASE_UNIT_AMOUNT_PATTERN.test(String(max))
 	) {
 		throw new Error(
@@ -520,9 +473,7 @@ export async function stakeOptions(
 			: {
 					cashStake: toBaseUnits(input.cashStake, 'cashStake', decimals),
 				}),
-		...(input.betCount == null
-			? {}
-			: { betCount: toPositiveInteger(input.betCount, 'betCount') }),
+		...(input.betCount == null ? {} : { betCount: toPositiveInteger(input.betCount, 'betCount') }),
 	};
 }
 
@@ -544,19 +495,14 @@ export async function buildTransactionTool({
 	>): Promise<ToolTextResult> {
 	const mode = getMode(input.mode);
 	if (mode === 'read-only') {
-		throw new Error(
-			'read-only mode must be handled before transaction execution.',
-		);
+		throw new Error('read-only mode must be handled before transaction execution.');
 	}
 
 	const bundle = createSuigarClient(getConfigInput(input));
 	await enforceBetCountLimit(game, input, bundle);
 	const coin = coinMetadataForAmount(bundle.config, input.coinType);
 	const baseStake =
-		stake ??
-		(stakeDisplay == null
-			? undefined
-			: toBaseUnits(stakeDisplay, 'stake', coin.decimals));
+		stake ?? (stakeDisplay == null ? undefined : toBaseUnits(stakeDisplay, 'stake', coin.decimals));
 	const transaction = await createTransaction(bundle);
 	const context = {
 		game,

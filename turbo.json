@@ -1,11 +1,6 @@
 {
 	"$schema": "https://turbo.build/schema.json",
-	"globalDependencies": [
-		".prettierignore",
-		".prettierrc.json",
-		"pnpm-workspace.yaml",
-		"tsconfig.shared.json"
-	],
+	"globalDependencies": [".oxfmtrc.json", "pnpm-workspace.yaml", "tsconfig.shared.json"],
 	"tasks": {
 		"test": {
 			"dependsOn": ["^build:ci"],
@@ -27,23 +22,11 @@
 			"outputs": []
 		},
 		"build": {
-			"inputs": [
-				"$TURBO_DEFAULT$",
-				"!test/**",
-				"!tests/**",
-				"!README.md",
-				"!CHANGELOG.md"
-			],
+			"inputs": ["$TURBO_DEFAULT$", "!test/**", "!tests/**", "!README.md", "!CHANGELOG.md"],
 			"outputs": ["dist/**"]
 		},
 		"build:ci": {
-			"inputs": [
-				"$TURBO_DEFAULT$",
-				"!test/**",
-				"!tests/**",
-				"!README.md",
-				"!CHANGELOG.md"
-			],
+			"inputs": ["$TURBO_DEFAULT$", "!test/**", "!tests/**", "!README.md", "!CHANGELOG.md"],
 			"outputs": ["dist/**"]
 		}
 	}

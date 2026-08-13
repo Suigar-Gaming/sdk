@@ -27,9 +27,7 @@ export function normalizeGameParameterValues<TGameParameters>(
 			GameParameterValue<TGameParameters[keyof TGameParameters]>
 		> = {};
 		for (const key of Object.keys(value)) {
-			normalized[key] = normalizeGameParameterValues(
-				value[key as keyof TGameParameters],
-			);
+			normalized[key] = normalizeGameParameterValues(value[key as keyof TGameParameters]);
 		}
 		return normalized as GameParameterValue<TGameParameters>;
 	}

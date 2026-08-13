@@ -3,15 +3,10 @@
  **************************************************************/
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
-import {
-	MoveStruct,
-	normalizeMoveArguments,
-	type RawTransactionArgument,
-} from '../utils/index.js';
+import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 
-const $moduleName =
-	'0x96c7841b9b32c59a219760fd656f1c3aceb53cc74a68ec9844a3a696374309f4::limbo';
+const $moduleName = '0x96c7841b9b32c59a219760fd656f1c3aceb53cc74a68ec9844a3a696374309f4::limbo';
 export const LimboSettingsKey = new MoveStruct({
 	name: `${$moduleName}::LimboSettingsKey`,
 	fields: {
@@ -49,8 +44,7 @@ export interface PlayOptions {
 }
 export function play(options: PlayOptions) {
 	const packageAddress =
-		options.package ??
-		'0x96c7841b9b32c59a219760fd656f1c3aceb53cc74a68ec9844a3a696374309f4';
+		options.package ?? '0x96c7841b9b32c59a219760fd656f1c3aceb53cc74a68ec9844a3a696374309f4';
 	const argumentsTypes = [
 		null,
 		'u64',

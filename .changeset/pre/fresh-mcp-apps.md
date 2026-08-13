@@ -1,5 +1,5 @@
 ---
-"@suigar/mcp": minor
+'@suigar/mcp': minor
 ---
 
 Add MCP App support and refreshed transaction tooling.

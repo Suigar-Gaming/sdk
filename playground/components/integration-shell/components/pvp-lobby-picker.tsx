@@ -2,25 +2,13 @@
 
 import { RefreshCw } from 'lucide-react';
 import { CoinIcon } from '@/components/coins';
-import {
-	parseCoinKey,
-	parseCoinTypeLabel,
-} from '@/components/integration-shell/helpers/coin';
+import { parseCoinKey, parseCoinTypeLabel } from '@/components/integration-shell/helpers/coin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { compactAddress } from '@/lib/suigar-app';
-import type {
-	PvPCoinflipLobbyGame,
-	SupportedCoinKey,
-} from '@/lib/suigar-types';
+import type { PvPCoinflipLobbyGame, SupportedCoinKey } from '@/lib/suigar-types';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -121,17 +109,12 @@ export function PvPLobbyPicker({
 									<div className="pointer-events-none relative z-10 flex flex-col gap-2">
 										<div className="flex items-start justify-between gap-3">
 											<div className="min-w-0 space-y-1">
-												<p className="text-sm uppercase text-muted-foreground">
-													Amount
-												</p>
+												<p className="text-sm uppercase text-muted-foreground">Amount</p>
 												<div className="flex min-w-0 items-center whitespace-nowrap text-sm font-semibold tabular-nums gap-1 text-foreground">
 													<span className="min-w-0 truncate">{amount}</span>
 													<span className="inline-flex shrink-0 items-center font-medium gap-1 text-xs text-muted-foreground">
 														{coinKey ? (
-															<CoinIcon
-																coinKey={coinKey}
-																className="size-3.5 shrink-0"
-															/>
+															<CoinIcon coinKey={coinKey} className="size-3.5 shrink-0" />
 														) : null}
 														{coinLabel}
 													</span>
@@ -147,9 +130,7 @@ export function PvPLobbyPicker({
 
 										<div className="flex items-center justify-between gap-3">
 											<div className="space-y-1">
-												<p className="text-xs uppercase text-muted-foreground">
-													Creator side
-												</p>
+												<p className="text-xs uppercase text-muted-foreground">Creator side</p>
 												<p className="text-xs font-medium capitalize text-foreground">
 													{creatorSide}
 												</p>

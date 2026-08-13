@@ -3,10 +3,7 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { play } from '../contracts/coinflip/coinflip.js';
-import type {
-	CoinflipTransactionOptions,
-	WithPartner,
-} from '../types/index.js';
+import type { CoinflipTransactionOptions, WithPartner } from '../types/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
 export function buildCoinflipTransaction(

@@ -3,16 +3,11 @@
 
 import { describe, expect, it } from 'vitest';
 import type { ReadOnlyPlan } from '../../../src/runtime/types.js';
-import {
-	buildNftV1MintTransactionTool,
-	listNftsTool,
-} from '../../../src/tools/handlers/index.js';
+import { buildNftV1MintTransactionTool, listNftsTool } from '../../../src/tools/handlers/index.js';
 
 describe('list_nfts', () => {
 	it('requires an owner when listing NFTs', async () => {
-		await expect(listNftsTool({})).rejects.toThrow(
-			'Missing required field: owner.',
-		);
+		await expect(listNftsTool({})).rejects.toThrow('Missing required field: owner.');
 	});
 });
 

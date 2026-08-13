@@ -3,10 +3,7 @@
 
 import type { Transaction as SuiTransaction } from '@mysten/sui/transactions';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type {
-	BuildTransactionResult,
-	ReadOnlyPlan,
-} from '../../../src/runtime/types.js';
+import type { BuildTransactionResult, ReadOnlyPlan } from '../../../src/runtime/types.js';
 import {
 	buildCoinflipTransactionTool,
 	buildLimboTransactionTool,
@@ -20,13 +17,11 @@ import {
 } from '../../../src/tools/handlers/index.js';
 
 const mocks = vi.hoisted(() => ({
-	buildTransactionBytes:
-		vi.fn<(...args: Array<unknown>) => Promise<Uint8Array>>(),
+	buildTransactionBytes: vi.fn<(...args: Array<unknown>) => Promise<Uint8Array>>(),
 }));
 
 vi.mock('@mysten/sui/transactions', async (importOriginal) => {
-	const actual =
-		await importOriginal<typeof import('@mysten/sui/transactions')>();
+	const actual = await importOriginal<typeof import('@mysten/sui/transactions')>();
 
 	return {
 		...actual,
@@ -36,8 +31,7 @@ vi.mock('@mysten/sui/transactions', async (importOriginal) => {
 	};
 });
 
-const owner =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 beforeEach(() => {
 	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));
@@ -49,23 +43,10 @@ afterEach(() => {
 
 describe('game transaction tools', () => {
 	it.each([
-		[
-			'coinflip',
-			() => buildCoinflipTransactionTool({ mode: 'read-only', side: 'heads' }),
-		],
-		[
-			'limbo',
-			() =>
-				buildLimboTransactionTool({ mode: 'read-only', targetMultiplier: 2 }),
-		],
-		[
-			'plinko',
-			() => buildPlinkoTransactionTool({ mode: 'read-only', configId: 0 }),
-		],
-		[
-			'wheel',
-			() => buildWheelTransactionTool({ mode: 'read-only', configId: 0 }),
-		],
+		['coinflip', () => buildCoinflipTransactionTool({ mode: 'read-only', side: 'heads' })],
+		['limbo', () => buildLimboTransactionTool({ mode: 'read-only', targetMultiplier: 2 })],
+		['plinko', () => buildPlinkoTransactionTool({ mode: 'read-only', configId: 0 })],
+		['wheel', () => buildWheelTransactionTool({ mode: 'read-only', configId: 0 })],
 		[
 			'range',
 			() =>
@@ -210,27 +191,31 @@ describe('game transaction tools', () => {
 			}),
 		]);
 
-		expect(
-			(limbo.structuredContent as BuildTransactionResult).summary.gameInputs,
-		).toEqual({ targetMultiplier: 2.5 });
-		expect(
-			(plinko.structuredContent as BuildTransactionResult).summary.gameInputs,
-		).toEqual({ configId: 3 });
-		expect(
-			(wheel.structuredContent as BuildTransactionResult).summary.gameInputs,
-		).toEqual({ configId: 4 });
-		expect(
-			(range.structuredContent as BuildTransactionResult).summary.gameInputs,
-		).toEqual({ leftPoint: 25, rightPoint: 75, outOfRange: true });
-		expect(
-			(soccer.structuredContent as BuildTransactionResult).summary.gameInputs,
-		).toEqual({ configId: 1, countryId: 2, shotZoneId: 3 });
+		expect((limbo.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			targetMultiplier: 2.5,
+		});
+		expect((plinko.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			configId: 3,
+		});
+		expect((wheel.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			configId: 4,
+		});
+		expect((range.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			leftPoint: 25,
+			rightPoint: 75,
+			outOfRange: true,
+		});
+		expect((soccer.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			configId: 1,
+			countryId: 2,
+			shotZoneId: 3,
+		});
 	});
 
 	it('throws actionable validation errors for missing build inputs', async () => {
-		await expect(
-			buildCoinflipTransactionTool({ mode: 'build', side: 'heads' }),
-		).rejects.toThrow(/stake/u);
+		await expect(buildCoinflipTransactionTool({ mode: 'build', side: 'heads' })).rejects.toThrow(
+			/stake/u,
+		);
 		await expect(
 			buildCoinflipTransactionTool({
 				mode: 'build',

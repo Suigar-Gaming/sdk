@@ -9,16 +9,10 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 	const sessionWallet = asRecord(result.sessionWallet);
 	const funding = asRecord(sessionWallet.funding);
 	const qrCode =
-		typeof funding.addressQrCodeDataUrl === 'string'
-			? funding.addressQrCodeDataUrl
-			: null;
-	const balances = Array.isArray(sessionWallet.balances)
-		? sessionWallet.balances
-		: [];
-	const fundingUrl =
-		typeof funding.fundingUrl === 'string' ? funding.fundingUrl : null;
-	const setupUrl =
-		typeof sessionWallet.setupUrl === 'string' ? sessionWallet.setupUrl : null;
+		typeof funding.addressQrCodeDataUrl === 'string' ? funding.addressQrCodeDataUrl : null;
+	const balances = Array.isArray(sessionWallet.balances) ? sessionWallet.balances : [];
+	const fundingUrl = typeof funding.fundingUrl === 'string' ? funding.fundingUrl : null;
+	const setupUrl = typeof sessionWallet.setupUrl === 'string' ? sessionWallet.setupUrl : null;
 
 	if (setupUrl) {
 		return (
@@ -64,10 +58,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 						{balances.map((item) => {
 							const balance = asRecord(item);
 							return (
-								<div
-									className="flex justify-between gap-3 text-xs"
-									key={String(balance.coinType)}
-								>
+								<div className="flex justify-between gap-3 text-xs" key={String(balance.coinType)}>
 									<dt
 										className="truncate font-mono text-muted-foreground"
 										title={String(balance.coinType)}

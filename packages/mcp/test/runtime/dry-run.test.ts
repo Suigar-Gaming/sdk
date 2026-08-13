@@ -2,14 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import {
-	extractDryRunErrors,
-	summarizeDryRun,
-	toJsonValue,
-} from '../../src/runtime/dry-run.js';
+import { extractDryRunErrors, summarizeDryRun, toJsonValue } from '../../src/runtime/dry-run.js';
 
-const owner =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 describe('dry-run JSON conversion', () => {
 	it('converts dry-run payloads into JSON-safe values', () => {
@@ -46,9 +41,7 @@ describe('dry-run errors', () => {
 			},
 		};
 
-		expect(extractDryRunErrors(dryRun as never)).toEqual([
-			'MoveAbort in coinflip::play',
-		]);
+		expect(extractDryRunErrors(dryRun as never)).toEqual(['MoveAbort in coinflip::play']);
 	});
 
 	it('deduplicates errors found on multiple dry-run branches', () => {

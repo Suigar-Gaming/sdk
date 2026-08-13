@@ -1,18 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	normalizeStructTag,
-	SUI_DECIMALS,
-	SUI_TYPE_ARG,
-} from '@mysten/sui/utils';
+import { normalizeStructTag, SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';
 import { describe, expect, it } from 'vitest';
-import {
-	COINS,
-	OBJECT_IDS,
-	PACKAGE_IDS,
-	REGISTRY_IDS,
-} from '../../src/configs/index.js';
+import { COINS, OBJECT_IDS, PACKAGE_IDS, REGISTRY_IDS } from '../../src/configs/index.js';
 import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Parameters as PlinkoParameters,
@@ -43,9 +34,7 @@ describe('resolveSuigarConfig', () => {
 		expect(config.packageIds.wheel).toBe(PACKAGE_IDS.testnet.wheel);
 		expect(config.packageIds.plinko).toBe(PACKAGE_IDS.testnet.plinko);
 		expect(config.packageIds.soccer).toBe(PACKAGE_IDS.testnet.soccer);
-		expect(config.registryIds.pvpCoinflip).toBe(
-			REGISTRY_IDS.testnet.pvpCoinflip,
-		);
+		expect(config.registryIds.pvpCoinflip).toBe(REGISTRY_IDS.testnet.pvpCoinflip);
 	});
 
 	it('uses the selected network package map', () => {
@@ -148,9 +137,9 @@ describe('resolveSuigarConfig', () => {
 	});
 
 	it('builds the SweetHouse settings key type with the generated typeTag helper', () => {
-		expect(
-			PlinkoSettingsKey.typeTag({ package: PACKAGE_IDS.mainnet.plinko }),
-		).toBe(`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`);
+		expect(PlinkoSettingsKey.typeTag({ package: PACKAGE_IDS.mainnet.plinko })).toBe(
+			`${PACKAGE_IDS.mainnet.plinko}::plinko::PlinkoSettingsKey`,
+		);
 	});
 
 	it('supports generated type tags with positional type arguments', () => {

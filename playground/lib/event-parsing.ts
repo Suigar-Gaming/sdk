@@ -1,12 +1,7 @@
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { fromBase64 } from '@mysten/sui/utils';
 import type { SuigarClient } from '@suigar/sdk';
-import {
-	fromMoveFloat,
-	isMoveFloat,
-	parseGameDetails,
-	parseGameEvent,
-} from '@suigar/sdk/utils';
+import { fromMoveFloat, isMoveFloat, parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
 import { bigintToString } from '@/lib/suigar-app';
 import type { EventLogRow } from '@/lib/suigar-types';
 

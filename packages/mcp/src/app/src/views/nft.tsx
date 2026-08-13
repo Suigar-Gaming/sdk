@@ -47,10 +47,7 @@ function NftImage({ name, url }: { name: string; url: unknown }): JSX.Element {
 
 	if (failed) {
 		return (
-			<span
-				className="block max-w-48 truncate font-mono text-muted-foreground"
-				title={imageUrl}
-			>
+			<span className="block max-w-48 truncate font-mono text-muted-foreground" title={imageUrl}>
 				{imageUrl || 'No image URL'}
 			</span>
 		);
@@ -85,14 +82,8 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 					]}
 				/>
 			</Panel>
-			<Panel
-				className="md:col-span-2"
-				hidden={catalog.length === 0}
-				title="NFT catalog"
-			>
-				<NftTable
-					headers={['Image', 'NFT', 'Available', 'Supply', 'Price (SUI)']}
-				>
+			<Panel className="md:col-span-2" hidden={catalog.length === 0} title="NFT catalog">
+				<NftTable headers={['Image', 'NFT', 'Available', 'Supply', 'Price (SUI)']}>
 					{catalog.map((item) => {
 						const nft = asRecord(item);
 						return (
@@ -102,19 +93,13 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 								</td>
 								<td className="px-3 py-2 font-bold">
 									<div>{String(nft.name)}</div>
-									<div
-										className="font-mono text-muted-foreground"
-										title={String(nft.id)}
-									>
+									<div className="font-mono text-muted-foreground" title={String(nft.id)}>
 										{formatAddress(String(nft.id))}
 									</div>
 								</td>
 								<td className="px-3 py-2 font-mono">{String(nft.available)}</td>
 								<td className="px-3 py-2 font-mono">{String(nft.supply)}</td>
-								<td
-									className="px-3 py-2 font-mono"
-									title={`${String(nft.price)} MIST`}
-								>
+								<td className="px-3 py-2 font-mono" title={`${String(nft.price)} MIST`}>
 									{String(nft.priceDisplay ?? nft.price)}
 								</td>
 							</tr>
@@ -140,10 +125,7 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 									<td className="px-3 py-2 font-mono" title={String(nft.id)}>
 										{formatAddress(String(nft.id))}
 									</td>
-									<td
-										className="px-3 py-2 font-mono"
-										title={String(nft.specId)}
-									>
+									<td className="px-3 py-2 font-mono" title={String(nft.specId)}>
 										{formatAddress(String(nft.specId))}
 									</td>
 								</tr>

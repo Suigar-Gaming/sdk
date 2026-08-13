@@ -1,13 +1,7 @@
 export function SuiCoinIcon({ className }: { className?: string }) {
 	return (
 		<svg viewBox="0 0 22 22" aria-hidden="true" className={className}>
-			<rect
-				width="22"
-				height="22"
-				rx="11"
-				fill="var(--secondary)"
-				opacity="0.22"
-			/>
+			<rect width="22" height="22" rx="11" fill="var(--secondary)" opacity="0.22" />
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"

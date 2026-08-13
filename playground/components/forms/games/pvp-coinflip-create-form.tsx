@@ -2,12 +2,7 @@
 
 import type * as React from 'react';
 import { SharedGameFields } from '@/components/forms/shared-game-fields';
-import {
-	Field,
-	FieldDescription,
-	FieldGroup,
-	FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import {
 	Select,
 	SelectContent,
@@ -36,9 +31,7 @@ export function PvPCoinflipCreateForm({
 					<FieldLabel>Creator side</FieldLabel>
 					<Select
 						value={value.side}
-						onValueChange={(side: PvPCoinflipCreateFormValues['side']) =>
-							onChange({ side })
-						}
+						onValueChange={(side: PvPCoinflipCreateFormValues['side']) => onChange({ side })}
 					>
 						<SelectTrigger
 							aria-label="Select creator side"
@@ -58,14 +51,10 @@ export function PvPCoinflipCreateForm({
 						<Switch
 							id="pvp-private-lobby"
 							checked={value.isPrivate}
-							onCheckedChange={(checked: boolean) =>
-								onChange({ isPrivate: checked })
-							}
+							onCheckedChange={(checked: boolean) => onChange({ isPrivate: checked })}
 						/>
 					</div>
-					<FieldDescription size="sm">
-						Marks the game as private on-chain
-					</FieldDescription>
+					<FieldDescription size="sm">Marks the game as private on-chain</FieldDescription>
 				</Field>
 			</FieldGroup>
 			<SharedGameFields

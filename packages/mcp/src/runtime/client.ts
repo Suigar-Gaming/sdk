@@ -16,11 +16,7 @@ import {
 import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
 import { formatBaseUnitAmount } from '../utils/index.js';
 import { readPersistedDefaultNetwork } from '../wallet/credentials.js';
-import {
-	extractDryRunErrors,
-	summarizeDryRun,
-	toJsonValue,
-} from './dry-run.js';
+import { extractDryRunErrors, summarizeDryRun, toJsonValue } from './dry-run.js';
 import type {
 	BuilderMode,
 	BuildTransactionResult,
@@ -45,15 +41,10 @@ export function normalizeNetwork(network?: string): SuigarNetwork {
 		return resolvedNetwork;
 	}
 
-	throw new RangeError(
-		`Unsupported network: ${resolvedNetwork}. Use "mainnet" or "testnet".`,
-	);
+	throw new RangeError(`Unsupported network: ${resolvedNetwork}. Use "mainnet" or "testnet".`);
 }
 
-export function getProviderUrl(
-	network: SuigarNetwork,
-	providerUrl?: string,
-): string {
+export function getProviderUrl(network: SuigarNetwork, providerUrl?: string): string {
 	return providerUrl ?? DEFAULT_PROVIDER_URLS[network];
 }
 
@@ -67,9 +58,7 @@ export type SuigarClientBundle = {
 	config: McpConfig;
 };
 
-export function createSuigarClient(
-	input: SuigarMcpConfigInput = {},
-): SuigarClientBundle {
+export function createSuigarClient(input: SuigarMcpConfigInput = {}): SuigarClientBundle {
 	const network = normalizeNetwork(input.network);
 	const providerUrl = getProviderUrl(network, input.providerUrl);
 	const baseClient = new SuiGrpcClient({
@@ -93,10 +82,7 @@ export function createSuigarClient(
 	};
 }
 
-export function resolveDefaultCoinType(
-	config: McpConfig,
-	coinType?: string,
-): string {
+export function resolveDefaultCoinType(config: McpConfig, coinType?: string): string {
 	return normalizeStructTag(coinType ?? config.sdk.coins.sui.coinType);
 }
 
@@ -124,9 +110,7 @@ export async function resolveOwnerAddress(
 		name: normalizedName,
 	});
 	if (!address) {
-		throw new Error(
-			`SuiNS name ${normalizedName} did not resolve to an address.`,
-		);
+		throw new Error(`SuiNS name ${normalizedName} did not resolve to an address.`);
 	}
 
 	return normalizeSuiAddress(address);
@@ -162,30 +146,22 @@ function summarizeTransaction(
 		return {
 			kind,
 			...(target ? { target } : {}),
-			...(moveCall?.typeArguments
-				? { typeArguments: moveCall.typeArguments }
-				: {}),
+			...(moveCall?.typeArguments ? { typeArguments: moveCall.typeArguments } : {}),
 		};
 	});
 
 	const objectInputs: Array<string> = [];
 	for (const input of data.inputs ?? []) {
-		if (
-			input.$kind === 'UnresolvedObject' &&
-			input.UnresolvedObject?.objectId
-		) {
+		if (input.$kind === 'UnresolvedObject' && input.UnresolvedObject?.objectId) {
 			objectInputs.push(input.UnresolvedObject.objectId);
 		}
 	}
 
 	return {
 		sender: data.sender ?? null,
-		gasBudget:
-			data.gasData?.budget == null ? null : String(data.gasData.budget),
+		gasBudget: data.gasData?.budget == null ? null : String(data.gasData.budget),
 		gasBudgetDisplay:
-			data.gasData?.budget == null
-				? null
-				: formatBaseUnitAmount(data.gasData.budget, SUI_DECIMALS),
+			data.gasData?.budget == null ? null : formatBaseUnitAmount(data.gasData.budget, SUI_DECIMALS),
 		gasPrice: data.gasData?.price == null ? null : String(data.gasData.price),
 		commandCount: commands.length,
 		commands,
@@ -193,14 +169,10 @@ function summarizeTransaction(
 		objectInputs,
 		...(context.game ? { game: context.game } : {}),
 		...(context.action ? { action: context.action } : {}),
-		...(context.coinType
-			? { coinType: normalizeStructTag(context.coinType) }
-			: {}),
+		...(context.coinType ? { coinType: normalizeStructTag(context.coinType) } : {}),
 		...(context.stake == null ? {} : { stake: String(context.stake) }),
 		...(context.stakeDisplay ? { stakeDisplay: context.stakeDisplay } : {}),
-		...(context.coinDecimals == null
-			? {}
-			: { coinDecimals: context.coinDecimals }),
+		...(context.coinDecimals == null ? {} : { coinDecimals: context.coinDecimals }),
 		...(context.gameInputs ? { gameInputs: context.gameInputs } : {}),
 	};
 }
@@ -266,17 +238,12 @@ export async function executeSessionTransaction({
 		signer,
 		include: { effects: true },
 	});
-	const executed =
-		result.$kind === 'Transaction'
-			? result.Transaction
-			: result.FailedTransaction;
+	const executed = result.$kind === 'Transaction' ? result.Transaction : result.FailedTransaction;
 	const error = executed.status.error?.message;
 	return {
 		address: signer.toSuiAddress(),
 		digest: executed.digest,
-		status: executed.status.success
-			? ('success' as const)
-			: ('failed' as const),
+		status: executed.status.success ? ('success' as const) : ('failed' as const),
 		...(error ? { error } : {}),
 	};
 }

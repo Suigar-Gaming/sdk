@@ -58,9 +58,5 @@ export function EventLogProvider({ children }: { children: React.ReactNode }) {
 		[addRows, clearRows, rows],
 	);
 
-	return (
-		<EventLogContext.Provider value={value}>
-			{children}
-		</EventLogContext.Provider>
-	);
+	return <EventLogContext.Provider value={value}>{children}</EventLogContext.Provider>;
 }

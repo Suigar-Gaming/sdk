@@ -19,8 +19,7 @@ const bridge = await import('../../src/wallet/bridge.js');
 const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
-const address =
-	'0x0000000000000000000000000000000000000000000000000000000000000001';
+const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
 
 const bridgeOrigin = (url: string, portParameter: string) => {
 	const port = new URL(url).searchParams.get(portParameter);
@@ -115,9 +114,7 @@ describe('wallet loopback bridges', () => {
 		const origin = bridgeOrigin(approval.approvalUrl, 'port');
 		const state = url.searchParams.get('state');
 
-		await expect(
-			fetch(`${origin}/request?state=${state}`),
-		).resolves.toMatchObject({
+		await expect(fetch(`${origin}/request?state=${state}`)).resolves.toMatchObject({
 			status: 403,
 		});
 		const request = await fetch(`${origin}/request?state=${state}`, {
@@ -157,26 +154,18 @@ describe('wallet loopback bridges', () => {
 		const origin = bridgeOrigin(logout.url, 'port');
 		const state = url.searchParams.get('state');
 
-		await expect(
-			fetch(`${origin}/request?state=${state}`),
-		).resolves.toMatchObject({ status: 403 });
+		await expect(fetch(`${origin}/request?state=${state}`)).resolves.toMatchObject({ status: 403 });
 		const request = await fetch(`${origin}/request?state=${state}`, {
 			headers: { origin: webOrigin },
 		});
 		expect(await request.json()).toEqual({ network: 'testnet', all: false });
-		expect(
-			(await credentials.loadCredentials()).profiles.testnet,
-		).toBeDefined();
-		await expect(
-			postJson(`${origin}/callback`, { state }),
-		).resolves.toMatchObject({ status: 200 });
+		expect((await credentials.loadCredentials()).profiles.testnet).toBeDefined();
+		await expect(postJson(`${origin}/callback`, { state })).resolves.toMatchObject({ status: 200 });
 		await expect(logout.done).resolves.toEqual({
 			network: 'testnet',
 			all: false,
 		});
-		expect(
-			(await credentials.loadCredentials()).profiles.testnet,
-		).toBeUndefined();
+		expect((await credentials.loadCredentials()).profiles.testnet).toBeUndefined();
 	});
 
 	it('opens bridge URLs by default and accepts explicit open opt-out', async () => {
@@ -205,9 +194,7 @@ describe('wallet loopback bridges', () => {
 			webOrigin,
 			open: false,
 		});
-		await expect(login.done).rejects.toThrow(
-			'Wallet login expired. Start login again.',
-		);
+		await expect(login.done).rejects.toThrow('Wallet login expired. Start login again.');
 
 		await expect(
 			bridge.createLoginBridge({
@@ -216,8 +203,6 @@ describe('wallet loopback bridges', () => {
 				maxBodyBytes: 0,
 				open: false,
 			}),
-		).rejects.toThrow(
-			'Maximum bridge request body size must be a positive integer.',
-		);
+		).rejects.toThrow('Maximum bridge request body size must be a positive integer.');
 	});
 });

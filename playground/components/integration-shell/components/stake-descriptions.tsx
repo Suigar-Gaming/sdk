@@ -43,9 +43,7 @@ export function StakeDescription({
 		<FieldDescription size="sm">
 			<span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 align-middle">
 				{activeConfigDisabled ? (
-					<span className="text-destructive">
-						The selected config is disabled on-chain.
-					</span>
+					<span className="text-destructive">The selected config is disabled on-chain.</span>
 				) : (
 					<>
 						<span className="shrink-0">On-chain stake range:</span>
@@ -93,9 +91,7 @@ export function PvPStakeDescription({
 
 	if (error) {
 		return (
-			<FieldDescription size="sm">
-				Unable to load on-chain stake minimum: {error}
-			</FieldDescription>
+			<FieldDescription size="sm">Unable to load on-chain stake minimum: {error}</FieldDescription>
 		);
 	}
 

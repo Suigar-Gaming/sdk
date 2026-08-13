@@ -29,9 +29,7 @@ export function CoinflipForm({
 				<FieldLabel>Side</FieldLabel>
 				<Select
 					value={value.side}
-					onValueChange={(side: CoinflipFormValues['side']) =>
-						onChange({ side })
-					}
+					onValueChange={(side: CoinflipFormValues['side']) => onChange({ side })}
 				>
 					<SelectTrigger
 						aria-label="Select coinflip side"

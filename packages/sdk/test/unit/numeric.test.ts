@@ -55,16 +55,12 @@ describe('toU8', () => {
 	});
 
 	it('rejects unsupported input types', () => {
-		expect(() => toU8(undefined)).toThrow(
-			'Value must be a finite number or integer string',
-		);
+		expect(() => toU8(undefined)).toThrow('Value must be a finite number or integer string');
 		expect(() => toU8(true)).toThrow('Value must be a u8 integer');
 	});
 
 	it('rejects non-finite numbers and invalid strings', () => {
-		expect(() => toU8(Number.NaN)).toThrow(
-			'Value must be a finite number or integer string',
-		);
+		expect(() => toU8(Number.NaN)).toThrow('Value must be a finite number or integer string');
 		expect(() => toU8(Number.NEGATIVE_INFINITY)).toThrow(
 			'Value must be a finite number or integer string',
 		);
@@ -90,16 +86,12 @@ describe('toU16', () => {
 	});
 
 	it('rejects unsupported input types', () => {
-		expect(() => toU16(undefined)).toThrow(
-			'Value must be a finite number or integer string',
-		);
+		expect(() => toU16(undefined)).toThrow('Value must be a finite number or integer string');
 		expect(() => toU16(true)).toThrow('Value must be a u16 integer');
 	});
 
 	it('rejects non-finite numbers and invalid strings', () => {
-		expect(() => toU16(Number.NaN)).toThrow(
-			'Value must be a finite number or integer string',
-		);
+		expect(() => toU16(Number.NaN)).toThrow('Value must be a finite number or integer string');
 		expect(() => toU16(Number.NEGATIVE_INFINITY)).toThrow(
 			'Value must be a finite number or integer string',
 		);

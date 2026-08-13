@@ -2,12 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import {
-	createServer,
-	type IncomingMessage,
-	type Server,
-	type ServerResponse,
-} from 'node:http';
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
@@ -25,8 +20,7 @@ import { resolvePositiveInteger } from './utils.js';
 export const DEFAULT_TIMEOUT_MS: number = 5 * 60_000;
 export const DEFAULT_MAX_BODY_BYTES: number = 16 * 1024;
 export const BRIDGE_TIMEOUT_MS_ENV: string = 'SUIGAR_MCP_BRIDGE_TIMEOUT_MS';
-export const BRIDGE_MAX_BODY_BYTES_ENV: string =
-	'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
+export const BRIDGE_MAX_BODY_BYTES_ENV: string = 'SUIGAR_MCP_BRIDGE_MAX_BODY_BYTES';
 
 export type BridgeOptions = {
 	timeoutMs?: number;
@@ -57,14 +51,11 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 }
 
 function sameState(left: string, right: string): boolean {
-	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left))
-		return false;
+	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) return false;
 	return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
 }
 
-function resolveBridgeOptions(
-	options: BridgeOptions = {},
-): Required<BridgeOptions> {
+function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptions> {
 	return {
 		timeoutMs: resolvePositiveInteger(
 			options.timeoutMs ?? process.env[BRIDGE_TIMEOUT_MS_ENV],
@@ -84,10 +75,7 @@ async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
 	if (shouldOpen) await open(url).catch(() => undefined);
 }
 
-function readBody(
-	request: IncomingMessage,
-	maxBodyBytes: number,
-): Promise<string> {
+function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
 		const chunks: Array<Buffer> = [];
 		let length = 0;
@@ -105,11 +93,7 @@ function readBody(
 	});
 }
 
-function respond(
-	response: ServerResponse,
-	status: number,
-	body: unknown,
-): void {
+function respond(response: ServerResponse, status: number, body: unknown): void {
 	response.writeHead(status, {
 		'content-type': 'application/json',
 		'cache-control': 'no-store',
@@ -124,14 +108,9 @@ async function createLoopbackServer(webOrigin: string): Promise<{
 	authorize: (request: IncomingMessage, response: ServerResponse) => boolean;
 }> {
 	const server = createServer();
-	await new Promise<void>((resolve) =>
-		server.listen(0, LOOPBACK_HOST, resolve),
-	);
+	await new Promise<void>((resolve) => server.listen(0, LOOPBACK_HOST, resolve));
 	const port = (server.address() as AddressInfo).port;
-	const allowedHosts = new Set([
-		`${LOOPBACK_HOST}:${port}`,
-		`${LOCALHOST_HOST}:${port}`,
-	]);
+	const allowedHosts = new Set([`${LOOPBACK_HOST}:${port}`, `${LOCALHOST_HOST}:${port}`]);
 	const authorize = (request: IncomingMessage, response: ServerResponse) => {
 		response.setHeader('access-control-allow-origin', webOrigin);
 		response.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
@@ -168,11 +147,7 @@ export async function createLoginBridge({
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let preflight = false;
-	const {
-		promise: done,
-		resolve,
-		reject,
-	} = Promise.withResolvers<WalletProfile>();
+	const { promise: done, resolve, reject } = Promise.withResolvers<WalletProfile>();
 	const timeout = setTimeout(() => {
 		close();
 		reject(new Error('Wallet login expired. Start login again.'));
@@ -199,13 +174,11 @@ export async function createLoginBridge({
 			return;
 		}
 		try {
-			const payload = JSON.parse(
-				await readBody(request, options.maxBodyBytes),
-			) as Record<string, unknown>;
-			if (
-				typeof payload.state !== 'string' ||
-				!sameState(payload.state, state)
-			) {
+			const payload = JSON.parse(await readBody(request, options.maxBodyBytes)) as Record<
+				string,
+				unknown
+			>;
+			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
 				respond(response, 403, { error: 'Invalid pairing state' });
 				return;
 			}
@@ -259,9 +232,7 @@ export async function createExecutionBridge({
 	const credentials = await loadCredentials();
 	const profile = credentials.profiles[network];
 	if (!profile)
-		throw new Error(
-			`No wallet is connected for ${network}. Call "suigar_login" first.`,
-		);
+		throw new Error(`No wallet is connected for ${network}. Call "suigar_login" first.`);
 	const state = randomBytes(32).toString('hex');
 	const requestId = randomBytes(16).toString('hex');
 	EXECUTIONS.set(requestId, { requestId, status: 'pending' });
@@ -274,10 +245,7 @@ export async function createExecutionBridge({
 	server.on('request', async (request, response) => {
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (!loopback.authorize(request, response)) return;
-		if (
-			!sameState(url.searchParams.get('state') ?? '', state) &&
-			request.method === 'GET'
-		) {
+		if (!sameState(url.searchParams.get('state') ?? '', state) && request.method === 'GET') {
 			respond(response, 403, { error: 'Invalid approval state' });
 			return;
 		}
@@ -300,9 +268,10 @@ export async function createExecutionBridge({
 			return;
 		}
 		try {
-			const payload = JSON.parse(
-				await readBody(request, options.maxBodyBytes),
-			) as Record<string, unknown>;
+			const payload = JSON.parse(await readBody(request, options.maxBodyBytes)) as Record<
+				string,
+				unknown
+			>;
 			if (
 				typeof payload.state !== 'string' ||
 				!sameState(payload.state, state) ||
@@ -319,10 +288,7 @@ export async function createExecutionBridge({
 						: {
 								requestId,
 								status: 'failed',
-								error:
-									typeof payload.error === 'string'
-										? payload.error
-										: 'Wallet approval failed',
+								error: typeof payload.error === 'string' ? payload.error : 'Wallet approval failed',
 							};
 			EXECUTIONS.set(requestId, status);
 			clearTimeout(expire);
@@ -387,13 +353,11 @@ export async function createLogoutBridge({
 			return;
 		}
 		try {
-			const payload = JSON.parse(
-				await readBody(request, options.maxBodyBytes),
-			) as Record<string, unknown>;
-			if (
-				typeof payload.state !== 'string' ||
-				!sameState(payload.state, state)
-			) {
+			const payload = JSON.parse(await readBody(request, options.maxBodyBytes)) as Record<
+				string,
+				unknown
+			>;
+			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
 				respond(response, 403, { error: 'Invalid logout callback' });
 				return;
 			}

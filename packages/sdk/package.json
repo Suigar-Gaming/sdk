@@ -2,48 +2,57 @@
 	"name": "@suigar/sdk",
 	"version": "2.0.0-beta.37",
 	"description": "TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.",
-	"author": "Suigar Gaming <contact.suigar@gmail.com>",
 	"keywords": [
-		"suigar",
-		"sui",
-		"sui-sdk",
-		"typescript",
-		"move",
-		"move-contracts",
-		"web3",
-		"dapp",
-		"sui-blockchain",
-		"web3-gaming",
-		"games",
+		"betting",
 		"casino",
 		"casino-games",
-		"sui-casino",
-		"crypto-casino",
-		"provably-fair",
-		"on-chain",
-		"gamblefi",
-		"betting",
 		"coinflip",
-		"pvp-coinflip",
+		"crypto-casino",
+		"dapp",
+		"gamblefi",
+		"games",
 		"limbo",
-		"plinko",
-		"range",
-		"wheel",
-		"soccer",
-		"pvp",
+		"move",
+		"move-contracts",
 		"nft",
+		"on-chain",
+		"plinko",
+		"provably-fair",
+		"pvp",
+		"pvp-coinflip",
+		"range",
 		"referral",
+		"soccer",
+		"sui",
+		"sui-blockchain",
+		"sui-casino",
+		"sui-sdk",
+		"suigar",
 		"transaction-builder",
-		"transactions"
+		"transactions",
+		"typescript",
+		"web3",
+		"web3-gaming",
+		"wheel"
 	],
+	"homepage": "https://suigar.com/docs/sdk",
+	"bugs": {
+		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
+	},
 	"license": "Apache-2.0",
-	"type": "module",
-	"sideEffects": false,
+	"author": "Suigar Gaming <contact.suigar@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
+		"directory": "packages/sdk"
+	},
 	"files": [
 		"dist",
 		"CHANGELOG.md",
 		"README.md"
 	],
+	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.mjs",
 	"types": "./dist/index.d.mts",
 	"exports": {
@@ -63,8 +72,8 @@
 			"default": "./dist/utils.mjs"
 		}
 	},
-	"engines": {
-		"node": "^22.18.0 || >=24.0.0"
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"build": "pnpm run clean && pnpm run codegen && tsdown",
@@ -75,26 +84,10 @@
 		"typecheck": "tsc --noEmit",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
-		"prettier": "prettier --check --ignore-unknown .",
-		"prettier:fix": "prettier --write --ignore-unknown .",
-		"lint": "pnpm run oxlint && pnpm run prettier",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run prettier:fix"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Suigar-Gaming/ts-sdks.git",
-		"directory": "packages/sdk"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"bugs": {
-		"url": "https://github.com/Suigar-Gaming/ts-sdks/issues/new"
-	},
-	"homepage": "https://suigar.com/docs/sdk",
-	"peerDependencies": {
-		"@mysten/bcs": "catalog:mysten",
-		"@mysten/sui": "catalog:mysten"
+		"oxfmt": "oxfmt . --check",
+		"oxfmt:fix": "oxfmt .",
+		"lint": "pnpm run oxlint && pnpm run oxfmt",
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"devDependencies": {
 		"@mysten/bcs": "catalog:mysten",
@@ -104,5 +97,12 @@
 		"tsdown": "catalog:tooling",
 		"typescript": "catalog:typescript",
 		"vitest": "catalog:test"
+	},
+	"peerDependencies": {
+		"@mysten/bcs": "catalog:mysten",
+		"@mysten/sui": "catalog:mysten"
+	},
+	"engines": {
+		"node": "^22.18.0 || >=24.0.0"
 	}
 }

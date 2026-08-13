@@ -23,11 +23,7 @@ import {
 	LimboSettingsKey,
 } from '../../src/contracts/limbo/limbo.js';
 import { Game as GeneratedPvPCoinflipGame } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
-import {
-	createContractCallMock,
-	getFirstMockArg,
-	TEST_CONFIG,
-} from './utils.js';
+import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from './utils.js';
 
 afterEach(() => {
 	vi.resetModules();
@@ -75,9 +71,7 @@ function createTypeNameDynamicField(
 	};
 }
 
-function createPvPCoinflipGameObject(
-	gameId: string,
-): SuiClientTypes.Object<{ content: true }> {
+function createPvPCoinflipGameObject(gameId: string): SuiClientTypes.Object<{ content: true }> {
 	return {
 		objectId: gameId,
 		version: '1',
@@ -124,9 +118,7 @@ function createCoinflipParametersObject({
 	};
 }
 
-function createLimboParametersObject(
-	objectId: string,
-): SuiClientTypes.Object<{ content: true }> {
+function createLimboParametersObject(objectId: string): SuiClientTypes.Object<{ content: true }> {
 	return {
 		objectId,
 		version: '1',
@@ -191,9 +183,7 @@ function createDynamicObjectFieldObject({
 	nameBcs: Uint8Array;
 	nameType: string;
 }): SuiClientTypes.Object<{ content: true }> {
-	const content = new Uint8Array(
-		SUI_ADDRESS_LENGTH + nameBcs.length + SUI_ADDRESS_LENGTH,
-	);
+	const content = new Uint8Array(SUI_ADDRESS_LENGTH + nameBcs.length + SUI_ADDRESS_LENGTH);
 	content.set(bcs.Address.serialize(normalizeSuiAddress(fieldId)).toBytes());
 	content.set(nameBcs, SUI_ADDRESS_LENGTH);
 	content.set(
@@ -218,9 +208,7 @@ function createDynamicObjectFieldObject({
 	};
 }
 
-function createPvPCoinflipGameObjectWithoutContent(
-	gameId: string,
-): SuiClientTypes.Object {
+function createPvPCoinflipGameObjectWithoutContent(gameId: string): SuiClientTypes.Object {
 	return {
 		objectId: gameId,
 		version: '1',
@@ -258,9 +246,7 @@ function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
 type SuigarTestClient = TestClient & { suigar: SuigarClient };
 
 class TestClient extends CoreClient {
-	mockObjects: Array<
-		Error | SuiClientTypes.Object | SuiClientTypes.Object<{ content: true }>
-	> = [];
+	mockObjects: Array<Error | SuiClientTypes.Object | SuiClientTypes.Object<{ content: true }>> = [];
 
 	mockDynamicFields: Array<SuiClientTypes.DynamicFieldEntry> = [];
 
@@ -271,8 +257,7 @@ class TestClient extends CoreClient {
 		parentId: string;
 	}> = [];
 
-	getDynamicObjectFieldCalls: Array<SuiClientTypes.GetDynamicObjectFieldOptions> =
-		[];
+	getDynamicObjectFieldCalls: Array<SuiClientTypes.GetDynamicObjectFieldOptions> = [];
 
 	listDynamicFieldsCalls: Array<SuiClientTypes.ListDynamicFieldsOptions> = [];
 
@@ -288,9 +273,7 @@ class TestClient extends CoreClient {
 		super({ network: 'testnet', base: undefined as never });
 	}
 
-	getObjects: CoreClient['getObjects'] = async <
-		Include extends SuiClientTypes.ObjectInclude,
-	>(
+	getObjects: CoreClient['getObjects'] = async <Include extends SuiClientTypes.ObjectInclude>(
 		options: SuiClientTypes.GetObjectsOptions<Include>,
 	) => {
 		this.getObjectsCalls.push(options);
@@ -299,8 +282,7 @@ class TestClient extends CoreClient {
 				const object = this.mockObjects.find((object) => {
 					return (
 						!(object instanceof Error) &&
-						normalizeSuiAddress(object.objectId) ===
-							normalizeSuiAddress(objectId)
+						normalizeSuiAddress(object.objectId) === normalizeSuiAddress(objectId)
 					);
 				});
 				if (object) {
@@ -315,17 +297,11 @@ class TestClient extends CoreClient {
 
 						return [lookup.parentId, normalizeSuiAddress(lookup.parentId)].some(
 							(parentId) =>
-								deriveDynamicFieldID(
-									parentId,
-									lookup.nameType,
-									lookup.nameBcs!,
-								) === objectId,
+								deriveDynamicFieldID(parentId, lookup.nameType, lookup.nameBcs!) === objectId,
 						);
 					}) ??
 					(() => {
-						const lookups = this.mockDynamicFieldLookups.filter(
-							(lookup) => lookup.nameBcs,
-						);
+						const lookups = this.mockDynamicFieldLookups.filter((lookup) => lookup.nameBcs);
 						return lookups[this.dynamicFieldObjectReads++ % lookups.length];
 					})();
 				if (dynamicFieldLookup?.nameBcs) {
@@ -337,10 +313,7 @@ class TestClient extends CoreClient {
 					});
 				}
 
-				return (
-					this.mockObjects[index] ??
-					new Error(`No object found for id ${objectId}`)
-				);
+				return this.mockObjects[index] ?? new Error(`No object found for id ${objectId}`);
 			}) as SuiClientTypes.GetObjectsResponse<Include>['objects'],
 		};
 	};
@@ -457,10 +430,9 @@ class TestClient extends CoreClient {
 		const lookup = this.mockDynamicFieldLookups.find(
 			(entry) =>
 				entry.parentId === options.parentId &&
-				[
-					entry.nameType,
-					`0x2::dynamic_object_field::Wrapper<${entry.nameType}>`,
-				].includes(options.name.type),
+				[entry.nameType, `0x2::dynamic_object_field::Wrapper<${entry.nameType}>`].includes(
+					options.name.type,
+				),
 		);
 
 		if (!lookup) {
@@ -491,13 +463,11 @@ class TestClient extends CoreClient {
 		}
 
 		return {
-			object:
-				object as SuiClientTypes.GetDynamicObjectFieldResponse<Include>['object'],
+			object: object as SuiClientTypes.GetDynamicObjectFieldResponse<Include>['object'],
 		};
 	};
 
-	resolveTransactionPlugin: CoreClient['resolveTransactionPlugin'] =
-		() => async () => {};
+	resolveTransactionPlugin: CoreClient['resolveTransactionPlugin'] = () => async () => {};
 
 	verifyZkLoginSignature: CoreClient['verifyZkLoginSignature'] = async () =>
 		({ success: true }) as SuiClientTypes.ZkLoginVerifyResponse;
@@ -512,11 +482,10 @@ class TestClient extends CoreClient {
 			},
 		}) satisfies SuiClientTypes.DefaultNameServiceNameResponse;
 
-	resolveNameServiceAddress: CoreClient['resolveNameServiceAddress'] =
-		async () =>
-			({
-				address: null,
-			}) satisfies SuiClientTypes.ResolveNameServiceAddressResponse;
+	resolveNameServiceAddress: CoreClient['resolveNameServiceAddress'] = async () =>
+		({
+			address: null,
+		}) satisfies SuiClientTypes.ResolveNameServiceAddressResponse;
 
 	listTransactions: CoreClient['listTransactions'] = () => {
 		throw new Error('Not implemented.');
@@ -611,16 +580,11 @@ describe('SuigarClient', () => {
 		const play = createContractCallMock();
 
 		vi.resetModules();
-		vi.doMock(
-			'../../src/contracts/coinflip/coinflip.js',
-			async (importOriginal) => {
-				const actual =
-					await importOriginal<
-						typeof import('../../src/contracts/coinflip/coinflip.js')
-					>();
-				return { ...actual, play };
-			},
-		);
+		vi.doMock('../../src/contracts/coinflip/coinflip.js', async (importOriginal) => {
+			const actual =
+				await importOriginal<typeof import('../../src/contracts/coinflip/coinflip.js')>();
+			return { ...actual, play };
+		});
 		for (const contractPath of [
 			'../../src/contracts/limbo/limbo.js',
 			'../../src/contracts/plinko/plinko.js',
@@ -636,9 +600,7 @@ describe('SuigarClient', () => {
 		);
 		const { suigar: mockedSuigar } = await import('../../src/client.js');
 		const partner = normalizeSuiAddress('0x456');
-		const client = new TestClient().$extend(
-			mockedSuigar({ partner }),
-		) as SuigarTestClient;
+		const client = new TestClient().$extend(mockedSuigar({ partner })) as SuigarTestClient;
 		const coinType = client.suigar.getConfig().coins.sui.coinType;
 		client.suigar.tx.createGameBet({
 			game: 'coinflip',
@@ -652,9 +614,7 @@ describe('SuigarClient', () => {
 			arguments: Array<unknown>;
 		}>(play);
 		expect(options.arguments[5]).toEqual(['partner']);
-		expect(options.arguments[6]).toEqual([
-			Array.from(Buffer.from(partner.slice(2), 'hex')),
-		]);
+		expect(options.arguments[6]).toEqual([Array.from(Buffer.from(partner.slice(2), 'hex'))]);
 	});
 
 	it('exposes standard, PvP, and NFT transaction factories', () => {
@@ -710,14 +670,9 @@ describe('SuigarClient', () => {
 
 	it('loads typed game parameters through the SweetHouse settings object', async () => {
 		const client = createSuigarTestClient({
-			objects: [
-				createCoinflipParametersObject({ objectId: '0x111', minStake: 25n }),
-			],
+			objects: [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })],
 			dynamicFields: [
-				createTypeNameDynamicField(
-					'0x111',
-					normalizeStructTag(COINS.testnet.sui.coinType),
-				),
+				createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
 			],
 			dynamicFieldLookups: [
 				{
@@ -751,9 +706,9 @@ describe('SuigarClient', () => {
 			type: TypeName.name,
 			bcs: SUI_TYPE_NAME_FIELD_BCS,
 		});
-		expect(
-			TypeName.parse(client.getDynamicObjectFieldCalls[1]!.name.bcs).name,
-		).toBe(normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''));
+		expect(TypeName.parse(client.getDynamicObjectFieldCalls[1]!.name.bcs).name).toBe(
+			normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''),
+		);
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
@@ -823,14 +778,9 @@ describe('SuigarClient', () => {
 
 	it('caches settings ids and game parameters until ignored', async () => {
 		const client = createSuigarTestClient({
-			objects: [
-				createCoinflipParametersObject({ objectId: '0x111', minStake: 25n }),
-			],
+			objects: [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })],
 			dynamicFields: [
-				createTypeNameDynamicField(
-					'0x111',
-					normalizeStructTag(COINS.testnet.sui.coinType),
-				),
+				createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
 			],
 			dynamicFieldLookups: [
 				{
@@ -861,9 +811,7 @@ describe('SuigarClient', () => {
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 
-		client.mockObjects = [
-			createCoinflipParametersObject({ objectId: '0x111', minStake: 50n }),
-		];
+		client.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 50n })];
 
 		const refreshed = await client.suigar.getGameParameters({
 			game: 'coinflip',
@@ -879,14 +827,9 @@ describe('SuigarClient', () => {
 
 	it('shares game parameter cache by extension name through the base Mysten client', async () => {
 		const baseClient = new TestClient();
-		baseClient.mockObjects = [
-			createCoinflipParametersObject({ objectId: '0x111', minStake: 25n }),
-		];
+		baseClient.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })];
 		baseClient.mockDynamicFields = [
-			createTypeNameDynamicField(
-				'0x111',
-				normalizeStructTag(COINS.testnet.sui.coinType),
-			),
+			createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
 		];
 		baseClient.mockDynamicFieldLookups = [
 			{
@@ -902,14 +845,10 @@ describe('SuigarClient', () => {
 				childId: '0x111',
 			},
 		];
-		const first = baseClient.$extend(
-			suigar({ name: 'shared' }),
-		) as TestClient & {
+		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
 			shared: SuigarClient;
 		};
-		const second = baseClient.$extend(
-			suigar({ name: 'shared' }),
-		) as TestClient & {
+		const second = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
 			shared: SuigarClient;
 		};
 
@@ -929,14 +868,8 @@ describe('SuigarClient', () => {
 
 	it('returns pvp coinflip games from the unresolved registry entries', async () => {
 		const client = createSuigarTestClient({
-			objects: [
-				createPvPCoinflipGameObject('0xopen'),
-				createPvPCoinflipGameObject('0xpending'),
-			],
-			dynamicFields: [
-				createDynamicField('0xopen'),
-				createDynamicField('0xpending'),
-			],
+			objects: [createPvPCoinflipGameObject('0xopen'), createPvPCoinflipGameObject('0xpending')],
+			dynamicFields: [createDynamicField('0xopen'), createDynamicField('0xpending')],
 		});
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
 			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
@@ -1037,9 +970,7 @@ describe('SuigarClient', () => {
 			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
 			dynamicFields: [createDynamicField('0xbroken')],
 		});
-		await expect(
-			client.suigar.getPvPCoinflipGames({ throwOnError: true }),
-		).rejects.toThrow(
+		await expect(client.suigar.getPvPCoinflipGames({ throwOnError: true })).rejects.toThrow(
 			'Unable to resolve PvP coinflip game from retrieved object',
 		);
 	});

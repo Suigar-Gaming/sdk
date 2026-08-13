@@ -61,11 +61,7 @@ export function encodeFloat(value: number): Array<number> {
 	const exponent = Math.floor(Math.log2(magnitude));
 	const mantissa = BigInt(Math.round(magnitude * Math.pow(2, 52 - exponent)));
 
-	return [
-		isNegative ? 1 : 0,
-		...writeU64(BigInt(exponent)),
-		...writeU64(mantissa),
-	];
+	return [isNegative ? 1 : 0, ...writeU64(BigInt(exponent)), ...writeU64(mantissa)];
 }
 
 export function encodeString(value: string): Array<number> {
@@ -80,8 +76,6 @@ export function createContractCallMock() {
 	return vi.fn<ContractCallMock>(() => (tx: Transaction) => tx.object('0x777'));
 }
 
-export function getFirstMockArg<T>(mock: {
-	mock: { calls: Array<Array<unknown>> };
-}): T {
+export function getFirstMockArg<T>(mock: { mock: { calls: Array<Array<unknown>> } }): T {
 	return mock.mock.calls[0]?.[0] as T;
 }

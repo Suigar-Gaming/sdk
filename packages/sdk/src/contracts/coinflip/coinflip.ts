@@ -3,14 +3,9 @@
  **************************************************************/
 import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
-import {
-	MoveStruct,
-	normalizeMoveArguments,
-	type RawTransactionArgument,
-} from '../utils/index.js';
+import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 
-const $moduleName =
-	'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip';
+const $moduleName = '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip';
 export const CoinFlipSettingsKey = new MoveStruct({
 	name: `${$moduleName}::CoinFlipSettingsKey`,
 	fields: {
@@ -42,8 +37,7 @@ export interface PlayOptions {
 }
 export function play(options: PlayOptions) {
 	const packageAddress =
-		options.package ??
-		'0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea';
+		options.package ?? '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea';
 	const argumentsTypes = [
 		null,
 		'u64',

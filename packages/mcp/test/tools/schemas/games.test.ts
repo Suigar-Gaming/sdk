@@ -19,9 +19,7 @@ describe('game input schemas', () => {
 
 		expect(input.stake).toBe('1.25');
 		expect(input.network).toBe('testnet');
-		expect(() => coinflipInputSchema.parse({ stake: -1 })).toThrow(
-			/Too small/u,
-		);
+		expect(() => coinflipInputSchema.parse({ stake: -1 })).toThrow(/Too small/u);
 	});
 
 	it('defaults to connected execution and accepts direct session execution', () => {
@@ -37,9 +35,7 @@ describe('game input schemas', () => {
 	});
 
 	it('keeps PvP join game id optional for read-only planning', () => {
-		expect(pvpCoinflipJoinInputSchema.parse({ mode: 'read-only' }).mode).toBe(
-			'read-only',
-		);
+		expect(pvpCoinflipJoinInputSchema.parse({ mode: 'read-only' }).mode).toBe('read-only');
 	});
 
 	it('bounds Soccer ids to their Move integer widths', () => {
@@ -50,8 +46,6 @@ describe('game input schemas', () => {
 				shotZoneId: 255,
 			}),
 		).toMatchObject({ countryId: 65_535 });
-		expect(() => soccerInputSchema.parse({ countryId: 65_536 })).toThrow(
-			/Too big/u,
-		);
+		expect(() => soccerInputSchema.parse({ countryId: 65_536 })).toThrow(/Too big/u);
 	});
 });

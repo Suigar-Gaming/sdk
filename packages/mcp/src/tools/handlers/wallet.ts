@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import QRCode from 'qrcode';
-import {
-	createSuigarClient,
-	type ToolTextResult,
-} from '../../runtime/index.js';
+import { createSuigarClient, type ToolTextResult } from '../../runtime/index.js';
 import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {
 	createSessionWalletSetup,
@@ -32,10 +29,8 @@ import {
 function connectionBridgeArgs(input: ConnectionInput): Array<string> {
 	const args: Array<string> = [];
 	if (input.webUrl) args.push('--web-url', input.webUrl);
-	if (input.timeoutMs !== undefined)
-		args.push('--timeout-ms', String(input.timeoutMs));
-	if (input.maxBodyBytes !== undefined)
-		args.push('--max-body-bytes', String(input.maxBodyBytes));
+	if (input.timeoutMs !== undefined) args.push('--timeout-ms', String(input.timeoutMs));
+	if (input.maxBodyBytes !== undefined) args.push('--max-body-bytes', String(input.maxBodyBytes));
 	if (input.noOpen === true || input.open === false) args.push('--no-open');
 	return args;
 }
@@ -59,10 +54,7 @@ export async function getWalletBalancesTool(
 		await Promise.all(
 			balances.map(
 				async (balance) =>
-					[
-						balance.coinType,
-						await resolveCoinDisplayMetadata(balance.coinType, bundle),
-					] as const,
+					[balance.coinType, await resolveCoinDisplayMetadata(balance.coinType, bundle)] as const,
 			),
 		),
 	);
@@ -83,9 +75,7 @@ export async function getWalletBalancesTool(
 	});
 }
 
-export async function listWalletCoinsTool(
-	input: ListWalletCoinsInput,
-): Promise<ToolTextResult> {
+export async function listWalletCoinsTool(input: ListWalletCoinsInput): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveWalletOwner(input, bundle);
 
@@ -122,16 +112,12 @@ export async function getExecutionStatusTool(
 ): Promise<ToolTextResult> {
 	const execution = getExecutionStatus(input.requestId);
 	if (!execution)
-		throw new Error(
-			'Unknown execution request. It may have expired or this MCP server restarted.',
-		);
+		throw new Error('Unknown execution request. It may have expired or this MCP server restarted.');
 	const { config } = createSuigarClient(getConfigInput(input));
 	return asTextResponse({ network: config.network, config, execution });
 }
 
-export async function getConnectionStatusTool(
-	input: ConnectionInput,
-): Promise<ToolTextResult> {
+export async function getConnectionStatusTool(input: ConnectionInput): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const profile = (await loadCredentials()).profiles[config.network];
 	return asTextResponse({
@@ -148,9 +134,7 @@ export async function getConnectionStatusTool(
 	});
 }
 
-export async function suigarLoginTool(
-	input: ConnectionInput,
-): Promise<ToolTextResult> {
+export async function suigarLoginTool(input: ConnectionInput): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const command = runSuigarCommand(
 		'login',
@@ -170,9 +154,7 @@ export async function suigarLoginTool(
 	});
 }
 
-export async function suigarLogoutTool(
-	input: ConnectionInput,
-): Promise<ToolTextResult> {
+export async function suigarLogoutTool(input: ConnectionInput): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const command = runSuigarCommand(
 		'logout',
@@ -192,15 +174,10 @@ export async function suigarLogoutTool(
 	});
 }
 
-export async function setupSessionWalletTool(
-	input: SessionWalletInput,
-): Promise<ToolTextResult> {
+export async function setupSessionWalletTool(input: SessionWalletInput): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const setup = await createSessionWalletSetup({
-		accountUrl: new URL(
-			'/account',
-			resolveWebOrigin(config.network),
-		).toString(),
+		accountUrl: new URL('/account', resolveWebOrigin(config.network)).toString(),
 	});
 	return asTextResponse({
 		network: config.network,
@@ -213,9 +190,7 @@ export async function setupSessionWalletTool(
 	});
 }
 
-export async function getSessionWalletTool(
-	input: SessionWalletInput,
-): Promise<ToolTextResult> {
+export async function getSessionWalletTool(input: SessionWalletInput): Promise<ToolTextResult> {
 	const bundle = createSuigarClient(getConfigInput(input));
 	const [wallet, wallets, credentials] = await Promise.all([
 		loadSessionWallet(input.sessionWalletId),
@@ -224,10 +199,7 @@ export async function getSessionWalletTool(
 	]);
 	if (!wallet) {
 		const setup = await createSessionWalletSetup({
-			accountUrl: new URL(
-				'/account',
-				resolveWebOrigin(bundle.config.network),
-			).toString(),
+			accountUrl: new URL('/account', resolveWebOrigin(bundle.config.network)).toString(),
 		});
 		return asTextResponse({
 			network: bundle.config.network,
@@ -260,10 +232,7 @@ export async function getSessionWalletTool(
 		await Promise.all(
 			balances.map(
 				async (balance) =>
-					[
-						balance.coinType,
-						await resolveCoinDisplayMetadata(balance.coinType, bundle),
-					] as const,
+					[balance.coinType, await resolveCoinDisplayMetadata(balance.coinType, bundle)] as const,
 			),
 		),
 	);
@@ -274,10 +243,7 @@ export async function getSessionWalletTool(
 	const pairedWallet = credentials.profiles[bundle.config.network];
 	const fundingUrl = pairedWallet
 		? (() => {
-				const url = new URL(
-					'/fund-session-wallet',
-					resolveWebOrigin(bundle.config.network),
-				);
+				const url = new URL('/fund-session-wallet', resolveWebOrigin(bundle.config.network));
 				url.searchParams.set('destination', wallet.address);
 				url.searchParams.set('owner', pairedWallet.address);
 				url.searchParams.set('network', bundle.config.network);
@@ -312,9 +278,7 @@ export async function getSessionWalletTool(
 	});
 }
 
-export async function fundSessionWalletTool(
-	input: SessionWalletInput,
-): Promise<ToolTextResult> {
+export async function fundSessionWalletTool(input: SessionWalletInput): Promise<ToolTextResult> {
 	const { config } = createSuigarClient(getConfigInput(input));
 	const [credentials, sessionWallet] = await Promise.all([
 		loadCredentials(),
@@ -322,20 +286,13 @@ export async function fundSessionWalletTool(
 	]);
 	const profile = credentials.profiles[config.network];
 	if (!profile) {
-		throw new Error(
-			'No wallet is connected for this network. Call "suigar_login" first.',
-		);
+		throw new Error('No wallet is connected for this network. Call "suigar_login" first.');
 	}
 	if (!sessionWallet) {
-		throw new Error(
-			'No session wallet exists. Call "setup_session_wallet" first.',
-		);
+		throw new Error('No session wallet exists. Call "setup_session_wallet" first.');
 	}
 
-	const fundingUrl = new URL(
-		'/fund-session-wallet',
-		resolveWebOrigin(config.network),
-	);
+	const fundingUrl = new URL('/fund-session-wallet', resolveWebOrigin(config.network));
 	fundingUrl.searchParams.set('destination', sessionWallet.address);
 	fundingUrl.searchParams.set('owner', profile.address);
 	fundingUrl.searchParams.set('network', config.network);

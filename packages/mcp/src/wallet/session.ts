@@ -15,21 +15,14 @@ import { Entry } from '@napi-rs/keyring';
 import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
 import { LOOPBACK_HOST, LOOPBACK_ORIGIN, loopbackOrigin } from './loopback.js';
-import {
-	ensureSuigarMcpDataDirectory,
-	SUIGAR_MCP_DATA_DIRECTORY,
-} from './storage.js';
+import { ensureSuigarMcpDataDirectory, SUIGAR_MCP_DATA_DIRECTORY } from './storage.js';
 import { resolvePositiveInteger } from './utils.js';
 
 const KEYCHAIN_SERVICE: string = 'com.suigar.mcp';
-const SESSION_WALLETS_FILE: string = join(
-	SUIGAR_MCP_DATA_DIRECTORY,
-	'session-wallets.json',
-);
+const SESSION_WALLETS_FILE: string = join(SUIGAR_MCP_DATA_DIRECTORY, 'session-wallets.json');
 const DISPLAY_FILE: string = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
 export const DEFAULT_SESSION_SETUP_TIMEOUT_MS: number = 10 * 60_000;
-export const SESSION_SETUP_TIMEOUT_MS_ENV: string =
-	'SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS';
+export const SESSION_SETUP_TIMEOUT_MS_ENV: string = 'SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS';
 
 export type SessionWallet = {
 	id: string;
@@ -49,21 +42,15 @@ function keychain(id: string): Entry {
 
 async function saveWalletFile(wallets: Array<SessionWallet>): Promise<void> {
 	await ensureSuigarMcpDataDirectory();
-	await writeFile(
-		SESSION_WALLETS_FILE,
-		`${JSON.stringify(wallets, null, 2)}\n`,
-		{
-			mode: 0o600,
-		},
-	);
+	await writeFile(SESSION_WALLETS_FILE, `${JSON.stringify(wallets, null, 2)}\n`, {
+		mode: 0o600,
+	});
 	await chmod(SESSION_WALLETS_FILE, 0o600);
 }
 
 export async function listSessionWallets(): Promise<Array<SessionWallet>> {
 	try {
-		const stored = JSON.parse(
-			await readFile(SESSION_WALLETS_FILE, 'utf8'),
-		) as Array<SessionWallet>;
+		const stored = JSON.parse(await readFile(SESSION_WALLETS_FILE, 'utf8')) as Array<SessionWallet>;
 		return Array.isArray(stored) ? stored : [];
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
@@ -71,27 +58,17 @@ export async function listSessionWallets(): Promise<Array<SessionWallet>> {
 	}
 }
 
-export async function loadSessionWallet(
-	id?: string,
-): Promise<SessionWallet | null> {
+export async function loadSessionWallet(id?: string): Promise<SessionWallet | null> {
 	const wallets = await listSessionWallets();
-	return (
-		wallets.find((wallet) => wallet.id === id) ??
-		(id ? null : (wallets[0] ?? null))
-	);
+	return wallets.find((wallet) => wallet.id === id) ?? (id ? null : (wallets[0] ?? null));
 }
 
 export async function loadSessionSigner(id?: string): Promise<Keypair> {
 	const wallet = await loadSessionWallet(id);
-	if (!wallet)
-		throw new Error(
-			'No session wallet is available. Create or recover one first.',
-		);
+	if (!wallet) throw new Error('No session wallet is available. Create or recover one first.');
 	const secret = keychain(wallet.id).getPassword();
 	if (!secret) {
-		throw new Error(
-			'No session wallet is available. Create or recover one first.',
-		);
+		throw new Error('No session wallet is available. Create or recover one first.');
 	}
 	return signerFromPrivateKey(secret);
 }
@@ -133,23 +110,13 @@ function persistMnemonicSessionWallet(
 	source: Extract<SessionWallet['source'], 'created' | 'imported'>,
 	name: string,
 ): Promise<SessionWallet> {
-	return persistSessionWallet(
-		Ed25519Keypair.deriveKeypair(mnemonic),
-		source,
-		name,
-	);
+	return persistSessionWallet(Ed25519Keypair.deriveKeypair(mnemonic), source, name);
 }
 
 const styles = `<style>
 :root{color-scheme:light dark;--background:#e4faff;--foreground:#072744;--card:#c8f1fb;--muted:#33546b;--accent:#a5e0f0;--primary:#ffbf49;--primary-foreground:#321c00;--secondary:#1fa8d8;--border:#7eb2c7;--success:#33b98d;--destructive:#de5978}@media(prefers-color-scheme:dark){:root{--background:#030914;--foreground:#edf4ff;--card:#0f1b2f;--muted:#9db3d6;--accent:#173155;--primary:#ffb547;--primary-foreground:#2d1500;--secondary:#4cc5ff;--border:#1f2d47;--success:#45c480;--destructive:#ff5f74}}*{box-sizing:border-box}body{min-height:100dvh;margin:0;background:radial-gradient(circle at top right,color-mix(in srgb,var(--secondary) 24%,transparent),transparent 38%),var(--background);color:var(--foreground);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.015em}.shell{width:min(100% - 32px,720px);margin:clamp(24px,8vh,88px) auto}.card{display:grid;gap:20px;padding:clamp(24px,5vw,44px);border:1px solid var(--border);border-radius:24px;background:color-mix(in srgb,var(--card) 92%,transparent);box-shadow:0 28px 70px color-mix(in srgb,var(--background) 75%,transparent)}.eyebrow{margin:0;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.16em}.heading{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0;font-size:clamp(28px,5vw,40px);line-height:1.08}.badge{padding:5px 10px;border:1px solid color-mix(in srgb,var(--secondary) 70%,var(--border));border-radius:999px;background:var(--accent);font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace}.lead{margin:0;color:var(--muted);font-weight:600}.notice{margin:0;padding:14px 16px;border:1px solid color-mix(in srgb,var(--destructive) 70%,var(--border));border-radius:14px;background:color-mix(in srgb,var(--destructive) 12%,transparent);font-weight:700}.recovery{display:block;overflow-wrap:anywhere;padding:18px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--background) 76%,transparent);font:600 15px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;word-spacing:5px}form{display:grid;gap:14px;margin:0}label{display:grid;gap:6px;font-weight:700}.confirmation{display:flex;align-items:flex-start;gap:10px;font-weight:650}.confirmation input{margin-top:5px;accent-color:var(--secondary)}.actions{display:flex;flex-wrap:wrap;gap:10px}button{min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:10px;background:var(--primary);color:var(--primary-foreground);cursor:pointer;font:800 15px/1 ui-sans-serif,system-ui,sans-serif}button.secondary{border-color:var(--border);background:var(--accent);color:var(--foreground)}button:hover{filter:brightness(1.04)}hr{width:100%;height:1px;margin:4px 0;border:0;background:var(--border)}h2{margin:0;font-size:20px}input[type=text],input:not([type]),textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--background) 76%,transparent);color:var(--foreground);font:14px/1.5 ui-sans-serif,system-ui,sans-serif}textarea{min-height:118px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}code.inline{padding:2px 5px;border-radius:5px;background:color-mix(in srgb,var(--background) 76%,transparent);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.success{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--success);color:#03150a;font-size:23px;font-weight:900}.details{display:grid;gap:8px;padding:16px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--background) 58%,transparent)}.details p{margin:0;color:var(--muted)}@media(max-width:500px){.shell{width:min(100% - 20px,720px)}.card{padding:22px}.actions button{width:100%}}</style>`;
 
-function layout({
-	title,
-	children,
-}: {
-	title: string;
-	children: string;
-}): string {
+function layout({ title, children }: { title: string; children: string }): string {
 	return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><title>${title}</title>${styles}</head>
 <body><main class="shell"><section class="card">${children}</section></main></body></html>`;
@@ -265,10 +232,8 @@ export async function createSessionWalletSetup({
 							form.get('name')?.trim() ?? '',
 						)
 					: await (async () => {
-							const phrase =
-								form.get('mnemonic')?.trim().replace(/\s+/gu, ' ') ?? '';
-							if (!validateMnemonic(phrase, wordlist))
-								throw new Error('Invalid recovery phrase.');
+							const phrase = form.get('mnemonic')?.trim().replace(/\s+/gu, ' ') ?? '';
+							if (!validateMnemonic(phrase, wordlist)) throw new Error('Invalid recovery phrase.');
 							if (url.pathname === '/save' && form.get('confirmed') !== 'on')
 								throw new Error('Confirm that you saved the recovery phrase.');
 							return persistMnemonicSessionWallet(
@@ -289,17 +254,11 @@ export async function createSessionWalletSetup({
 				'cache-control': 'no-store',
 			});
 			response.end(
-				failure(
-					error instanceof Error
-						? error.message
-						: 'Unable to save session wallet.',
-				),
+				failure(error instanceof Error ? error.message : 'Unable to save session wallet.'),
 			);
 		}
 	});
-	await new Promise<void>((resolve) =>
-		server.listen(0, LOOPBACK_HOST, resolve),
-	);
+	await new Promise<void>((resolve) => server.listen(0, LOOPBACK_HOST, resolve));
 	const port = (server.address() as AddressInfo).port;
 	const timeout = setTimeout(() => server.close(), resolvedTimeoutMs).unref();
 	server.once('close', () => clearTimeout(timeout));

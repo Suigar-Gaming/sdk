@@ -18,9 +18,7 @@ export type InspectorViewModel = {
 
 function resultEventFields(structuredContent: AnyRecord): AnyRecord {
 	const dryRunSummary = asRecord(structuredContent.dryRunSummary);
-	const events = Array.isArray(dryRunSummary.events)
-		? dryRunSummary.events
-		: [];
+	const events = Array.isArray(dryRunSummary.events) ? dryRunSummary.events : [];
 	const eventRecords = events.map(asRecord);
 	const event =
 		eventRecords.find((item) => item.eventName === 'BetResultEvent') ??
@@ -103,16 +101,9 @@ export function createInspectorViewModel(
 	const eventFields = resultEventFields(record);
 	const plan = asRecord(record.plan);
 	const game = asRecord(record.game);
-	const typeArguments = Array.isArray(plan.typeArguments)
-		? plan.typeArguments
-		: null;
-	const requiredInputs = Array.isArray(plan.requiredInputs)
-		? plan.requiredInputs
-		: null;
-	const coinType =
-		summary.coinType ??
-		game.coinType ??
-		(typeArguments ? typeArguments[0] : null);
+	const typeArguments = Array.isArray(plan.typeArguments) ? plan.typeArguments : null;
+	const requiredInputs = Array.isArray(plan.requiredInputs) ? plan.requiredInputs : null;
+	const coinType = summary.coinType ?? game.coinType ?? (typeArguments ? typeArguments[0] : null);
 
 	return {
 		coinBadge: coinBadgeFor(coinType),

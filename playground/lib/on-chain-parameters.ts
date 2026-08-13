@@ -11,9 +11,7 @@ import type {
 	StandardGameParametersSummary,
 } from '@/lib/suigar-types';
 
-type StandardGameParametersResult = Awaited<
-	ReturnType<SuigarClient['getGameParameters']>
->;
+type StandardGameParametersResult = Awaited<ReturnType<SuigarClient['getGameParameters']>>;
 
 type StakeParameters = {
 	min_stake: bigint | string | number;
@@ -38,19 +36,12 @@ function formatAtomicAmount(value: bigint, decimals: number) {
 		return whole.toString();
 	}
 
-	const trimmedFraction = fraction
-		.toString()
-		.padStart(decimals, '0')
-		.replace(/0+$/, '');
+	const trimmedFraction = fraction.toString().padStart(decimals, '0').replace(/0+$/, '');
 
 	return `${whole.toString()}.${trimmedFraction}`;
 }
 
-function toStakeRange(
-	minStake: bigint,
-	maxStake: bigint,
-	decimals: number,
-): StakeRangeSummary {
+function toStakeRange(minStake: bigint, maxStake: bigint, decimals: number): StakeRangeSummary {
 	return {
 		min: formatAtomicAmount(minStake, decimals),
 		max: formatAtomicAmount(maxStake, decimals),
@@ -71,9 +62,7 @@ function toStakeMinimum(minStake: bigint, decimals: number): StakeRangeSummary {
 function toConfigOptions<TEntry extends ConfigEntry>(
 	entries: Array<TEntry>,
 	decimals: number,
-	buildConfig: (
-		entry: TEntry,
-	) => Pick<GameConfigOption, 'label' | 'details' | 'multiplierValues'>,
+	buildConfig: (entry: TEntry) => Pick<GameConfigOption, 'label' | 'details' | 'multiplierValues'>,
 ): Array<GameConfigOption> {
 	return entries.map((entry) => {
 		const stakeRange = toStakeRange(
@@ -179,21 +168,17 @@ export function summarizeStandardGameParameters(
 				toBigInt(plinkoParameters.max_stake),
 				decimals,
 			);
-			const configs = toConfigOptions(
-				plinkoParameters.configs.contents,
-				decimals,
-				(entry) => ({
-					label: `Config ${entry.key}`,
-					details: [
-						{ label: 'Rows', value: String(entry.value.num_rows) },
-						{ label: 'Slots', value: String(entry.value.multipliers.length) },
-					],
-					multiplierValues: entry.value.multipliers.map((value) => ({
-						id: crypto.randomUUID(),
-						value: String(value),
-					})),
-				}),
-			);
+			const configs = toConfigOptions(plinkoParameters.configs.contents, decimals, (entry) => ({
+				label: `Config ${entry.key}`,
+				details: [
+					{ label: 'Rows', value: String(entry.value.num_rows) },
+					{ label: 'Slots', value: String(entry.value.multipliers.length) },
+				],
+				multiplierValues: entry.value.multipliers.map((value) => ({
+					id: crypto.randomUUID(),
+					value: String(value),
+				})),
+			}));
 
 			return {
 				stakeRange,
@@ -223,24 +208,20 @@ export function summarizeStandardGameParameters(
 				toBigInt(wheelParameters.max_stake),
 				decimals,
 			);
-			const configs = toConfigOptions(
-				wheelParameters.configs.contents,
-				decimals,
-				(entry) => ({
-					label: `Config ${entry.key}`,
-					details: [
-						{ label: 'Cases', value: String(entry.value.num_cases) },
-						{
-							label: 'Multipliers',
-							value: String(entry.value.multipliers.length),
-						},
-					],
-					multiplierValues: entry.value.multipliers.map((value) => ({
-						id: crypto.randomUUID(),
-						value: String(value),
-					})),
-				}),
-			);
+			const configs = toConfigOptions(wheelParameters.configs.contents, decimals, (entry) => ({
+				label: `Config ${entry.key}`,
+				details: [
+					{ label: 'Cases', value: String(entry.value.num_cases) },
+					{
+						label: 'Multipliers',
+						value: String(entry.value.multipliers.length),
+					},
+				],
+				multiplierValues: entry.value.multipliers.map((value) => ({
+					id: crypto.randomUUID(),
+					value: String(value),
+				})),
+			}));
 
 			return {
 				stakeRange,
@@ -273,33 +254,27 @@ export function summarizeStandardGameParameters(
 				toBigInt(soccerParameters.max_stake),
 				decimals,
 			);
-			const configs = toConfigOptions(
-				soccerParameters.configs.contents,
-				decimals,
-				(entry) => ({
-					label: `Config ${entry.key}`,
-					details: [
-						{
-							label: 'Countries',
-							value: String(soccerParameters.countries.contents.length),
-						},
-						{
-							label: 'Shot zones',
-							value: String(entry.value.shot_zone_ids.length),
-						},
-						{
-							label: 'Multipliers',
-							value: String(entry.value.shot_zone_multipliers.length),
-						},
-					],
-					multiplierValues: entry.value.shot_zone_multipliers.map(
-						(value, index) => ({
-							id: String(entry.value.shot_zone_ids[index]),
-							value: String(value),
-						}),
-					),
-				}),
-			);
+			const configs = toConfigOptions(soccerParameters.configs.contents, decimals, (entry) => ({
+				label: `Config ${entry.key}`,
+				details: [
+					{
+						label: 'Countries',
+						value: String(soccerParameters.countries.contents.length),
+					},
+					{
+						label: 'Shot zones',
+						value: String(entry.value.shot_zone_ids.length),
+					},
+					{
+						label: 'Multipliers',
+						value: String(entry.value.shot_zone_multipliers.length),
+					},
+				],
+				multiplierValues: entry.value.shot_zone_multipliers.map((value, index) => ({
+					id: String(entry.value.shot_zone_ids[index]),
+					value: String(value),
+				})),
+			}));
 
 			return {
 				stakeRange,
@@ -341,10 +316,7 @@ export function summarizePvPGameParameters(
 			};
 
 			return {
-				stakeRange: toStakeMinimum(
-					toBigInt(pvpCoinflipParameters.min_stake),
-					decimals,
-				),
+				stakeRange: toStakeMinimum(toBigInt(pvpCoinflipParameters.min_stake), decimals),
 				topLevelDetails: [
 					{
 						label: 'House edge (bps)',
@@ -368,9 +340,7 @@ export function findGameConfigOption(
 	parameters: StandardGameParametersSummary | null,
 	configId: string,
 ) {
-	return (
-		parameters?.configOptions?.find((option) => option.id === configId) ?? null
-	);
+	return parameters?.configOptions?.find((option) => option.id === configId) ?? null;
 }
 
 export function resolveStakeRangeForGame(
@@ -383,10 +353,7 @@ export function resolveStakeRangeForGame(
 	}
 
 	if ((game === 'plinko' || game === 'wheel') && configId) {
-		return (
-			findGameConfigOption(parameters, configId)?.stakeRange ??
-			parameters.stakeRange
-		);
+		return findGameConfigOption(parameters, configId)?.stakeRange ?? parameters.stakeRange;
 	}
 
 	return parameters.stakeRange;

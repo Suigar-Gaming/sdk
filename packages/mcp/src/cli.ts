@@ -67,9 +67,7 @@ function getBridgeOptions(args: BridgeArgs): BridgeOptions {
 	};
 }
 
-export async function runSuigarCli(
-	argv = hideBin(process.argv),
-): Promise<void> {
+export async function runSuigarCli(argv = hideBin(process.argv)): Promise<void> {
 	const parser = yargs(argv)
 		.scriptName('')
 		.strict()
@@ -93,9 +91,7 @@ export async function runSuigarCli(
 					webOrigin: resolveWebOrigin(network, bridgeArgs.webUrl),
 					...getBridgeOptions(bridgeArgs),
 				});
-				process.stderr.write(
-					`Open this URL to connect your wallet:\n${bridge.url}\n`,
-				);
+				process.stderr.write(`Open this URL to connect your wallet:\n${bridge.url}\n`);
 				const profile = await bridge.done;
 				const result = {
 					network,
@@ -181,9 +177,7 @@ export async function runSuigarCli(
 			'status',
 			'Show non-secret MCP connection status',
 			(command: Argv) =>
-				command
-					.option('network', { choices: SUPPORTED_SUI_NETWORKS })
-					.option('json', JSON_OPTION),
+				command.option('network', { choices: SUPPORTED_SUI_NETWORKS }).option('json', JSON_OPTION),
 			async (args: NetworkArgs & JsonArgs) => {
 				const credentials = await loadCredentials();
 				const network = args.network ?? credentials.defaultNetwork;
@@ -205,8 +199,7 @@ export async function runSuigarCli(
 		.command(
 			'$0',
 			'Start the stdio MCP server',
-			(command: Argv) =>
-				command.option('network', { choices: SUPPORTED_SUI_NETWORKS }),
+			(command: Argv) => command.option('network', { choices: SUPPORTED_SUI_NETWORKS }),
 			async (args: NetworkArgs) => {
 				if (args.network) await setDefaultNetwork(args.network);
 				await startSuigarMcpServer();
