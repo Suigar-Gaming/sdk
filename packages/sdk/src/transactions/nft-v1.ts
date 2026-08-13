@@ -14,7 +14,7 @@ import type {
 } from '../types/index.js';
 import { createBaseTransaction } from './shared.js';
 
-export function buildMintNftV1PaymentCoin({
+function buildMintNftV1PaymentCoin({
 	client,
 	config,
 	specId,
@@ -45,16 +45,13 @@ export function buildMintNftV1PaymentCoin({
 }
 
 export function buildMintNftV1Transaction({
+	client,
 	config,
 	owner,
 	gasBudget,
 	specId,
-	paymentCoin,
-}: WithConfig<
-	MintNftV1Options & {
-		paymentCoin: TransactionArgument;
-	}
->): Transaction {
+	useGasCoin,
+}: WithClient<WithConfig<MintNftV1Options>>): Transaction {
 	const tx = createBaseTransaction({ owner, gasBudget });
 
 	tx.add(
@@ -64,7 +61,12 @@ export function buildMintNftV1Transaction({
 				config.objectIds.nftV1Factory,
 				config.objectIds.sweetHouse,
 				specId,
-				paymentCoin,
+				buildMintNftV1PaymentCoin({
+					client,
+					config,
+					specId,
+					useGasCoin,
+				}),
 			],
 		}),
 	);
