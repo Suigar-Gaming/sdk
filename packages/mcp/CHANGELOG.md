@@ -1,5 +1,13 @@
 # @suigar/mcp
 
+## 1.0.0-beta.24
+
+### Patch Changes
+
+- [#152](https://github.com/Suigar-Gaming/ts-sdks/pull/152) [`2496c29`](https://github.com/Suigar-Gaming/ts-sdks/commit/2496c29fc18fb6e91e5f21609b5f9c1b2d3e2b12) - Reformat package sources with Oxfmt without changing runtime APIs.
+- Updated dependencies [[`2496c29`](https://github.com/Suigar-Gaming/ts-sdks/commit/2496c29fc18fb6e91e5f21609b5f9c1b2d3e2b12)]:
+  - @suigar/sdk@2.0.0-beta.38
+
 ## 1.0.0-beta.23
 
 ### Patch Changes
