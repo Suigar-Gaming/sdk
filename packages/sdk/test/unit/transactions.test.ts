@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
+import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Factory as NftV1Factory } from '../../src/contracts/nft-v1/nft.js';
@@ -681,6 +681,13 @@ describe('pvp coinflip transaction wrapper', () => {
 
 	it('passes join action arguments into the generated helper', async () => {
 		const joinGame = createContractCallMock();
+		const getGame = vi
+			.fn<() => Promise<{ json: { stake_per_player: bigint } }>>()
+			.mockResolvedValue({
+				json: {
+					stake_per_player: 1000n,
+				},
+			});
 		const { buildPvPCoinflipTransaction: buildPvPCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
@@ -690,20 +697,24 @@ describe('pvp coinflip transaction wrapper', () => {
 					createGame: createUnusedContractCallMock(),
 					joinGame,
 					cancelGame: createUnusedContractCallMock(),
+					Game: {
+						get: getGame,
+					},
 				},
 				'../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
+		const client = {} as never;
 
 		buildPvPCoinflipTransactionWithMock({
 			action: 'join',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			gameId: '0x999',
+			client,
 			metadata: { label: 'vip' },
 			partner,
 			config: TEST_CONFIG,
-			betCoin: coinWithBalance({ type: '0x2::sui::SUI', balance: 1000 }),
 		});
 
 		const options = getFirstMockArg<{
@@ -719,6 +730,13 @@ describe('pvp coinflip transaction wrapper', () => {
 			encodeUtf8('vip'),
 		]);
 		expect(options.arguments[5]).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
+		await (options.arguments[2] as (tx: Transaction) => Promise<unknown>)(
+			new Transaction(),
+		);
+		expect(getGame).toHaveBeenCalledWith({
+			client,
+			objectId: '0x999',
+		});
 	});
 
 	it('passes cancel action arguments into the generated helper', async () => {

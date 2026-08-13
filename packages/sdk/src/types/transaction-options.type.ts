@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
-import type {
-	Transaction,
-	TransactionArgument,
-} from '@mysten/sui/transactions';
+import type { Transaction } from '@mysten/sui/transactions';
 import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide, Game, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';
@@ -32,10 +29,6 @@ export type WithGame<T, TGame extends Game = Game> = T & {
 
 export type WithCoinType<T = {}> = T & {
 	coinType: string;
-};
-
-export type WithBetCoin<T, TBetCoin = TransactionArgument> = T & {
-	betCoin: TBetCoin;
 };
 
 /** Common sender and gas settings for every SDK-built transaction. */

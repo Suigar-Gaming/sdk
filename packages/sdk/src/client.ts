@@ -35,7 +35,6 @@ import {
 	buildLimboTransaction,
 	buildMintNftV1Transaction,
 	buildPlinkoTransaction,
-	buildPvPCoinflipJoinBetCoin,
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
 	buildSoccerTransaction,
@@ -395,10 +394,7 @@ export class SuigarClient {
 				return buildPvPCoinflipTransaction({
 					...options,
 					action: 'join',
-					betCoin: buildPvPCoinflipJoinBetCoin({
-						...options,
-						client: this.#client,
-					}),
+					client: this.#client,
 					config: this.#config,
 					partner: this.#partner,
 				});

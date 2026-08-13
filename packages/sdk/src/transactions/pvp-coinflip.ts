@@ -18,7 +18,6 @@ import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	PvPCoinflipAction,
 	PvPCoinflipTransactionOptions,
-	WithBetCoin,
 	WithClient,
 	WithPartner,
 } from '../types/index.js';
@@ -29,7 +28,7 @@ type BuildPvPCoinflipTransactionOptions<
 	TAction extends PvPCoinflipAction = PvPCoinflipAction,
 > = {
 	[Action in PvPCoinflipAction]: (Action extends 'join'
-		? WithPartner<WithBetCoin<PvPCoinflipTransactionOptions<Action>>>
+		? WithClient<WithPartner<PvPCoinflipTransactionOptions<Action>>>
 		: WithPartner<PvPCoinflipTransactionOptions<Action>>) & {
 		action: Action;
 	};
@@ -40,7 +39,7 @@ type BuildPvPCoinflipTransactionOptions<
  *
  * The stake is read from the on-chain game when the transaction is built, which keeps transaction construction compatible with wallet interaction flows.
  */
-export function buildPvPCoinflipJoinBetCoin(
+function buildPvPCoinflipJoinBetCoin(
 	options: WithClient<
 		Pick<
 			PvPCoinflipTransactionOptions<'join'>,
@@ -115,7 +114,10 @@ export function buildPvPCoinflipTransaction(
 					arguments: [
 						options.gameId,
 						config.objectIds.sweetHouse,
-						options.betCoin,
+						buildPvPCoinflipJoinBetCoin({
+							...options,
+							coinType: normalizedCoinType,
+						}),
 						encodedMetadata.keys,
 						encodedMetadata.values,
 						priceInfoObjectId,

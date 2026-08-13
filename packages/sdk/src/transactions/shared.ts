@@ -4,6 +4,7 @@
 import {
 	coinWithBalance,
 	Transaction,
+	TransactionArgument,
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
@@ -18,7 +19,6 @@ import type {
 	SharedBetTransactionOptions,
 	StakeTransactionOptions,
 	TransactionSenderOptions,
-	WithBetCoin,
 	WithCoinType,
 	WithGame,
 	WithPartner,
@@ -35,12 +35,11 @@ type StrictStakeTransactionOptions = {
 
 type SharedBetTransactionContext = WithCoinType<
 	Pick<BaseTransactionOptions, 'config' | 'owner'> &
-		WithBetCoin<
-			StrictStakeTransactionOptions & {
-				metadata: EncodedBetMetadata;
-				priceInfoObjectId: string;
-			}
-		>
+		StrictStakeTransactionOptions & {
+			betCoin: TransactionArgument;
+			metadata: EncodedBetMetadata;
+			priceInfoObjectId: string;
+		}
 >;
 
 type CreateBaseGameTransactionOptions = WithGame<BaseTransactionOptions>;
