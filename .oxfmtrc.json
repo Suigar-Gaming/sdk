@@ -8,7 +8,6 @@
 	"sortPackageJson": true,
 	"ignorePatterns": [
 		"**/.turbo/**",
-		".changeset/**/*.md",
 		"**/.next/**",
 		"**/build/**",
 		"**/coverage/**",
