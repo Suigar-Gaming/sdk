@@ -3,6 +3,7 @@
 	"changelog": [
 		"@changesets/changelog-github",
 		{
+			"disableThanks": true,
 			"repo": "Suigar-Gaming/ts-sdks"
 		}
 	],
