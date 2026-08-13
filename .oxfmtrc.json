@@ -6,18 +6,7 @@
 	"semi": true,
 	"proseWrap": "never",
 	"sortPackageJson": true,
-	"ignorePatterns": [
-		"**/.turbo/**",
-		"**/.next/**",
-		"**/build/**",
-		"**/coverage/**",
-		"**/dist/**",
-		"**/out/**",
-		"pnpm-lock.yaml",
-		"npm-debug.log*",
-		"package-lock.json",
-		"yarn-debug.log*"
-	],
+	"ignorePatterns": ["**/.next/**", "**/build/**", "**/coverage/**", "**/out/**"],
 	"sortImports": {
 		"newlinesBetween": false,
 		"customGroups": [
