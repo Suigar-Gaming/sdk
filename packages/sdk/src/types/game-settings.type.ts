@@ -70,7 +70,7 @@ export const GAME_SETTINGS = {
 	{ settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }
 >;
 
-type OnChainGameParametersMap = {
+type OnChainGameParametersRegistry = {
 	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;
 };
 
@@ -83,7 +83,7 @@ export type GameParameterValue<TValue> = TValue extends MoveFloat
 			: TValue;
 
 export type OnChainGameParameters<TGame extends Game> =
-	OnChainGameParametersMap[TGame];
+	OnChainGameParametersRegistry[TGame];
 
 /** Consumer-ready parameters with generated Move float values decoded to numbers. */
 export type GameParameters<TGame extends Game> = GameParameterValue<
