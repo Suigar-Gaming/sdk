@@ -2,7 +2,7 @@
 
 
 .turbo/
-.changeset/*.md
+.changeset/**/*.md
 .next/
 build/
 coverage/
