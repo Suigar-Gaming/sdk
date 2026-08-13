@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-
 import { readGameMetadataTool } from '../../../src/tools/handlers/index.js';
 
 describe('read_game_metadata', () => {

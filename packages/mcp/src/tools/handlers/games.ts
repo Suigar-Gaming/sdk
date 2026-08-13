@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Transaction } from '@mysten/sui/transactions';
-
 import {
 	type CoinSide,
 	type Game,
 	type PvPCoinflipAction,
 	type StandardGame,
 } from '@suigar/sdk/games';
-
 import {
 	buildTransactionResult,
 	createSuigarClient,

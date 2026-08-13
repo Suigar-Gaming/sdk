@@ -4,7 +4,6 @@
 import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
-
 import { GAME_DETAIL_BCS, GAME_DETAILS_SCHEMAS } from '../types/game-details.type.js';
 import { GAME_EVENTS, GAMES } from '../types/game.type.js';
 import type {

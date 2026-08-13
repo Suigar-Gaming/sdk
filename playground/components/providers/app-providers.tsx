@@ -1,7 +1,6 @@
 'use client';
 
 import { DAppKitProvider } from '@mysten/dapp-kit-react';
-
 import { EventLogProvider } from '@/components/providers/event-log-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/sonner';

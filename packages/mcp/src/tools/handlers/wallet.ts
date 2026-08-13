@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import QRCode from 'qrcode';
-
 import { createSuigarClient, type ToolTextResult } from '../../runtime/index.js';
 import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {

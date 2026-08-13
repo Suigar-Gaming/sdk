@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SUI_DECIMALS } from '@mysten/sui/utils';
-
 import { GAMES, type Game } from '@suigar/sdk/games';
 import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
-
 import { formatAmount, isAmountFieldName } from '../utils/index.js';
 import type { SuigarClientBundle } from './client.js';
 import type {

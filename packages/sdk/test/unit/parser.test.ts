@@ -3,7 +3,6 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-
 import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
 import type { SuigarGameEvent } from '../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../src/types/game.type.js';

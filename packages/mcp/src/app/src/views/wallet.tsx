@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ReactNode } from 'react';
-
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 

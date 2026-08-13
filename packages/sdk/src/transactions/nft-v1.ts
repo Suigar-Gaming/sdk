@@ -3,7 +3,6 @@
 
 import { Transaction, type TransactionArgument } from '@mysten/sui/transactions';
 import { normalizeSuiAddress } from '@mysten/sui/utils';
-
 import { Factory, mintToSender } from '../contracts/nft-v1/nft.js';
 import type { MintNftV1Options, WithClient, WithConfig } from '../types/index.js';
 import { createBaseTransaction } from './shared.js';

@@ -3,7 +3,6 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { describe, expect, it, vi } from 'vitest';
-
 import {
 	executeSessionTransaction,
 	getProviderUrl,

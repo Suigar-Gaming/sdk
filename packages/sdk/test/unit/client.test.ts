@@ -11,7 +11,6 @@ import {
 	SUI_ADDRESS_LENGTH,
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
-
 import { suigar, type SuigarClient } from '../../src/client.js';
 import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../../src/configs/index.js';
 import {

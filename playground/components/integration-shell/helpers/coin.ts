@@ -1,5 +1,4 @@
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
-
 import type { SupportedCoinKey } from '@/lib/suigar-types';
 
 export type CoinBalanceState = {

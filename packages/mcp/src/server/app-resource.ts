@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { readFile } from 'node:fs/promises';
-
 import { RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 
 export const SUIGAR_MCP_APP_RESOURCE_URI = 'ui://suigar/transaction-inspector.html';

@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
-
 import { GAMES } from '@suigar/sdk/games';
-
 import { configInputSchema } from './config.js';
 import { COIN_TYPE_DESCRIPTION } from './shared.js';
 

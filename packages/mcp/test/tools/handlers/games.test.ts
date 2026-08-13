@@ -3,7 +3,6 @@
 
 import type { Transaction as SuiTransaction } from '@mysten/sui/transactions';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import type { BuildTransactionResult, ReadOnlyPlan } from '../../../src/runtime/types.js';
 import {
 	buildCoinflipTransactionTool,

@@ -4,7 +4,6 @@
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-
 import { Factory as NftV1Factory } from '../../src/contracts/nft-v1/nft.js';
 import {
 	buildClaimReferralCommissionTransaction,

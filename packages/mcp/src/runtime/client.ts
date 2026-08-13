@@ -13,9 +13,7 @@ import {
 	normalizeSuiNSName,
 	SUI_DECIMALS,
 } from '@mysten/sui/utils';
-
 import { suigar, type SuigarClient, type SuigarNetwork } from '@suigar/sdk';
-
 import { formatBaseUnitAmount } from '../utils/index.js';
 import { readPersistedDefaultNetwork } from '../wallet/credentials.js';
 import { extractDryRunErrors, summarizeDryRun, toJsonValue } from './dry-run.js';

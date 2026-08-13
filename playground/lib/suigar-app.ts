@@ -1,7 +1,5 @@
 import { formatAddress, parseToUnits } from '@mysten/sui/utils';
-
 import { DEFAULT_RANGE_SCALE, RANGE_POINT_LIMIT } from '@suigar/sdk/utils';
-
 import type { PvPCoinflipForms, SharedFields, StandardForms } from '@/lib/suigar-types';
 import { DECIMAL_AMOUNT_PATTERN } from '@/lib/validation';
 

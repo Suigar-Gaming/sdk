@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it, vi } from 'vitest';
-
 import packageJson from '../../package.json' with { type: 'json' };
 
 const mocks = vi.hoisted(() => ({

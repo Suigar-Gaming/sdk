@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-
 import { createInspectorViewModel } from '../../src/app/src/lib/inspector.js';
 import { resolveAppView } from '../../src/app/src/views/index.js';
 

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { rm } from 'node:fs/promises';
-
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

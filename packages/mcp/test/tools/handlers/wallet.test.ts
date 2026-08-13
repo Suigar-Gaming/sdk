@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { toolOutputSchema } from '../../../src/tools/schemas/output.js';
 import { loopbackOrigin } from '../../../src/wallet/loopback.js';
 

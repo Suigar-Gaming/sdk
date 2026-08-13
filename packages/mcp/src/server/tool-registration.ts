@@ -4,7 +4,6 @@
 import { registerAppTool, type ToolConfig } from '@modelcontextprotocol/ext-apps/server';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
-
 import type { ToolTextResult } from '../runtime/index.js';
 import {
 	buildCoinflipTransactionTool,

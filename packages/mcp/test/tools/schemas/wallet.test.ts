@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-
 import { connectionInputSchema } from '../../../src/tools/schemas/wallet.js';
 
 describe('wallet input schemas', () => {

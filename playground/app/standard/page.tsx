@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-
 import { StandardIntegrationPage } from '@/components/integration-shell';
 
 export const metadata: Metadata = {

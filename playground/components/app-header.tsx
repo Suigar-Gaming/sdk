@@ -7,7 +7,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
-
 import { CoinSelectLabel } from '@/components/integration-shell/components/coin-select-label';
 import {
 	formatBalance,

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { spawn } from 'node:child_process';
-
 import { VERSION } from './version.js';
 
 export function runSuigarCommand(...args: Array<string>): {

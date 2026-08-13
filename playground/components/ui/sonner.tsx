@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
-
 import { useTheme } from '@/components/providers/theme-provider';
 
 function subscribeToMobileViewport(onStoreChange: () => void) {

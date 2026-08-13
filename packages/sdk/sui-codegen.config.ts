@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SuiCodegenConfig } from '@mysten/codegen';
-
 import { SUIGAR_PACKAGES } from './suigar-packages.ts';
 
 const packagesConfiguration: SuiCodegenConfig['packages'] = Object.entries(SUIGAR_PACKAGES).map(

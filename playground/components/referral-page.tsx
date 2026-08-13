@@ -3,7 +3,6 @@
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
 import { FileCode2, RefreshCw, SendHorizontal } from 'lucide-react';
 import * as React from 'react';
-
 import { AppHeader } from '@/components/app-header';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';

@@ -1,7 +1,6 @@
 'use client';
 
 import { CirclePlus, ShieldX, Swords } from 'lucide-react';
-
 import type { PvPAction, PvPGameId, StandardGameId } from '@/lib/suigar-types';
 
 export const STANDARD_GAME_OPTIONS = [

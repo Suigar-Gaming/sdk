@@ -1,7 +1,6 @@
 'use client';
 
 import { RefreshCw } from 'lucide-react';
-
 import { CoinIcon } from '@/components/coins';
 import { parseCoinKey, parseCoinTypeLabel } from '@/components/integration-shell/helpers/coin';
 import { Badge } from '@/components/ui/badge';

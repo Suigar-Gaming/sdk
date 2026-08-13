@@ -10,7 +10,6 @@ import {
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { StrictMode, useEffect, useReducer, useRef, useState, type JSX } from 'react';
 import { createRoot } from 'react-dom/client';
-
 import {
 	ExecutionApproval,
 	Header,

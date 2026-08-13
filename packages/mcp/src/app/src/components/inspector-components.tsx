@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ReactNode } from 'react';
-
 import { stringify, valueTone, visibleDefinitionEntries } from '../lib/format.js';
 import type { DefinitionEntry } from '../lib/types.js';
 import { cn } from '../lib/utils.js';

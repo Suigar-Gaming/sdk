@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { normalizeStructTag } from '@mysten/sui/utils';
-
 import { COINS, OBJECT_IDS, PACKAGE_IDS, REGISTRY_IDS } from '../configs/index.js';
 import type {
 	SuigarCoin,

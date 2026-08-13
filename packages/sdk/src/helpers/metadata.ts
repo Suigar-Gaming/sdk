@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fromHex } from '@mysten/sui/utils';
-
 import type {
 	BetMetadataInput,
 	BetMetadataValue,

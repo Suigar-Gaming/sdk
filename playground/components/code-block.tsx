@@ -2,7 +2,6 @@
 
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 
 export function CodeBlock({

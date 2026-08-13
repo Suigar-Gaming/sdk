@@ -1,9 +1,7 @@
 'use client';
 
 import type * as React from 'react';
-
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
-
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Field, FieldCode, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';

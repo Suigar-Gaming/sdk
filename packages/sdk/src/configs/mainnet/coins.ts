@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';
-
 import type { SuigarCoinRegistry } from '../../types/index.js';
 
 export const COINS: SuigarCoinRegistry = {

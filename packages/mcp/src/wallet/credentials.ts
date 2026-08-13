@@ -4,11 +4,8 @@
 import { readFileSync } from 'node:fs';
 import { chmod, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-
 import { isValidSuiAddress } from '@mysten/sui/utils';
-
 import type { SuigarNetwork } from '@suigar/sdk';
-
 import { ensureSuigarMcpDataDirectory, SUIGAR_MCP_DATA_DIRECTORY } from './storage.js';
 
 export type WalletType = 'wallet' | 'zklogin';

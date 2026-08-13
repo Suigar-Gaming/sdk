@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
-
 import { CURRENCY_AMOUNT_PATTERN, POSITIVE_INTEGER_PATTERN } from '../../utils/index.js';
 import { configInputSchema } from './config.js';
 import { ADDRESS_DESCRIPTION, BUILDER_MODES, COIN_TYPE_DESCRIPTION } from './shared.js';

@@ -3,7 +3,6 @@
 
 import type { BcsType, InferBcsType } from '@mysten/bcs';
 import { bcs } from '@mysten/sui/bcs';
-
 import type { BetResultEvent } from '../contracts/core/core.js';
 import { Float } from '../contracts/core/float.js';
 import type { Game } from './game.type.js';

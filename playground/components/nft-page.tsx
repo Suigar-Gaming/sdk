@@ -4,9 +4,7 @@ import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
 import { Check, FileCode2 } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
-
 import type { SuigarClient } from '@suigar/sdk';
-
 import { AppHeader } from '@/components/app-header';
 import { CodeBlock } from '@/components/code-block';
 import { Badge } from '@/components/ui/badge';

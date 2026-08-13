@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-
 import { play } from '../contracts/limbo/limbo.js';
 import type { LimboTransactionOptions, WithPartner } from '../types/index.js';
 import { DEFAULT_LIMBO_MULTIPLIER_SCALE } from '../utils/constants.js';

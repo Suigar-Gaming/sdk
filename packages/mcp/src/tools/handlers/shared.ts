@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { parseStructTag } from '@mysten/sui/utils';
-
 import { GAMES, type Game } from '@suigar/sdk/games';
-
 import {
 	resolveDefaultCoinType,
 	resolveOwnerAddress,

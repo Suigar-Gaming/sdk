@@ -2,7 +2,6 @@
 
 import { Moon, SunMedium } from 'lucide-react';
 import * as React from 'react';
-
 import { useTheme } from '@/components/providers/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';

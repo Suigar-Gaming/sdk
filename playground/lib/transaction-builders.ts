@@ -1,5 +1,4 @@
 import type { SuigarClient } from '@suigar/sdk';
-
 import { parseOptionalNumber, toAtomicAmount } from '@/lib/suigar-app';
 import type {
 	CoinflipFormValues,

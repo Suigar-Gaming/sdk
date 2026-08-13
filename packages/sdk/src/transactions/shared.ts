@@ -8,7 +8,6 @@ import {
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
-
 import { assertConfiguredBetGame, resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {

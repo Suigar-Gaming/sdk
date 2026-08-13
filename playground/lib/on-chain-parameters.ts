@@ -2,7 +2,6 @@
 
 import type { SuigarClient } from '@suigar/sdk';
 import { toBigInt } from '@suigar/sdk/utils';
-
 import type {
 	GameConfigOption,
 	PvPGameId,

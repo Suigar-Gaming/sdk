@@ -3,7 +3,6 @@
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
 import type { Transaction } from '@mysten/sui/transactions';
-
 import type { BetMetadataInput } from './bet-metadata.type.js';
 import type { CoinSide, Game, PvPCoinflipAction } from './game.type.js';
 import type { SuigarConfig } from './suigar-config.type.js';

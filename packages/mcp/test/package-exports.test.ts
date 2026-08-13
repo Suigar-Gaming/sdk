@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { readFile } from 'node:fs/promises';
-
 import { describe, expect, it } from 'vitest';
-
 import packageJson from '../package.json' with { type: 'json' };
 
 describe('package exports', () => {

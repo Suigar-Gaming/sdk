@@ -3,7 +3,6 @@
 
 import type { InferBcsType } from '@mysten/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
-
 import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,

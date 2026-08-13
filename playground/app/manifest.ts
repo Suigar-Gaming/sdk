@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-
 import { withBasePath } from '@/lib/paths';
 
 export const dynamic = 'force-static';

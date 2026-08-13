@@ -5,9 +5,7 @@ import { BookOpenText, Cog, Gamepad2, Swords } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
-
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
-
 import { AppHeader } from '@/components/app-header';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/forms/games/coinflip-form';

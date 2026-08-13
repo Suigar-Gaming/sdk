@@ -3,7 +3,6 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { describe, expect, it } from 'vitest';
-
 import type { ToolTextResult } from '../../src/runtime/types.js';
 import { SUIGAR_MCP_APP_RESOURCE_URI } from '../../src/server/app-resource.js';
 import {

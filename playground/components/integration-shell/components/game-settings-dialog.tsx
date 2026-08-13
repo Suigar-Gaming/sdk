@@ -1,7 +1,6 @@
 'use client';
 
 import { RefreshCw, SlidersHorizontal, X } from 'lucide-react';
-
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
 import { GameSettingsConfigList } from '@/components/integration-shell/components/game-settings-config-list';

@@ -4,7 +4,6 @@
 import { formatAddress } from '@mysten/sui/utils';
 import type { JSX, ReactNode } from 'react';
 import { useState } from 'react';
-
 import { DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 

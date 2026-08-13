@@ -3,7 +3,6 @@
 
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
-
 import {
 	claimCommissionBalance,
 	claimReferrerLevelUpUsdRewards,

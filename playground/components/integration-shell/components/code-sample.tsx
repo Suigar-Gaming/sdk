@@ -1,7 +1,6 @@
 'use client';
 
 import { FileCode2 } from 'lucide-react';
-
 import { CodeBlock } from '@/components/code-block';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
