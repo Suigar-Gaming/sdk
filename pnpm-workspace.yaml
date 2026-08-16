@@ -20,7 +20,7 @@ catalogs:
     '@tailwindcss/postcss': ^4.3.3
     '@tailwindcss/vite': ^4.3.3
     'oxfmt': ^0.63.0
-    'react-doctor': ^0.9.11
+    'react-doctor': ^0.9.12
     'tailwindcss': ^4.3.3
     'tsdown': ^0.22.14
   typescript:
