@@ -27,14 +27,30 @@ export const GAME_LABELS = {
 	'pvp-coinflip': 'PvP Coinflip',
 } as const satisfies Record<Game, string>;
 
-const GAME_TO_PACKAGE_KEY: Record<Game, keyof McpConfig['sdk']['packageIds']> = {
+type PackageKey = keyof McpConfig['sdk']['packageIds'];
+type ResolvablePackage = Game | 'referral' | 'nftV1';
+
+const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 	coinflip: 'coinflip',
 	limbo: 'limbo',
+	nftV1: 'nftV1',
 	plinko: 'plinko',
 	range: 'range',
+	referral: 'referral',
 	soccer: 'soccer',
 	wheel: 'wheel',
 	'pvp-coinflip': 'pvpCoinflip',
+};
+
+const SUIGAR_PACKAGE_FALLBACKS: Partial<Record<ResolvablePackage, string>> = {
+	coinflip: '@suigar/coinflip',
+	limbo: '@suigar/limbo',
+	plinko: '@suigar/plinko',
+	range: '@suigar/range',
+	referral: '@suigar/referral',
+	soccer: '@suigar/soccer',
+	wheel: '@suigar/wheel',
+	'pvp-coinflip': '@suigar/pvp-coinflip',
 };
 
 const GAME_TO_TOOLS = {
@@ -236,16 +252,17 @@ export function supportedFeatures(): ReadConfigResult['supportedFeatures'] {
 	];
 }
 
-export function getPackageId(config: McpConfig, game: Game): string {
-	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]] ?? `@suigar/${game}`;
-}
-
-export function getReferralPackageId(config: McpConfig): string {
-	return config.sdk.packageIds.referral ?? '@suigar/referral';
+export function getSuigarPackageId(config: McpConfig, pkg: ResolvablePackage): string {
+	const packageId =
+		config.sdk.packageIds[SUIGAR_PACKAGE_KEYS[pkg]] ?? SUIGAR_PACKAGE_FALLBACKS[pkg];
+	if (!packageId) {
+		throw new RangeError(`Missing Suigar package id for ${pkg}.`);
+	}
+	return packageId;
 }
 
 export function referralClaimTarget(config: McpConfig, kind: ReferralClaimKind): string {
-	return `${getReferralPackageId(config)}::referral::${
+	return `${getSuigarPackageId(config, 'referral')}::referral::${
 		kind === 'commission' ? 'claim_commission_balance' : 'claim_referrer_level_up_usd_rewards'
 	}`;
 }

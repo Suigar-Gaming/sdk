@@ -50,7 +50,7 @@ import {
 	GAME_LABELS,
 	getConfigInput,
 	getMode,
-	getPackageId,
+	getSuigarPackageId,
 	requireString,
 } from './shared.js';
 
@@ -336,7 +336,7 @@ export function requireNumber(value: unknown, fieldName: string): number {
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
 }
 function getTarget(config: McpConfig, game: Game, action?: PvPCoinflipAction): string {
-	const packageId = getPackageId(config, game);
+	const packageId = getSuigarPackageId(config, game);
 	if (game === 'pvp-coinflip') {
 		const functionName = `${action?.toLowerCase() ?? 'create'}_game`;
 		return `${packageId}::${game}::${functionName}`;

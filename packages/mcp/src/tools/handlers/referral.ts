@@ -23,7 +23,7 @@ import {
 	coinMetadataForAmount,
 	getConfigInput,
 	getMode,
-	getReferralPackageId,
+	getSuigarPackageId,
 	referralClaimTarget,
 	requireString,
 } from './shared.js';
@@ -109,7 +109,7 @@ function referralReadOnlyPlan({
 		referral: {
 			kind,
 			coinType: coin.coinType,
-			packageId: getReferralPackageId(config),
+			packageId: getSuigarPackageId(config, 'referral'),
 		},
 	} satisfies ReferralClaimReadOnlyPlan);
 }
