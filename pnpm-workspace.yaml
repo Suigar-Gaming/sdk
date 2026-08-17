@@ -12,8 +12,8 @@ catalogs:
     'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.0
-    '@mysten/codegen': ^0.11.14
-    '@mysten/sui': ^2.24.0
+    '@mysten/codegen': ^0.12.2
+    '@mysten/sui': ^2.26.1
   test:
     'vitest': ^4.1.10
   tooling:

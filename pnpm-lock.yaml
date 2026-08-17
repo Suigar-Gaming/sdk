@@ -222,11 +222,11 @@ catalogs:
       specifier: ^2.1.0
       version: 2.1.0
     '@mysten/codegen':
-      specifier: ^0.11.14
-      version: 0.11.14
+      specifier: ^0.12.2
+      version: 0.12.2
     '@mysten/sui':
-      specifier: ^2.24.0
-      version: 2.24.0
+      specifier: ^2.26.1
+      version: 2.26.1
   test:
     vitest:
       specifier: ^4.1.10
@@ -297,8 +297,8 @@ importers:
         specifier: ^7.0.2001
         version: 7.0.2001
       turbo:
-        specifier: ^2.10.9
-        version: 2.10.9
+        specifier: ^2.10.10
+        version: 2.10.10
 
   packages/mcp:
     dependencies:
@@ -310,7 +310,7 @@ importers:
         version: 1.30.0(zod@4.4.3)
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.24.0(typescript@6.0.3)
+        version: 2.26.1(typescript@6.0.3)
       '@napi-rs/keyring':
         specifier: ^1.3.0
         version: 1.3.0
@@ -395,10 +395,10 @@ importers:
         version: 2.1.0
       '@mysten/codegen':
         specifier: catalog:mysten
-        version: 0.11.14
+        version: 0.12.2
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.24.0(typescript@6.0.3)
+        version: 2.26.1(typescript@6.0.3)
       '@types/node':
         specifier: catalog:typescript
         version: 24.13.3
@@ -415,14 +415,14 @@ importers:
   playground:
     dependencies:
       '@mysten/dapp-kit-core':
-        specifier: ^1.6.14
-        version: 1.6.14(@mysten/sui@2.24.0(typescript@6.0.3))(typescript@6.0.3)
+        specifier: ^1.6.17
+        version: 1.6.17(@mysten/sui@2.26.1(typescript@6.0.3))(typescript@6.0.3)
       '@mysten/dapp-kit-react':
-        specifier: ^2.1.16
-        version: 2.1.16(@mysten/sui@2.24.0(typescript@6.0.3))(@types/react@19.2.18)(react@19.2.8)(typescript@6.0.3)
+        specifier: ^2.1.19
+        version: 2.1.19(@mysten/sui@2.26.1(typescript@6.0.3))(@types/react@19.2.18)(react@19.2.8)(typescript@6.0.3)
       '@mysten/sui':
         specifier: catalog:mysten
-        version: 2.24.0(typescript@6.0.3)
+        version: 2.26.1(typescript@6.0.3)
       '@radix-ui/react-accordion':
         specifier: ^1.2.20
         version: 1.2.20(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -980,37 +980,37 @@ packages:
   '@mysten/bcs@2.1.0':
     resolution: {integrity: sha512-rIR/cDAqDfBDxmYEZXppN/on8gmh1OW0dYi/Bk2kMBZcYMTaBaEtEX1VR6g7HicVxuMbFAIP0/SQkdH7J9Y5dQ==}
 
-  '@mysten/codegen@0.11.14':
-    resolution: {integrity: sha512-QOMeI/uKzlHW9LblCDgGeByVxGBIHNRB0HpsqLGgk1hrXguv9QSZIQ5OqYEz/ZetyipncsTnyU4XQQppR7WoaA==}
+  '@mysten/codegen@0.12.2':
+    resolution: {integrity: sha512-g1+ZN4EJVlftM8C1IIpQIJzgC80A24aAZTI3ka6zsPtbKRCsqot9DxlxTQhGH2pMNdhPPaqxW9uQAew/o8Hjqw==}
     hasBin: true
 
-  '@mysten/dapp-kit-core@1.6.14':
-    resolution: {integrity: sha512-g6Vs+FaGe4PY5Elsr+BgLbaPNpcg37akJvaD/d1SrdK7rJLyqxgyswELE0ZmHEDAB+6H7m3Y+wrKDUD/e7SFAQ==}
+  '@mysten/dapp-kit-core@1.6.17':
+    resolution: {integrity: sha512-5OlAUH1xB6cQdNSYUPMxzoNyJSswCjXDEY+GPklDBWHvbD3HCED/JuDq1z/W77VVpn3EWaz1vWzsJJ8KiyKZ3A==}
     peerDependencies:
-      '@mysten/sui': ^2.24.0
+      '@mysten/sui': ^2.26.1
 
-  '@mysten/dapp-kit-react@2.1.16':
-    resolution: {integrity: sha512-SbBQ9i4Q/IacxBNEScU+hsC+qJ6XaU7zIzpAW5ccg70pW/3azHj8p3jdH0T5sxeuz1G4E7qTnJlCToY4IiZF2Q==}
+  '@mysten/dapp-kit-react@2.1.19':
+    resolution: {integrity: sha512-mF5YmNgsePcv+eRIhoXdRKPUDM9H4cGCZHROnNrpv+Q4Tt8gYxGwetpk4vq9RKI7B5ueu1+764GPyevyj4iCzw==}
     peerDependencies:
       '@types/react': '>=17.0.0'
       react: '>=17.0.0'
 
-  '@mysten/slush-wallet@1.1.14':
-    resolution: {integrity: sha512-mvO7VZD9x/KIHGz2kUXq07wi5PjCaBzidGVPfI8uYuzRbyoZovFn0UhmBYyXmHmu9rnBmnQoQBCO5wRQoU5y4g==}
+  '@mysten/slush-wallet@1.1.17':
+    resolution: {integrity: sha512-etn8OF6plz4eWuzhGmI5ilYe4Ll+9RUQs2aRphM4zx7OTMLDOMnn1HuO7EC3MxeD6T2EmQXInMfQnoNW48U1Jg==}
     peerDependencies:
-      '@mysten/sui': ^2.24.0
+      '@mysten/sui': ^2.26.1
 
-  '@mysten/sui@2.24.0':
-    resolution: {integrity: sha512-VmIkgnMulRVeA0mnBgHiTFTci5XKJH5/UB8Kr2M9+1nZnKC1RKsNGRXWBtox+2HYtwHNdUjHxYchfWnfZ9yHkQ==}
+  '@mysten/sui@2.26.1':
+    resolution: {integrity: sha512-0LficGJJH0+62HqfGBbQ/SN42srpJSC0MLoE+2OjO/qTQMez6juD1tMRvFet36lN9QSOavu7qp/NebOvphSTwA==}
     engines: {node: '>=22'}
 
   '@mysten/utils@0.4.0':
     resolution: {integrity: sha512-nHlXECBl9kE+AHF/aw5a7JVNizae8Kb71A4H18BV/sXd5/l2BaWNGWVatq05fzJo3hF78AWorDxa++1TgcBKWw==}
 
-  '@mysten/wallet-standard@0.21.14':
-    resolution: {integrity: sha512-LyQ08vsHCJNB6Itv8DZJ92m5CpF5SBXlfydIVc6pqmb61hdOdcCaDFE8by0kCDfRiuTLptpL6WkOyh39RM9nNQ==}
+  '@mysten/wallet-standard@0.21.17':
+    resolution: {integrity: sha512-O2nTtYQDIV/50H7iO1VnG0B4LNbP0Nv86kcaOnv3SDA/XFHcIDASxazvrMNuoU501t+vM2vxbaop8ifsfaZMMA==}
     peerDependencies:
-      '@mysten/sui': ^2.24.0
+      '@mysten/sui': ^2.26.1
 
   '@mysten/window-wallet-core@0.2.1':
     resolution: {integrity: sha512-gWOVvbi9TjpeDorLgcjavhf2KPiQTKFnbs6j8bKxxE88+lur6n59pnp7BnqmfeKI+c8bOGYI2SRjj97UfK68ew==}
@@ -2496,33 +2496,33 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
-  '@turbo/darwin-64@2.10.9':
-    resolution: {integrity: sha512-Jh+pTGXLNz8+1tkUU13TI/f+ZOI+OvC4YbHi1H+57iSpLt5DR3xgptd+4sA07RdjdRR/RX/01uQQu2OkbzIefA==}
+  '@turbo/darwin-64@2.10.10':
+    resolution: {integrity: sha512-gFDD+wRP5hWxBRghGyEbjpbLOY7aIU/wvsnKdMM7odQcp/wHMrnI83p0FyxxMRZnFH9ZD+S59MvcpOC5b+nrCA==}
     cpu: [x64]
     os: [darwin]
 
-  '@turbo/darwin-arm64@2.10.9':
-    resolution: {integrity: sha512-aqtpPkiIC4IUas8Vv27oJ3aDfTuP1d5wofd01dZ7gfhHRrIKuFdqQb4imvNnVFahcOViF9Jh8Oi7feDoz8/ciA==}
+  '@turbo/darwin-arm64@2.10.10':
+    resolution: {integrity: sha512-VZYsxZ6yjyDosUqtiroAVSXPLmx/qBxdHJgIxdMH9RyNmLdOLOWtJnYMnI4qckwCgQMK85G3fu94/xk5+iBCgw==}
     cpu: [arm64]
     os: [darwin]
 
-  '@turbo/linux-64@2.10.9':
-    resolution: {integrity: sha512-XyAneUBsS5uNOUOjBSs81zyigMVwwhVUd3u7F2JFMKGQk6F7eNAiOEBASJ+aHLldjYsOEjhfW+5gWIqwziyFFw==}
+  '@turbo/linux-64@2.10.10':
+    resolution: {integrity: sha512-lAvW+yEnmsCKMEIwNugjozawvYytHKPhU0kfLBizu83MIs8OUb9KobYvkZ56L5akSM6K7+gBFLEIfQkaceh90g==}
     cpu: [x64]
     os: [android, linux]
 
-  '@turbo/linux-arm64@2.10.9':
-    resolution: {integrity: sha512-5jAcldLnkuWIjujGhCn2MGIeUwW8IVNOq9Sce4EEzzgLcxmhTasbV0RiW6ZkaRdOjmOCGzeNXPLkDJEOIucOLw==}
+  '@turbo/linux-arm64@2.10.10':
+    resolution: {integrity: sha512-MSJ+NkRTd79Z9+YEZpUV9VOWVOOigFhE+v/ETNYJEuTJp3r00y9YgFvDXrmM+DP8Kal6tk3U6xSugD2/Ojh+Jg==}
     cpu: [arm64]
     os: [android, linux]
 
-  '@turbo/windows-64@2.10.9':
-    resolution: {integrity: sha512-u1xGpGlefzuhBedbt/VR2nWdftfFVZwPeDg9e5uZl68sV1fL3HNYTNr5VyHkzgtPK2VTYg1x4OKZuGrh1Gvhtg==}
+  '@turbo/windows-64@2.10.10':
+    resolution: {integrity: sha512-ycWpXDkUfnDFDY9d+4Qna/UZotDB0wj+s9agrlmNt0Q7a3XHORhK8GPKJdzgzeutXu9EW5P/jyabTEHlohuDXw==}
     cpu: [x64]
     os: [win32]
 
-  '@turbo/windows-arm64@2.10.9':
-    resolution: {integrity: sha512-W2Ub165Qv0iMFljbYKxxbZN+2dVSngnzEjQNEFXtnz5oJVx9XSypmNmUvMtuYMeZ3kdVC1zI7yd/rtuX+SDnbg==}
+  '@turbo/windows-arm64@2.10.10':
+    resolution: {integrity: sha512-PMk6zQN0csUFklLe+1hz/5G9uU1YmV0cEIey2R/bSeA6o69qcBTlN4A3jOqkgenOO5dOpMHmq2sEUZo8r1+Ssg==}
     cpu: [arm64]
     os: [win32]
 
@@ -3081,8 +3081,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.5.406:
-    resolution: {integrity: sha512-hWH5ORBi3d0IipnMh7BN5GDTaAmrSSSWmznwt2zltdiRNEWoEQyTwF0FFSBxzHO7hLSRT6loQu3IQGV0wg/Tvg==}
+  electron-to-chromium@1.5.407:
+    resolution: {integrity: sha512-4R8XgQOdfxexCd/u63lRm6wCHjECwI45MV9wxAs2ggtfWe2hwlo1ql97jKsju2IcJ+jFSTwBssyYoiWhh7mauQ==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -3418,8 +3418,8 @@ packages:
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
 
-  jose@6.2.8:
-    resolution: {integrity: sha512-Bsdjwm3Qsd/P0jR+BHDe3LytDfY7WBq2HmCCLIwuVRHMuEC9ae7/R474GIUdF1NgCyZjzVo/A9DOiOBtXq8ZoQ==}
+  jose@6.2.9:
+    resolution: {integrity: sha512-XrchZOFZUl/T3vTwRe8XK+cJrGtMF4th1ARnDfwbBXFKThGhlsxEE4Zu03AD/bjJSt/9jT/mxrOCkJWOg77aPA==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -4301,8 +4301,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  turbo@2.10.9:
-    resolution: {integrity: sha512-Yl9+ukxH+UmPtKidpDkjn82tvPoEvFNb9UACd9vUomN1Ft0cwl3rx0P8yC1D93W9EOsWRMjllvIDG8y25sFOog==}
+  turbo@2.10.10:
+    resolution: {integrity: sha512-/90KTW+USzvYOPmafRZHVKLBsHXQ5810Ao/HdtJYAqguIhZ+XruS6eIUjqJUDtrSxaZYynNFht68qckGKAOWTA==}
     hasBin: true
 
   type-fest@5.8.0:
@@ -5132,7 +5132,7 @@ snapshots:
       express: 5.2.1
       express-rate-limit: 8.6.2(express@5.2.1)
       hono: 4.13.2
-      jose: 6.2.8
+      jose: 6.2.9
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
@@ -5146,10 +5146,10 @@ snapshots:
       '@mysten/utils': 0.4.0
       '@scure/base': 2.3.0
 
-  '@mysten/codegen@0.11.14':
+  '@mysten/codegen@0.12.2':
     dependencies:
       '@mysten/bcs': 2.1.0
-      '@mysten/sui': 2.24.0(typescript@6.0.3)
+      '@mysten/sui': 2.26.1(typescript@6.0.3)
       '@stricli/auto-complete': 1.3.0
       '@stricli/core': 1.3.0
       '@types/node': 25.9.5
@@ -5162,15 +5162,15 @@ snapshots:
       - '@gql.tada/svelte-support'
       - '@gql.tada/vue-support'
 
-  '@mysten/dapp-kit-core@1.6.14(@mysten/sui@2.24.0(typescript@6.0.3))(typescript@6.0.3)':
+  '@mysten/dapp-kit-core@1.6.17(@mysten/sui@2.26.1(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       '@lit-labs/scoped-registry-mixin': 1.0.4
       '@lit/task': 1.0.3
-      '@mysten/slush-wallet': 1.1.14(@mysten/sui@2.24.0(typescript@6.0.3))(typescript@6.0.3)
-      '@mysten/sui': 2.24.0(typescript@6.0.3)
+      '@mysten/slush-wallet': 1.1.17(@mysten/sui@2.26.1(typescript@6.0.3))(typescript@6.0.3)
+      '@mysten/sui': 2.26.1(typescript@6.0.3)
       '@mysten/utils': 0.4.0
-      '@mysten/wallet-standard': 0.21.14(@mysten/sui@2.24.0(typescript@6.0.3))
+      '@mysten/wallet-standard': 0.21.17(@mysten/sui@2.26.1(typescript@6.0.3))
       '@nanostores/lit': 0.2.3(lit@3.3.3)(nanostores@1.4.2)
       '@wallet-standard/ui': 1.0.3
       '@wallet-standard/ui-registry': 1.1.1
@@ -5180,10 +5180,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@mysten/dapp-kit-react@2.1.16(@mysten/sui@2.24.0(typescript@6.0.3))(@types/react@19.2.18)(react@19.2.8)(typescript@6.0.3)':
+  '@mysten/dapp-kit-react@2.1.19(@mysten/sui@2.26.1(typescript@6.0.3))(@types/react@19.2.18)(react@19.2.8)(typescript@6.0.3)':
     dependencies:
       '@lit/react': 1.0.8(@types/react@19.2.18)
-      '@mysten/dapp-kit-core': 1.6.14(@mysten/sui@2.24.0(typescript@6.0.3))(typescript@6.0.3)
+      '@mysten/dapp-kit-core': 1.6.17(@mysten/sui@2.26.1(typescript@6.0.3))(typescript@6.0.3)
       '@nanostores/react': 1.1.0(nanostores@1.4.2)(react@19.2.8)
       '@types/react': 19.2.18
       nanostores: 1.4.2
@@ -5192,17 +5192,17 @@ snapshots:
       - '@mysten/sui'
       - typescript
 
-  '@mysten/slush-wallet@1.1.14(@mysten/sui@2.24.0(typescript@6.0.3))(typescript@6.0.3)':
+  '@mysten/slush-wallet@1.1.17(@mysten/sui@2.26.1(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@mysten/sui': 2.24.0(typescript@6.0.3)
+      '@mysten/sui': 2.26.1(typescript@6.0.3)
       '@mysten/utils': 0.4.0
-      '@mysten/wallet-standard': 0.21.14(@mysten/sui@2.24.0(typescript@6.0.3))
+      '@mysten/wallet-standard': 0.21.17(@mysten/sui@2.26.1(typescript@6.0.3))
       '@mysten/window-wallet-core': 0.2.1(typescript@6.0.3)
       valibot: 1.4.2(typescript@6.0.3)
     transitivePeerDependencies:
       - typescript
 
-  '@mysten/sui@2.24.0(typescript@6.0.3)':
+  '@mysten/sui@2.26.1(typescript@6.0.3)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.2)
       '@mysten/bcs': 2.1.0
@@ -5228,15 +5228,15 @@ snapshots:
     dependencies:
       '@scure/base': 2.3.0
 
-  '@mysten/wallet-standard@0.21.14(@mysten/sui@2.24.0(typescript@6.0.3))':
+  '@mysten/wallet-standard@0.21.17(@mysten/sui@2.26.1(typescript@6.0.3))':
     dependencies:
-      '@mysten/sui': 2.24.0(typescript@6.0.3)
+      '@mysten/sui': 2.26.1(typescript@6.0.3)
       '@wallet-standard/core': 1.1.2
 
   '@mysten/window-wallet-core@0.2.1(typescript@6.0.3)':
     dependencies:
       '@mysten/utils': 0.4.0
-      jose: 6.2.8
+      jose: 6.2.9
       valibot: 1.4.2(typescript@6.0.3)
     transitivePeerDependencies:
       - typescript
@@ -6267,22 +6267,22 @@ snapshots:
       tailwindcss: 4.3.3
       vite: 8.2.1(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0)
 
-  '@turbo/darwin-64@2.10.9':
+  '@turbo/darwin-64@2.10.10':
     optional: true
 
-  '@turbo/darwin-arm64@2.10.9':
+  '@turbo/darwin-arm64@2.10.10':
     optional: true
 
-  '@turbo/linux-64@2.10.9':
+  '@turbo/linux-64@2.10.10':
     optional: true
 
-  '@turbo/linux-arm64@2.10.9':
+  '@turbo/linux-arm64@2.10.10':
     optional: true
 
-  '@turbo/windows-64@2.10.9':
+  '@turbo/windows-64@2.10.10':
     optional: true
 
-  '@turbo/windows-arm64@2.10.9':
+  '@turbo/windows-arm64@2.10.10':
     optional: true
 
   '@tybys/wasm-util@0.10.3':
@@ -6591,7 +6591,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.11.14
       caniuse-lite: 1.0.30001809
-      electron-to-chromium: 1.5.406
+      electron-to-chromium: 1.5.407
       node-releases: 2.0.53
       update-browserslist-db: 1.3.1(browserslist@4.28.8)
 
@@ -6768,7 +6768,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-to-chromium@1.5.406: {}
+  electron-to-chromium@1.5.407: {}
 
   emoji-regex@10.6.0: {}
 
@@ -7089,7 +7089,7 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jose@6.2.8: {}
+  jose@6.2.9: {}
 
   js-tokens@4.0.0: {}
 
@@ -7982,14 +7982,14 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  turbo@2.10.9:
+  turbo@2.10.10:
     optionalDependencies:
-      '@turbo/darwin-64': 2.10.9
-      '@turbo/darwin-arm64': 2.10.9
-      '@turbo/linux-64': 2.10.9
-      '@turbo/linux-arm64': 2.10.9
-      '@turbo/windows-64': 2.10.9
-      '@turbo/windows-arm64': 2.10.9
+      '@turbo/darwin-64': 2.10.10
+      '@turbo/darwin-arm64': 2.10.10
+      '@turbo/linux-64': 2.10.10
+      '@turbo/linux-arm64': 2.10.10
+      '@turbo/windows-64': 2.10.10
+      '@turbo/windows-arm64': 2.10.10
 
   type-fest@5.8.0:
     dependencies:
