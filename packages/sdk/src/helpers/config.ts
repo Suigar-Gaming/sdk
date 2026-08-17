@@ -46,10 +46,9 @@ export function resolveSuigarConfig({
 }
 
 export function resolvePriceInfoObjectId({ config, coinType }: WithConfig<WithCoinType>): string {
-	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = resolveSupportedCoin({
 		config,
-		coinType: normalizedCoinType,
+		coinType,
 	});
 	const objectId = config.coins[supportedCoin].priceInfoObjectId;
 
@@ -89,8 +88,9 @@ function resolveCoinMetadata({
 }
 
 function resolveSupportedCoin({ config, coinType }: WithConfig<WithCoinType>): SuigarCoin {
+	const normalizedCoinType = normalizeStructTag(coinType);
 	const supportedCoin = getSupportedCoins(config.coins).find(
-		(coin) => config.coins[coin].coinType === coinType,
+		(coin) => config.coins[coin].coinType === normalizedCoinType,
 	);
 
 	if (!supportedCoin) {
