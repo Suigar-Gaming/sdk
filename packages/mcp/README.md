@@ -170,6 +170,8 @@ All transaction tools accept the shared config inputs and support these `mode` v
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed dry-runs include an `errors` array extracted from the failed transaction status.
 - `execute`: by default opens a paired-wallet approval request. Set `executionWallet: "session"` for game tools to have MCP sign and execute immediately with the local session wallet instead.
 
+Transaction summaries include the configured gas budget as raw MIST plus a SUI display value when `gasBudget` is provided or present on the built transaction.
+
 Dry-run summaries include:
 
 - `success` and `error`
