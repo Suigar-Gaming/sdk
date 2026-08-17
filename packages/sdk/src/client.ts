@@ -116,7 +116,7 @@ export class SuigarClient {
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * registry ids, supported coin metadata, and price info object ids the SDK
+	 * object ids, supported coin metadata, and price info object ids the SDK
 	 * resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
@@ -224,7 +224,7 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Lists unresolved PvP coinflip games from the configured registry and resolves
+	 * Lists unresolved PvP coinflip games from the resolved registry and resolves
 	 * each entry into parsed on-chain game state.
 	 *
 	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk

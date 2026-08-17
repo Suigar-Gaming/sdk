@@ -169,10 +169,11 @@ client.games.bcs;
 
 `suigar(options?)` resolves config from:
 
-- internal package ids by network
-- internal supported coin metadata by network
-- the connected client network
-- the extension name
+- MVR-backed package names for generated game, referral, and core bindings
+- The internal NFT V1 package id by network, plus optional package id overrides
+- Internal supported coin metadata by network
+- The connected client network
+- The extension name
 
 Supported override areas:
 
@@ -181,10 +182,9 @@ Supported override areas:
 - `cacheTtl`
 - `config.packageIds`
 - `config.objectIds`
-- `config.registryIds`
 - `config.coins`
 
-Use `config` when the application needs to patch package, singleton object, or registry ids—or supported `sui`/`usdc` coin metadata—before a new SDK release is published. Each coin entry includes its price-info object id.
+Use `config` when the application needs to patch the NFT V1 package id, override an MVR-backed package id, patch singleton object ids, or adjust supported `sui`/`usdc` coin metadata before a new SDK release is published. Game, referral, and core bindings use `@suigar/*` MVR names by default; optional `packageIds` entries override those defaults when needed. `packageIds.nftV1` remains configured by network because it is not resolved from MVR. Each coin entry includes its price-info object id.
 
 Both supported coin keys accept the same partial metadata shape:
 
@@ -231,13 +231,12 @@ The registered extension instance exposes the main runtime surface:
 
 Returns the resolved SDK configuration for the connected network.
 
-This is intended mainly for debugging and inspection, for example to verify the resolved package ids or supported coin metadata for the active client network.
+This is intended mainly for debugging and inspection, for example to verify the NFT V1 package id, optional MVR package overrides, object ids, or supported coin metadata for the active client network.
 
 It includes:
 
-- `packageIds`
+- `packageIds` (`nftV1` plus any configured MVR package overrides)
 - `objectIds`
-- `registryIds`
 - `coins`
 
 ```ts
@@ -355,9 +354,9 @@ Shared behavior:
 - `metadata` is encoded into `keys` and `values` byte arrays
 - `partner` configured via `suigar({ partner })` is prepended automatically to metadata as the partner wallet address
 - `metadata.partner` and `metadata.referrer` are reserved and ignored with a warning
-- the SDK resolves the price info object from the configured supported-coin mapping
-- bet coin inputs are built from the owner's balance with Mysten coin intent helpers, using `coinType`, `cashStake`, and optional `useGasCoin`; omit `useGasCoin` to use Mysten's default behavior
-- the reward object is transferred back to `owner`
+- The SDK resolves the price info object from the configured supported-coin mapping
+- Bet coin inputs are built from the owner's balance with Mysten coin intent helpers, using `coinType`, `cashStake`, and optional `useGasCoin`; omit `useGasCoin` to use Mysten's default behavior
+- The reward object is transferred back to `owner`
 
 Error behavior:
 

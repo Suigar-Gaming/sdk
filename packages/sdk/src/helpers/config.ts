@@ -11,12 +11,9 @@ import type {
 	SuigarNetwork,
 	WithCoinType,
 	WithConfig,
-	WithGame,
 } from '../types/index.js';
 
 export const DEFAULT_CACHE_TTL_MS: number = 30 * 60 * 1000;
-
-type GamePackageIdOptions = WithGame<WithConfig>;
 
 export function resolveSuigarConfig({
 	network,
@@ -46,31 +43,6 @@ export function resolveSuigarConfig({
 		objectIds: { ...objectIds, ...config.objectIds },
 		coins: resolvedCoins,
 	};
-}
-
-export function assertConfiguredBetGame({ config, game }: GamePackageIdOptions): void {
-	if (!resolveGamePackageId({ config, game })) {
-		throw new Error(`Missing required config for ${game}: packageIds.${game}`);
-	}
-}
-
-export function resolveGamePackageId({ config, game }: GamePackageIdOptions): string {
-	switch (game) {
-		case 'coinflip':
-			return config.packageIds.coinflip;
-		case 'limbo':
-			return config.packageIds.limbo;
-		case 'plinko':
-			return config.packageIds.plinko;
-		case 'pvp-coinflip':
-			return config.packageIds.pvpCoinflip;
-		case 'range':
-			return config.packageIds.range;
-		case 'soccer':
-			return config.packageIds.soccer;
-		case 'wheel':
-			return config.packageIds.wheel;
-	}
 }
 
 export function resolvePriceInfoObjectId({ config, coinType }: WithConfig<WithCoinType>): string {

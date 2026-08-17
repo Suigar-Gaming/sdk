@@ -12,7 +12,7 @@ import {
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { suigar, type SuigarClient } from '../../src/client.js';
-import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../../src/configs/index.js';
+import { COINS, OBJECT_IDS } from '../../src/configs/index.js';
 import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
@@ -39,6 +39,27 @@ const LIMBO_SETTINGS_FIELD_BCS = LimboSettingsKey.serialize({
 const SUI_TYPE_NAME_FIELD_BCS = TypeName.serialize({
 	name: normalizeStructTag(COINS.testnet.sui.coinType).replace(/^0x/u, ''),
 }).toBytes();
+
+const TEST_MVR_PACKAGES: Record<string, string> = {
+	'@suigar/core': TEST_CONFIG.packageIds.core,
+	'@suigar/referral': TEST_CONFIG.packageIds.referral,
+	'@suigar/coinflip': TEST_CONFIG.packageIds.coinflip,
+	'@suigar/limbo': TEST_CONFIG.packageIds.limbo,
+	'@suigar/plinko': TEST_CONFIG.packageIds.plinko,
+	'@suigar/pvp-coinflip': TEST_CONFIG.packageIds.pvpCoinflip,
+	'@suigar/range': TEST_CONFIG.packageIds.range,
+	'@suigar/soccer': TEST_CONFIG.packageIds.soccer,
+	'@suigar/wheel': TEST_CONFIG.packageIds.wheel,
+};
+
+function resolveTestMvrType(type: string): string {
+	return normalizeStructTag(
+		Object.entries(TEST_MVR_PACKAGES).reduce(
+			(result, [name, address]) => result.replaceAll(name, address),
+			type,
+		),
+	);
+}
 
 function createDynamicField(childId: string): SuiClientTypes.DynamicFieldEntry {
 	return {
@@ -273,6 +294,24 @@ class TestClient extends CoreClient {
 		super({ network: 'testnet', base: undefined as never });
 	}
 
+	mvr: SuiClientTypes.MvrMethods = {
+		resolvePackage: async ({ package: packageName }) => ({
+			package: TEST_MVR_PACKAGES[packageName] ?? packageName,
+		}),
+		resolveType: async ({ type }) => ({
+			type: resolveTestMvrType(type),
+		}),
+		resolve: async ({ packages = [], types = [] }) => ({
+			packages: Object.fromEntries(
+				packages.map((packageName) => [
+					packageName,
+					{ package: TEST_MVR_PACKAGES[packageName] ?? packageName },
+				]),
+			),
+			types: Object.fromEntries(types.map((type) => [type, { type: resolveTestMvrType(type) }])),
+		}),
+	};
+
 	getObjects: CoreClient['getObjects'] = async <Include extends SuiClientTypes.ObjectInclude>(
 		options: SuiClientTypes.GetObjectsOptions<Include>,
 	) => {
@@ -427,13 +466,13 @@ class TestClient extends CoreClient {
 		options: SuiClientTypes.GetDynamicObjectFieldOptions<Include>,
 	) => {
 		this.getDynamicObjectFieldCalls.push(options);
-		const lookup = this.mockDynamicFieldLookups.find(
-			(entry) =>
-				entry.parentId === options.parentId &&
-				[entry.nameType, `0x2::dynamic_object_field::Wrapper<${entry.nameType}>`].includes(
-					options.name.type,
-				),
-		);
+		const lookup = this.mockDynamicFieldLookups.find((entry) => {
+			const nameTypes = [
+				entry.nameType,
+				`0x2::dynamic_object_field::Wrapper<${entry.nameType}>`,
+			].map((type) => normalizeStructTag(type));
+			return entry.parentId === options.parentId && nameTypes.includes(options.name.type);
+		});
 
 		if (!lookup) {
 			throw new Error(`No dynamic object field found for ${options.name.type}`);
@@ -512,7 +551,14 @@ function createSuigarTestClient({
 	const client = new TestClient();
 	client.mockObjects = objects;
 	client.mockDynamicFields = dynamicFields;
-	client.mockDynamicFieldLookups = dynamicFieldLookups;
+	client.mockDynamicFieldLookups = [
+		{
+			childId: TEST_CONFIG.registryIds.pvpCoinflip,
+			parentId: OBJECT_IDS.testnet.sweetHouse,
+			nameType: `${TEST_CONFIG.packageIds.pvpCoinflip}::pvp_coinflip::PvpCoinflipRegistryKey`,
+		},
+		...dynamicFieldLookups,
+	];
 
 	return (
 		partner || cacheTtl !== undefined
@@ -583,7 +629,7 @@ describe('SuigarClient', () => {
 		vi.doMock('../../src/contracts/coinflip/coinflip.js', async (importOriginal) => {
 			const actual =
 				await importOriginal<typeof import('../../src/contracts/coinflip/coinflip.js')>();
-			return { ...actual, play };
+			return { ...actual, playV2: play };
 		});
 		for (const contractPath of [
 			'../../src/contracts/limbo/limbo.js',
@@ -678,7 +724,7 @@ describe('SuigarClient', () => {
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
 					parentId: OBJECT_IDS.testnet.sweetHouse,
-					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+					nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
 				{
@@ -699,7 +745,7 @@ describe('SuigarClient', () => {
 		expect(parameters.house_edge).toBe('100');
 		expect(client.getDynamicObjectFieldCalls).toHaveLength(2);
 		expect(client.getDynamicObjectFieldCalls[0]?.name).toEqual({
-			type: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+			type: `${normalizeSuiAddress(TEST_CONFIG.packageIds.coinflip)}::coinflip::CoinFlipSettingsKey`,
 			bcs: COINFLIP_SETTINGS_FIELD_BCS,
 		});
 		expect(client.getDynamicObjectFieldCalls[1]?.name).toEqual({
@@ -720,7 +766,7 @@ describe('SuigarClient', () => {
 				{
 					nameBcs: LIMBO_SETTINGS_FIELD_BCS,
 					parentId: OBJECT_IDS.testnet.sweetHouse,
-					nameType: `${PACKAGE_IDS.testnet.limbo}::limbo::LimboSettingsKey`,
+					nameType: `${TEST_CONFIG.packageIds.limbo}::limbo::LimboSettingsKey`,
 					childId: '0x222',
 				},
 				{
@@ -752,7 +798,7 @@ describe('SuigarClient', () => {
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
 					parentId: OBJECT_IDS.testnet.sweetHouse,
-					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+					nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
 				{
@@ -786,7 +832,7 @@ describe('SuigarClient', () => {
 				{
 					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
 					parentId: OBJECT_IDS.testnet.sweetHouse,
-					nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+					nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
 					childId: '0x222',
 				},
 				{
@@ -835,7 +881,7 @@ describe('SuigarClient', () => {
 			{
 				nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
 				parentId: OBJECT_IDS.testnet.sweetHouse,
-				nameType: `${PACKAGE_IDS.testnet.coinflip}::coinflip::CoinFlipSettingsKey`,
+				nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
 				childId: '0x222',
 			},
 			{

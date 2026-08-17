@@ -18,9 +18,8 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 	/**
 	 * Network-resolved configuration overrides.
 	 *
-	 * Use this to patch package ids, object ids, registry ids, supported coins, or price
-	 * info object ids when on-chain deployments move faster than the published
-	 * SDK defaults.
+	 * Use this to patch package ids, object ids, supported coins, or price info object
+	 * ids when on-chain deployments move faster than MVR or the published SDK defaults.
 	 */
 	config?: SuigarConfigOverrides;
 	/**
@@ -53,7 +52,9 @@ export type SuigarPackage =
 	| 'range'
 	| 'soccer'
 	| 'wheel';
-export type SuigarPackageIds = Record<SuigarPackage, string>;
+export type SuigarPackageIds = { nftV1: string } & Partial<
+	Record<Exclude<SuigarPackage, 'nftV1'>, string>
+>;
 
 export type SuigarObject = 'sweetHouse' | 'nftV1Factory';
 export type SuigarObjectIds = Record<SuigarObject, string>;

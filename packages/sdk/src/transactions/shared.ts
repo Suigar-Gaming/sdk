@@ -8,7 +8,7 @@ import {
 	type TransactionResult,
 } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
-import { assertConfiguredBetGame, resolvePriceInfoObjectId } from '../helpers/config.js';
+import { resolvePriceInfoObjectId } from '../helpers/config.js';
 import { encodeBetMetadata } from '../helpers/metadata.js';
 import type {
 	BaseTransactionOptions,
@@ -36,8 +36,6 @@ type SharedBetTransactionContext = WithCoinType<
 		}
 >;
 
-type CreateBaseGameTransactionOptions = WithGame<BaseTransactionOptions>;
-
 type StandardGameBetTransactionOptions = WithPartner<
 	WithGame<
 		SharedBetTransactionOptions & {
@@ -56,21 +54,10 @@ export function createBaseTransaction({ owner, gasBudget }: TransactionSenderOpt
 	return tx;
 }
 
-export function createBaseGameTransaction({
-	config,
-	game,
-	owner,
-	gasBudget,
-}: CreateBaseGameTransactionOptions): Transaction {
-	assertConfiguredBetGame({ config, game });
-	return createBaseTransaction({ owner, gasBudget });
-}
-
 export function buildSharedStandardGameBetTransaction({
 	config,
 	owner,
 	gasBudget,
-	game,
 	coinType,
 	stake,
 	cashStake,
@@ -80,7 +67,7 @@ export function buildSharedStandardGameBetTransaction({
 	useGasCoin,
 	buildRewardCoin,
 }: StandardGameBetTransactionOptions): Transaction {
-	const tx = createBaseGameTransaction({ config, game, owner, gasBudget });
+	const tx = createBaseTransaction({ owner, gasBudget });
 	const normalizedOwner = normalizeSuiAddress(owner);
 	const normalizedCoinType = normalizeStructTag(coinType);
 	const resolvedStake = toBigInt(stake);
