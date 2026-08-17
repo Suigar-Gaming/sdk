@@ -237,11 +237,15 @@ export function supportedFeatures(): ReadConfigResult['supportedFeatures'] {
 }
 
 export function getPackageId(config: McpConfig, game: Game): string {
-	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]];
+	return config.sdk.packageIds[GAME_TO_PACKAGE_KEY[game]] ?? `@suigar/${game}`;
+}
+
+export function getReferralPackageId(config: McpConfig): string {
+	return config.sdk.packageIds.referral ?? '@suigar/referral';
 }
 
 export function referralClaimTarget(config: McpConfig, kind: ReferralClaimKind): string {
-	return `${config.sdk.packageIds.referral}::referral::${
+	return `${getReferralPackageId(config)}::referral::${
 		kind === 'commission' ? 'claim_commission_balance' : 'claim_referrer_level_up_usd_rewards'
 	}`;
 }

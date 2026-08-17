@@ -36,12 +36,6 @@ const configOverridesSchema = z
 			})
 			.strict()
 			.optional(),
-		registryIds: z
-			.object({
-				pvpCoinflip: z.string().min(1).optional(),
-			})
-			.strict()
-			.optional(),
 		coins: z
 			.object({
 				sui: coinMetadataSchema.optional(),

@@ -511,6 +511,7 @@ export async function buildTransactionTool({
 		stake: baseStake,
 		stakeDisplay,
 		coinDecimals: coin.decimals,
+		gasBudget: input.gasBudget,
 		gameInputs,
 	};
 	if (mode === 'execute') {

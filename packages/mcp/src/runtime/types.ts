@@ -58,6 +58,7 @@ export type TransactionSummaryDetails = {
 
 export type TransactionSummaryContext = Omit<TransactionSummaryDetails, 'stake'> & {
 	stake?: TransactionSummaryDetails['stake'] | bigint | number;
+	gasBudget?: string | bigint | number;
 };
 
 export type TransactionSummaryFormattingContext = Pick<TransactionSummaryDetails, 'coinDecimals'>;

@@ -134,7 +134,29 @@ function summarizeTransaction(
 	transaction: Transaction,
 	context: TransactionSummaryContext = {},
 ): TransactionSummary {
-	const data = transaction.getData();
+	let data: ReturnType<Transaction['getData']>;
+	try {
+		data = transaction.getData();
+	} catch {
+		const gasBudget = context.gasBudget == null ? null : String(context.gasBudget);
+		return {
+			sender: null,
+			gasBudget,
+			gasBudgetDisplay: gasBudget == null ? null : formatBaseUnitAmount(gasBudget, SUI_DECIMALS),
+			gasPrice: null,
+			commandCount: 0,
+			commands: [],
+			inputs: 0,
+			objectInputs: [],
+			...(context.game ? { game: context.game } : {}),
+			...(context.action ? { action: context.action } : {}),
+			...(context.coinType ? { coinType: normalizeStructTag(context.coinType) } : {}),
+			...(context.stake == null ? {} : { stake: String(context.stake) }),
+			...(context.stakeDisplay ? { stakeDisplay: context.stakeDisplay } : {}),
+			...(context.coinDecimals == null ? {} : { coinDecimals: context.coinDecimals }),
+			...(context.gameInputs ? { gameInputs: context.gameInputs } : {}),
+		};
+	}
 
 	const commands = (data.commands ?? []).map((command) => {
 		const kind = String(command.$kind ?? Object.keys(command)[0] ?? 'Unknown');

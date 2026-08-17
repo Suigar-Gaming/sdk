@@ -18,25 +18,23 @@ describe('config input schema', () => {
 		expect(() => configInputSchema.parse({ providerUrl: 'not-a-url' })).toThrow(/Invalid URL/u);
 	});
 
-	it('uses the SDK package, object, and registry override groups', () => {
+	it('uses the SDK package and object override groups', () => {
 		expect(
 			configInputSchema.parse({
 				config: {
-					packageIds: { referral: '0xreferral', soccer: '0xsoccer' },
+					packageIds: { nftV1: '0xnft', referral: '0xreferral', soccer: '0xsoccer' },
 					objectIds: { sweetHouse: '0xsweet-house' },
-					registryIds: { pvpCoinflip: '0xpvp-registry' },
 				},
 			}),
 		).toMatchObject({
 			config: {
-				packageIds: { soccer: '0xsoccer' },
+				packageIds: { nftV1: '0xnft', referral: '0xreferral', soccer: '0xsoccer' },
 				objectIds: { sweetHouse: '0xsweet-house' },
-				registryIds: { pvpCoinflip: '0xpvp-registry' },
 			},
 		});
 	});
 
-	it('accepts a referral package override', () => {
+	it('accepts optional MVR package overrides', () => {
 		expect(
 			configInputSchema.parse({
 				config: { packageIds: { referral: '0xreferral' } },

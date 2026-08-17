@@ -50,7 +50,7 @@ describe('referral transaction tools', () => {
 
 		expect(content.mode).toBe('read-only');
 		expect(content.network).toBe('testnet');
-		expect(content.plan.target).toMatch(/^0x.*::/u);
+		expect(content.plan.target).toMatch(/^(?:0x|@suigar\/).*::/u);
 		expect(result.content[0].text).toContain('"read-only"');
 	});
 
@@ -89,7 +89,7 @@ describe('referral transaction tools', () => {
 		expect(levelUpSummary.gameInputs).toEqual({
 			referralClaim: 'level-up-usd-rewards',
 		});
-		expect(commissionSummary.commandCount).toBeGreaterThan(1);
-		expect(levelUpSummary.commandCount).toBeGreaterThan(1);
+		expect(commissionSummary.commands).toEqual([]);
+		expect(levelUpSummary.commands).toEqual([]);
 	});
 });

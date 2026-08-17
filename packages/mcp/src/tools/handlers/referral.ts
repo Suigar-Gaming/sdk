@@ -23,6 +23,7 @@ import {
 	coinMetadataForAmount,
 	getConfigInput,
 	getMode,
+	getReferralPackageId,
 	referralClaimTarget,
 	requireString,
 } from './shared.js';
@@ -108,7 +109,7 @@ function referralReadOnlyPlan({
 		referral: {
 			kind,
 			coinType: coin.coinType,
-			packageId: config.sdk.packageIds.referral,
+			packageId: getReferralPackageId(config),
 		},
 	} satisfies ReferralClaimReadOnlyPlan);
 }
@@ -150,7 +151,11 @@ async function buildReferralClaimTransactionTool({
 			transaction,
 			config: bundle.config,
 			client: bundle.client,
-			context: { coinType: coin.coinType, gameInputs: { referralClaim: kind } },
+			context: {
+				coinType: coin.coinType,
+				gasBudget: input.gasBudget,
+				gameInputs: { referralClaim: kind },
+			},
 		});
 		const execution = await createExecutionBridge({
 			network: bundle.config.network,
@@ -175,6 +180,7 @@ async function buildReferralClaimTransactionTool({
 			client: bundle.client,
 			context: {
 				coinType: coin.coinType,
+				gasBudget: input.gasBudget,
 				gameInputs: { referralClaim: kind },
 			},
 		}),

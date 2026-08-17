@@ -7,11 +7,11 @@ The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specif
 It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
-- referral claimable-amount reads and unsigned claim builders
-- unsigned transaction builders for standard Suigar games and PvP coinflip
+- Referral claimable-amount reads and unsigned claim builders
+- Unsigned transaction builders for standard Suigar games and PvP coinflip
 - `build`, `dry-run`, and `read-only` modes
-- a compact MCP App UI resource for compatible hosts
-- text and structured-content fallbacks for normal MCP clients
+- A compact MCP App UI resource for compatible hosts
+- Text and structured-content fallbacks for normal MCP clients
 
 Transactions remain unsigned by default. `mode: "execute"` uses the paired Suigar browser wallet and opens an explicit approval request unless `executionWallet: "session"` is selected. Session execution signs and submits directly from the local session-wallet key held in the operating-system keychain; it returns the final transaction digest without an approval URL. Wallet balance reads aggregate all result pages and display human-readable amounts using configured or on-chain coin metadata.
 
@@ -173,9 +173,9 @@ All transaction tools accept the shared config inputs and support these `mode` v
 Dry-run summaries include:
 
 - `success` and `error`
-- gas computation, storage, rebate, non-refundable storage fee, and net gas delta as raw base units plus decimal-formatted display values
-- balance changes as raw base units plus decimal-formatted display values
-- decoded event fields when available, including standard `BetResultEvent` game details such as `player_bet`, `coin_outcome`, `stake_amount`, and `outcome_amount`; the MCP App renders all parsed result fields it receives, so non-coinflip games expose their own parsed result keys as well
+- Gas computation, storage, rebate, non-refundable storage fee, and net gas delta as raw base units plus decimal-formatted display values
+- Balance changes as raw base units plus decimal-formatted display values
+- Decoded event fields when available, including standard `BetResultEvent` game details such as `player_bet`, `coin_outcome`, `stake_amount`, and `outcome_amount`; the MCP App renders all parsed result fields it receives, so non-coinflip games expose their own parsed result keys as well
 
 ### Shared transaction inputs
 
@@ -212,8 +212,8 @@ Optional `config` input follows the public SDK extension override shape:
 {
 	packageIds?: {
 		nftV1?: string;
-		referral?: string;
 		core?: string;
+		referral?: string;
 		coinflip?: string;
 		limbo?: string;
 		plinko?: string;
@@ -226,13 +226,14 @@ Optional `config` input follows the public SDK extension override shape:
 		sweetHouse?: string;
 		nftV1Factory?: string;
 	};
-	registryIds?: { pvpCoinflip?: string };
 	coins?: {
 		sui?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
 		usdc?: { coinType?: string; decimals?: number; priceInfoObjectId?: string };
 	};
 }
 ```
+
+Game, referral, and core calls use the `@suigar/*` MVR package names by default. Optional `packageIds` entries override those package names when needed; `nftV1` remains configured by network because it is not resolved from MVR.
 
 Partner attribution should be passed as top-level `partner`; the MCP server forwards it through `suigar({ partner })`.
 

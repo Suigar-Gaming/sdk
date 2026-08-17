@@ -15,8 +15,13 @@ describe('read_config', () => {
 		};
 
 		expect(content.network).toBe('testnet');
-		expect(content.config.sdk.packageIds.coinflip).toMatch(/^0x/u);
-		expect(content.config.sdk.packageIds.soccer).toMatch(/^0x/u);
+		expect(content.config.sdk.packageIds).toEqual(
+			expect.objectContaining({
+				nftV1: expect.stringMatching(/^0x/u),
+			}),
+		);
+		expect(content.config.sdk.packageIds.coinflip).toBeUndefined();
+		expect(content.config.sdk.packageIds.soccer).toBeUndefined();
 		expect(content.config.sdk.objectIds.sweetHouse).toMatch(/^0x/u);
 		expect(content.config.sdk.coins.sui.coinType).toMatch(/::/u);
 		expect(content.supportedGames.map((game) => game.id)).toContain('pvp-coinflip');
