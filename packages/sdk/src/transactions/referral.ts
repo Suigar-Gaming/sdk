@@ -5,7 +5,7 @@ import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import {
 	claimCommissionBalance,
-	claimReferrerLevelUpUsdRewards,
+	claimReferrerLevelUpUsdRewardsV2,
 } from '../contracts/referral/referral.js';
 import type {
 	ClaimReferralCommissionOptions,
@@ -43,7 +43,7 @@ export function buildClaimReferralLevelUpUsdRewardsTransaction({
 	const tx = createBaseTransaction({ owner, gasBudget });
 
 	const claimedCoin = tx.add(
-		claimReferrerLevelUpUsdRewards({
+		claimReferrerLevelUpUsdRewardsV2({
 			package: config.packageIds.referral,
 			typeArguments: [normalizeStructTag(config.coins.usdc.coinType)],
 			arguments: [config.objectIds.sweetHouse, config.coins.usdc.priceInfoObjectId],

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { play } from '../contracts/coinflip/coinflip.js';
+import { playV2 } from '../contracts/coinflip/coinflip.js';
 import type { CoinflipTransactionOptions, WithPartner } from '../types/index.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
 
@@ -21,7 +21,7 @@ export function buildCoinflipTransaction(
 			priceInfoObjectId,
 			betCoin,
 		}) =>
-			play({
+			playV2({
 				package: config.packageIds.coinflip,
 				typeArguments: [coinType],
 				arguments: [
