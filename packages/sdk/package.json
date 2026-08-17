@@ -79,7 +79,7 @@
 		"build": "pnpm run clean && pnpm run codegen && tsdown",
 		"build:ci": "pnpm run clean && tsdown",
 		"clean": "rm -rf dist",
-		"codegen": "node ./scripts/update-package-configs.ts && sui-ts-codegen generate && pnpm run lint:fix",
+		"codegen": "sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"oxlint": "oxlint .",
