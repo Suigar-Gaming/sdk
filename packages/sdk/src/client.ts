@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InferBcsType } from '@mysten/bcs';
-import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
+import type { ClientCache, ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
@@ -84,7 +84,8 @@ export class SuigarClient {
 
 	#partner: string | undefined;
 
-	#cache: TtlClientCache;
+	#cache: ClientCache;
+	#ttlCache: TtlClientCache;
 
 	constructor({
 		client,
@@ -103,7 +104,8 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache.scope('@suigar/sdk').readSync([name, 'ttl-cache'], () => {
+		this.#cache = client.cache.scope(['@suigar/sdk', name]);
+		this.#ttlCache = this.#cache.readSync(['ttl-cache'], () => {
 			return new TtlClientCache({
 				ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
 			});
@@ -162,21 +164,24 @@ export class SuigarClient {
 		game,
 		...options
 	}: GetGameParametersOptions<TGame>): Promise<GameParameters<TGame>> {
+		const { sweetHouse: sweetHouseObjectId } = this.#config.objectIds;
+		const gameDefinition = GAME_SETTINGS[game];
+		const gameSettingsKeyType = gameDefinition.settingsKey.typeTag({
+			package: this.#config.packageIds[gameDefinition.packageId],
+		});
 		const coinType = normalizeStructTag(options.coinType);
-		return this.#cache.read(
-			['getGameParameters', game, coinType],
+
+		return this.#ttlCache.read(
+			['getGameParameters', sweetHouseObjectId, gameSettingsKeyType, coinType],
 			async () => {
-				const gameDefinition = GAME_SETTINGS[game];
 				const { signal } = options;
 
 				const {
 					object: { objectId },
 				} = await this.#client.core.getDynamicObjectField({
-					parentId: this.#config.objectIds.sweetHouse,
+					parentId: sweetHouseObjectId,
 					name: {
-						type: gameDefinition.settingsKey.typeTag({
-							package: this.#config.packageIds[gameDefinition.packageId],
-						}),
+						type: gameSettingsKeyType,
 						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
 					},
 					signal,
@@ -209,20 +214,26 @@ export class SuigarClient {
 	}
 
 	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {
-		return this.#cache.read(['getPvPCoinflipRegistryId'], async () => {
-			const { object } = await this.#client.core.getDynamicObjectField({
-				parentId: this.#config.objectIds.sweetHouse,
-				name: {
-					type: PvpCoinflipRegistryKey.typeTag({
-						package: this.#config.packageIds.pvpCoinflip,
-					}),
-					bcs: PvpCoinflipRegistryKey.serialize({ dummy_field: false }).toBytes(),
-				},
-				signal,
-			});
-
-			return object.objectId;
+		const { sweetHouse: sweetHouseObjectId } = this.#config.objectIds;
+		const pvpCoinflipRegistryKeyType = PvpCoinflipRegistryKey.typeTag({
+			package: this.#config.packageIds.pvpCoinflip,
 		});
+
+		return this.#cache.read(
+			['getPvPCoinflipRegistryId', sweetHouseObjectId, pvpCoinflipRegistryKeyType],
+			async () => {
+				const { object } = await this.#client.core.getDynamicObjectField({
+					parentId: sweetHouseObjectId,
+					name: {
+						type: pvpCoinflipRegistryKeyType,
+						bcs: PvpCoinflipRegistryKey.serialize({ dummy_field: false }).toBytes(),
+					},
+					signal,
+				});
+
+				return object.objectId;
+			},
+		);
 	}
 
 	/**
