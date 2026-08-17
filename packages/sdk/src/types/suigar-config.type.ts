@@ -52,9 +52,8 @@ export type SuigarPackage =
 	| 'range'
 	| 'soccer'
 	| 'wheel';
-export type SuigarPackageIds = { nftV1: string } & Partial<
-	Record<Exclude<SuigarPackage, 'nftV1'>, string>
->;
+export type SuigarPackageIds = Record<'nftV1', string> &
+	Partial<Record<Exclude<SuigarPackage, 'nftV1'>, string>>;
 
 export type SuigarObject = 'sweetHouse' | 'nftV1Factory';
 export type SuigarObjectIds = Record<SuigarObject, string>;

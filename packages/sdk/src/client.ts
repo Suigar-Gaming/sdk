@@ -174,7 +174,9 @@ export class SuigarClient {
 				} = await this.#client.core.getDynamicObjectField({
 					parentId: this.#config.objectIds.sweetHouse,
 					name: {
-						type: gameDefinition.settingsKey.name,
+						type: gameDefinition.settingsKey.typeTag({
+							package: this.#config.packageIds[gameDefinition.packageId],
+						}),
 						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
 					},
 					signal,
@@ -211,7 +213,9 @@ export class SuigarClient {
 			const { object } = await this.#client.core.getDynamicObjectField({
 				parentId: this.#config.objectIds.sweetHouse,
 				name: {
-					type: PvpCoinflipRegistryKey.name,
+					type: PvpCoinflipRegistryKey.typeTag({
+						package: this.#config.packageIds.pvpCoinflip,
+					}),
 					bcs: PvpCoinflipRegistryKey.serialize({ dummy_field: false }).toBytes(),
 				},
 				signal,

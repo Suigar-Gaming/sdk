@@ -19,38 +19,49 @@ import type { MoveStruct } from '../contracts/utils/index.js';
 import { Parameters as WheelParameters, WheelSettingsKey } from '../contracts/wheel/wheel.js';
 import type { Game } from './game.type.js';
 import type { MoveFloat } from './move-float.type.js';
+import type { SuigarPackage } from './suigar-config.type.js';
 import type { WithCoinType, WithGame } from './transaction-options.type.js';
 
 export const GAME_SETTINGS = {
 	coinflip: {
+		packageId: 'coinflip',
 		settingsKey: CoinFlipSettingsKey,
 		parameters: CoinflipParameters,
 	},
 	limbo: {
+		packageId: 'limbo',
 		settingsKey: LimboSettingsKey,
 		parameters: LimboParameters,
 	},
 	plinko: {
+		packageId: 'plinko',
 		settingsKey: PlinkoSettingsKey,
 		parameters: PlinkoParameters,
 	},
 	'pvp-coinflip': {
+		packageId: 'pvpCoinflip',
 		settingsKey: PvpCoinflipSettingsKey,
 		parameters: PvPCoinflipParameters,
 	},
 	range: {
+		packageId: 'range',
 		settingsKey: RangeSettingsKey,
 		parameters: RangeParameters,
 	},
 	soccer: {
+		packageId: 'soccer',
 		settingsKey: SoccerSettingsKey,
 		parameters: SoccerParameters,
 	},
 	wheel: {
+		packageId: 'wheel',
 		settingsKey: WheelSettingsKey,
 		parameters: WheelParameters,
 	},
-} as const satisfies Record<Game, { settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }>;
+} as const satisfies Record<
+	Game,
+	{ packageId: SuigarPackage; settingsKey: MoveStruct<any>; parameters: MoveStruct<any> }
+>;
 
 type OnChainGameParametersRegistry = {
 	[TGame in Game]: InferBcsType<(typeof GAME_SETTINGS)[TGame]['parameters']>;
