@@ -14,6 +14,12 @@ export const PvpCoinflipSettingsKey = new MoveStruct({
 		dummy_field: bcs.bool(),
 	},
 });
+export const PvpCoinflipRegistryKey = new MoveStruct({
+	name: `${$moduleName}::PvpCoinflipRegistryKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
 export const Game = new MoveStruct({
 	name: `${$moduleName}::Game<phantom T0>`,
 	fields: {

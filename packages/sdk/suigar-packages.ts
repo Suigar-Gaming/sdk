@@ -53,6 +53,7 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		packageName: 'pvp-coinflip',
 		types: [
 			'PvpCoinflipSettingsKey',
+			'PvpCoinflipRegistryKey',
 			'Game',
 			'GameCreatedEvent',
 			'GameResolvedEvent',
