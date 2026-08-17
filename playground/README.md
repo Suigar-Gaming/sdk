@@ -14,9 +14,9 @@ Next.js example app for the Suigar SDK. It runs on Sui testnet and uses:
 
 The example reflects the current package export split:
 
-- runtime integration through `@suigar/sdk`
-- game option types through `@suigar/sdk/games`
-- parsing helpers through `@suigar/sdk/utils`
+- Runtime integration through `@suigar/sdk`
+- Game option types through `@suigar/sdk/games`
+- Parsing helpers through `@suigar/sdk/utils`
 
 - Standard game route: `/standard?game=coinflip`
 - PvP route: `/pvp?game=pvp-coinflip&action=create`
