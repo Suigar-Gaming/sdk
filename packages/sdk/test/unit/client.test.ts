@@ -639,13 +639,13 @@ describe('SuigarClient', () => {
 	});
 
 	it('injects the configured partner into standard-game metadata', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 
 		vi.resetModules();
 		vi.doMock('../../src/contracts/coinflip/coinflip.js', async (importOriginal) => {
 			const actual =
 				await importOriginal<typeof import('../../src/contracts/coinflip/coinflip.js')>();
-			return { ...actual, playV2: play };
+			return { ...actual, playV2 };
 		});
 		for (const contractPath of [
 			'../../src/contracts/limbo/limbo.js',
@@ -674,7 +674,7 @@ describe('SuigarClient', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[5]).toEqual(['partner']);
 		expect(options.arguments[6]).toEqual([Array.from(Buffer.from(partner.slice(2), 'hex'))]);
 	});
