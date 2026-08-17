@@ -1,13 +1,12 @@
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
-
-const $moduleName = '0xd3dd2200883af10811724f0bed97591ad155a02efd6332d471ff8b346030dfb7::plinko';
+const $moduleName = '@suigar/plinko::plinko';
 export const PlinkoSettingsKey = new MoveStruct({
 	name: `${$moduleName}::PlinkoSettingsKey`,
 	fields: {
@@ -34,7 +33,7 @@ export const Parameters = new MoveStruct({
 		configs: vec_map.VecMap(bcs.u8(), PlinkoConfig),
 	},
 });
-export interface PlayOptions {
+export interface PlayV2Options {
 	package?: string;
 	arguments: [
 		RawTransactionArgument<string>,
@@ -48,9 +47,8 @@ export interface PlayOptions {
 	];
 	typeArguments: [string];
 }
-export function play(options: PlayOptions) {
-	const packageAddress =
-		options.package ?? '0xd3dd2200883af10811724f0bed97591ad155a02efd6332d471ff8b346030dfb7';
+export function playV2(options: PlayV2Options) {
+	const packageAddress = options.package ?? '@suigar/plinko';
 	const argumentsTypes = [
 		null,
 		'u64',
@@ -67,7 +65,7 @@ export function play(options: PlayOptions) {
 		tx.moveCall({
 			package: packageAddress,
 			module: 'plinko',
-			function: 'play',
+			function: 'play_v2',
 			arguments: normalizeMoveArguments(options.arguments, argumentsTypes),
 			typeArguments: options.typeArguments,
 		});

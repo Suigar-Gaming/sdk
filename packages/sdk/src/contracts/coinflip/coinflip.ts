@@ -1,11 +1,10 @@
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
-
-const $moduleName = '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::coinflip';
+const $moduleName = '@suigar/coinflip::coinflip';
 export const CoinFlipSettingsKey = new MoveStruct({
 	name: `${$moduleName}::CoinFlipSettingsKey`,
 	fields: {
@@ -21,7 +20,7 @@ export const Parameters = new MoveStruct({
 		max_stake: bcs.u64(),
 	},
 });
-export interface PlayOptions {
+export interface PlayV2Options {
 	package?: string;
 	arguments: [
 		RawTransactionArgument<string>,
@@ -35,9 +34,8 @@ export interface PlayOptions {
 	];
 	typeArguments: [string];
 }
-export function play(options: PlayOptions) {
-	const packageAddress =
-		options.package ?? '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea';
+export function playV2(options: PlayV2Options) {
+	const packageAddress = options.package ?? '@suigar/coinflip';
 	const argumentsTypes = [
 		null,
 		'u64',
@@ -54,7 +52,7 @@ export function play(options: PlayOptions) {
 		tx.moveCall({
 			package: packageAddress,
 			module: 'coinflip',
-			function: 'play',
+			function: 'play_v2',
 			arguments: normalizeMoveArguments(options.arguments, argumentsTypes),
 			typeArguments: options.typeArguments,
 		});
