@@ -58,14 +58,10 @@ export type SuigarPackageIds = Record<SuigarPackage, string>;
 export type SuigarObject = 'sweetHouse' | 'nftV1Factory';
 export type SuigarObjectIds = Record<SuigarObject, string>;
 
-export type SuigarRegistry = 'pvpCoinflip';
-export type SuigarRegistryIds = Record<SuigarRegistry, string>;
-
 export type SuigarNetworkRegistry<TRegistry> = Record<SuigarNetwork, TRegistry>;
 
 export type SuigarConfig = {
 	packageIds: SuigarPackageIds;
 	objectIds: SuigarObjectIds;
-	registryIds: SuigarRegistryIds;
 	coins: SuigarCoinRegistry;
 };

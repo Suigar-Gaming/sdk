@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { normalizeStructTag } from '@mysten/sui/utils';
-import { COINS, OBJECT_IDS, PACKAGE_IDS, REGISTRY_IDS } from '../configs/index.js';
+import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../configs/index.js';
 import type {
 	SuigarCoin,
 	SuigarCoinMetadata,
@@ -27,7 +27,6 @@ export function resolveSuigarConfig({
 }): SuigarConfig {
 	const packageIds = PACKAGE_IDS[network];
 	const objectIds = OBJECT_IDS[network];
-	const registryIds = REGISTRY_IDS[network];
 	const coins = COINS[network];
 
 	const resolvedCoins = getSupportedCoins(coins).reduce(
@@ -45,7 +44,6 @@ export function resolveSuigarConfig({
 	return {
 		packageIds: { ...packageIds, ...config.packageIds },
 		objectIds: { ...objectIds, ...config.objectIds },
-		registryIds: { ...registryIds, ...config.registryIds },
 		coins: resolvedCoins,
 	};
 }

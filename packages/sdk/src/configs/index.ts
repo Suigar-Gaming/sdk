@@ -4,4 +4,3 @@
 export * from './coins.js';
 export * from './objects.js';
 export * from './packages.js';
-export * from './registries.js';

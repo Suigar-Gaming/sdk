@@ -14,6 +14,7 @@ import {
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
 	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
+	PvpCoinflipRegistryKey,
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	ReferrerClaimCommissionBalanceEvent,
@@ -22,7 +23,6 @@ import {
 import {
 	DEFAULT_CACHE_TTL_MS,
 	normalizeGameParameterValues,
-	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -174,8 +174,8 @@ export class SuigarClient {
 				} = await this.#client.core.getDynamicObjectField({
 					parentId: this.#config.objectIds.sweetHouse,
 					name: {
-						type: gameDefinition.settingsKey.typeTag({
-							package: resolveGamePackageId({ config: this.#config, game }),
+						type: await gameDefinition.settingsKey.resolveTypeTag({
+							client: this.#client,
 						}),
 						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
 					},
@@ -208,6 +208,21 @@ export class SuigarClient {
 		) as Promise<GameParameters<TGame>>;
 	}
 
+	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {
+		return this.#cache.read(['getPvPCoinflipRegistryId'], async () => {
+			const { object } = await this.#client.core.getDynamicObjectField({
+				parentId: this.#config.objectIds.sweetHouse,
+				name: {
+					type: await PvpCoinflipRegistryKey.resolveTypeTag({ client: this.#client }),
+					bcs: PvpCoinflipRegistryKey.serialize({ dummy_field: false }).toBytes(),
+				},
+				signal,
+			});
+
+			return object.objectId;
+		});
+	}
+
 	/**
 	 * Lists unresolved PvP coinflip games from the configured registry and resolves
 	 * each entry into parsed on-chain game state.
@@ -237,7 +252,7 @@ export class SuigarClient {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
-			parentId: this.#config.registryIds.pvpCoinflip,
+			parentId: await this.#getPvPCoinflipRegistryId(listOptions.signal),
 		});
 
 		const { objects } = await this.#client.core.getObjects({
