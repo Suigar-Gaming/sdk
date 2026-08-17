@@ -973,6 +973,113 @@ describe('SuigarClient', () => {
 		expect(baseClient.getObjectsCalls).toHaveLength(0);
 	});
 
+	it('keeps game parameter cache entries separate across extension names', async () => {
+		const baseClient = new TestClient();
+		baseClient.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })];
+		baseClient.mockDynamicFields = [
+			createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
+		];
+		baseClient.mockDynamicFieldLookups = [
+			{
+				nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
+				parentId: OBJECT_IDS.testnet.sweetHouse,
+				nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
+				childId: '0x222',
+			},
+			{
+				nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+				parentId: '0x222',
+				nameType: TypeName.name,
+				childId: '0x111',
+			},
+		];
+		const first = baseClient.$extend(suigar({ name: 'first' })) as TestClient & {
+			first: SuigarClient;
+		};
+		const second = baseClient.$extend(suigar({ name: 'second' })) as TestClient & {
+			second: SuigarClient;
+		};
+
+		await first.first.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await second.second.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(4);
+		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);
+		expect(baseClient.getObjectsCalls).toHaveLength(0);
+	});
+
+	it('keeps game parameter cache entries separate across settings package overrides', async () => {
+		const coinflipPackageId = '0xcafe';
+		const baseClient = new TestClient();
+		baseClient.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })];
+		baseClient.mockDynamicFieldLookups = [
+			{
+				nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
+				parentId: OBJECT_IDS.testnet.sweetHouse,
+				nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
+				childId: '0x222',
+			},
+			{
+				nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+				parentId: '0x222',
+				nameType: TypeName.name,
+				childId: '0x111',
+			},
+			{
+				nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
+				parentId: OBJECT_IDS.testnet.sweetHouse,
+				nameType: `${coinflipPackageId}::coinflip::CoinFlipSettingsKey`,
+				childId: '0x333',
+			},
+			{
+				nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+				parentId: '0x333',
+				nameType: TypeName.name,
+				childId: '0x111',
+			},
+		];
+		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
+			shared: SuigarClient;
+		};
+		const second = baseClient.$extend(
+			suigar({
+				name: 'shared',
+				config: {
+					packageIds: {
+						coinflip: coinflipPackageId,
+					},
+				},
+			}),
+		) as TestClient & {
+			shared: SuigarClient;
+		};
+
+		await first.shared.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+		await second.shared.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(4);
+		expect(baseClient.getDynamicObjectFieldCalls[0]?.name.type).toBe(
+			normalizeStructTag(`${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`),
+		);
+		expect(baseClient.getDynamicObjectFieldCalls[2]?.name.type).toBe(
+			normalizeStructTag(`${coinflipPackageId}::coinflip::CoinFlipSettingsKey`),
+		);
+		expect(baseClient.listDynamicFieldsCalls).toHaveLength(0);
+		expect(baseClient.getObjectsCalls).toHaveLength(0);
+	});
+
 	it('returns pvp coinflip games from the unresolved registry entries', async () => {
 		const client = createSuigarTestClient({
 			objects: [createPvPCoinflipGameObject('0xopen'), createPvPCoinflipGameObject('0xpending')],
@@ -1026,6 +1133,59 @@ describe('SuigarClient', () => {
 			bcs: PVP_COINFLIP_REGISTRY_FIELD_BCS,
 		});
 		expect(client.listDynamicFieldsCalls[0]?.parentId).toBe(TEST_CONFIG.registryIds.pvpCoinflip);
+	});
+
+	it('caches the pvp coinflip registry id through the base Mysten client', async () => {
+		const client = createSuigarTestClient();
+
+		await client.suigar.getPvPCoinflipGames();
+		await client.suigar.getPvPCoinflipGames();
+
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(1);
+		expect(client.listDynamicFieldsCalls).toHaveLength(2);
+		expect(client.listDynamicFieldsCalls[0]?.parentId).toBe(TEST_CONFIG.registryIds.pvpCoinflip);
+		expect(client.listDynamicFieldsCalls[1]?.parentId).toBe(TEST_CONFIG.registryIds.pvpCoinflip);
+	});
+
+	it('keeps pvp coinflip registry cache entries separate across package overrides', async () => {
+		const pvpCoinflipPackageId = '0xface';
+		const baseClient = new TestClient();
+		baseClient.mockDynamicFieldLookups = [
+			{
+				childId: '0x111',
+				parentId: OBJECT_IDS.testnet.sweetHouse,
+				nameType: `${TEST_CONFIG.packageIds.pvpCoinflip}::pvp_coinflip::PvpCoinflipRegistryKey`,
+			},
+			{
+				childId: '0x222',
+				parentId: OBJECT_IDS.testnet.sweetHouse,
+				nameType: `${pvpCoinflipPackageId}::pvp_coinflip::PvpCoinflipRegistryKey`,
+			},
+		];
+		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
+			shared: SuigarClient;
+		};
+		const second = baseClient.$extend(
+			suigar({
+				name: 'shared',
+				config: {
+					packageIds: {
+						pvpCoinflip: pvpCoinflipPackageId,
+					},
+				},
+			}),
+		) as TestClient & {
+			shared: SuigarClient;
+		};
+
+		await first.shared.getPvPCoinflipGames();
+		await second.shared.getPvPCoinflipGames();
+
+		expect(baseClient.getDynamicObjectFieldCalls).toHaveLength(2);
+		expect(baseClient.listDynamicFieldsCalls.map(({ parentId }) => parentId)).toEqual([
+			'0x111',
+			'0x222',
+		]);
 	});
 
 	it('forwards signal from getPvPCoinflipGames options into getObjects', async () => {
