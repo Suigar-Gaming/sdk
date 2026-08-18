@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { play } from '../contracts/range/range.js';
+import { playV2 } from '../contracts/range/range.js';
 import type { RangeTransactionOptions, WithPartner } from '../types/index.js';
 import { DEFAULT_RANGE_SCALE } from '../utils/constants.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
@@ -24,7 +24,7 @@ export function buildRangeTransaction(options: WithPartner<RangeTransactionOptio
 			priceInfoObjectId,
 			betCoin,
 		}) =>
-			play({
+			playV2({
 				package: config.packageIds.range,
 				typeArguments: [coinType],
 				arguments: [

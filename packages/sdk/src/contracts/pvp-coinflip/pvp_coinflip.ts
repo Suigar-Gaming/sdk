@@ -1,17 +1,21 @@
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import * as balance from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/balance.js';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
-
-const $moduleName =
-	'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip';
+const $moduleName = '@suigar/pvp-coinflip::pvp_coinflip';
 export const PvpCoinflipSettingsKey = new MoveStruct({
 	name: `${$moduleName}::PvpCoinflipSettingsKey`,
+	fields: {
+		dummy_field: bcs.bool(),
+	},
+});
+export const PvpCoinflipRegistryKey = new MoveStruct({
+	name: `${$moduleName}::PvpCoinflipRegistryKey`,
 	fields: {
 		dummy_field: bcs.bool(),
 	},
@@ -93,8 +97,7 @@ export interface CreateGameOptions {
 	typeArguments: [string];
 }
 export function createGame(options: CreateGameOptions) {
-	const packageAddress =
-		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+	const packageAddress = options.package ?? '@suigar/pvp-coinflip';
 	const argumentsTypes = [
 		null,
 		null,
@@ -112,7 +115,7 @@ export function createGame(options: CreateGameOptions) {
 			typeArguments: options.typeArguments,
 		});
 }
-export interface JoinGameOptions {
+export interface JoinGameV2Options {
 	package?: string;
 	arguments: [
 		RawTransactionArgument<string>,
@@ -124,9 +127,8 @@ export interface JoinGameOptions {
 	];
 	typeArguments: [string];
 }
-export function joinGame(options: JoinGameOptions) {
-	const packageAddress =
-		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+export function joinGameV2(options: JoinGameV2Options) {
+	const packageAddress = options.package ?? '@suigar/pvp-coinflip';
 	const argumentsTypes = [
 		'0x2::object::ID',
 		null,
@@ -141,7 +143,7 @@ export function joinGame(options: JoinGameOptions) {
 		tx.moveCall({
 			package: packageAddress,
 			module: 'pvp_coinflip',
-			function: 'join_game',
+			function: 'join_game_v2',
 			arguments: normalizeMoveArguments(options.arguments, argumentsTypes),
 			typeArguments: options.typeArguments,
 		});
@@ -152,8 +154,7 @@ export interface CancelGameOptions {
 	typeArguments: [string];
 }
 export function cancelGame(options: CancelGameOptions) {
-	const packageAddress =
-		options.package ?? '0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202';
+	const packageAddress = options.package ?? '@suigar/pvp-coinflip';
 	const argumentsTypes = ['0x2::object::ID', null] satisfies Array<string | null>;
 	return (tx: Transaction) =>
 		tx.moveCall({

@@ -1,9 +1,8 @@
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
-import { bcs, type BcsType } from '@mysten/sui/bcs';
+import { type BcsType, bcs } from '@mysten/sui/bcs';
 import { MoveStruct } from '../../../utils/index.js';
-
 const $moduleName = '0x2::vec_map';
 export function Entry<T0 extends BcsType<any>, T1 extends BcsType<any>>(
 	...typeParameters: [T0, T1]

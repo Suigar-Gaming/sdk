@@ -3,7 +3,7 @@
 
 import { PACKAGE_IDS as TESTNET_PACKAGE_IDS } from './src/configs/testnet/packages.ts';
 
-export interface PackageInfo {
+interface PackageInfo {
 	package: string;
 	packageName: string;
 	types?: boolean | Array<string>;
@@ -18,65 +18,66 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		functions: ['mint_to_sender'],
 	},
 	core: {
-		package: TESTNET_PACKAGE_IDS.core,
+		package: '@suigar/core',
 		packageName: 'core',
 		types: ['BetResultEvent'],
 		functions: false,
 	},
 	referral: {
-		package: TESTNET_PACKAGE_IDS.referral,
+		package: '@suigar/referral',
 		packageName: 'referral',
 		types: ['ReferrerClaimCommissionBalanceEvent', 'ReferrerClaimLevelUpUsdRewardsEvent'],
-		functions: ['claim_commission_balance', 'claim_referrer_level_up_usd_rewards'],
+		functions: ['claim_commission_balance', 'claim_referrer_level_up_usd_rewards_v2'],
 	},
 	// Games packages
 	coinflip: {
-		package: TESTNET_PACKAGE_IDS.coinflip,
+		package: '@suigar/coinflip',
 		packageName: 'coinflip',
 		types: ['CoinFlipSettingsKey', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 	limbo: {
-		package: TESTNET_PACKAGE_IDS.limbo,
+		package: '@suigar/limbo',
 		packageName: 'limbo',
 		types: ['LimboSettingsKey', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 	plinko: {
-		package: TESTNET_PACKAGE_IDS.plinko,
+		package: '@suigar/plinko',
 		packageName: 'plinko',
 		types: ['PlinkoSettingsKey', 'PlinkoConfig', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 	pvp_coinflip: {
-		package: TESTNET_PACKAGE_IDS.pvpCoinflip,
+		package: '@suigar/pvp-coinflip',
 		packageName: 'pvp-coinflip',
 		types: [
 			'PvpCoinflipSettingsKey',
+			'PvpCoinflipRegistryKey',
 			'Game',
 			'GameCreatedEvent',
 			'GameResolvedEvent',
 			'GameCancelledEvent',
 			'Parameters',
 		],
-		functions: ['create_game', 'join_game', 'cancel_game'],
+		functions: ['create_game', 'join_game_v2', 'cancel_game'],
 	},
 	range: {
-		package: TESTNET_PACKAGE_IDS.range,
+		package: '@suigar/range',
 		packageName: 'range',
 		types: ['RangeSettingsKey', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 	soccer: {
-		package: TESTNET_PACKAGE_IDS.soccer,
+		package: '@suigar/soccer',
 		packageName: 'soccer',
 		types: ['SoccerSettingsKey', 'SoccerConfig', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 	wheel: {
-		package: TESTNET_PACKAGE_IDS.wheel,
+		package: '@suigar/wheel',
 		packageName: 'wheel',
 		types: ['WheelSettingsKey', 'WheelConfig', 'Parameters'],
-		functions: ['play'],
+		functions: ['play_v2'],
 	},
 };

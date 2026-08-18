@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { play } from '../contracts/wheel/wheel.js';
+import { playV2 } from '../contracts/wheel/wheel.js';
 import type { WheelTransactionOptions, WithPartner } from '../types/index.js';
 import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
@@ -22,7 +22,7 @@ export function buildWheelTransaction(options: WithPartner<WheelTransactionOptio
 			priceInfoObjectId,
 			betCoin,
 		}) =>
-			play({
+			playV2({
 				package: config.packageIds.wheel,
 				typeArguments: [coinType],
 				arguments: [

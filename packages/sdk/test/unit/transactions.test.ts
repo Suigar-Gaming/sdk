@@ -44,7 +44,7 @@ function createUnusedContractCallMock() {
 }
 
 describe('transaction builders', () => {
-	it('builds a coinflip transaction with the configured package id', () => {
+	it('builds a coinflip transaction with a configured package override', () => {
 		const tx = buildCoinflipTransaction({
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
@@ -62,7 +62,7 @@ describe('transaction builders', () => {
 		);
 	});
 
-	it('builds pvp coinflip create and cancel transactions with the configured package id', () => {
+	it('builds pvp coinflip create and cancel transactions with configured package overrides', () => {
 		const createTx = buildPvPCoinflipTransaction({
 			action: 'create',
 			owner: '0x123',
@@ -95,7 +95,7 @@ describe('transaction builders', () => {
 		);
 	});
 
-	it('builds referral commission and level-up claims with configured dependencies', () => {
+	it('builds referral commission and level-up claims with configured package overrides', () => {
 		const commissionTx = buildClaimReferralCommissionTransaction({
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
@@ -114,7 +114,7 @@ describe('transaction builders', () => {
 		expect(commissionCall.function).toBe('claim_commission_balance');
 		expect(commissionCall.typeArguments).toEqual([normalizeStructTag('0x2::sui::SUI')]);
 		expect(levelUpCall.package).toBe(normalizeSuiAddress(TEST_CONFIG.packageIds.referral));
-		expect(levelUpCall.function).toBe('claim_referrer_level_up_usd_rewards');
+		expect(levelUpCall.function).toBe('claim_referrer_level_up_usd_rewards_v2');
 		expect(levelUpCall.typeArguments).toEqual([TEST_CONFIG.coins.usdc.coinType]);
 		expect(levelUpCall.arguments).toHaveLength(3);
 	});
@@ -338,14 +338,14 @@ describe('shared transaction helpers', () => {
 
 describe('coinflip transaction wrapper', () => {
 	it('passes normalized arguments to the generated coinflip contract helper', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 
 		const { buildCoinflipTransaction: buildCoinflipTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildCoinflipTransaction: typeof buildCoinflipTransaction;
 			}>(
 				'../../src/contracts/coinflip/coinflip.js',
-				{ play },
+				{ playV2 },
 				'../../src/transactions/coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
@@ -362,10 +362,10 @@ describe('coinflip transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			package: string;
+			package?: string;
 			typeArguments: Array<string>;
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 
 		expect(options.package).toBe(TEST_CONFIG.packageIds.coinflip);
 		expect(options.typeArguments).toEqual([normalizeStructTag('0x2::sui::SUI')]);
@@ -384,12 +384,12 @@ describe('coinflip transaction wrapper', () => {
 
 describe('limbo transaction wrapper', () => {
 	it('converts target multiplier using the default scale', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildLimboTransaction } = await loadTransactionModuleWithMock<{
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/limbo/limbo.js', { play }, '../../src/transactions/limbo.js');
+		}>('../../src/contracts/limbo/limbo.js', { playV2 }, '../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -401,18 +401,18 @@ describe('limbo transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[4]).toBe(250n);
 		expect(options.arguments[5]).toBe(100n);
 	});
 
 	it('respects a custom limbo scale', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildLimboTransaction } = await loadTransactionModuleWithMock<{
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/limbo/limbo.js', { play }, '../../src/transactions/limbo.js');
+		}>('../../src/contracts/limbo/limbo.js', { playV2 }, '../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -425,7 +425,7 @@ describe('limbo transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[4]).toBe(2500n);
 		expect(options.arguments[5]).toBe(1000n);
 	});
@@ -433,12 +433,12 @@ describe('limbo transaction wrapper', () => {
 
 describe('plinko transaction wrapper', () => {
 	it('passes the validated config id into the generated helper', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildPlinkoTransaction } = await loadTransactionModuleWithMock<{
 			buildPlinkoTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/plinko/plinko.js', { play }, '../../src/transactions/plinko.js');
+		}>('../../src/contracts/plinko/plinko.js', { playV2 }, '../../src/transactions/plinko.js');
 
 		buildPlinkoTransaction({
 			owner: '0x123',
@@ -450,7 +450,7 @@ describe('plinko transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[4]).toBe(7);
 	});
 
@@ -471,12 +471,12 @@ describe('plinko transaction wrapper', () => {
 
 describe('range transaction wrapper', () => {
 	it('converts range points and out-of-range flag before calling the generated helper', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildRangeTransaction } = await loadTransactionModuleWithMock<{
 			buildRangeTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/range/range.js', { play }, '../../src/transactions/range.js');
+		}>('../../src/contracts/range/range.js', { playV2 }, '../../src/transactions/range.js');
 
 		buildRangeTransaction({
 			owner: '0x123',
@@ -490,7 +490,7 @@ describe('range transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[4]).toBe(950000n);
 		expect(options.arguments[5]).toBe(1050000n);
 		expect(options.arguments[6]).toBe(true);
@@ -499,12 +499,12 @@ describe('range transaction wrapper', () => {
 
 describe('wheel transaction wrapper', () => {
 	it('passes the validated wheel config id into the generated helper', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildWheelTransaction } = await loadTransactionModuleWithMock<{
 			buildWheelTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/wheel/wheel.js', { play }, '../../src/transactions/wheel.js');
+		}>('../../src/contracts/wheel/wheel.js', { playV2 }, '../../src/transactions/wheel.js');
 
 		buildWheelTransaction({
 			owner: '0x123',
@@ -516,7 +516,7 @@ describe('wheel transaction wrapper', () => {
 
 		const options = getFirstMockArg<{
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.arguments[4]).toBe(9);
 	});
 
@@ -537,11 +537,11 @@ describe('wheel transaction wrapper', () => {
 
 describe('soccer transaction wrapper', () => {
 	it('passes validated soccer selections into the generated helper', async () => {
-		const play = createContractCallMock();
+		const playV2 = createContractCallMock();
 		const { buildSoccerTransaction: buildSoccerTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildSoccerTransaction: typeof buildSoccerTransaction;
-			}>('../../src/contracts/soccer/soccer.js', { play }, '../../src/transactions/soccer.js');
+			}>('../../src/contracts/soccer/soccer.js', { playV2 }, '../../src/transactions/soccer.js');
 
 		buildSoccerTransactionWithMock({
 			owner: '0x123',
@@ -554,10 +554,11 @@ describe('soccer transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			package: string;
+			package?: string;
 			arguments: Array<unknown>;
-		}>(play);
+		}>(playV2);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.soccer);
+		expect(options.arguments[0]).toBe(TEST_CONFIG.objectIds.sweetHouse);
 		expect(options.arguments.slice(4, 7)).toEqual([9, 250, 4]);
 	});
 
@@ -586,7 +587,7 @@ describe('pvp coinflip transaction wrapper', () => {
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame,
-					joinGame: createUnusedContractCallMock(),
+					joinGameV2: createUnusedContractCallMock(),
 					cancelGame: createUnusedContractCallMock(),
 				},
 				'../../src/transactions/pvp-coinflip.js',
@@ -606,7 +607,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			package: string;
+			package?: string;
 			typeArguments: Array<string>;
 			arguments: Array<unknown>;
 		}>(createGame);
@@ -623,7 +624,7 @@ describe('pvp coinflip transaction wrapper', () => {
 	});
 
 	it('passes join action arguments into the generated helper', async () => {
-		const joinGame = createContractCallMock();
+		const joinGameV2 = createContractCallMock();
 		const getGame = vi
 			.fn<() => Promise<{ json: { stake_per_player: bigint } }>>()
 			.mockResolvedValue({
@@ -638,7 +639,7 @@ describe('pvp coinflip transaction wrapper', () => {
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame: createUnusedContractCallMock(),
-					joinGame,
+					joinGameV2,
 					cancelGame: createUnusedContractCallMock(),
 					Game: {
 						get: getGame,
@@ -661,9 +662,9 @@ describe('pvp coinflip transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
-			package: string;
+			package?: string;
 			arguments: Array<unknown>;
-		}>(joinGame);
+		}>(joinGameV2);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments[0]).toBe('0x999');
 		expect(options.arguments[1]).toBe(TEST_CONFIG.objectIds.sweetHouse);
@@ -689,7 +690,7 @@ describe('pvp coinflip transaction wrapper', () => {
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame: createUnusedContractCallMock(),
-					joinGame: createUnusedContractCallMock(),
+					joinGameV2: createUnusedContractCallMock(),
 					cancelGame,
 				},
 				'../../src/transactions/pvp-coinflip.js',
@@ -704,8 +705,10 @@ describe('pvp coinflip transaction wrapper', () => {
 		});
 
 		const options = getFirstMockArg<{
+			package?: string;
 			arguments: Array<unknown>;
 		}>(cancelGame);
+		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments).toEqual(['0x999', TEST_CONFIG.objectIds.sweetHouse]);
 	});
 });

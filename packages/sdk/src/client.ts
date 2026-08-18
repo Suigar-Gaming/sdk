@@ -2,27 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InferBcsType } from '@mysten/bcs';
-import type { ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
+import type { ClientCache, ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
-import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import { Nft as NftV1, Factory as NftV1Factory } from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,
 	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
 	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
 	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
+	PvpCoinflipRegistryKey,
 } from './contracts/pvp-coinflip/pvp_coinflip.js';
 import {
 	ReferrerClaimCommissionBalanceEvent,
 	ReferrerClaimLevelUpUsdRewardsEvent,
 } from './contracts/referral/referral.js';
+import { TypeName } from './contracts/stdlib/type_name.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
 	normalizeGameParameterValues,
-	resolveGamePackageId,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -84,7 +84,8 @@ export class SuigarClient {
 
 	#partner: string | undefined;
 
-	#cache: TtlClientCache;
+	#cache: ClientCache;
+	#ttlCache: TtlClientCache;
 
 	constructor({
 		client,
@@ -103,7 +104,8 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache.scope('@suigar/sdk').readSync([name, 'ttl-cache'], () => {
+		this.#cache = client.cache.scope(['@suigar/sdk', name]);
+		this.#ttlCache = this.#cache.readSync(['ttl-cache'], () => {
 			return new TtlClientCache({
 				ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
 			});
@@ -116,7 +118,7 @@ export class SuigarClient {
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
 	 * This is primarily useful for debugging or inspecting which package ids,
-	 * registry ids, supported coin metadata, and price info object ids the SDK
+	 * object ids, supported coin metadata, and price info object ids the SDK
 	 * resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
@@ -162,21 +164,24 @@ export class SuigarClient {
 		game,
 		...options
 	}: GetGameParametersOptions<TGame>): Promise<GameParameters<TGame>> {
+		const { sweetHouse: sweetHouseObjectId } = this.#config.objectIds;
+		const gameDefinition = GAME_SETTINGS[game];
+		const gameSettingsKeyType = gameDefinition.settingsKey.typeTag({
+			package: this.#config.packageIds[gameDefinition.packageId],
+		});
 		const coinType = normalizeStructTag(options.coinType);
-		return this.#cache.read(
-			['getGameParameters', game, coinType],
+
+		return this.#ttlCache.read(
+			['getGameParameters', sweetHouseObjectId, gameSettingsKeyType, coinType],
 			async () => {
-				const gameDefinition = GAME_SETTINGS[game];
 				const { signal } = options;
 
 				const {
 					object: { objectId },
 				} = await this.#client.core.getDynamicObjectField({
-					parentId: this.#config.objectIds.sweetHouse,
+					parentId: sweetHouseObjectId,
 					name: {
-						type: gameDefinition.settingsKey.typeTag({
-							package: resolveGamePackageId({ config: this.#config, game }),
-						}),
+						type: gameSettingsKeyType,
 						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
 					},
 					signal,
@@ -208,8 +213,31 @@ export class SuigarClient {
 		) as Promise<GameParameters<TGame>>;
 	}
 
+	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {
+		const { sweetHouse: sweetHouseObjectId } = this.#config.objectIds;
+		const pvpCoinflipRegistryKeyType = PvpCoinflipRegistryKey.typeTag({
+			package: this.#config.packageIds.pvpCoinflip,
+		});
+
+		return this.#cache.read(
+			['getPvPCoinflipRegistryId', sweetHouseObjectId, pvpCoinflipRegistryKeyType],
+			async () => {
+				const { object } = await this.#client.core.getDynamicObjectField({
+					parentId: sweetHouseObjectId,
+					name: {
+						type: pvpCoinflipRegistryKeyType,
+						bcs: PvpCoinflipRegistryKey.serialize({ dummy_field: false }).toBytes(),
+					},
+					signal,
+				});
+
+				return object.objectId;
+			},
+		);
+	}
+
 	/**
-	 * Lists unresolved PvP coinflip games from the configured registry and resolves
+	 * Lists unresolved PvP coinflip games from the resolved registry and resolves
 	 * each entry into parsed on-chain game state.
 	 *
 	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
@@ -237,7 +265,7 @@ export class SuigarClient {
 		const { throwOnError = false, ...listOptions } = options;
 		const { dynamicFields } = await this.#client.core.listDynamicFields({
 			...listOptions,
-			parentId: this.#config.registryIds.pvpCoinflip,
+			parentId: await this.#getPvPCoinflipRegistryId(listOptions.signal),
 		});
 
 		const { objects } = await this.#client.core.getObjects({

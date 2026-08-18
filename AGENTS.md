@@ -162,7 +162,7 @@ When making changes:
 
 Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is responsible for:
 
-- Resolving network-scoped package ids
+- Resolving the network-scoped NFT V1 package id and optional MVR package overrides
 - Normalizing the configured supported coin types for the active network
 - Resolving price info object ids from the supported-coin mapping
 - Throwing explicit errors when a required coin mapping is missing
@@ -178,7 +178,7 @@ This is a core invariant: standard game transactions must fail clearly when the 
 
 #### Referral
 
-- Use `packageIds.referral` with `client.suigar.tx.referral` for claims.
+- `client.suigar.tx.referral` uses `@suigar/referral` by default, or `packageIds.referral` when an override is configured.
 - Use `client.suigar.view.referral` for simulated claimable amounts.
 
 #### NFT V1

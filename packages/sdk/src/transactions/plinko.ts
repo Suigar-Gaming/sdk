@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { play } from '../contracts/plinko/plinko.js';
+import { playV2 } from '../contracts/plinko/plinko.js';
 import type { PlinkoTransactionOptions, WithPartner } from '../types/index.js';
 import { toU8 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
@@ -24,7 +24,7 @@ export function buildPlinkoTransaction(
 			priceInfoObjectId,
 			betCoin,
 		}) =>
-			play({
+			playV2({
 				package: config.packageIds.plinko,
 				typeArguments: [coinType],
 				arguments: [

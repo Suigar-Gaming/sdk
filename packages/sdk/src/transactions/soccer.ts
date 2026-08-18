@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Transaction } from '@mysten/sui/transactions';
-import { play } from '../contracts/soccer/soccer.js';
+import { playV2 } from '../contracts/soccer/soccer.js';
 import type { SoccerTransactionOptions, WithPartner } from '../types/index.js';
 import { toU8, toU16 } from '../utils/numeric.js';
 import { buildSharedStandardGameBetTransaction } from './shared.js';
@@ -26,7 +26,7 @@ export function buildSoccerTransaction(
 			priceInfoObjectId,
 			betCoin,
 		}) =>
-			play({
+			playV2({
 				package: config.packageIds.soccer,
 				typeArguments: [coinType],
 				arguments: [

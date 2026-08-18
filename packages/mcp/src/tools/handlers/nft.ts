@@ -10,13 +10,20 @@ import {
 } from '../../runtime/index.js';
 import { createExecutionBridge, resolveWebOrigin } from '../../wallet/index.js';
 import type { BuildNftV1MintTransactionInput } from '../schemas/index.js';
-import { asTextResponse, getConfigInput, getMode, requireString } from './shared.js';
+import {
+	asTextResponse,
+	getConfigInput,
+	getMode,
+	getSuigarPackageId,
+	requireString,
+} from './shared.js';
 
 export async function buildNftV1MintTransactionTool(
 	input: BuildNftV1MintTransactionInput = {},
 ): Promise<ToolTextResult> {
 	const mode = getMode(input.mode);
 	const { config } = createSuigarClient(getConfigInput(input));
+	const nftV1PackageId = getSuigarPackageId(config, 'nftV1');
 
 	if (mode === 'read-only') {
 		return asTextResponse({
@@ -24,7 +31,7 @@ export async function buildNftV1MintTransactionTool(
 			network: config.network,
 			config,
 			plan: {
-				target: `${config.sdk.packageIds.nftV1}::nft::mint_to_sender`,
+				target: `${nftV1PackageId}::nft::mint_to_sender`,
 				typeArguments: [],
 				requiredInputs: ['owner', 'specId'],
 				notes: [
@@ -32,7 +39,7 @@ export async function buildNftV1MintTransactionTool(
 				],
 			},
 			nft: {
-				packageId: config.sdk.packageIds.nftV1,
+				packageId: nftV1PackageId,
 				factoryId: config.sdk.objectIds.nftV1Factory,
 			},
 		} satisfies NftV1MintReadOnlyPlan);

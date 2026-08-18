@@ -6,7 +6,7 @@ import { normalizeStructTag } from '@mysten/sui/utils';
 import {
 	cancelGame,
 	createGame,
-	joinGame,
+	joinGameV2,
 	Game as PvPCoinflipGame,
 } from '../contracts/pvp-coinflip/pvp_coinflip.js';
 import { resolvePriceInfoObjectId } from '../helpers/config.js';
@@ -18,7 +18,7 @@ import type {
 	WithPartner,
 } from '../types/index.js';
 import { toBigInt } from '../utils/numeric.js';
-import { createBaseGameTransaction } from './shared.js';
+import { createBaseTransaction } from './shared.js';
 
 type BuildPvPCoinflipTransactionOptions<TAction extends PvPCoinflipAction = PvPCoinflipAction> = {
 	[Action in PvPCoinflipAction]: (Action extends 'join'
@@ -55,10 +55,7 @@ function buildPvPCoinflipJoinBetCoin(
 export function buildPvPCoinflipTransaction(
 	options: BuildPvPCoinflipTransactionOptions,
 ): Transaction {
-	const tx = createBaseGameTransaction({
-		...options,
-		game: 'pvp-coinflip',
-	});
+	const tx = createBaseTransaction(options);
 	const { config, metadata, partner } = options;
 
 	const normalizedCoinType = normalizeStructTag(options.coinType);
@@ -99,7 +96,7 @@ export function buildPvPCoinflipTransaction(
 			});
 
 			tx.add(
-				joinGame({
+				joinGameV2({
 					package: config.packageIds.pvpCoinflip,
 					typeArguments: [normalizedCoinType],
 					arguments: [

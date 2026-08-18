@@ -17,7 +17,7 @@ import {
 	formatGameParameters,
 	GAME_LABELS,
 	getConfigInput,
-	getPackageId,
+	getSuigarPackageId,
 	requireGame,
 	requireString,
 	supportedFeatures,
@@ -45,7 +45,7 @@ export async function readGameMetadataTool(
 		game: {
 			id: game,
 			label: GAME_LABELS[game],
-			packageId: getPackageId(config, game),
+			packageId: getSuigarPackageId(config, game),
 			coinType: coin.coinType,
 			parameters: toJsonValue(formatGameParameters(parameters, coin.decimals)) ?? null,
 			ignoreCache,
@@ -63,8 +63,9 @@ export async function listNftsTool(input: Partial<ListNftsInput> = {}): Promise<
 	const bundle = createSuigarClient(getConfigInput(input));
 	const owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
 	const { client, config } = bundle;
+	const nftV1PackageId = getSuigarPackageId(config, 'nftV1');
 	const nftType = client.suigar.bcs.NftV1.typeTag({
-		package: config.sdk.packageIds.nftV1,
+		package: nftV1PackageId,
 	});
 	const factory = await client.core.getObject({
 		objectId: config.sdk.objectIds.nftV1Factory,

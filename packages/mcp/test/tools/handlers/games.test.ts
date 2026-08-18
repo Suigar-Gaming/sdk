@@ -96,7 +96,7 @@ describe('game transaction tools', () => {
 
 		expect(content.mode).toBe('read-only');
 		expect(content.network).toBe('testnet');
-		expect(content.plan.target).toMatch(/^0x.*::/u);
+		expect(content.plan.target).toMatch(/^(?:0x|@suigar\/).*::/u);
 		expect(result.content[0].text).toContain('"read-only"');
 	});
 

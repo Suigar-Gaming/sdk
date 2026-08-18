@@ -1,13 +1,12 @@
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
-
-const $moduleName = '0x0075c2c17dc7770888a6edf9892dbad5223cd6672162ed8c79f42b0482a0d53b::soccer';
+const $moduleName = '@suigar/soccer::soccer';
 export const SoccerSettingsKey = new MoveStruct({
 	name: `${$moduleName}::SoccerSettingsKey`,
 	fields: {
@@ -38,7 +37,7 @@ export const Parameters = new MoveStruct({
 		countries: vec_map.VecMap(bcs.u16(), bcs.string()),
 	},
 });
-export interface PlayOptions {
+export interface PlayV2Options {
 	package?: string;
 	arguments: [
 		RawTransactionArgument<string>,
@@ -54,9 +53,8 @@ export interface PlayOptions {
 	];
 	typeArguments: [string];
 }
-export function play(options: PlayOptions) {
-	const packageAddress =
-		options.package ?? '0x0075c2c17dc7770888a6edf9892dbad5223cd6672162ed8c79f42b0482a0d53b';
+export function playV2(options: PlayV2Options) {
+	const packageAddress = options.package ?? '@suigar/soccer';
 	const argumentsTypes = [
 		null,
 		'u64',
@@ -75,7 +73,7 @@ export function play(options: PlayOptions) {
 		tx.moveCall({
 			package: packageAddress,
 			module: 'soccer',
-			function: 'play',
+			function: 'play_v2',
 			arguments: normalizeMoveArguments(options.arguments, argumentsTypes),
 			typeArguments: options.typeArguments,
 		});
