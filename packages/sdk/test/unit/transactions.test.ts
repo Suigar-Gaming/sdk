@@ -624,7 +624,7 @@ describe('pvp coinflip transaction wrapper', () => {
 	});
 
 	it('passes join action arguments into the generated helper', async () => {
-		const joinGame = createContractCallMock();
+		const joinGameV2 = createContractCallMock();
 		const getGame = vi
 			.fn<() => Promise<{ json: { stake_per_player: bigint } }>>()
 			.mockResolvedValue({
@@ -639,7 +639,7 @@ describe('pvp coinflip transaction wrapper', () => {
 				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame: createUnusedContractCallMock(),
-					joinGameV2: joinGame,
+					joinGameV2,
 					cancelGame: createUnusedContractCallMock(),
 					Game: {
 						get: getGame,
@@ -664,7 +664,7 @@ describe('pvp coinflip transaction wrapper', () => {
 		const options = getFirstMockArg<{
 			package?: string;
 			arguments: Array<unknown>;
-		}>(joinGame);
+		}>(joinGameV2);
 		expect(options.package).toBe(TEST_CONFIG.packageIds.pvpCoinflip);
 		expect(options.arguments[0]).toBe('0x999');
 		expect(options.arguments[1]).toBe(TEST_CONFIG.objectIds.sweetHouse);
