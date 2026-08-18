@@ -3,7 +3,7 @@
 
 import { PACKAGE_IDS as TESTNET_PACKAGE_IDS } from './src/configs/testnet/packages.ts';
 
-export interface PackageInfo {
+interface PackageInfo {
 	package: string;
 	packageName: string;
 	types?: boolean | Array<string>;

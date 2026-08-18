@@ -7,7 +7,7 @@ import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
-import { TypeName } from './contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import { TypeName } from './contracts/move_stdlib/type_name.js';
 import { Nft as NftV1, Factory as NftV1Factory } from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,

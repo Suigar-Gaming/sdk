@@ -17,11 +17,11 @@ import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
 } from '../../src/contracts/coinflip/coinflip.js';
-import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Parameters as GeneratedLimboParameters,
 	LimboSettingsKey,
 } from '../../src/contracts/limbo/limbo.js';
+import { TypeName } from '../../src/contracts/move_stdlib/type_name.js';
 import {
 	Game as GeneratedPvPCoinflipGame,
 	PvpCoinflipRegistryKey,
