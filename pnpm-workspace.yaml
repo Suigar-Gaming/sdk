@@ -11,9 +11,9 @@ catalogs:
     'react-dom': ^19.2.8
     'tailwind-merge': ^3.6.0
   mysten:
-    '@mysten/bcs': ^2.1.0
-    '@mysten/codegen': ^0.12.2
-    '@mysten/sui': ^2.26.1
+    '@mysten/bcs': ^2.1.1
+    '@mysten/codegen': ^0.12.3
+    '@mysten/sui': ^2.26.2
   test:
     'vitest': ^4.1.10
   tooling:
@@ -49,5 +49,8 @@ overrides:
   'sharp': 0.35.3
 
 peerDependencyRules:
+  allowAny:
+    - graphql
+    - typescript
   ignoreMissing:
     - eslint

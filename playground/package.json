@@ -17,8 +17,9 @@
 		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"dependencies": {
-		"@mysten/dapp-kit-core": "^1.6.17",
-		"@mysten/dapp-kit-react": "^2.1.19",
+		"@mysten/bcs": "catalog:mysten",
+		"@mysten/dapp-kit-core": "^1.6.18",
+		"@mysten/dapp-kit-react": "^2.1.20",
 		"@mysten/sui": "catalog:mysten",
 		"@radix-ui/react-accordion": "^1.2.20",
 		"@radix-ui/react-dialog": "^1.1.23",
