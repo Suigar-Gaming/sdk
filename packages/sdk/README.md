@@ -16,10 +16,10 @@ npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 
 Runtime requirements:
 
-- Node.js `^22.18.0 || >=24.0.0`
+- Node.js `^24.0.0 || ^26.0.0`
 - ESM project configuration (`"type": "module"`)
-- `@mysten/sui` v2
-- `@mysten/bcs` v2
+- `@mysten/sui@2`
+- `@mysten/bcs@2`
 
 This SDK targets Sui TypeScript SDK 2.0+ only. Follow the official [Sui 2.0 migration guide](https://sdk.mystenlabs.com/sui/migrations/sui-2.0) if your app still uses the pre-2.0 client API.
 

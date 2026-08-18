@@ -17,6 +17,10 @@ Transactions remain unsigned by default. `mode: "execute"` uses the paired Suiga
 
 ## Install
 
+Runtime requirement:
+
+- Node.js `^24.0.0 || ^26.0.0`.
+
 Install for all detected coding agents with [add-mcp](https://www.npmjs.com/package/add-mcp):
 
 ```bash
