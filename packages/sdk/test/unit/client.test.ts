@@ -21,11 +21,11 @@ import {
 	Parameters as GeneratedLimboParameters,
 	LimboSettingsKey,
 } from '../../src/contracts/limbo/limbo.js';
-import { TypeName } from '../../src/contracts/move_stdlib/type_name.js';
 import {
 	Game as GeneratedPvPCoinflipGame,
 	PvpCoinflipRegistryKey,
 } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
+import { TypeName } from '../../src/contracts/stdlib/type_name.js';
 import type { SuigarConfigOverrides } from '../../src/types/index.js';
 import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from './utils.js';
 

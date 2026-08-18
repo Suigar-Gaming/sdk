@@ -30,7 +30,7 @@ const config: SuiCodegenConfig = {
 		...SUIGAR_PACKAGES_CONFIGURATION,
 		{
 			package: MOVE_STDLIB_ADDRESS,
-			packageName: 'move_stdlib',
+			packageName: 'stdlib',
 			network: NETWORK,
 			generate: {
 				modules: {
