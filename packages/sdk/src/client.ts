@@ -124,6 +124,16 @@ export class SuigarClient {
 	}
 
 	/**
+	 * Clears all cached data for this Suigar client extension instance.
+	 *
+	 * Use this to force subsequent SDK reads to fetch fresh on-chain data,
+	 * including cached game parameters and PvP coinflip registry lookups.
+	 */
+	reset(): void {
+		this.#cache.clear();
+	}
+
+	/**
 	 * Builds a transaction with the configured Sui client and encodes the resulting BCS bytes as base64.
 	 *
 	 * Use this when an external wallet, API, or transport expects the built transaction payload as a base64 string
