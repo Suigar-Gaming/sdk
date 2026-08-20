@@ -5,6 +5,7 @@ import type { PvPAction, PvPGameId, StandardGameId } from '@/lib/suigar-types';
 
 export const STANDARD_GAME_OPTIONS = [
 	{ value: 'coinflip', label: 'Coinflip' },
+	{ value: 'keno', label: 'Keno' },
 	{ value: 'limbo', label: 'Limbo' },
 	{ value: 'plinko', label: 'Plinko' },
 	{ value: 'range', label: 'Range' },

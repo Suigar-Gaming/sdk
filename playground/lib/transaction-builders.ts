@@ -2,6 +2,7 @@ import type { SuigarClient } from '@suigar/sdk';
 import { parseOptionalNumber, toAtomicAmount } from '@/lib/suigar-app';
 import type {
 	CoinflipFormValues,
+	KenoFormValues,
 	LimboFormValues,
 	PlinkoFormValues,
 	PvPAction,
@@ -89,6 +90,20 @@ function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
 	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
+function parseKenoPicks(value: string) {
+	const picks = value
+		.split(',')
+		.map((pick) => pick.trim())
+		.filter(Boolean)
+		.map(Number);
+
+	if (picks.length === 0 || picks.some((pick) => !Number.isSafeInteger(pick))) {
+		throw new Error('Keno picks must be comma-separated whole numbers.');
+	}
+
+	return picks;
+}
+
 export function buildPvPPreviewFallback(
 	action: 'join' | 'cancel',
 	{
@@ -127,6 +142,15 @@ export function buildStandardTransaction<K extends StandardGameId>(
 			const typedForm = form as CoinflipFormValues;
 			baseOptions.side = typedForm.side;
 			codeLines.push(`side: '${typedForm.side}',`);
+			break;
+		}
+		case 'keno': {
+			const typedForm = form as KenoFormValues;
+			const picks = parseKenoPicks(typedForm.picks);
+			baseOptions.configId = Number(typedForm.configId);
+			baseOptions.picks = picks;
+			codeLines.push(`configId: ${Number(typedForm.configId)},`);
+			codeLines.push(`picks: [${picks.join(', ')}],`);
 			break;
 		}
 		case 'limbo': {

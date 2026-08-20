@@ -121,6 +121,74 @@ export function summarizeStandardGameParameters(
 				},
 			};
 		}
+		case 'keno': {
+			const kenoParameters = parameters as StakeParameters & {
+				configs: {
+					contents: Array<
+						ConfigEntry & {
+							value: ConfigEntry['value'] & {
+								board_size: number;
+								draw_count: number;
+								min_picks: number;
+								max_picks: number;
+								paytable: Array<number>;
+								max_number_of_games: bigint | string | number;
+								min_rtp: number;
+								max_rtp: number;
+							};
+						}
+					>;
+				};
+			};
+			const stakeRange = toStakeRange(
+				toBigInt(kenoParameters.min_stake),
+				toBigInt(kenoParameters.max_stake),
+				decimals,
+			);
+			const configs = toConfigOptions(kenoParameters.configs.contents, decimals, (entry) => ({
+				label: `Config ${entry.key}`,
+				details: [
+					{ label: 'Board size', value: String(entry.value.board_size) },
+					{ label: 'Draw count', value: String(entry.value.draw_count) },
+					{
+						label: 'Picks',
+						value: `${entry.value.min_picks}-${entry.value.max_picks}`,
+					},
+					{ label: 'Paytable', value: String(entry.value.paytable.length) },
+				],
+				multiplierValues: entry.value.paytable.map((value, index) => ({
+					id: String(index),
+					value: String(value),
+				})),
+			}));
+			const firstPlayableConfig = configs.find((config) => config.isPlayable) ?? configs[0];
+			const firstConfig = firstPlayableConfig
+				? kenoParameters.configs.contents.find(
+						(entry) => String(entry.key) === firstPlayableConfig.id,
+					)
+				: undefined;
+
+			return {
+				stakeRange,
+				betCountLimit: firstConfig
+					? {
+							max: toBigInt(firstConfig.value.max_number_of_games),
+							label: 'games',
+						}
+					: undefined,
+				configOptions: configs,
+				kenoBounds: firstConfig
+					? {
+							boardSize: firstConfig.value.board_size,
+							drawCount: firstConfig.value.draw_count,
+							minPicks: firstConfig.value.min_picks,
+							maxPicks: firstConfig.value.max_picks,
+							minRtp: firstConfig.value.min_rtp,
+							maxRtp: firstConfig.value.max_rtp,
+						}
+					: undefined,
+			};
+		}
 		case 'range': {
 			const rangeParameters = parameters as StakeParameters & {
 				min_zone_size: bigint | string | number;
@@ -352,7 +420,7 @@ export function resolveStakeRangeForGame(
 		return null;
 	}
 
-	if ((game === 'plinko' || game === 'wheel') && configId) {
+	if ((game === 'keno' || game === 'plinko' || game === 'wheel') && configId) {
 		return findGameConfigOption(parameters, configId)?.stakeRange ?? parameters.stakeRange;
 	}
 

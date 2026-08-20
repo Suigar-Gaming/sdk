@@ -9,6 +9,7 @@ import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { AppHeader } from '@/components/app-header';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/forms/games/coinflip-form';
+import { KenoForm } from '@/components/forms/games/keno-form';
 import { LimboForm } from '@/components/forms/games/limbo-form';
 import { PlinkoForm } from '@/components/forms/games/plinko-form';
 import { PvPCoinflipCancelForm } from '@/components/forms/games/pvp-coinflip-cancel-form';
@@ -542,6 +543,7 @@ function IntegrationControls({
 	standardGameParametersError,
 	stakeDescription,
 	limboTargetMultiplierDescription,
+	kenoPicksDescription,
 	rangeBoundsDescription,
 	pvpStakeDescription,
 	showPrivateJoinLobbies,
@@ -572,6 +574,7 @@ function IntegrationControls({
 	standardGameParametersError: string | null;
 	stakeDescription: React.ReactNode;
 	limboTargetMultiplierDescription: React.ReactNode;
+	kenoPicksDescription: React.ReactNode;
 	rangeBoundsDescription: React.ReactNode;
 	pvpStakeDescription: React.ReactNode;
 	showPrivateJoinLobbies: boolean;
@@ -653,6 +656,18 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('limbo')}
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
+								/>
+							) : null}
+							{standardGame === 'keno' ? (
+								<KenoForm
+									value={effectiveStandardForms.keno}
+									onChange={(patch) => updateStandardForm('keno', patch)}
+									onStakeBlur={() => onStandardStakeBlur('keno')}
+									configOptions={standardGameParameters?.configOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+									picksDescription={kenoPicksDescription}
 								/>
 							) : null}
 							{standardGame === 'plinko' ? (
@@ -1042,7 +1057,10 @@ function useIntegrationState({
 	const normalizedCurrentAccount = currentAccount?.address.toLowerCase() ?? null;
 	const selectedStandardForm = standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
 	const activeConfigId =
-		standardGame === 'plinko' || standardGame === 'soccer' || standardGame === 'wheel'
+		standardGame === 'keno' ||
+		standardGame === 'plinko' ||
+		standardGame === 'soccer' ||
+		standardGame === 'wheel'
 			? resolvePlayableConfigId(
 					(selectedStandardForm as { configId: string }).configId,
 					standardGameParameters?.configOptions,
@@ -1171,6 +1189,27 @@ function useIntegrationState({
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
+	const kenoPicksDescription = React.useMemo(() => {
+		if (standardGame !== 'keno' || !activeConfigOption) {
+			return null;
+		}
+
+		const picks = activeConfigOption.details?.find((detail) => detail.label === 'Picks')?.value;
+		const boardSize = activeConfigOption.details?.find(
+			(detail) => detail.label === 'Board size',
+		)?.value;
+
+		if (!picks || !boardSize) {
+			return null;
+		}
+
+		return (
+			<FieldDescription size="sm">
+				Select <FieldCode>{picks}</FieldCode> positions from a <FieldCode>{boardSize}</FieldCode>{' '}
+				slot board
+			</FieldDescription>
+		);
+	}, [activeConfigOption, standardGame]);
 
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
 		let nextForms: StandardForms = {
@@ -1178,12 +1217,20 @@ function useIntegrationState({
 				...DEFAULT_STANDARD_FORMS.coinflip,
 				...standardForms.coinflip,
 			},
+			keno: { ...DEFAULT_STANDARD_FORMS.keno, ...standardForms.keno },
 			limbo: { ...DEFAULT_STANDARD_FORMS.limbo, ...standardForms.limbo },
 			plinko: { ...DEFAULT_STANDARD_FORMS.plinko, ...standardForms.plinko },
 			range: { ...DEFAULT_STANDARD_FORMS.range, ...standardForms.range },
 			soccer: { ...DEFAULT_STANDARD_FORMS.soccer, ...standardForms.soccer },
 			wheel: { ...DEFAULT_STANDARD_FORMS.wheel, ...standardForms.wheel },
 		};
+
+		if (standardGame === 'keno') {
+			nextForms.keno.configId = resolvePlayableConfigId(
+				standardForms.keno.configId,
+				standardGameParameters?.configOptions,
+			);
+		}
 
 		if (standardGame === 'plinko') {
 			nextForms.plinko.configId = resolvePlayableConfigId(
@@ -1219,6 +1266,12 @@ function useIntegrationState({
 					nextForms = {
 						...nextForms,
 						limbo: clampBetCount(nextForms.limbo, betCountLimit.max),
+					};
+					break;
+				case 'keno':
+					nextForms = {
+						...nextForms,
+						keno: clampBetCount(nextForms.keno, betCountLimit.max),
 					};
 					break;
 				case 'plinko':
@@ -1554,6 +1607,7 @@ function useIntegrationState({
 		standardGameParametersError,
 		stakeDescription,
 		limboTargetMultiplierDescription,
+		kenoPicksDescription,
 		rangeBoundsDescription,
 		pvpStakeDescription,
 		showPrivateJoinLobbies,
@@ -1735,6 +1789,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					standardGameParametersError={integration.standardGameParametersError}
 					stakeDescription={integration.stakeDescription}
 					limboTargetMultiplierDescription={integration.limboTargetMultiplierDescription}
+					kenoPicksDescription={integration.kenoPicksDescription}
 					rangeBoundsDescription={integration.rangeBoundsDescription}
 					pvpStakeDescription={integration.pvpStakeDescription}
 					showPrivateJoinLobbies={integration.showPrivateJoinLobbies}
