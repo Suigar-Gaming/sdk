@@ -15,11 +15,10 @@ catalogs:
     '@mysten/codegen': ^0.12.3
     '@mysten/sui': ^2.26.2
   test:
-    'vitest': ^4.1.10
+    'vitest': ^4.1.11
   tooling:
     '@tailwindcss/postcss': ^4.3.3
     '@tailwindcss/vite': ^4.3.3
-    'oxfmt': ^0.63.0
     'react-doctor': ^0.9.12
     'tailwindcss': ^4.3.3
     'tsdown': ^0.22.14
