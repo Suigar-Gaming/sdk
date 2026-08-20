@@ -437,7 +437,7 @@ function IntegrationHero({
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 					<div className="space-y-2">
 						<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
-							Suigar SDK playground
+							Suigar Game Playground
 						</h1>
 						<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
 							Build standard and PvP transactions, inspect the exact builder call, execute it, and

@@ -5,8 +5,8 @@ export const dynamic = 'force-static';
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
-		name: 'Suigar SDK Playground',
-		short_name: 'Suigar SDK PG',
+		name: 'Suigar Game Playground',
+		short_name: 'Suigar Games',
 		description:
 			'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
 		start_url: '/',

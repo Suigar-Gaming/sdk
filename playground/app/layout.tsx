@@ -22,8 +22,8 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	applicationName: 'Suigar SDK Playground',
-	title: 'Suigar SDK Playground',
+	applicationName: 'Suigar Game Playground',
+	title: 'Suigar Game Playground',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
 	icons: {

@@ -1,5 +1,6 @@
 'use client';
 
+import { Eraser } from 'lucide-react';
 import type * as React from 'react';
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
 import { Button } from '@/components/ui/button';
@@ -120,9 +121,21 @@ export function KenoForm({
 			<Field>
 				<div className="flex items-center justify-between gap-3">
 					<FieldLabel>Picks</FieldLabel>
-					<span className="text-xs font-medium text-muted-foreground">
-						{selectedPicks.length}/{maxPicks}
-					</span>
+					<div className="flex items-center gap-2">
+						<Button
+							type="button"
+							variant="ghost"
+							size="xs"
+							disabled={selectedPicks.length === 0}
+							onClick={() => onChange({ picks: [] })}
+						>
+							<Eraser className="size-3.5" aria-hidden />
+							Clear
+						</Button>
+						<span className="text-xs font-medium text-muted-foreground">
+							{selectedPicks.length}/{maxPicks}
+						</span>
+					</div>
 				</div>
 				<fieldset className="grid grid-cols-8 gap-1.5 sm:grid-cols-10">
 					{boardPositions.map((pick) => {
@@ -138,7 +151,7 @@ export function KenoForm({
 								aria-pressed={isSelected}
 								disabled={isDisabled}
 								onClick={() => togglePick(pick)}
-								className={cn('aspect-square h-auto min-h-8 w-full rounded-lg p-0 text-xs')}
+								className={cn('aspect-square h-auto min-h-7 w-full rounded-md p-0 text-[11px]')}
 							>
 								{pick}
 							</Button>
