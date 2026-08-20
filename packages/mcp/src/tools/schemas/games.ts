@@ -62,6 +62,16 @@ export const coinflipInputSchema = stakeBuildInputSchema
 	})
 	.strict();
 
+export const kenoInputSchema = stakeBuildInputSchema
+	.extend({
+		configId: z.number().int().min(0).max(255).optional().describe('On-chain Keno config id.'),
+		picks: z
+			.array(z.number().int().min(0).max(255))
+			.optional()
+			.describe('Keno board positions selected by the player.'),
+	})
+	.strict();
+
 export const limboInputSchema = stakeBuildInputSchema
 	.extend({
 		targetMultiplier: z.number().positive().optional().describe('Target multiplier.'),
@@ -131,6 +141,7 @@ export const pvpCoinflipCancelInputSchema = commonBuildInputSchema
 
 export type CommonBuildInput = z.input<typeof commonBuildInputSchema>;
 export type CoinflipInput = z.input<typeof coinflipInputSchema>;
+export type KenoInput = z.input<typeof kenoInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;
 export type ConfigIdInput = z.input<typeof configIdInputSchema>;
 export type RangeInput = z.input<typeof rangeInputSchema>;
@@ -141,6 +152,7 @@ export type PvpCoinflipCancelInput = z.input<typeof pvpCoinflipCancelInputSchema
 
 export type TransactionToolInput =
 	| CoinflipInput
+	| KenoInput
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput
@@ -151,6 +163,7 @@ export type TransactionToolInput =
 
 export type StandardTransactionToolInput =
 	| CoinflipInput
+	| KenoInput
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput

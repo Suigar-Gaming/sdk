@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	coinflipInputSchema,
+	kenoInputSchema,
 	pvpCoinflipJoinInputSchema,
 	soccerInputSchema,
 } from '../../../src/tools/schemas/games.js';
@@ -47,5 +48,13 @@ describe('game input schemas', () => {
 			}),
 		).toMatchObject({ countryId: 65_535 });
 		expect(() => soccerInputSchema.parse({ countryId: 65_536 })).toThrow(/Too big/u);
+	});
+
+	it('bounds Keno config and picks to u8 values', () => {
+		expect(kenoInputSchema.parse({ configId: 255, picks: [0, 255] })).toMatchObject({
+			configId: 255,
+			picks: [0, 255],
+		});
+		expect(() => kenoInputSchema.parse({ picks: [256] })).toThrow(/Too big/u);
 	});
 });

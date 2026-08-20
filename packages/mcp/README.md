@@ -114,6 +114,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_referral_level_up_usd_rewards_claim_transaction`
 - `build_nft_v1_mint_transaction`
 - `build_coinflip_transaction`
+- `build_keno_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
 - `build_soccer_transaction`
@@ -170,7 +171,7 @@ In an App-capable host, the NFT view presents catalog and owned-NFT tables separ
 All transaction tools accept the shared config inputs and support these `mode` values:
 
 - `read-only`: resolves SDK config and returns the intended Move target, type arguments, required inputs, and notes.
-- `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
+- `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, Keno `configId` and `picks`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed dry-runs include an `errors` array extracted from the failed transaction status.
 - `execute`: by default opens a paired-wallet approval request. Set `executionWallet: "session"` for game tools to have MCP sign and execute immediately with the local session wallet instead.
 
@@ -191,13 +192,14 @@ For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui 
 
 Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `useGasCoin` for native SUI bets. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings.
 
-When `betCount` is provided for Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
+When `betCount` is provided for Keno, Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
 ### Workflow-specific inputs
 
 | Workflow | Required inputs | Optional inputs | Notes |
 | --- | --- | --- | --- |
 | Coinflip | `side` | — | — |
+| Keno | `configId`, `picks` | — | `picks` is an array of board positions. |
 | Limbo | `targetMultiplier` | — | — |
 | Plinko, Wheel | `configId` | — | — |
 | Soccer | `configId`, `countryId`, `shotZoneId` | — | — |
@@ -221,6 +223,7 @@ Optional `config` input follows the public SDK extension override shape:
 		core?: string;
 		referral?: string;
 		coinflip?: string;
+		keno?: string;
 		limbo?: string;
 		plinko?: string;
 		pvpCoinflip?: string;

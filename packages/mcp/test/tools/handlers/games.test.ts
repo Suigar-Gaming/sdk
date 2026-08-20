@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BuildTransactionResult, ReadOnlyPlan } from '../../../src/runtime/types.js';
 import {
 	buildCoinflipTransactionTool,
+	buildKenoTransactionTool,
 	buildLimboTransactionTool,
 	buildPlinkoTransactionTool,
 	buildPvpCoinflipCancelTransactionTool,
@@ -44,6 +45,7 @@ afterEach(() => {
 describe('game transaction tools', () => {
 	it.each([
 		['coinflip', () => buildCoinflipTransactionTool({ mode: 'read-only', side: 'heads' })],
+		['keno', () => buildKenoTransactionTool({ mode: 'read-only', configId: 0, picks: [1, 2] })],
 		['limbo', () => buildLimboTransactionTool({ mode: 'read-only', targetMultiplier: 2 })],
 		['plinko', () => buildPlinkoTransactionTool({ mode: 'read-only', configId: 0 })],
 		['wheel', () => buildWheelTransactionTool({ mode: 'read-only', configId: 0 })],
@@ -154,7 +156,14 @@ describe('game transaction tools', () => {
 	});
 
 	it('includes game-specific inputs in standard transaction summaries', async () => {
-		const [limbo, plinko, wheel, range, soccer] = await Promise.all([
+		const [keno, limbo, plinko, wheel, range, soccer] = await Promise.all([
+			buildKenoTransactionTool({
+				mode: 'build',
+				owner,
+				stake: 1,
+				configId: 2,
+				picks: [1, 7, 20],
+			}),
 			buildLimboTransactionTool({
 				mode: 'build',
 				owner,
@@ -191,6 +200,10 @@ describe('game transaction tools', () => {
 			}),
 		]);
 
+		expect((keno.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
+			configId: 2,
+			picks: [1, 7, 20],
+		});
 		expect((limbo.structuredContent as BuildTransactionResult).summary.gameInputs).toEqual({
 			targetMultiplier: 2.5,
 		});

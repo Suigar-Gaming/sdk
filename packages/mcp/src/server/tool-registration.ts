@@ -7,6 +7,7 @@ import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import type { ToolTextResult } from '../runtime/index.js';
 import {
 	buildCoinflipTransactionTool,
+	buildKenoTransactionTool,
 	buildLimboTransactionTool,
 	buildNftV1MintTransactionInputSchema,
 	buildNftV1MintTransactionTool,
@@ -35,6 +36,7 @@ import {
 	getSessionWalletTool,
 	getWalletBalancesInputSchema,
 	getWalletBalancesTool,
+	kenoInputSchema,
 	limboInputSchema,
 	listNftsInputSchema,
 	listNftsTool,
@@ -301,6 +303,15 @@ const toolDefinitions = [
 		inputSchema: limboInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildLimboTransactionTool,
+		isAppTool: true,
+	},
+	{
+		name: 'build_keno_transaction',
+		title: 'Build Keno Transaction',
+		description: 'Build, dry-run, or inspect an unsigned Suigar Keno transaction.',
+		inputSchema: kenoInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: buildKenoTransactionTool,
 		isAppTool: true,
 	},
 	{
