@@ -253,6 +253,36 @@ describe('parseGameDetails', () => {
 		});
 	});
 
+	it('decodes Keno board and draw detail values', () => {
+		expect(
+			parseGameDetails({
+				game: 'keno',
+				gameDetails: gameDetails([
+					{ key: 'board_size', value: [40] },
+					{ key: 'draw_count', value: [10] },
+					{ key: 'picks', value: [5, 1, 2, 3, 4, 5] },
+					{ key: 'drawn_numbers', value: [10, 6, 36, 1, 25, 22, 37, 4, 30, 33, 40] },
+					{ key: 'hit_count', value: [2] },
+				]),
+			}),
+		).toEqual({
+			board_size: 40,
+			draw_count: 10,
+			picks: [1, 2, 3, 4, 5],
+			drawn_numbers: [6, 36, 1, 25, 22, 37, 4, 30, 33, 40],
+			hit_count: 2,
+		});
+	});
+
+	it('rejects malformed Keno vector detail values', () => {
+		expect(() =>
+			parseGameDetails({
+				game: 'keno',
+				gameDetails: gameDetails([{ key: 'picks', value: [1, 2, 3, 4, 5] }]),
+			}),
+		).toThrow('Invalid BCS vector<u8> game detail value.');
+	});
+
 	it('narrows parsed detail keys and value types by game id', () => {
 		const details = parseGameDetails({
 			game: 'coinflip',

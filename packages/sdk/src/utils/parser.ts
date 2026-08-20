@@ -77,6 +77,21 @@ function parseStringGameDetail(value: Array<number>): string {
 	}
 }
 
+function parseVectorU8GameDetail(value: Array<number>): Array<number> {
+	const bytes = Uint8Array.from(value);
+	const parsed = GAME_DETAIL_BCS.vectorU8.parse(bytes);
+	const serialized = GAME_DETAIL_BCS.vectorU8.serialize(parsed).toBytes();
+
+	if (
+		serialized.length !== bytes.length ||
+		serialized.some((byte, index) => byte !== bytes[index])
+	) {
+		throw new TypeError('Invalid BCS vector<u8> game detail value.');
+	}
+
+	return parsed;
+}
+
 function parseGameDetail<TValueType extends GameDetailValueType>({
 	valueType,
 	value,
@@ -86,6 +101,9 @@ function parseGameDetail<TValueType extends GameDetailValueType>({
 }): GameDetail<TValueType> {
 	if (valueType === 'string') {
 		return parseStringGameDetail(value) as GameDetail<TValueType>;
+	}
+	if (valueType === 'vectorU8') {
+		return parseVectorU8GameDetail(value) as GameDetail<TValueType>;
 	}
 
 	const parsed = GAME_DETAIL_BCS[valueType].parse(Uint8Array.from(value));

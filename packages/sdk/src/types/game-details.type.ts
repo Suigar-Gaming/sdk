@@ -9,7 +9,7 @@ import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
 
-export type GameDetailValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
+export type GameDetailValueType = 'u8' | 'vectorU8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
 export type GameDetailsSchema = Record<string, GameDetailValueType>;
 
 export type GameDetail<TValueType extends GameDetailValueType> = TValueType extends 'float' | 'u64'
@@ -24,6 +24,7 @@ export type GameDetails<TGame extends Game> = {
 
 export const GAME_DETAIL_BCS = {
 	u8: bcs.U8,
+	vectorU8: bcs.vector(bcs.u8()),
 	u16: bcs.U16,
 	u64: bcs.U64,
 	bool: bcs.Bool,
@@ -38,6 +39,10 @@ const COINFLIP_GAME_DETAILS_SCHEMA = {
 
 const KENO_GAME_DETAILS_SCHEMA = {
 	keno_config: 'u8',
+	board_size: 'u8',
+	draw_count: 'u8',
+	picks: 'vectorU8',
+	drawn_numbers: 'vectorU8',
 	hit_count: 'u8',
 	multiplier: 'float',
 	payout_amount: 'u64',
