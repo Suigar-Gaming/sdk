@@ -205,7 +205,7 @@ export class SuigarClient {
 
 			return normalizeGameParameterValues(
 				gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
-			) as Promise<GameParameters<TGame>>;
+			);
 		};
 
 		return readCache({
