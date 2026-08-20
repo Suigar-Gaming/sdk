@@ -137,7 +137,7 @@ export function KenoForm({
 						</span>
 					</div>
 				</div>
-				<fieldset className="grid grid-cols-8 gap-1.5 sm:grid-cols-10">
+				<fieldset className="mx-auto grid max-w-md grid-cols-10 gap-1.5 sm:max-w-lg">
 					{boardPositions.map((pick) => {
 						const isSelected = selectedPickSet.has(pick);
 						const isDisabled = !isSelected && selectedPicks.length >= maxPicks;
@@ -151,7 +151,7 @@ export function KenoForm({
 								aria-pressed={isSelected}
 								disabled={isDisabled}
 								onClick={() => togglePick(pick)}
-								className={cn('aspect-square h-auto min-h-7 w-full rounded-md p-0 text-[11px]')}
+								className={cn('aspect-square h-auto min-h-8 w-full rounded-md p-0 text-xs')}
 							>
 								{pick}
 							</Button>
