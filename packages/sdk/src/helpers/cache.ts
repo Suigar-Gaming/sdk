@@ -3,13 +3,16 @@
 
 import type { ClientCache } from '@mysten/sui/client';
 
-const NO_CACHE_TTL_KEY = 'ttl:no-cache';
+type CacheEntry<Value> = {
+	expiresAt: number;
+	value: Value;
+};
 
 type CacheKey = Parameters<ClientCache['read']>[0];
 
 type ReadCacheOptions = {
 	ignoreCache?: boolean;
-	ttlMs?: number;
+	ttlMs: number;
 	sync?: boolean;
 };
 
@@ -17,7 +20,7 @@ type ReadCacheParams<T> = {
 	cache: ClientCache;
 	key: CacheKey;
 	load: () => T | Promise<T>;
-	options?: ReadCacheOptions;
+	options: ReadCacheOptions;
 };
 
 type ReadCacheSyncParams<T> = {
@@ -27,35 +30,69 @@ type ReadCacheSyncParams<T> = {
 	options: ReadCacheOptions & { sync: true };
 };
 
-function getTtlCacheKey(ttlMs: number, now = Date.now()): string {
-	if (isNoCacheTtl(ttlMs)) {
-		return NO_CACHE_TTL_KEY;
-	}
-
-	return `ttl:${Math.floor(now / ttlMs)}`;
-}
-
-function isNoCacheTtl(ttlMs: number): boolean {
-	return ttlMs <= 0;
-}
-
 export function readCache<T>(params: ReadCacheSyncParams<T>): T;
 export function readCache<T>(params: ReadCacheParams<T>): T | Promise<T>;
 export function readCache<T>({
 	cache,
 	key,
 	load,
-	options = {},
+	options,
 }: ReadCacheParams<T> | ReadCacheSyncParams<T>): T | Promise<T> {
-	const readKey = getCacheReadKey(key, options.ttlMs);
-
-	if (options.ignoreCache || (options.ttlMs !== undefined && isNoCacheTtl(options.ttlMs))) {
+	if (options.ignoreCache) {
 		cache.clear(key);
 	}
 
-	return options.sync ? cache.readSync(readKey, load as () => T) : cache.read(readKey, load);
+	if (options.ttlMs <= 0) {
+		cache.clear(key);
+		return load();
+	}
+
+	const { ttlMs, sync } = options;
+
+	const createEntry = (resolvedCache?: { cache: ClientCache; key: CacheKey }) => {
+		const value = load();
+		const entry: CacheEntry<T | Promise<T>> = {
+			expiresAt: Date.now() + ttlMs,
+			value,
+		};
+
+		if (isPromiseLike(value)) {
+			entry.value = Promise.resolve(value)
+				.then((resolved) => {
+					resolvedCache?.cache.clear(resolvedCache.key);
+					void resolvedCache?.cache.read<CacheEntry<T>>(resolvedCache.key, () => ({
+						expiresAt: Date.now() + ttlMs,
+						value: resolved,
+					}));
+					return resolved;
+				})
+				.catch((error) => {
+					resolvedCache?.cache.clear(resolvedCache.key);
+					throw error;
+				});
+		}
+
+		return entry;
+	};
+
+	const readEntry = () =>
+		sync
+			? cache.readSync<CacheEntry<T>>(key, () => createEntry() as CacheEntry<T>)
+			: cache.read<CacheEntry<T | Promise<T>>>(key, () => createEntry({ cache, key }));
+
+	let cached = readEntry() as CacheEntry<T | Promise<T>>;
+
+	if (cached.expiresAt > Date.now()) {
+		return cached.value;
+	}
+
+	cache.clear(key);
+	cached = readEntry() as CacheEntry<T | Promise<T>>;
+	return cached.value;
 }
 
-function getCacheReadKey(key: CacheKey, ttlMs?: number): CacheKey {
-	return ttlMs === undefined ? key : [...key, getTtlCacheKey(ttlMs)];
+function isPromiseLike<T>(value: T | Promise<T>): value is Promise<T> {
+	return (
+		(typeof value === 'object' || typeof value === 'function') && value !== null && 'then' in value
+	);
 }

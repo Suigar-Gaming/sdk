@@ -19,8 +19,12 @@ describe('readCache', () => {
 		const cache = new ClientCache().scope('test');
 		const load = vi.fn<() => Promise<string>>().mockResolvedValue('value');
 
-		await expect(Promise.resolve(readCache({ cache, key: ['key'], load }))).resolves.toBe('value');
-		await expect(Promise.resolve(readCache({ cache, key: ['key'], load }))).resolves.toBe('value');
+		await expect(
+			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })),
+		).resolves.toBe('value');
+		await expect(
+			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })),
+		).resolves.toBe('value');
 
 		expect(load).toHaveBeenCalledTimes(1);
 	});
@@ -29,8 +33,12 @@ describe('readCache', () => {
 		const cache = new ClientCache().scope('test');
 		const load = vi.fn<() => string>().mockReturnValue('value');
 
-		expect(readCache({ cache, key: ['key'], load, options: { sync: true } })).toBe('value');
-		expect(readCache({ cache, key: ['key'], load, options: { sync: true } })).toBe('value');
+		expect(readCache({ cache, key: ['key'], load, options: { sync: true, ttlMs: 1000 } })).toBe(
+			'value',
+		);
+		expect(readCache({ cache, key: ['key'], load, options: { sync: true, ttlMs: 1000 } })).toBe(
+			'value',
+		);
 
 		expect(load).toHaveBeenCalledTimes(1);
 	});
@@ -42,15 +50,19 @@ describe('readCache', () => {
 			.mockResolvedValueOnce('first')
 			.mockResolvedValueOnce('second');
 
-		await expect(readCache({ cache, key: ['key'], load })).resolves.toBe('first');
+		await expect(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })).resolves.toBe(
+			'first',
+		);
 		await expect(
-			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ignoreCache: true } })),
+			Promise.resolve(
+				readCache({ cache, key: ['key'], load, options: { ignoreCache: true, ttlMs: 1000 } }),
+			),
 		).resolves.toBe('second');
 
 		expect(load).toHaveBeenCalledTimes(2);
 	});
 
-	it('uses ttl keys and reloads when ttl means no cache', async () => {
+	it('reloads when ttl means no cache', async () => {
 		const cache = new ClientCache().scope('test');
 		const load = vi
 			.fn<() => Promise<string>>()
@@ -67,16 +79,21 @@ describe('readCache', () => {
 		expect(load).toHaveBeenCalledTimes(2);
 	});
 
-	it('caches within a ttl bucket and reloads across ttl buckets', async () => {
+	it('caches until the ttl expires from the load time', async () => {
 		const cache = new ClientCache().scope('test');
 		const load = vi
 			.fn<() => Promise<string>>()
 			.mockResolvedValueOnce('first')
 			.mockResolvedValueOnce('second');
+
+		vi.setSystemTime(new Date('2026-01-01T00:00:00.999Z'));
 
 		await expect(
 			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })),
 		).resolves.toBe('first');
+
+		vi.advanceTimersByTime(1);
+
 		await expect(
 			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })),
 		).resolves.toBe('first');
@@ -86,6 +103,23 @@ describe('readCache', () => {
 		await expect(
 			Promise.resolve(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })),
 		).resolves.toBe('second');
+
+		expect(load).toHaveBeenCalledTimes(2);
+	});
+
+	it('clears failed async reads so the next call can retry', async () => {
+		const cache = new ClientCache().scope('test');
+		const load = vi
+			.fn<() => Promise<string>>()
+			.mockRejectedValueOnce(new Error('boom'))
+			.mockResolvedValueOnce('recovered');
+
+		await expect(
+			readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } }),
+		).rejects.toThrow('boom');
+		await expect(readCache({ cache, key: ['key'], load, options: { ttlMs: 1000 } })).resolves.toBe(
+			'recovered',
+		);
 
 		expect(load).toHaveBeenCalledTimes(2);
 	});
