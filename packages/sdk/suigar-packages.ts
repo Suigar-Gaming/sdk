@@ -36,6 +36,12 @@ export const SUIGAR_PACKAGES: Record<string, PackageInfo> = {
 		types: ['CoinFlipSettingsKey', 'Parameters'],
 		functions: ['play_v2'],
 	},
+	keno: {
+		package: '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a',
+		packageName: 'keno',
+		types: ['KenoSettingsKey', 'Parameters'],
+		functions: ['play_v2'],
+	},
 	limbo: {
 		package: '@suigar/limbo',
 		packageName: 'limbo',
