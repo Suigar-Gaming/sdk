@@ -1,5 +1,15 @@
 # @suigar/mcp
 
+## 1.0.0-beta.25
+
+### Patch Changes
+
+- [#155](https://github.com/Suigar-Gaming/ts-sdks/pull/155) [`3a9391f`](https://github.com/Suigar-Gaming/ts-sdks/commit/3a9391f90687c7dde76da23c6fc77bc7a2c9e0bd) - Update the MCP package dependencies: `open` and `react-doctor`
+
+- [#157](https://github.com/Suigar-Gaming/ts-sdks/pull/157) [`77a9247`](https://github.com/Suigar-Gaming/ts-sdks/commit/77a924767bc68edaeb8c8c0470a916a86e679504) - Allow MCP read-only plans and transaction summaries to work with SDK configs that use MVR-backed package defaults instead of concrete package ids. Transaction summaries also preserve configured gas budget inputs as raw MIST plus SUI display values.
+- Updated dependencies [[`e82da77`](https://github.com/Suigar-Gaming/ts-sdks/commit/e82da77a0b0b2d937b8396a48c7a0a396f17ac3e), [`77a9247`](https://github.com/Suigar-Gaming/ts-sdks/commit/77a924767bc68edaeb8c8c0470a916a86e679504)]:
+  - @suigar/sdk@2.0.0-beta.39
+
 ## 1.0.0-beta.24
 
 ### Patch Changes
