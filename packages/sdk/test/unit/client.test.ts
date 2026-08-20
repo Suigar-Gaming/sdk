@@ -27,7 +27,7 @@ import {
 } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
 import { TypeName } from '../../src/contracts/stdlib/type_name.js';
 import type { SuigarConfigOverrides } from '../../src/types/index.js';
-import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from './utils.js';
+import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from '../utils.js';
 
 afterEach(() => {
 	vi.resetModules();

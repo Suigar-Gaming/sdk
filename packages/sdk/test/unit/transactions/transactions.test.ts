@@ -4,7 +4,7 @@
 import { Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Factory as NftV1Factory } from '../../src/contracts/nft-v1/nft.js';
+import { Factory as NftV1Factory } from '../../../src/contracts/nft-v1/nft.js';
 import {
 	buildClaimReferralCommissionTransaction,
 	buildClaimReferralLevelUpUsdRewardsTransaction,
@@ -12,8 +12,8 @@ import {
 	buildMintNftV1Transaction,
 	buildPvPCoinflipTransaction,
 	buildSoccerTransaction,
-} from '../../src/transactions/index.js';
-import { createContractCallMock, encodeUtf8, getFirstMockArg, TEST_CONFIG } from './utils.js';
+} from '../../../src/transactions/index.js';
+import { createContractCallMock, encodeUtf8, getFirstMockArg, TEST_CONFIG } from '../../utils.js';
 
 afterEach(() => {
 	vi.resetModules();
@@ -166,7 +166,7 @@ describe('transaction builders', () => {
 
 describe('shared transaction helpers', () => {
 	it('creates a base transaction with normalized owner address and configured gas budget', async () => {
-		const { createBaseTransaction } = await import('../../src/transactions/shared.js');
+		const { createBaseTransaction } = await import('../../../src/transactions/shared.js');
 
 		const tx = createBaseTransaction({
 			owner: '0xabc',
@@ -180,7 +180,7 @@ describe('shared transaction helpers', () => {
 
 	it('resolves standard game bet context before invoking the reward builder', async () => {
 		const { buildSharedStandardGameBetTransaction } =
-			await import('../../src/transactions/shared.js');
+			await import('../../../src/transactions/shared.js');
 
 		type RewardContext = Parameters<
 			Parameters<typeof buildSharedStandardGameBetTransaction>[0]['buildRewardCoin']
@@ -235,7 +235,7 @@ describe('shared transaction helpers', () => {
 		});
 
 		const { buildSharedStandardGameBetTransaction } =
-			await import('../../src/transactions/shared.js');
+			await import('../../../src/transactions/shared.js');
 
 		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
@@ -275,7 +275,7 @@ describe('shared transaction helpers', () => {
 
 	it('warns and skips reserved metadata keys', async () => {
 		const { buildSharedStandardGameBetTransaction } =
-			await import('../../src/transactions/shared.js');
+			await import('../../../src/transactions/shared.js');
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
 		buildSharedStandardGameBetTransaction({
@@ -312,7 +312,7 @@ describe('shared transaction helpers', () => {
 
 	it('encodes wallet addresses in non-reserved metadata values', async () => {
 		const { buildSharedStandardGameBetTransaction } =
-			await import('../../src/transactions/shared.js');
+			await import('../../../src/transactions/shared.js');
 		const accountManager = normalizeSuiAddress('0x456');
 
 		buildSharedStandardGameBetTransaction({
@@ -344,9 +344,9 @@ describe('coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildCoinflipTransaction: typeof buildCoinflipTransaction;
 			}>(
-				'../../src/contracts/coinflip/coinflip.js',
+				'../../../src/contracts/coinflip/coinflip.js',
 				{ playV2 },
-				'../../src/transactions/coinflip.js',
+				'../../../src/transactions/coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 
@@ -389,7 +389,7 @@ describe('limbo transaction wrapper', () => {
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/limbo/limbo.js', { playV2 }, '../../src/transactions/limbo.js');
+		}>('../../../src/contracts/limbo/limbo.js', { playV2 }, '../../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -412,7 +412,7 @@ describe('limbo transaction wrapper', () => {
 			buildLimboTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/limbo/limbo.js', { playV2 }, '../../src/transactions/limbo.js');
+		}>('../../../src/contracts/limbo/limbo.js', { playV2 }, '../../../src/transactions/limbo.js');
 
 		buildLimboTransaction({
 			owner: '0x123',
@@ -438,7 +438,11 @@ describe('plinko transaction wrapper', () => {
 			buildPlinkoTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/plinko/plinko.js', { playV2 }, '../../src/transactions/plinko.js');
+		}>(
+			'../../../src/contracts/plinko/plinko.js',
+			{ playV2 },
+			'../../../src/transactions/plinko.js',
+		);
 
 		buildPlinkoTransaction({
 			owner: '0x123',
@@ -455,7 +459,7 @@ describe('plinko transaction wrapper', () => {
 	});
 
 	it('rejects config ids outside the u8 range', async () => {
-		const { buildPlinkoTransaction } = await import('../../src/transactions/plinko.js');
+		const { buildPlinkoTransaction } = await import('../../../src/transactions/plinko.js');
 
 		expect(() =>
 			buildPlinkoTransaction({
@@ -476,7 +480,7 @@ describe('range transaction wrapper', () => {
 			buildRangeTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/range/range.js', { playV2 }, '../../src/transactions/range.js');
+		}>('../../../src/contracts/range/range.js', { playV2 }, '../../../src/transactions/range.js');
 
 		buildRangeTransaction({
 			owner: '0x123',
@@ -504,7 +508,7 @@ describe('wheel transaction wrapper', () => {
 			buildWheelTransaction: (
 				options: Record<string, unknown>,
 			) => ReturnType<typeof buildCoinflipTransaction>;
-		}>('../../src/contracts/wheel/wheel.js', { playV2 }, '../../src/transactions/wheel.js');
+		}>('../../../src/contracts/wheel/wheel.js', { playV2 }, '../../../src/transactions/wheel.js');
 
 		buildWheelTransaction({
 			owner: '0x123',
@@ -521,7 +525,7 @@ describe('wheel transaction wrapper', () => {
 	});
 
 	it('rejects invalid wheel config ids', async () => {
-		const { buildWheelTransaction } = await import('../../src/transactions/wheel.js');
+		const { buildWheelTransaction } = await import('../../../src/transactions/wheel.js');
 
 		expect(() =>
 			buildWheelTransaction({
@@ -541,7 +545,11 @@ describe('soccer transaction wrapper', () => {
 		const { buildSoccerTransaction: buildSoccerTransactionWithMock } =
 			await loadTransactionModuleWithMock<{
 				buildSoccerTransaction: typeof buildSoccerTransaction;
-			}>('../../src/contracts/soccer/soccer.js', { playV2 }, '../../src/transactions/soccer.js');
+			}>(
+				'../../../src/contracts/soccer/soccer.js',
+				{ playV2 },
+				'../../../src/transactions/soccer.js',
+			);
 
 		buildSoccerTransactionWithMock({
 			owner: '0x123',
@@ -584,13 +592,13 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame,
 					joinGameV2: createUnusedContractCallMock(),
 					cancelGame: createUnusedContractCallMock(),
 				},
-				'../../src/transactions/pvp-coinflip.js',
+				'../../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 
@@ -636,7 +644,7 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame: createUnusedContractCallMock(),
 					joinGameV2,
@@ -645,7 +653,7 @@ describe('pvp coinflip transaction wrapper', () => {
 						get: getGame,
 					},
 				},
-				'../../src/transactions/pvp-coinflip.js',
+				'../../../src/transactions/pvp-coinflip.js',
 			);
 		const partner = normalizeSuiAddress('0x456');
 		const client = {} as never;
@@ -687,13 +695,13 @@ describe('pvp coinflip transaction wrapper', () => {
 			await loadTransactionModuleWithMock<{
 				buildPvPCoinflipTransaction: typeof buildPvPCoinflipTransaction;
 			}>(
-				'../../src/contracts/pvp-coinflip/pvp_coinflip.js',
+				'../../../src/contracts/pvp-coinflip/pvp_coinflip.js',
 				{
 					createGame: createUnusedContractCallMock(),
 					joinGameV2: createUnusedContractCallMock(),
 					cancelGame,
 				},
-				'../../src/transactions/pvp-coinflip.js',
+				'../../../src/transactions/pvp-coinflip.js',
 			);
 
 		buildPvPCoinflipTransactionWithMock({

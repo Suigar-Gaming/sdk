@@ -3,13 +3,13 @@
 
 import { normalizeStructTag, SUI_DECIMALS, SUI_TYPE_ARG } from '@mysten/sui/utils';
 import { describe, expect, it } from 'vitest';
-import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../../src/configs/index.js';
-import { TypeName } from '../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
+import { COINS, OBJECT_IDS, PACKAGE_IDS } from '../../../src/configs/index.js';
+import { TypeName } from '../../../src/contracts/core/deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 import {
 	Parameters as PlinkoParameters,
 	PlinkoSettingsKey,
-} from '../../src/contracts/plinko/plinko.js';
-import { resolvePriceInfoObjectId, resolveSuigarConfig } from '../../src/helpers/index.js';
+} from '../../../src/contracts/plinko/plinko.js';
+import { resolvePriceInfoObjectId, resolveSuigarConfig } from '../../../src/helpers/index.js';
 
 describe('resolveSuigarConfig', () => {
 	it('resolves NFT package ids and default coin types', () => {

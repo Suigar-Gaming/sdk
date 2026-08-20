@@ -37,7 +37,6 @@ import {
 	buildSoccerTransaction,
 	buildWheelTransaction,
 } from './transactions/index.js';
-import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	ClaimReferralCommissionOptions,
@@ -55,6 +54,7 @@ import type {
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
+import { getTtlCacheKey } from './utils/cache.js';
 import { DEFAULT_QUERY_LIMIT, parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
@@ -85,7 +85,7 @@ export class SuigarClient {
 	#partner: string | undefined;
 
 	#cache: ClientCache;
-	#ttlCache: TtlClientCache;
+	#cacheTtl: number;
 
 	constructor({
 		client,
@@ -104,12 +104,8 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache.scope(['@suigar/sdk', name]);
-		this.#ttlCache = this.#cache.readSync(['ttl-cache'], () => {
-			return new TtlClientCache({
-				ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
-			});
-		});
+		this.#cache = client.cache.scope([`@suigar/sdk:${name}`]);
+		this.#cacheTtl = cacheTtl ?? DEFAULT_CACHE_TTL_MS;
 
 		this.#config = resolveSuigarConfig({ network, config });
 	}
@@ -171,46 +167,58 @@ export class SuigarClient {
 		});
 		const coinType = normalizeStructTag(options.coinType);
 
-		return this.#ttlCache.read(
-			['getGameParameters', sweetHouseObjectId, gameSettingsKeyType, coinType],
-			async () => {
-				const { signal } = options;
+		const cacheKey: [string, ...Array<string>] = [
+			'getGameParameters',
+			sweetHouseObjectId,
+			gameSettingsKeyType,
+			coinType,
+		];
+		const load = async () => {
+			const { signal } = options;
 
-				const {
-					object: { objectId },
-				} = await this.#client.core.getDynamicObjectField({
-					parentId: sweetHouseObjectId,
-					name: {
-						type: gameSettingsKeyType,
-						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
-					},
-					signal,
-				});
+			const {
+				object: { objectId },
+			} = await this.#client.core.getDynamicObjectField({
+				parentId: sweetHouseObjectId,
+				name: {
+					type: gameSettingsKeyType,
+					bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
+				},
+				signal,
+			});
 
-				const { object } = await this.#client.core.getDynamicObjectField({
-					parentId: objectId,
-					name: {
-						type: TypeName.name,
-						bcs: TypeName.serialize({
-							name: coinType.replace(/^0x/u, ''),
-						}).toBytes(),
-					},
-					include: { content: true },
-					signal,
-				});
+			const { object } = await this.#client.core.getDynamicObjectField({
+				parentId: objectId,
+				name: {
+					type: TypeName.name,
+					bcs: TypeName.serialize({
+						name: coinType.replace(/^0x/u, ''),
+					}).toBytes(),
+				},
+				include: { content: true },
+				signal,
+			});
 
-				if (!object?.content) {
-					throw new Error(
-						`Missing parameters object content for ${game} and coin type ${coinType}`,
-					);
-				}
+			if (!object?.content) {
+				throw new Error(`Missing parameters object content for ${game} and coin type ${coinType}`);
+			}
 
-				return normalizeGameParameterValues(
-					gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
-				);
-			},
-			{ ignoreCache: options.ignoreCache },
-		) as Promise<GameParameters<TGame>>;
+			return normalizeGameParameterValues(
+				gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
+			);
+		};
+
+		if (options.ignoreCache) {
+			this.#cache.clear(cacheKey);
+		}
+
+		if (this.#cacheTtl <= 0) {
+			return load() as Promise<GameParameters<TGame>>;
+		}
+
+		return this.#cache.read([...cacheKey, getTtlCacheKey(this.#cacheTtl)], load) as Promise<
+			GameParameters<TGame>
+		>;
 	}
 
 	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {

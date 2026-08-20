@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { normalizeGameParameterValues } from '../../src/helpers/index.js';
+import { normalizeGameParameterValues } from '../../../src/helpers/index.js';
 
 describe('normalizeGameParameterValues', () => {
 	it('decodes nested Move floats while preserving integer strings', () => {
