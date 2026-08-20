@@ -22,8 +22,8 @@ import {
 import { TypeName } from './contracts/stdlib/type_name.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
-	getTtlCacheKey,
 	normalizeGameParameterValues,
+	readCache,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -105,7 +105,7 @@ export class SuigarClient {
 		this.#client = client;
 		this.#partner = partner;
 		this.#cache = client.cache.scope(`@suigar/sdk:${name}`);
-		this.#cacheTtl = cacheTtl ? (cacheTtl <= 0 ? 0 : cacheTtl) : DEFAULT_CACHE_TTL_MS;
+		this.#cacheTtl = cacheTtl ?? DEFAULT_CACHE_TTL_MS;
 
 		this.#config = resolveSuigarConfig({ network, config });
 	}
@@ -205,20 +205,18 @@ export class SuigarClient {
 
 			return normalizeGameParameterValues(
 				gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
-			);
+			) as Promise<GameParameters<TGame>>;
 		};
 
-		if (options.ignoreCache) {
-			this.#cache.clear(cacheKey);
-		}
-
-		if (this.#cacheTtl <= 0) {
-			return load() as Promise<GameParameters<TGame>>;
-		}
-
-		return this.#cache.read([...cacheKey, getTtlCacheKey(this.#cacheTtl)], load) as Promise<
-			GameParameters<TGame>
-		>;
+		return readCache({
+			cache: this.#cache,
+			key: cacheKey,
+			load,
+			options: {
+				ignoreCache: options.ignoreCache,
+				ttlMs: this.#cacheTtl,
+			},
+		});
 	}
 
 	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {
