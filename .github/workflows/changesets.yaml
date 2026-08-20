@@ -33,7 +33,7 @@ jobs:
 
       - name: Create release PR or publish packages
         id: changesets
-        uses: changesets/action@v2.1.0
+        uses: changesets/action@v2.1.1
         with:
           version-script: pnpm run changeset:version
           publish-script: pnpm run release
