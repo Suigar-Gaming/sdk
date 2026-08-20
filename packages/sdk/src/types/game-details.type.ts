@@ -36,6 +36,14 @@ const COINFLIP_GAME_DETAILS_SCHEMA = {
 	coin_outcome: 'string',
 } satisfies GameDetailsSchema;
 
+const KENO_GAME_DETAILS_SCHEMA = {
+	keno_config: 'u8',
+	hit_count: 'u8',
+	multiplier: 'float',
+	payout_amount: 'u64',
+	draw_value: 'u64',
+} satisfies GameDetailsSchema;
+
 const PVP_COINFLIP_GAME_DETAILS_SCHEMA = {
 	pvp_result: 'string',
 } satisfies GameDetailsSchema;
@@ -95,6 +103,7 @@ const SOCCER_GAME_DETAILS_SCHEMA = {
 
 export const GAME_DETAILS_SCHEMAS = {
 	coinflip: COINFLIP_GAME_DETAILS_SCHEMA,
+	keno: KENO_GAME_DETAILS_SCHEMA,
 	limbo: LIMBO_GAME_DETAILS_SCHEMA,
 	plinko: PLINKO_GAME_DETAILS_SCHEMA,
 	'pvp-coinflip': PVP_COINFLIP_GAME_DETAILS_SCHEMA,

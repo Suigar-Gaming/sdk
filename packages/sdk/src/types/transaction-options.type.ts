@@ -61,6 +61,11 @@ export type CoinflipTransactionOptions = SharedBetTransactionOptions & {
 	side: CoinSide;
 };
 
+export type KenoTransactionOptions = SharedBetTransactionOptions & {
+	configId: number;
+	picks: Array<number>;
+};
+
 export type LimboTransactionOptions = SharedBetTransactionOptions & {
 	targetMultiplier: number;
 	scale?: number;

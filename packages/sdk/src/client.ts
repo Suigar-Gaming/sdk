@@ -30,6 +30,7 @@ import {
 	buildClaimReferralCommissionTransaction,
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
+	buildKenoTransaction,
 	buildLimboTransaction,
 	buildMintNftV1Transaction,
 	buildPlinkoTransaction,
@@ -364,6 +365,12 @@ export class SuigarClient {
 			switch (options.game) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					});
+				case 'keno':
+					return buildKenoTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,

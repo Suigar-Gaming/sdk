@@ -4,6 +4,7 @@
 import type { PvPCoinflipAction, StandardGame } from './game.type.js';
 import type {
 	CoinflipTransactionOptions,
+	KenoTransactionOptions,
 	LimboTransactionOptions,
 	PlinkoTransactionOptions,
 	PvPCoinflipTransactionOptions,
@@ -17,6 +18,7 @@ type WithoutConfig<T> = Omit<T, 'config'>;
 
 type StandardGameTransactionOptionsRegistry = {
 	coinflip: CoinflipTransactionOptions;
+	keno: KenoTransactionOptions;
 	wheel: WheelTransactionOptions;
 	limbo: LimboTransactionOptions;
 	plinko: PlinkoTransactionOptions;

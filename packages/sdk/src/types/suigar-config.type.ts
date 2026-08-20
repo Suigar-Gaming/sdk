@@ -46,6 +46,7 @@ export type SuigarPackage =
 	| 'core'
 	| 'referral'
 	| 'coinflip'
+	| 'keno'
 	| 'limbo'
 	| 'plinko'
 	| 'pvpCoinflip'

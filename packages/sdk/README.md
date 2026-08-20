@@ -96,7 +96,7 @@ import type {
 
 Current game-type subpath exports:
 
-- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `CreateGameBetOptions`, `CoinflipTransactionOptions`, `LimboTransactionOptions`, `PlinkoTransactionOptions`, `RangeTransactionOptions`, `SoccerTransactionOptions`, `WheelTransactionOptions`, `CreatePvPCoinflipTransactionOptions`, `JoinPvPCoinflipTransactionOptions`, `CancelPvPCoinflipTransactionOptions`
+- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `CreateGameBetOptions`, `CoinflipTransactionOptions`, `KenoTransactionOptions`, `LimboTransactionOptions`, `PlinkoTransactionOptions`, `RangeTransactionOptions`, `SoccerTransactionOptions`, `WheelTransactionOptions`, `CreatePvPCoinflipTransactionOptions`, `JoinPvPCoinflipTransactionOptions`, `CancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
@@ -319,6 +319,7 @@ Transaction builders live under `client.suigar.tx`.
 Use `createGameBet({ game, ...options })` for:
 
 - `coinflip`
+- `keno`
 - `limbo`
 - `plinko`
 - `range`
@@ -362,13 +363,15 @@ Error behavior:
 
 - `RangeError` when `gameId` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
-- `RangeError` when a Plinko or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Keno, Plinko, or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Keno `picks` value is not a `u8` integer (`0..255`)
 - `RangeError` when a Soccer `configId` or `shotZoneId` is not a `u8` integer (`0..255`), or its `countryId` is not a `u16` integer (`0..65535`)
 - `TypeError` when those selection values are not finite numbers or plain integer strings
 
 Per-game options:
 
 - `coinflip`: `side: 'heads' | 'tails'`
+- `keno`: `configId: number`, `picks: number[]`
 - `limbo`: `targetMultiplier: number`, `scale?: number`
 - `plinko`: `configId: number`
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
@@ -404,7 +407,7 @@ const rangeTx = client.suigar.tx.createGameBet({
 > - `range` converts each point with `Math.round(value * scale)`
 > - `range` points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
 > - With the default `range` scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-> - `plinko`, `soccer`, and `wheel` `configId` values must fit in `u8`; `soccer` `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
+> - `keno`, `plinko`, `soccer`, and `wheel` `configId` values must fit in `u8`; Keno `picks` values must fit in `u8`; `soccer` `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
 
 > **Tip:**
 >
@@ -630,7 +633,7 @@ const gameDetails = parseGameDetails({
 
 `parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
 
-- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
+- `{ gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
 - `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 

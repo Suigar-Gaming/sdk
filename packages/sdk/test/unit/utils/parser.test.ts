@@ -28,7 +28,7 @@ describe('parseGameEvent', () => {
 	it('models valid game and event combinations as a discriminated union', () => {
 		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
 			| {
-					gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
 					eventName: 'BetResultEvent';
 			  }
 			| {
@@ -74,7 +74,15 @@ describe('parseGameEvent', () => {
 	});
 
 	it('parses every supported standard bet result game family', () => {
-		for (const gameId of ['coinflip', 'limbo', 'plinko', 'range', 'soccer', 'wheel'] as const) {
+		for (const gameId of [
+			'coinflip',
+			'keno',
+			'limbo',
+			'plinko',
+			'range',
+			'soccer',
+			'wheel',
+		] as const) {
 			expect(
 				parseGameEvent(
 					createEvent({

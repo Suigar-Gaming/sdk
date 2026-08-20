@@ -3,6 +3,7 @@
 
 export const GAMES = [
 	'coinflip',
+	'keno',
 	'limbo',
 	'plinko',
 	'pvp-coinflip',

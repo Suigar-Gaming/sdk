@@ -6,6 +6,7 @@ export type {
 	CoinSide,
 	CancelPvPCoinflipTransactionOptions,
 	CoinflipTransactionOptions,
+	KenoTransactionOptions,
 	CreatePvPCoinflipTransactionOptions,
 	JoinPvPCoinflipTransactionOptions,
 	LimboTransactionOptions,
