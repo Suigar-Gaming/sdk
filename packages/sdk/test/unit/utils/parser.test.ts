@@ -263,6 +263,7 @@ describe('parseGameDetails', () => {
 					{ key: 'picks', value: [5, 1, 2, 3, 4, 5] },
 					{ key: 'drawn_numbers', value: [10, 6, 36, 1, 25, 22, 37, 4, 30, 33, 40] },
 					{ key: 'hit_count', value: [2] },
+					{ key: 'actual_rtp', value: encodeFloat(0.97) },
 				]),
 			}),
 		).toEqual({
@@ -271,6 +272,7 @@ describe('parseGameDetails', () => {
 			picks: [1, 2, 3, 4, 5],
 			drawn_numbers: [6, 36, 1, 25, 22, 37, 4, 30, 33, 40],
 			hit_count: 2,
+			actual_rtp: 0.97,
 		});
 	});
 

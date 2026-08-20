@@ -46,7 +46,7 @@ const KENO_GAME_DETAILS_SCHEMA = {
 	hit_count: 'u8',
 	multiplier: 'float',
 	payout_amount: 'u64',
-	draw_value: 'u64',
+	actual_rtp: 'float',
 } satisfies GameDetailsSchema;
 
 const PVP_COINFLIP_GAME_DETAILS_SCHEMA = {
