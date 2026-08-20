@@ -142,7 +142,7 @@ Key files:
 
 There are two transaction families and they must not be mixed:
 
-- **Standard games** use `client.suigar.tx.createGameBet({ game, ...options })` for `coinflip`, `limbo`, `plinko`, `range`, `soccer`, and `wheel`.
+- **Standard games** use `client.suigar.tx.createGameBet({ game, ...options })` for `coinflip`, `keno`, `limbo`, `plinko`, `range`, `soccer`, and `wheel`.
 - **PvP games** use dedicated per-game transaction properties, such as `client.suigar.tx.pvpCoinflip`, and should keep PvP game rules separate from standard game flows.
 - **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
   - Calling it without options uses `DEFAULT_QUERY_LIMIT` (`50`); supply `limit: DEFAULT_QUERY_LIMIT` when also passing `cursor` or another query option.
@@ -172,7 +172,7 @@ Treat unsupported network resolution and unsupported configured coin types as `R
 
 #### Game Parameters
 
-`client.suigar.getGameParameters({ game, coinType, ...options })` requires a coin type. It reads the selected game's settings object from SweetHouse, then that coin's `Parameters<T>` object. It parses the result, decodes Move float fields into JavaScript numbers—including nested Plinko and Wheel multipliers—and caches it for `cacheTtl`.
+`client.suigar.getGameParameters({ game, coinType, ...options })` requires a coin type. It reads the selected game's settings object from SweetHouse, then that coin's `Parameters<T>` object. It parses the result, decodes Move float fields into JavaScript numbers—including nested Keno, Plinko, and Wheel multipliers—and caches it for `cacheTtl`.
 
 This is a core invariant: standard game transactions must fail clearly when the required price info object configuration is not available for the chosen coin type.
 
