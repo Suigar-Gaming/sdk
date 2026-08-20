@@ -1,5 +1,15 @@
 # @suigar/sdk
 
+## 2.0.0-beta.39
+
+### Minor Changes
+
+- [#158](https://github.com/Suigar-Gaming/ts-sdks/pull/158) [`e82da77`](https://github.com/Suigar-Gaming/ts-sdks/commit/e82da77a0b0b2d937b8396a48c7a0a396f17ac3e) - Treat non-positive `cacheTtl` values as disabling SDK-managed game parameter caching and route TTL cache reads through a shared internal cache helper.
+
+  Add `SuigarClient.reset()` to clear cached SDK reads for the extension instance.
+
+- [#157](https://github.com/Suigar-Gaming/ts-sdks/pull/157) [`77a9247`](https://github.com/Suigar-Gaming/ts-sdks/commit/77a924767bc68edaeb8c8c0470a916a86e679504) - Use generated MVR package defaults for Suigar game, referral, and core bindings while keeping optional package id overrides for deployments that need them. `nftV1` remains the only statically configured package id. Game parameter settings lookup and PvP coinflip registry lookup now also respect overridden game package ids.
+
 ## 2.0.0-beta.38
 
 ### Patch Changes
