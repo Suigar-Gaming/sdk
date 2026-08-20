@@ -90,12 +90,14 @@ function toCodeBlock(factoryLine: string, codeLines: Array<string>) {
 	return `${factoryLine}${objectPrefix}\n${codeLines.map((line) => `\t${line}`).join('\n')}\n});`;
 }
 
-function parseKenoPicks(value: string) {
-	const picks = value
-		.split(',')
-		.map((pick) => pick.trim())
-		.filter(Boolean)
-		.map(Number);
+function parseKenoPicks(value: Array<string> | string) {
+	const rawPicks = Array.isArray(value)
+		? value
+		: value
+				.split(',')
+				.map((pick) => pick.trim())
+				.filter(Boolean);
+	const picks = rawPicks.map(Number);
 
 	if (picks.length === 0 || picks.some((pick) => !Number.isSafeInteger(pick))) {
 		throw new Error('Keno picks must be comma-separated whole numbers.');

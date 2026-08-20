@@ -86,6 +86,7 @@ import type {
 	PvPCoinflipLobbyGame,
 	PvPGameId,
 	PvPGameParametersSummary,
+	GameConfigOption,
 	StakeRangeSummary,
 	StandardForms,
 	StandardGameId,
@@ -127,6 +128,41 @@ function clampBetCount<T extends StandardSharedFields>(form: T, max: bigint): T 
 
 	return nextBetCount === form.betCount ? form : { ...form, betCount: nextBetCount };
 }
+
+function normalizeKenoPickValues(value: unknown): Array<string> {
+	const rawValues = Array.isArray(value)
+		? value
+		: typeof value === 'string'
+			? value.split(',')
+			: DEFAULT_STANDARD_FORMS.keno.picks;
+	const picks = new Set<string>();
+
+	for (const rawValue of rawValues) {
+		const pick = String(rawValue).trim();
+		if (pick) {
+			picks.add(pick);
+		}
+	}
+
+	return [...picks].sort((left, right) => Number(left) - Number(right));
+}
+
+function clampKenoPicks(picks: Array<string>, configOption: GameConfigOption | null) {
+	const kenoConfig = configOption?.keno;
+	if (!kenoConfig) {
+		return picks;
+	}
+
+	return picks
+		.filter((pick) => {
+			const numericPick = Number(pick);
+			return (
+				Number.isSafeInteger(numericPick) && numericPick >= 1 && numericPick <= kenoConfig.boardSize
+			);
+		})
+		.slice(0, kenoConfig.maxPicks);
+}
+
 type LobbyState = {
 	games: Array<PvPCoinflipLobbyGame>;
 	error: string | null;
@@ -1227,21 +1263,25 @@ function useIntegrationState({
 
 		if (standardGame === 'keno') {
 			nextForms.keno.configId = resolvePlayableConfigId(
-				standardForms.keno.configId,
+				nextForms.keno.configId,
 				standardGameParameters?.configOptions,
+			);
+			nextForms.keno.picks = clampKenoPicks(
+				normalizeKenoPickValues(nextForms.keno.picks),
+				findGameConfigOption(standardGameParameters, nextForms.keno.configId),
 			);
 		}
 
 		if (standardGame === 'plinko') {
 			nextForms.plinko.configId = resolvePlayableConfigId(
-				standardForms.plinko.configId,
+				nextForms.plinko.configId,
 				standardGameParameters?.configOptions,
 			);
 		}
 
 		if (standardGame === 'wheel') {
 			nextForms.wheel.configId = resolvePlayableConfigId(
-				standardForms.wheel.configId,
+				nextForms.wheel.configId,
 				standardGameParameters?.configOptions,
 			);
 		}

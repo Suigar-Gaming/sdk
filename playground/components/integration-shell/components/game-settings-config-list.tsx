@@ -93,6 +93,7 @@ export function GameSettingsConfigList({
 										<div className="flex flex-wrap gap-1.5">
 											{option.multiplierValues.map((multiplier) => (
 												<FieldCode key={multiplier.id} className="shrink-0">
+													{multiplier.label ? `${multiplier.label}: ` : null}
 													{multiplier.value}
 												</FieldCode>
 											))}

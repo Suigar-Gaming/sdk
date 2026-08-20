@@ -2,6 +2,7 @@
 
 import type * as React from 'react';
 import { StandardGameFields } from '@/components/forms/shared-game-fields';
+import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,6 +14,16 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import type { GameConfigOption, KenoFormValues } from '@/lib/suigar-types';
+import { cn } from '@/lib/utils';
+
+function toPickValues(value: KenoFormValues['picks'] | string): Array<string> {
+	return Array.isArray(value)
+		? value
+		: value
+				.split(',')
+				.map((pick) => pick.trim())
+				.filter(Boolean);
+}
 
 export function KenoForm({
 	value,
@@ -35,6 +46,27 @@ export function KenoForm({
 }) {
 	const selectedConfig = configOptions?.find((option) => option.id === value.configId) ?? null;
 	const playableConfigOptions = configOptions?.filter((option) => option.isPlayable) ?? [];
+	const selectedPicks = toPickValues(value.picks);
+	const boardSize = selectedConfig?.keno?.boardSize ?? 40;
+	const minPicks = selectedConfig?.keno?.minPicks ?? 1;
+	const maxPicks = selectedConfig?.keno?.maxPicks ?? 10;
+	const selectedPickSet = new Set(selectedPicks);
+	const boardPositions = Array.from({ length: boardSize }, (_item, index) => String(index + 1));
+
+	function togglePick(pick: string) {
+		if (selectedPickSet.has(pick)) {
+			onChange({ picks: selectedPicks.filter((item) => item !== pick) });
+			return;
+		}
+
+		if (selectedPicks.length >= maxPicks) {
+			return;
+		}
+
+		onChange({
+			picks: [...selectedPicks, pick].sort((left, right) => Number(left) - Number(right)),
+		});
+	}
 
 	return (
 		<div className="space-y-6">
@@ -86,15 +118,37 @@ export function KenoForm({
 				</FieldDescription>
 			</Field>
 			<Field>
-				<FieldLabel htmlFor="kenoPicks">Picks</FieldLabel>
-				<Input
-					id="kenoPicks"
-					className="h-11 px-4 bg-background/55 rounded-2xl"
-					value={value.picks}
-					onChange={(event) => onChange({ picks: event.target.value })}
-				/>
+				<div className="flex items-center justify-between gap-3">
+					<FieldLabel>Picks</FieldLabel>
+					<span className="text-xs font-medium text-muted-foreground">
+						{selectedPicks.length}/{maxPicks}
+					</span>
+				</div>
+				<fieldset className="grid grid-cols-8 gap-1.5 sm:grid-cols-10">
+					{boardPositions.map((pick) => {
+						const isSelected = selectedPickSet.has(pick);
+						const isDisabled = !isSelected && selectedPicks.length >= maxPicks;
+
+						return (
+							<Button
+								key={pick}
+								type="button"
+								variant={isSelected ? 'control-active' : 'control'}
+								size="icon-sm"
+								aria-pressed={isSelected}
+								disabled={isDisabled}
+								onClick={() => togglePick(pick)}
+								className={cn('aspect-square h-auto min-h-8 w-full rounded-lg p-0 text-xs')}
+							>
+								{pick}
+							</Button>
+						);
+					})}
+				</fieldset>
 				{picksDescription ?? (
-					<FieldDescription size="sm">Comma-separated board positions.</FieldDescription>
+					<FieldDescription size="sm">
+						Select {minPicks} to {maxPicks} board positions.
+					</FieldDescription>
 				)}
 			</Field>
 			<StandardGameFields

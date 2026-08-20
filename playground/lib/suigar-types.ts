@@ -52,8 +52,15 @@ export type GameConfigOption = {
 	}>;
 	multiplierValues?: Array<{
 		id: string;
+		label?: string;
 		value: string;
 	}>;
+	keno?: {
+		boardSize: number;
+		drawCount: number;
+		minPicks: number;
+		maxPicks: number;
+	};
 	isPlayable: boolean;
 	stakeRange: StakeRangeSummary;
 };
@@ -95,7 +102,7 @@ export type CoinflipFormValues = StandardSharedFields & {
 
 export type KenoFormValues = StandardSharedFields & {
 	configId: string;
-	picks: string;
+	picks: Array<string>;
 };
 
 export type LimboFormValues = StandardSharedFields & {

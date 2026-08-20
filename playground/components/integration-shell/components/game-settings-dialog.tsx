@@ -277,6 +277,7 @@ function GameSettingsOverview({
 												<div className="flex flex-wrap gap-1.5">
 													{activeMultiplierValues.map((multiplier) => (
 														<FieldCode key={multiplier.id} className="shrink-0 justify-center">
+															{multiplier.label ? `${multiplier.label}: ` : null}
 															{multiplier.value}
 														</FieldCode>
 													))}

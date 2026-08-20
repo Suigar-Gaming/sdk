@@ -81,6 +81,46 @@ function toConfigOptions<TEntry extends ConfigEntry>(
 	});
 }
 
+function toKenoPaytableMultipliers({
+	paytable,
+	minPicks,
+	maxPicks,
+}: {
+	paytable: Array<number>;
+	minPicks: number;
+	maxPicks: number;
+}): NonNullable<GameConfigOption['multiplierValues']> {
+	const expectedLength = Array.from(
+		{ length: maxPicks - minPicks + 1 },
+		(_value, index) => minPicks + index + 1,
+	).reduce((total, item) => total + item, 0);
+
+	if (expectedLength !== paytable.length) {
+		return paytable.map((value, index) => ({
+			id: String(index),
+			label: `Entry ${index}`,
+			value: String(value),
+		}));
+	}
+
+	let offset = 0;
+	return Array.from({ length: maxPicks - minPicks + 1 }, (_value, pickIndex) => {
+		const pickCount = minPicks + pickIndex;
+		return Array.from({ length: pickCount + 1 }, (_hitValue, hitCount) => {
+			const value = paytable[offset];
+			const id = `${pickCount}-${hitCount}`;
+			offset += 1;
+			return {
+				id,
+				label: `${pickCount} pick${pickCount === 1 ? '' : 's'}, ${hitCount} hit${
+					hitCount === 1 ? '' : 's'
+				}`,
+				value: String(value),
+			};
+		});
+	}).flat();
+}
+
 export function summarizeStandardGameParameters(
 	game: StandardGameId,
 	parameters: StandardGameParametersResult,
@@ -154,12 +194,19 @@ export function summarizeStandardGameParameters(
 						label: 'Picks',
 						value: `${entry.value.min_picks}-${entry.value.max_picks}`,
 					},
-					{ label: 'Paytable', value: String(entry.value.paytable.length) },
+					{ label: 'Paytable entries', value: String(entry.value.paytable.length) },
 				],
-				multiplierValues: entry.value.paytable.map((value, index) => ({
-					id: String(index),
-					value: String(value),
-				})),
+				multiplierValues: toKenoPaytableMultipliers({
+					paytable: entry.value.paytable,
+					minPicks: entry.value.min_picks,
+					maxPicks: entry.value.max_picks,
+				}),
+				keno: {
+					boardSize: entry.value.board_size,
+					drawCount: entry.value.draw_count,
+					minPicks: entry.value.min_picks,
+					maxPicks: entry.value.max_picks,
+				},
 			}));
 			const firstPlayableConfig = configs.find((config) => config.isPlayable) ?? configs[0];
 			const firstConfig = firstPlayableConfig

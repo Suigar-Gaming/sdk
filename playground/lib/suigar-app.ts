@@ -20,7 +20,7 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 	keno: {
 		...DEFAULT_STANDARD_SHARED_FIELDS,
 		configId: '',
-		picks: '1, 2, 3, 4, 5',
+		picks: ['1', '2', '3', '4', '5'],
 	},
 	limbo: {
 		...DEFAULT_STANDARD_SHARED_FIELDS,
