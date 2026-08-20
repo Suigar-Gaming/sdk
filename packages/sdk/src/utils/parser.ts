@@ -11,6 +11,9 @@ import type {
 	Game,
 	GameDetail,
 	GameDetails,
+	GameDetailScalarValueType,
+	GameDetailVectorElementType,
+	GameDetailVectorValueType,
 	GameDetailValueType,
 	GameEvent,
 	MoveFloat,
@@ -77,19 +80,55 @@ function parseStringGameDetail(value: Array<number>): string {
 	}
 }
 
-function parseVectorU8GameDetail(value: Array<number>): Array<number> {
+function normalizeBcsGameDetailValue<TValueType extends GameDetailScalarValueType>(
+	valueType: TValueType,
+	parsed: unknown,
+): GameDetail<TValueType> {
+	switch (valueType) {
+		case 'float':
+			return fromMoveFloat(parsed as MoveFloat) as GameDetail<TValueType>;
+		case 'u64':
+			return Number(parsed) as GameDetail<TValueType>;
+		default:
+			return parsed as GameDetail<TValueType>;
+	}
+}
+
+function parseVectorValueType(valueType: GameDetailValueType): GameDetailVectorElementType | null {
+	if (!valueType.startsWith('vector<') || !valueType.endsWith('>')) {
+		return null;
+	}
+
+	const elementType = valueType.slice(7, -1);
+	return elementType in GAME_DETAIL_BCS && elementType !== 'string'
+		? (elementType as GameDetailVectorElementType)
+		: null;
+}
+
+function parseVectorGameDetail<TValueType extends GameDetailVectorValueType>({
+	valueType,
+	elementType,
+	value,
+}: {
+	valueType: TValueType;
+	elementType: GameDetailVectorElementType;
+	value: Array<number>;
+}): GameDetail<TValueType> {
 	const bytes = Uint8Array.from(value);
-	const parsed = GAME_DETAIL_BCS.vectorU8.parse(bytes);
-	const serialized = GAME_DETAIL_BCS.vectorU8.serialize(parsed).toBytes();
+	const vectorBcs = bcs.vector(GAME_DETAIL_BCS[elementType]);
+	const parsed = vectorBcs.parse(bytes);
+	const serialized = vectorBcs.serialize(parsed).toBytes();
 
 	if (
 		serialized.length !== bytes.length ||
 		serialized.some((byte, index) => byte !== bytes[index])
 	) {
-		throw new TypeError('Invalid BCS vector<u8> game detail value.');
+		throw new TypeError(`Invalid BCS ${valueType} game detail value.`);
 	}
 
-	return parsed;
+	return parsed.map((item) =>
+		normalizeBcsGameDetailValue(elementType, item),
+	) as GameDetail<TValueType>;
 }
 
 function parseGameDetail<TValueType extends GameDetailValueType>({
@@ -102,20 +141,19 @@ function parseGameDetail<TValueType extends GameDetailValueType>({
 	if (valueType === 'string') {
 		return parseStringGameDetail(value) as GameDetail<TValueType>;
 	}
-	if (valueType === 'vectorU8') {
-		return parseVectorU8GameDetail(value) as GameDetail<TValueType>;
+
+	const vectorElementType = parseVectorValueType(valueType);
+	if (vectorElementType) {
+		return parseVectorGameDetail({
+			valueType: valueType as GameDetailVectorValueType,
+			elementType: vectorElementType,
+			value,
+		}) as GameDetail<TValueType>;
 	}
 
-	const parsed = GAME_DETAIL_BCS[valueType].parse(Uint8Array.from(value));
-
-	switch (valueType) {
-		case 'float':
-			return fromMoveFloat(parsed as MoveFloat) as GameDetail<TValueType>;
-		case 'u64':
-			return Number(parsed) as GameDetail<TValueType>;
-		default:
-			return parsed as GameDetail<TValueType>;
-	}
+	const scalarValueType = valueType as GameDetailScalarValueType;
+	const parsed = GAME_DETAIL_BCS[scalarValueType].parse(Uint8Array.from(value));
+	return normalizeBcsGameDetailValue(scalarValueType, parsed) as GameDetail<TValueType>;
 }
 
 /**

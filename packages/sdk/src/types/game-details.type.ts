@@ -9,12 +9,22 @@ import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
 
-export type GameDetailValueType = 'u8' | 'vectorU8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
-export type GameDetailsSchema = Record<string, GameDetailValueType>;
+export type GameDetailScalarValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
+export type GameDetailVectorElementType = Exclude<GameDetailScalarValueType, 'string'>;
+export type GameDetailVectorValueType = `vector<${GameDetailVectorElementType}>`;
+export type GameDetailValueType = GameDetailScalarValueType | GameDetailVectorValueType;
+type GameDetailsSchema = Record<string, GameDetailValueType>;
 
-export type GameDetail<TValueType extends GameDetailValueType> = TValueType extends 'float' | 'u64'
+type ScalarGameDetail<TValueType extends GameDetailScalarValueType> = TValueType extends
+	| 'float'
+	| 'u64'
 	? number
 	: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
+
+export type GameDetail<TValueType extends GameDetailValueType> =
+	TValueType extends `vector<${infer TElementType extends GameDetailVectorElementType}>`
+		? Array<ScalarGameDetail<TElementType>>
+		: ScalarGameDetail<TValueType & GameDetailScalarValueType>;
 
 export type GameDetails<TGame extends Game> = {
 	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<
@@ -24,13 +34,12 @@ export type GameDetails<TGame extends Game> = {
 
 export const GAME_DETAIL_BCS = {
 	u8: bcs.U8,
-	vectorU8: bcs.vector(bcs.u8()),
 	u16: bcs.U16,
 	u64: bcs.U64,
 	bool: bcs.Bool,
 	float: Float,
 	string: bcs.String,
-} as const satisfies Record<GameDetailValueType, BcsType<any>>;
+} as const satisfies Record<GameDetailScalarValueType, BcsType<any>>;
 
 const COINFLIP_GAME_DETAILS_SCHEMA = {
 	player_bet: 'string',
@@ -41,8 +50,8 @@ const KENO_GAME_DETAILS_SCHEMA = {
 	keno_config: 'u8',
 	board_size: 'u8',
 	draw_count: 'u8',
-	picks: 'vectorU8',
-	drawn_numbers: 'vectorU8',
+	picks: 'vector<u8>',
+	drawn_numbers: 'vector<u8>',
 	hit_count: 'u8',
 	multiplier: 'float',
 	payout_amount: 'u64',
