@@ -23,6 +23,7 @@ import { TypeName } from './contracts/stdlib/type_name.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
 	normalizeGameParameterValues,
+	readCache,
 	resolveSuigarConfig,
 } from './helpers/index.js';
 import {
@@ -37,7 +38,6 @@ import {
 	buildSoccerTransaction,
 	buildWheelTransaction,
 } from './transactions/index.js';
-import { TtlClientCache } from './ttl-cache.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	ClaimReferralCommissionOptions,
@@ -85,7 +85,7 @@ export class SuigarClient {
 	#partner: string | undefined;
 
 	#cache: ClientCache;
-	#ttlCache: TtlClientCache;
+	#cacheTtl: number;
 
 	constructor({
 		client,
@@ -104,12 +104,8 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache.scope(['@suigar/sdk', name]);
-		this.#ttlCache = this.#cache.readSync(['ttl-cache'], () => {
-			return new TtlClientCache({
-				ttlMs: cacheTtl ?? DEFAULT_CACHE_TTL_MS,
-			});
-		});
+		this.#cache = client.cache.scope(`@suigar/sdk:${name}`);
+		this.#cacheTtl = cacheTtl ?? DEFAULT_CACHE_TTL_MS;
 
 		this.#config = resolveSuigarConfig({ network, config });
 	}
@@ -125,6 +121,16 @@ export class SuigarClient {
 	 */
 	getConfig(): SuigarConfig {
 		return this.#config;
+	}
+
+	/**
+	 * Clears all cached data for this Suigar client extension instance.
+	 *
+	 * Use this to force subsequent SDK reads to fetch fresh on-chain data,
+	 * including cached game parameters and PvP coinflip registry lookups.
+	 */
+	reset(): void {
+		this.#cache.clear();
 	}
 
 	/**
@@ -171,46 +177,56 @@ export class SuigarClient {
 		});
 		const coinType = normalizeStructTag(options.coinType);
 
-		return this.#ttlCache.read(
-			['getGameParameters', sweetHouseObjectId, gameSettingsKeyType, coinType],
-			async () => {
-				const { signal } = options;
+		const cacheKey: [string, ...Array<string>] = [
+			'getGameParameters',
+			sweetHouseObjectId,
+			gameSettingsKeyType,
+			coinType,
+		];
+		const load = async () => {
+			const { signal } = options;
 
-				const {
-					object: { objectId },
-				} = await this.#client.core.getDynamicObjectField({
-					parentId: sweetHouseObjectId,
-					name: {
-						type: gameSettingsKeyType,
-						bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
-					},
-					signal,
-				});
+			const {
+				object: { objectId },
+			} = await this.#client.core.getDynamicObjectField({
+				parentId: sweetHouseObjectId,
+				name: {
+					type: gameSettingsKeyType,
+					bcs: gameDefinition.settingsKey.serialize({ dummy_field: false }).toBytes(),
+				},
+				signal,
+			});
 
-				const { object } = await this.#client.core.getDynamicObjectField({
-					parentId: objectId,
-					name: {
-						type: TypeName.name,
-						bcs: TypeName.serialize({
-							name: coinType.replace(/^0x/u, ''),
-						}).toBytes(),
-					},
-					include: { content: true },
-					signal,
-				});
+			const { object } = await this.#client.core.getDynamicObjectField({
+				parentId: objectId,
+				name: {
+					type: TypeName.name,
+					bcs: TypeName.serialize({
+						name: coinType.replace(/^0x/u, ''),
+					}).toBytes(),
+				},
+				include: { content: true },
+				signal,
+			});
 
-				if (!object?.content) {
-					throw new Error(
-						`Missing parameters object content for ${game} and coin type ${coinType}`,
-					);
-				}
+			if (!object?.content) {
+				throw new Error(`Missing parameters object content for ${game} and coin type ${coinType}`);
+			}
 
-				return normalizeGameParameterValues(
-					gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
-				);
+			return normalizeGameParameterValues(
+				gameDefinition.parameters.parse(object.content) as OnChainGameParameters<TGame>,
+			);
+		};
+
+		return readCache({
+			cache: this.#cache,
+			key: cacheKey,
+			load,
+			options: {
+				ignoreCache: options.ignoreCache,
+				ttlMs: this.#cacheTtl,
 			},
-			{ ignoreCache: options.ignoreCache },
-		) as Promise<GameParameters<TGame>>;
+		});
 	}
 
 	async #getPvPCoinflipRegistryId(signal?: AbortSignal): Promise<string> {

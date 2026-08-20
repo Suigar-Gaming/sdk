@@ -27,7 +27,7 @@ import {
 } from '../../src/contracts/pvp-coinflip/pvp_coinflip.js';
 import { TypeName } from '../../src/contracts/stdlib/type_name.js';
 import type { SuigarConfigOverrides } from '../../src/types/index.js';
-import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from './utils.js';
+import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from '../utils.js';
 
 afterEach(() => {
 	vi.resetModules();
@@ -918,7 +918,14 @@ describe('SuigarClient', () => {
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 
-		client.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 50n })];
+		client.mockObjects = [createCoinflipParametersObject({ objectId: '0x333', minStake: 50n })];
+		client.mockDynamicFieldLookups = client.mockDynamicFieldLookups.map((lookup) => {
+			if (lookup.parentId === '0x222' && lookup.nameType === TypeName.name) {
+				return { ...lookup, childId: '0x333' };
+			}
+
+			return lookup;
+		});
 
 		const refreshed = await client.suigar.getGameParameters({
 			game: 'coinflip',
@@ -931,6 +938,93 @@ describe('SuigarClient', () => {
 		expect(client.listDynamicFieldsCalls).toHaveLength(0);
 		expect(client.getObjectsCalls).toHaveLength(0);
 	});
+
+	it('resets the extension cache', async () => {
+		const client = createSuigarTestClient({
+			objects: [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })],
+			dynamicFields: [
+				createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
+			],
+			dynamicFieldLookups: [
+				{
+					nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
+					parentId: OBJECT_IDS.testnet.sweetHouse,
+					nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
+					childId: '0x222',
+				},
+				{
+					nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+					parentId: '0x222',
+					nameType: TypeName.name,
+					childId: '0x111',
+				},
+			],
+		});
+
+		const first = await client.suigar.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+
+		client.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 50n })];
+		client.suigar.reset();
+
+		const second = await client.suigar.getGameParameters({
+			game: 'coinflip',
+			coinType: COINS.testnet.sui.coinType,
+		});
+
+		expect(first.min_stake).toBe('25');
+		expect(second.min_stake).toBe('50');
+		expect(client.getDynamicObjectFieldCalls).toHaveLength(4);
+		expect(client.listDynamicFieldsCalls).toHaveLength(0);
+		expect(client.getObjectsCalls).toHaveLength(0);
+	});
+
+	it.each([{ cacheTtl: 0 }, { cacheTtl: -1 }])(
+		'does not cache game parameters when cacheTtl is $cacheTtl',
+		async ({ cacheTtl }) => {
+			const client = createSuigarTestClient({
+				cacheTtl,
+				objects: [createCoinflipParametersObject({ objectId: '0x111', minStake: 25n })],
+				dynamicFields: [
+					createTypeNameDynamicField('0x111', normalizeStructTag(COINS.testnet.sui.coinType)),
+				],
+				dynamicFieldLookups: [
+					{
+						nameBcs: COINFLIP_SETTINGS_FIELD_BCS,
+						parentId: OBJECT_IDS.testnet.sweetHouse,
+						nameType: `${TEST_CONFIG.packageIds.coinflip}::coinflip::CoinFlipSettingsKey`,
+						childId: '0x222',
+					},
+					{
+						nameBcs: SUI_TYPE_NAME_FIELD_BCS,
+						parentId: '0x222',
+						nameType: TypeName.name,
+						childId: '0x111',
+					},
+				],
+			});
+
+			const first = await client.suigar.getGameParameters({
+				game: 'coinflip',
+				coinType: COINS.testnet.sui.coinType,
+			});
+
+			client.mockObjects = [createCoinflipParametersObject({ objectId: '0x111', minStake: 50n })];
+
+			const second = await client.suigar.getGameParameters({
+				game: 'coinflip',
+				coinType: COINS.testnet.sui.coinType,
+			});
+
+			expect(client.getDynamicObjectFieldCalls).toHaveLength(4);
+			expect(first.min_stake).toBe('25');
+			expect(second.min_stake).toBe('50');
+			expect(client.listDynamicFieldsCalls).toHaveLength(0);
+			expect(client.getObjectsCalls).toHaveLength(0);
+		},
+	);
 
 	it('shares game parameter cache by extension name through the base Mysten client', async () => {
 		const baseClient = new TestClient();

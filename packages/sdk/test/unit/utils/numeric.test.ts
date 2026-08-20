@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { toBigInt, toU8, toU16 } from '../../src/utils/index.js';
+import { toBigInt, toU8, toU16 } from '../../../src/utils/index.js';
 
 describe('toBigInt', () => {
 	it('accepts bigint, number, integer string, and boolean inputs', () => {

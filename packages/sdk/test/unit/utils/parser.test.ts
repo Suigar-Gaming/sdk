@@ -3,11 +3,11 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import type { BetResultGameDetails } from '../../src/types/game-details.type.js';
-import type { SuigarGameEvent } from '../../src/types/game.type.js';
-import { GAME_EVENTS } from '../../src/types/game.type.js';
-import { parseCoinType, parseGameDetails, parseGameEvent } from '../../src/utils/index.js';
-import { encodeFloat, encodeString, writeU64 } from './utils.js';
+import type { BetResultGameDetails } from '../../../src/types/game-details.type.js';
+import type { SuigarGameEvent } from '../../../src/types/game.type.js';
+import { GAME_EVENTS } from '../../../src/types/game.type.js';
+import { parseCoinType, parseGameDetails, parseGameEvent } from '../../../src/utils/index.js';
+import { encodeFloat, encodeString, writeU64 } from '../../utils.js';
 
 function gameDetails(contents: Array<{ key: string; value: Array<number> }>): BetResultGameDetails {
 	return { contents };
