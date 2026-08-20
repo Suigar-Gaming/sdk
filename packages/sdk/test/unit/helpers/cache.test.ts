@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { getTtlCacheKey } from '../../../src/utils/cache.js';
+import { getTtlCacheKey } from '../../../src/helpers/index.js';
 
 describe('getTtlCacheKey', () => {
 	it('uses the same key within a ttl bucket', () => {

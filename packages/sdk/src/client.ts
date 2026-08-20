@@ -22,6 +22,7 @@ import {
 import { TypeName } from './contracts/stdlib/type_name.js';
 import {
 	DEFAULT_CACHE_TTL_MS,
+	getTtlCacheKey,
 	normalizeGameParameterValues,
 	resolveSuigarConfig,
 } from './helpers/index.js';
@@ -54,7 +55,6 @@ import type {
 	WithThrowOnError,
 } from './types/index.js';
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
-import { getTtlCacheKey } from './utils/cache.js';
 import { DEFAULT_QUERY_LIMIT, parseCoinType } from './utils/index.js';
 
 export function suigar<const Name = 'suigar'>({
@@ -104,8 +104,8 @@ export class SuigarClient {
 
 		this.#client = client;
 		this.#partner = partner;
-		this.#cache = client.cache.scope([`@suigar/sdk:${name}`]);
-		this.#cacheTtl = cacheTtl ?? DEFAULT_CACHE_TTL_MS;
+		this.#cache = client.cache.scope(`@suigar/sdk:${name}`);
+		this.#cacheTtl = cacheTtl ? (cacheTtl <= 0 ? 0 : cacheTtl) : DEFAULT_CACHE_TTL_MS;
 
 		this.#config = resolveSuigarConfig({ network, config });
 	}
