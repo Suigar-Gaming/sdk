@@ -88,12 +88,11 @@ export function AppHeader({
 		Partial<Record<SupportedCoinKey, CoinBalanceState>>
 	>({});
 	const activeCoin = selectedCoin ?? localSelectedCoin;
-	const activeBalances = coinBalances ?? localBalances;
+	const activeBalances = account ? (coinBalances ?? localBalances) : {};
 	const activeBalanceOwner = coinBalances ? (balanceOwner ?? null) : (account?.address ?? null);
 
 	React.useEffect(() => {
 		if (coinBalances || !account) {
-			if (!account) setLocalBalances({});
 			return;
 		}
 

@@ -3,6 +3,7 @@
 import { useCurrentAccount, useCurrentClient } from '@mysten/dapp-kit-react';
 import { FileCode2, RefreshCw, SendHorizontal } from 'lucide-react';
 import * as React from 'react';
+import type { SuigarClient } from '@suigar/sdk';
 import { AppHeader } from '@/components/app-header';
 import { CodeBlock } from '@/components/code-block';
 import { CoinIcon } from '@/components/coins';
@@ -31,75 +32,95 @@ type ClaimState = {
 };
 
 const INITIAL_CLAIM_STATE: ClaimState = { amount: null, error: null };
+const INITIAL_CLAIMS: Record<ClaimKind, ClaimState> = {
+	'commission-sui': INITIAL_CLAIM_STATE,
+	'commission-usdc': INITIAL_CLAIM_STATE,
+	'level-up': INITIAL_CLAIM_STATE,
+};
 
 function getErrorMessage(error: unknown) {
 	return error instanceof Error ? error.message : String(error);
+}
+
+async function getReferralClaims(
+	client: ReturnType<typeof useCurrentClient> & { suigar: SuigarClient },
+	owner: string,
+): Promise<Record<ClaimKind, ClaimState>> {
+	try {
+		const { sui, usdc } = client.suigar.getConfig().coins;
+		const results = await Promise.allSettled([
+			client.suigar.view.referral.getCommission({
+				owner,
+				coinType: sui.coinType,
+			}),
+			client.suigar.view.referral.getCommission({
+				owner,
+				coinType: usdc.coinType,
+			}),
+			client.suigar.view.referral.getLevelUpUsdRewards({ owner }),
+		]);
+
+		const toClaimState = (result: (typeof results)[number]): ClaimState =>
+			result.status === 'fulfilled'
+				? { amount: result.value, error: null }
+				: { amount: null, error: getErrorMessage(result.reason) };
+
+		return {
+			'commission-sui': toClaimState(results[0]),
+			'commission-usdc': toClaimState(results[1]),
+			'level-up': toClaimState(results[2]),
+		};
+	} catch (error) {
+		const message = getErrorMessage(error);
+		return {
+			'commission-sui': { amount: null, error: message },
+			'commission-usdc': { amount: null, error: message },
+			'level-up': { amount: null, error: message },
+		};
+	}
 }
 
 export function ReferralPage() {
 	const client = useCurrentClient();
 	const account = useCurrentAccount();
 	const owner = account?.address;
-	const [claims, setClaims] = React.useState<Record<ClaimKind, ClaimState>>({
-		'commission-sui': INITIAL_CLAIM_STATE,
-		'commission-usdc': INITIAL_CLAIM_STATE,
-		'level-up': INITIAL_CLAIM_STATE,
+	const [claimResult, setClaimResult] = React.useState<{
+		owner: string | null;
+		claims: Record<ClaimKind, ClaimState>;
+	}>({
+		owner: null,
+		claims: INITIAL_CLAIMS,
 	});
-	const [isLoading, setIsLoading] = React.useState(false);
+	const [isRefreshing, setIsRefreshing] = React.useState(false);
 	const [isExecuting, setIsExecuting] = React.useState<ClaimKind | null>(null);
-	const [status, setStatus] = React.useState<string | null>(null);
+	const [status, setStatus] = React.useState<{ owner: string; digest: string } | null>(null);
 
 	const refreshClaims = React.useCallback(async () => {
-		if (!owner) {
-			setClaims({
-				'commission-sui': INITIAL_CLAIM_STATE,
-				'commission-usdc': INITIAL_CLAIM_STATE,
-				'level-up': INITIAL_CLAIM_STATE,
-			});
-			return;
-		}
+		if (!owner) return;
 
-		setIsLoading(true);
+		setIsRefreshing(true);
 		setStatus(null);
-		try {
-			const { sui, usdc } = client.suigar.getConfig().coins;
-			const results = await Promise.allSettled([
-				client.suigar.view.referral.getCommission({
-					owner,
-					coinType: sui.coinType,
-				}),
-				client.suigar.view.referral.getCommission({
-					owner,
-					coinType: usdc.coinType,
-				}),
-				client.suigar.view.referral.getLevelUpUsdRewards({ owner }),
-			]);
-
-			const toClaimState = (result: (typeof results)[number]): ClaimState =>
-				result.status === 'fulfilled'
-					? { amount: result.value, error: null }
-					: { amount: null, error: getErrorMessage(result.reason) };
-
-			setClaims({
-				'commission-sui': toClaimState(results[0]),
-				'commission-usdc': toClaimState(results[1]),
-				'level-up': toClaimState(results[2]),
-			});
-		} catch (error) {
-			const message = getErrorMessage(error);
-			setClaims({
-				'commission-sui': { amount: null, error: message },
-				'commission-usdc': { amount: null, error: message },
-				'level-up': { amount: null, error: message },
-			});
-		} finally {
-			setIsLoading(false);
-		}
+		const claims = await getReferralClaims(client, owner);
+		setClaimResult({ owner, claims });
+		setIsRefreshing(false);
 	}, [client, owner]);
 
 	React.useEffect(() => {
-		void refreshClaims();
-	}, [refreshClaims]);
+		if (!owner) return;
+
+		let cancelled = false;
+		void getReferralClaims(client, owner).then((claims) => {
+			if (!cancelled) setClaimResult({ owner, claims });
+		});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [client, owner]);
+
+	const claims = owner && claimResult.owner === owner ? claimResult.claims : INITIAL_CLAIMS;
+	const isLoading = Boolean(owner) && (isRefreshing || claimResult.owner !== owner);
+	const submittedDigest = owner && status?.owner === owner ? status.digest : null;
 
 	const executeClaim = async (kind: ClaimKind) => {
 		if (!owner) return;
@@ -128,13 +149,19 @@ export function ReferralPage() {
 				throw new Error(execution.FailedTransaction.status.error?.message);
 			}
 
-			setStatus(execution.Transaction.digest);
+			setStatus({ owner, digest: execution.Transaction.digest });
 			await refreshClaims();
 		} catch (error) {
-			setClaims((current) => ({
-				...current,
-				[kind]: { ...current[kind], error: getErrorMessage(error) },
-			}));
+			setClaimResult((current) => {
+				const currentClaims = current.owner === owner ? current.claims : INITIAL_CLAIMS;
+				return {
+					owner,
+					claims: {
+						...currentClaims,
+						[kind]: { ...currentClaims[kind], error: getErrorMessage(error) },
+					},
+				};
+			});
 		} finally {
 			setIsExecuting(null);
 		}
@@ -247,11 +274,13 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 					</div>
 				</section>
 
-				{status ? (
+				{submittedDigest ? (
 					<Alert variant="success" className="mb-6">
 						<SendHorizontal />
 						<AlertTitle>Claim submitted</AlertTitle>
-						<AlertDescription className="font-mono text-xs break-all">{status}</AlertDescription>
+						<AlertDescription className="font-mono text-xs break-all">
+							{submittedDigest}
+						</AlertDescription>
 					</Alert>
 				) : null}
 
