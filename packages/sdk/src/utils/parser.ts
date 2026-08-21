@@ -87,6 +87,7 @@ function normalizeBcsGameDetailValue<TValueType extends GameDetailValueType>(
 		case 'float':
 			return fromMoveFloat(parsed as MoveFloat) as GameDetail<TValueType>;
 		case 'u64':
+		case 'u128':
 			return Number(parsed) as GameDetail<TValueType>;
 		default:
 			return parsed as GameDetail<TValueType>;
