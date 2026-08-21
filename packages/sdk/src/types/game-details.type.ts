@@ -9,7 +9,16 @@ import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
 
-export type GameDetailValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string' | 'address';
+export type GameDetailValueType =
+	| 'u8'
+	| 'u16'
+	| 'u32'
+	| 'u64'
+	| 'u128'
+	| 'bool'
+	| 'float'
+	| 'string'
+	| 'address';
 export type GameDetailVectorValueType = `vector<${GameDetailValueType}>`;
 export type GameDetailSchemaValueType = GameDetailValueType | GameDetailVectorValueType;
 type GameDetailsSchema = Record<string, GameDetailSchemaValueType>;
@@ -32,7 +41,9 @@ export type GameDetails<TGame extends Game> = {
 export const GAME_DETAIL_BCS = {
 	u8: bcs.U8,
 	u16: bcs.U16,
+	u32: bcs.U32,
 	u64: bcs.U64,
+	u128: bcs.U128,
 	bool: bcs.Bool,
 	float: Float,
 	string: bcs.String,
