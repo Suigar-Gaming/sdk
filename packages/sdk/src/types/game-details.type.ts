@@ -9,26 +9,23 @@ import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
 
-export type GameDetailScalarValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
-export type GameDetailVectorElementType = Exclude<GameDetailScalarValueType, 'string'>;
-export type GameDetailVectorValueType = `vector<${GameDetailVectorElementType}>`;
-export type GameDetailValueType = GameDetailScalarValueType | GameDetailVectorValueType;
-type GameDetailsSchema = Record<string, GameDetailValueType>;
+export type GameDetailValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string' | 'address';
+export type GameDetailVectorValueType = `vector<${GameDetailValueType}>`;
+export type GameDetailSchemaValueType = GameDetailValueType | GameDetailVectorValueType;
+type GameDetailsSchema = Record<string, GameDetailSchemaValueType>;
 
-type ScalarGameDetail<TValueType extends GameDetailScalarValueType> = TValueType extends
-	| 'float'
-	| 'u64'
+type ScalarGameDetail<TValueType extends GameDetailValueType> = TValueType extends 'float' | 'u64'
 	? number
 	: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
 
-export type GameDetail<TValueType extends GameDetailValueType> =
-	TValueType extends `vector<${infer TElementType extends GameDetailVectorElementType}>`
+export type GameDetail<TValueType extends GameDetailSchemaValueType> =
+	TValueType extends `vector<${infer TElementType extends GameDetailValueType}>`
 		? Array<ScalarGameDetail<TElementType>>
-		: ScalarGameDetail<TValueType & GameDetailScalarValueType>;
+		: ScalarGameDetail<TValueType & GameDetailValueType>;
 
 export type GameDetails<TGame extends Game> = {
 	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<
-		(typeof GAME_DETAILS_SCHEMAS)[TGame][K] & GameDetailValueType
+		(typeof GAME_DETAILS_SCHEMAS)[TGame][K] & GameDetailSchemaValueType
 	>;
 };
 
@@ -39,7 +36,8 @@ export const GAME_DETAIL_BCS = {
 	bool: bcs.Bool,
 	float: Float,
 	string: bcs.String,
-} as const satisfies Record<GameDetailScalarValueType, BcsType<any>>;
+	address: bcs.Address,
+} as const satisfies Record<GameDetailValueType, BcsType<any>>;
 
 const COINFLIP_GAME_DETAILS_SCHEMA = {
 	player_bet: 'string',

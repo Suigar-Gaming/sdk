@@ -3,7 +3,8 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import type { BetResultGameDetails } from '../../../src/types/game-details.type.js';
+import type { BetResultGameDetails, GameDetail } from '../../../src/types/game-details.type.js';
+import { GAME_DETAIL_BCS } from '../../../src/types/game-details.type.js';
 import type { SuigarGameEvent } from '../../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../../src/types/game.type.js';
 import { parseCoinType, parseGameDetails, parseGameEvent } from '../../../src/utils/index.js';
@@ -190,6 +191,16 @@ describe('parseCoinType', () => {
 });
 
 describe('parseGameDetails', () => {
+	it('supports address scalar and vector detail types', () => {
+		const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+
+		expect(
+			GAME_DETAIL_BCS.address.parse(GAME_DETAIL_BCS.address.serialize(address).toBytes()),
+		).toBe(address);
+		expectTypeOf<GameDetail<'address'>>().toEqualTypeOf<string>();
+		expectTypeOf<GameDetail<'vector<address>'>>().toEqualTypeOf<Array<string>>();
+	});
+
 	it('parses known detail types and preserves unknown event keys', () => {
 		expect(
 			parseGameDetails({

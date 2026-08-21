@@ -11,8 +11,7 @@ import type {
 	Game,
 	GameDetail,
 	GameDetails,
-	GameDetailScalarValueType,
-	GameDetailVectorElementType,
+	GameDetailSchemaValueType,
 	GameDetailVectorValueType,
 	GameDetailValueType,
 	GameEvent,
@@ -80,7 +79,7 @@ function parseStringGameDetail(value: Array<number>): string {
 	}
 }
 
-function normalizeBcsGameDetailValue<TValueType extends GameDetailScalarValueType>(
+function normalizeBcsGameDetailValue<TValueType extends GameDetailValueType>(
 	valueType: TValueType,
 	parsed: unknown,
 ): GameDetail<TValueType> {
@@ -94,15 +93,13 @@ function normalizeBcsGameDetailValue<TValueType extends GameDetailScalarValueTyp
 	}
 }
 
-function parseVectorValueType(valueType: GameDetailValueType): GameDetailVectorElementType | null {
+function parseVectorValueType(valueType: GameDetailSchemaValueType): GameDetailValueType | null {
 	if (!valueType.startsWith('vector<') || !valueType.endsWith('>')) {
 		return null;
 	}
 
 	const elementType = valueType.slice(7, -1);
-	return elementType in GAME_DETAIL_BCS && elementType !== 'string'
-		? (elementType as GameDetailVectorElementType)
-		: null;
+	return elementType in GAME_DETAIL_BCS ? (elementType as GameDetailValueType) : null;
 }
 
 function parseVectorGameDetail<TValueType extends GameDetailVectorValueType>({
@@ -111,7 +108,7 @@ function parseVectorGameDetail<TValueType extends GameDetailVectorValueType>({
 	value,
 }: {
 	valueType: TValueType;
-	elementType: GameDetailVectorElementType;
+	elementType: GameDetailValueType;
 	value: Array<number>;
 }): GameDetail<TValueType> {
 	const bytes = Uint8Array.from(value);
@@ -131,7 +128,7 @@ function parseVectorGameDetail<TValueType extends GameDetailVectorValueType>({
 	) as GameDetail<TValueType>;
 }
 
-function parseGameDetail<TValueType extends GameDetailValueType>({
+function parseGameDetail<TValueType extends GameDetailSchemaValueType>({
 	valueType,
 	value,
 }: {
@@ -151,7 +148,7 @@ function parseGameDetail<TValueType extends GameDetailValueType>({
 		}) as GameDetail<TValueType>;
 	}
 
-	const scalarValueType = valueType as GameDetailScalarValueType;
+	const scalarValueType = valueType as GameDetailValueType;
 	const parsed = GAME_DETAIL_BCS[scalarValueType].parse(Uint8Array.from(value));
 	return normalizeBcsGameDetailValue(scalarValueType, parsed) as GameDetail<TValueType>;
 }
@@ -182,7 +179,7 @@ export function parseGameDetails<TGame extends Game>({
 	},
 	TGame
 >): GameDetails<TGame> {
-	const schema: Record<string, GameDetailValueType> = GAME_DETAILS_SCHEMAS[game];
+	const schema: Record<string, GameDetailSchemaValueType> = GAME_DETAILS_SCHEMAS[game];
 	const details = gameDetails.contents.reduce<Record<string, unknown>>((parsedDetails, entry) => {
 		const valueType = schema[entry.key] ?? 'string';
 		parsedDetails[entry.key] = parseGameDetail({
