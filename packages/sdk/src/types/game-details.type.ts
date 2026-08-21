@@ -23,12 +23,11 @@ export type GameDetailVectorValueType = `vector<${GameDetailValueType}>`;
 export type GameDetailSchemaValueType = GameDetailValueType | GameDetailVectorValueType;
 type GameDetailsSchema = Record<string, GameDetailSchemaValueType>;
 
-type ScalarGameDetail<TValueType extends GameDetailValueType> = TValueType extends
-	| 'float'
-	| 'u64'
-	| 'u128'
-	? number
-	: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
+type ScalarGameDetail<TValueType extends GameDetailValueType> = TValueType extends 'u64' | 'u128'
+	? bigint
+	: TValueType extends 'float'
+		? number
+		: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
 
 export type GameDetail<TValueType extends GameDetailSchemaValueType> =
 	TValueType extends `vector<${infer TElementType extends GameDetailValueType}>`

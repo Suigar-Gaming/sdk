@@ -77,7 +77,7 @@ Numeric helper behavior:
 - `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
 - `isMoveFloat(value)` checks whether an unknown value has the generated Move float shape
 - `parseCoinType(type)` extracts the normalized first generic coin type from a Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails({ game, gameDetails })` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
+- `parseGameDetails({ game, gameDetails })` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, bigint, boolean, and address values while preserving the original on-chain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -547,7 +547,7 @@ These are generated Move event decoders. Use them to parse Suigar event payloads
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
 - `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
-- `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
+- `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, bigint, boolean, and address values
 
 ### Parse PvP Coinflip Game Object Data
 
