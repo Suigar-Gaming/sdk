@@ -201,6 +201,14 @@ describe('parseGameDetails', () => {
 		expectTypeOf<GameDetail<'vector<address>'>>().toEqualTypeOf<Array<string>>();
 	});
 
+	it('models numeric detail runtime types', () => {
+		expectTypeOf<GameDetail<'u8'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u16'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u32'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u64'>>().toEqualTypeOf<bigint>();
+		expectTypeOf<GameDetail<'u128'>>().toEqualTypeOf<bigint>();
+	});
+
 	it('parses known detail types and preserves unknown event keys', () => {
 		expect(
 			parseGameDetails({
@@ -231,7 +239,7 @@ describe('parseGameDetails', () => {
 		});
 
 		expect(rangeDetails).toMatchObject({
-			roll_value: 42,
+			roll_value: 42n,
 			win: true,
 			range_mode: 2,
 			payout_multiplier: 2.5,
