@@ -9,7 +9,7 @@ inputs:
   doctor:
     description: Run pnpm diagnostics after pnpm setup.
     required: false
-    default: 'false'
+    default: 'true'
   install:
     description: Install workspace dependencies from the repository root.
     required: false
