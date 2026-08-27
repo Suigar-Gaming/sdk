@@ -1307,7 +1307,7 @@ describe('SuigarClient', () => {
 		);
 	});
 
-	it('skips unresolved PvP coinflip games when throwOnError is false', async () => {
+	it('skips unresolved PvP Coinflip games when throwOnError is false', async () => {
 		const client = createSuigarTestClient({
 			objects: [
 				createPvPCoinflipGameObject('0xopen'),
@@ -1365,17 +1365,17 @@ describe('SuigarClient', () => {
 		expect(client.suigar.bcs.PvPCoinflipGameCancelledEvent).toBeDefined();
 	});
 
-	it('rejects unresolved PvP coinflip games when throwOnError is true', async () => {
+	it('rejects unresolved PvP Coinflip games when throwOnError is true', async () => {
 		const client = createSuigarTestClient({
 			objects: [createPvPCoinflipGameObjectWithoutContent('0xbroken')],
 			dynamicFields: [createDynamicField('0xbroken')],
 		});
 		await expect(client.suigar.getPvPCoinflipGames({ throwOnError: true })).rejects.toThrow(
-			'Unable to resolve PvP coinflip game from retrieved object',
+			'Unable to resolve PvP Coinflip game from retrieved object',
 		);
 	});
 
-	it('forwards object lookup options when resolving PvP coinflip registry games', async () => {
+	it('forwards object lookup options when resolving PvP Coinflip registry games', async () => {
 		const client = createSuigarTestClient({
 			objects: [createPvPCoinflipGameObject('0xopen')],
 			dynamicFields: [createDynamicField('0xopen')],

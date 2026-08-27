@@ -107,7 +107,7 @@
 
 ### Major Changes
 
-- 5f53b3f: Reorganize the client extension transaction API. Rename `client.suigar.tx.createBetTransaction(game, options)` to `client.suigar.tx.createGameBet(game, options)`, and replace `createPvPCoinflipTransaction(action, options)` with action-specific `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and `.cancelGame(options)` builders. Rename public transaction option types to reflect their game or action inputs, including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP coinflip transaction option types.
+- 5f53b3f: Reorganize the client extension transaction API. Rename `client.suigar.tx.createBetTransaction(game, options)` to `client.suigar.tx.createGameBet(game, options)`, and replace `createPvPCoinflipTransaction(action, options)` with action-specific `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and `.cancelGame(options)` builders. Rename public transaction option types to reflect their game or action inputs, including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP Coinflip transaction option types.
 
 ### Minor Changes
 
@@ -302,6 +302,6 @@
 
 - dca5598: Initial release of `@suigar/mcp`, a lightweight MCP server and library for Suigar game tooling.
   - Add config and metadata read helpers backed by released `@suigar/sdk` defaults.
-  - Add MCP tools for building and dry-running on-chain transactions for coinflip, limbo, plinko, range, wheel, and PvP coinflip.
+  - Add MCP tools for building and dry-running on-chain transactions for coinflip, limbo, plinko, range, wheel, and PvP Coinflip.
   - Add shared MCP support metadata so clients can distinguish on-chain games from unsupported backend-driven games such as slots.
   - Add transaction serialization helpers, read-only Sui client setup, stdio server entrypoint, tests, and README usage guidance.

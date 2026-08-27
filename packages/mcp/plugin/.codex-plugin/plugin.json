@@ -57,7 +57,7 @@
 		"defaultPrompt": [
 			"Read testnet config",
 			"Build a coinflip transaction",
-			"Dry-run a PvP coinflip transaction"
+			"Dry-run a PvP Coinflip transaction"
 		],
 		"brandColor": "#2AC2FF",
 		"composerIcon": "./assets/logo.png",

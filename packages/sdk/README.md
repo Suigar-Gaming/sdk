@@ -278,11 +278,11 @@ const base64 = await client.suigar.serializeTransactionToBase64({
 
 ### `getPvPCoinflipGames(options?)`
 
-Lists unresolved PvP coinflip games from the configured PvP registry.
+Lists unresolved PvP Coinflip games from the configured PvP registry.
 
 This reads the registry dynamic fields for the active network and resolves each entry into parsed game state through a bulk `client.core.getObjects()` lookup. Registry membership is the unresolved-state signal: once a match is joined and resolved, the Move flow removes it from the registry and deletes the live `Game` object.
 
-Use this when a product needs the current set of open PvP coinflip matches for browsing or lobby views.
+Use this when a product needs the current set of open PvP Coinflip matches for browsing or lobby views.
 
 By default, per-object fetch or parse failures are skipped so one broken or already-deleted registry entry does not reject the full lookup. Pass `throwOnError: true` if you want the call to reject instead.
 
@@ -418,7 +418,7 @@ const rangeTx = client.suigar.tx.createGameBet({
 
 #### PvP Coinflip
 
-Use the action-specific `pvpCoinflip` builders for PvP coinflip flows:
+Use the action-specific `pvpCoinflip` builders for PvP Coinflip flows:
 
 - `createGame`
 - `joinGame`
@@ -546,10 +546,10 @@ Current exposed helpers:
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
-- `PvPCoinflipGame` parses a PvP coinflip game object's `content`
+- `PvPCoinflipGame` parses a PvP Coinflip game object's `content`
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
-- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
+- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP Coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
 - `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, bigint, boolean, and address values
 
 ### Parse PvP Coinflip Game Object Data
@@ -637,7 +637,7 @@ const gameDetails = parseGameDetails({
 `parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
 
 - `{ gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
-- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
+- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP Coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 
 When the extension is configured with `partner`, decoded event `metadata` will contain that partner wallet address under the `partner` entry.
@@ -657,7 +657,7 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 
 ### Parse PvP Coinflip Event Data
 
-Use the matching helper for each PvP coinflip event payload found in `transactionResult.events`:
+Use the matching helper for each PvP Coinflip event payload found in `transactionResult.events`:
 
 - `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
 - `client.suigar.bcs.PvPCoinflipGameResolvedEvent`

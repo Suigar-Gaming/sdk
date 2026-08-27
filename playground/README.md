@@ -27,7 +27,7 @@ The example reflects the current package export split:
 - Connected-wallet balance cards for every supported coin type
 - Per-game form components for standard and PvP Coinflip flows
 - Standard game forms backed by `client.suigar.getGameParameters({ game, coinType })` for live on-chain stake ranges, per-game parameter bounds, and Keno/Plinko/Soccer/Wheel config selection
-- A game-settings dialog in the controls card that shows the current typed `getGameParameters({ game, coinType })` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP coinflip
+- A game-settings dialog in the controls card that shows the current typed `getGameParameters({ game, coinType })` result, available configs when present, lookup request, raw payload, and expandable detail views for both standard games and PvP Coinflip
 - PvP game selection scaffolded through a dedicated selector, with `pvp-coinflip` as the first option
 - Join and cancel lobby cards backed by `client.suigar.getPvPCoinflipGames()`, using each returned lobby's `coin_type` field for coin selection and display, with public join lobbies visible while disconnected, an optional private-lobby join toggle, connected-wallet filtering for cancel, compact multi-column cards, creator-side labels, privacy badges, and copyable game ids
 - Live transaction-builder code preview

@@ -144,19 +144,19 @@ There are two transaction families and they must not be mixed:
 
 - **Standard games** use `client.suigar.tx.createGameBet({ game, ...options })` for `coinflip`, `keno`, `limbo`, `plinko`, `range`, `soccer`, and `wheel`.
 - **PvP games** use dedicated per-game transaction properties, such as `client.suigar.tx.pvpCoinflip`, and should keep PvP game rules separate from standard game flows.
-- **PvP coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
+- **PvP Coinflip unresolved lobby lookups** use `client.suigar.getPvPCoinflipGames(options?)`:
   - Calling it without options uses `DEFAULT_QUERY_LIMIT` (`50`); supply `limit: DEFAULT_QUERY_LIMIT` when also passing `cursor` or another query option.
   - Bulk-load lobby objects with `client.core.getObjects()`.
   - Skip per-object fetch or parse failures by default.
   - Reject on per-object fetch or parse failures only when `throwOnError: true` is passed.
   - Return each parsed game with a derived `coin_type` string from the Move object type.
-- **Specific PvP coinflip game object lookups** should use the exported generated helper, `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })`, when a product needs one live game object outside the registry list.
+- **Specific PvP Coinflip game object lookups** should use the exported generated helper, `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })`, when a product needs one live game object outside the registry list.
 
 When making changes:
 
 - Read both the client entrypoint and the relevant transaction builder before changing behavior.
 - Keep standard and PvP option shapes separate.
-- Do not route PvP coinflip through the standard game builder.
+- Do not route PvP Coinflip through the standard game builder.
 
 #### Config Resolution
 
@@ -166,7 +166,7 @@ Config is normalized in `packages/sdk/src/helpers/config.ts`. This layer is resp
 - Normalizing the configured supported coin types for the active network
 - Resolving price info object ids from the supported-coin mapping
 - Throwing explicit errors when a required coin mapping is missing
-- Providing the price info object id used by PvP coinflip join
+- Providing the price info object id used by PvP Coinflip join
 
 Treat unsupported network resolution and unsupported configured coin types as `RangeError` cases when documenting or testing these flows.
 

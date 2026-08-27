@@ -128,7 +128,7 @@ export class SuigarClient {
 	 * Clears all cached data for this Suigar client extension instance.
 	 *
 	 * Use this to force subsequent SDK reads to fetch fresh on-chain data,
-	 * including cached game parameters and PvP coinflip registry lookups.
+	 * including cached game parameters and PvP Coinflip registry lookups.
 	 */
 	reset(): void {
 		this.#cache.clear();
@@ -254,14 +254,14 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Lists unresolved PvP coinflip games from the resolved registry and resolves
+	 * Lists unresolved PvP Coinflip games from the resolved registry and resolves
 	 * each entry into parsed on-chain game state.
 	 *
-	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
+	 * This fetches dynamic fields from the PvP Coinflip registry object, then bulk
 	 * loads the referenced game objects through `client.core.getObjects()`. Registry
 	 * membership is the unresolved-state signal: when a game is joined and resolved,
 	 * the Move flow removes it from the registry and deletes the live `Game` object.
-	 * Use this when a product needs the current set of open PvP coinflip matches for
+	 * Use this when a product needs the current set of open PvP Coinflip matches for
 	 * browsing or lobby views.
 	 *
 	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
@@ -270,7 +270,7 @@ export class SuigarClient {
 	 * when any referenced game object cannot be fetched or parsed. By default,
 	 * failed per-object lookups are skipped and only successfully parsed unresolved
 	 * games are returned.
-	 * @returns Parsed unresolved PvP coinflip game objects for the requested
+	 * @returns Parsed unresolved PvP Coinflip game objects for the requested
 	 * registry page. When `throwOnError` is `false`, entries that fail object fetch
 	 * or parse are omitted from the returned array.
 	 */
@@ -300,7 +300,7 @@ export class SuigarClient {
 				}
 
 				if (!object.content) {
-					throw new Error('Unable to resolve PvP coinflip game from retrieved object');
+					throw new Error('Unable to resolve PvP Coinflip game from retrieved object');
 				}
 
 				return {
@@ -409,7 +409,7 @@ export class SuigarClient {
 					throw new RangeError(`Unsupported game: ${(options as { game?: string })?.game}`);
 			}
 		},
-		/** PvP coinflip transaction builders, grouped by game action. */
+		/** PvP Coinflip transaction builders, grouped by game action. */
 		pvpCoinflip: {
 			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
 				return buildPvPCoinflipTransaction({
@@ -519,7 +519,7 @@ export class SuigarClient {
 		 */
 		NftV1,
 		/**
-		 * Object representing the state of a PvP coinflip game, as stored on-chain.
+		 * Object representing the state of a PvP Coinflip game, as stored on-chain.
 		 */
 		PvPCoinflipGame,
 		// Events

@@ -2,7 +2,7 @@
 '@suigar/sdk': patch
 ---
 
-Update PvP coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
+Update PvP Coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
 
 - Make `getPvPCoinflipGames()` parse bulk `client.core.getObjects()` results instead of resolving each game individually.
 - Skip per-object fetch or parse failures by default and continue supporting strict rejection with `throwOnError: true`.

@@ -8,7 +8,7 @@
 
   Add `SuigarClient.reset()` to clear cached SDK reads for the extension instance.
 
-- [#157](https://github.com/Suigar-Gaming/ts-sdks/pull/157) [`77a9247`](https://github.com/Suigar-Gaming/ts-sdks/commit/77a924767bc68edaeb8c8c0470a916a86e679504) - Use generated MVR package defaults for Suigar game, referral, and core bindings while keeping optional package id overrides for deployments that need them. `nftV1` remains the only statically configured package id. Game parameter settings lookup and PvP coinflip registry lookup now also respect overridden game package ids.
+- [#157](https://github.com/Suigar-Gaming/ts-sdks/pull/157) [`77a9247`](https://github.com/Suigar-Gaming/ts-sdks/commit/77a924767bc68edaeb8c8c0470a916a86e679504) - Use generated MVR package defaults for Suigar game, referral, and core bindings while keeping optional package id overrides for deployments that need them. `nftV1` remains the only statically configured package id. Game parameter settings lookup and PvP Coinflip registry lookup now also respect overridden game package ids.
 
 ## 2.0.0-beta.38
 
@@ -28,7 +28,7 @@
 
 - [#150](https://github.com/Suigar-Gaming/ts-sdks/pull/150) [`22b810f`](https://github.com/Suigar-Gaming/ts-sdks/commit/22b810f2208c9165cca3131d081d145a187c2cb8) - Refactor the internal on-chain game parameters registry type for clearer SDK game settings definitions.
 
-- [#149](https://github.com/Suigar-Gaming/ts-sdks/pull/149) [`a4a3772`](https://github.com/Suigar-Gaming/ts-sdks/commit/a4a377257285446714d73f0b3cb66b79671b7cac) - Keep NFT V1 mint and PvP coinflip join transaction builders responsible for resolving their own payment coins from the configured client.
+- [#149](https://github.com/Suigar-Gaming/ts-sdks/pull/149) [`a4a3772`](https://github.com/Suigar-Gaming/ts-sdks/commit/a4a377257285446714d73f0b3cb66b79671b7cac) - Keep NFT V1 mint and PvP Coinflip join transaction builders responsible for resolving their own payment coins from the configured client.
 
 ## 2.0.0-beta.36
 
@@ -58,7 +58,7 @@
 
 ### Major Changes
 
-- 5f53b3f: Reorganize the client extension transaction API. Rename `client.suigar.tx.createBetTransaction(game, options)` to `client.suigar.tx.createGameBet(game, options)`, and replace `createPvPCoinflipTransaction(action, options)` with action-specific `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and `.cancelGame(options)` builders. Rename public transaction option types to reflect their game or action inputs, including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP coinflip transaction option types.
+- 5f53b3f: Reorganize the client extension transaction API. Rename `client.suigar.tx.createBetTransaction(game, options)` to `client.suigar.tx.createGameBet(game, options)`, and replace `createPvPCoinflipTransaction(action, options)` with action-specific `client.suigar.tx.pvpCoinflip.createGame(options)`, `.joinGame(options)`, and `.cancelGame(options)` builders. Rename public transaction option types to reflect their game or action inputs, including `CreateGameBetOptions`, `RangeTransactionOptions`, and the PvP Coinflip transaction option types.
 
 ### Minor Changes
 
@@ -149,7 +149,7 @@
   - Add `suigar({ config })` overrides for package ids, registry ids, supported coin metadata, and price info object ids.
   - Rename `SuiNetwork` to `SuigarNetwork` and export `SuigarCoin` and `SuigarNetwork` from the package root.
   - Rename `allowGasCoinShortcut` to `useGasCoin`.
-  - Use Mysten `coinWithBalance` transaction arguments for standard game and PvP coinflip bet coin construction.
+  - Use Mysten `coinWithBalance` transaction arguments for standard game and PvP Coinflip bet coin construction.
   - Leave `useGasCoin` undefined unless the caller explicitly configures it, so Mysten's coin intent helpers apply their default behavior.
   - Convert the package config updater to TypeScript and run it through `tsx`.
 
@@ -203,7 +203,7 @@
 
 ### Patch Changes
 
-- 67a8b5b: Add `parseGameEvent` to `@suigar/sdk/utils` for extracting a normalized Suigar game id plus raw Move event name for supported Suigar events in `GAME_EVENTS`, including standard `BetResultEvent` and PvP coinflip events.
+- 67a8b5b: Add `parseGameEvent` to `@suigar/sdk/utils` for extracting a normalized Suigar game id plus raw Move event name for supported Suigar events in `GAME_EVENTS`, including standard `BetResultEvent` and PvP Coinflip events.
 
   Change `parseGameDetails` to accept `gameId` first so TypeScript can narrow the returned detail keys and value types per game.
 
@@ -244,7 +244,7 @@
 
 ### Patch Changes
 
-- 4b59c7b: Remove the `client.suigar.resolvePvPCoinflipGame()` client method. Use the exported generated helper `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` for one specific live PvP coinflip game object instead.
+- 4b59c7b: Remove the `client.suigar.resolvePvPCoinflipGame()` client method. Use the exported generated helper `client.suigar.bcs.PvPCoinflipGame.get({ client, objectId })` for one specific live PvP Coinflip game object instead.
 
   Add `parseCoinType` to `@suigar/sdk/utils` for extracting normalized coin types from generic Move object type strings.
 
@@ -263,7 +263,7 @@
 
 - 0292edb: Rename transaction builder option `owner` to `playerAddress` and remove the separate `sender` option so all game transactions use a single explicit player address.
 - 20311be: Improve the public JSDoc for `parseGameDetails`, `toBigInt`, and `toU8` so the generated API surface explains their coercion, validation, and decoding behavior more clearly.
-- a2aa324: Update PvP coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
+- a2aa324: Update PvP Coinflip lookup helpers to use bulk object reads for unresolved lobby discovery and support forwarded lookup options.
   - Make `getPvPCoinflipGames()` parse bulk `client.core.getObjects()` results instead of resolving each game individually.
   - Skip per-object fetch or parse failures by default and continue supporting strict rejection with `throwOnError: true`.
   - Forward supported lookup options such as `signal` through `getPvPCoinflipGames()` and `resolvePvPCoinflipGame(gameId, options?)`.
@@ -285,9 +285,9 @@
 
 ### Patch Changes
 
-- bf98e0a: Update PvP coinflip registry lookups so `getPvPCoinflipGames()` can skip individual game resolution failures by default while still supporting `rejectOnError: true` for strict rejection.
+- bf98e0a: Update PvP Coinflip registry lookups so `getPvPCoinflipGames()` can skip individual game resolution failures by default while still supporting `rejectOnError: true` for strict rejection.
   - Document the `rejectOnError` behavior in the public JSDoc and README examples.
-  - Clarify repo guidance and skill documentation to distinguish general PvP game guidance from the current PvP coinflip-specific runtime surface.
+  - Clarify repo guidance and skill documentation to distinguish general PvP game guidance from the current PvP Coinflip-specific runtime surface.
 
 ## 2.0.0-beta.4
 
@@ -301,12 +301,12 @@
   - integrate Mysten dApp Kit wallet connection, signing, and execution
   - add live transaction code previews and shared decoded event logging with SDK parser helpers
   - add Suigar-themed responsive UI, supported coin selection, and human-readable stake handling
-  - update PvP coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id
+  - update PvP Coinflip join so callers only provide `gameId` and the SDK derives the join stake while using the configured price info object id
 
 - b89d0b4: Add a public `@suigar/sdk/games` export subpath for shared game option types, and export `SuigarClient` from the package root.
 - bf1f71b: Add `registryIds` to `SuigarConfig` and resolve them from the network config registry map.
 
-  Document the PvP coinflip runtime helpers more clearly by describing registry-backed unresolved game discovery through `getPvPCoinflipGames()` and the normalized live-game lookup behavior of `resolvePvPCoinflipGame()`.
+  Document the PvP Coinflip runtime helpers more clearly by describing registry-backed unresolved game discovery through `getPvPCoinflipGames()` and the normalized live-game lookup behavior of `resolvePvPCoinflipGame()`.
 
 - 4861f55: Add public utility exports for shared scaling constants in `@suigar/sdk/utils`, including `RANGE_POINT_LIMIT` and `DEFAULT_RANGE_SCALE`. Update the SDK example app and documentation to use the exported constants and document limbo/range scaling behavior more clearly.
 
@@ -350,9 +350,9 @@
 
 - Initial release of `@suigar/sdk`, a TypeScript SDK for building Suigar v2 game transactions on Sui.
 - Added the `suigar()` client extension to public API.
-- Added transaction builders for `coinflip`, `limbo`, `plinko`, `range`, `wheel`, and PvP coinflip.
+- Added transaction builders for `coinflip`, `limbo`, `plinko`, `range`, `wheel`, and PvP Coinflip.
 - Added dedicated exported transaction option types for standard and PvP game builders, including shared bet option helpers and `BuildGameOptions` aliases.
-- Added generated contract bindings and BCS helpers, including `BetResultEvent` parsing support and PvP coinflip event BCS constructors for created, resolved, and cancelled events.
+- Added generated contract bindings and BCS helpers, including `BetResultEvent` parsing support and PvP Coinflip event BCS constructors for created, resolved, and cancelled events.
 - Added configuration utilities for package IDs, coin types, and network-aware SDK setup.
 - Expanded `SuigarClient` API documentation for transaction serialization, event decoding, and transaction builder helpers.
 - Added build, test, typecheck, code generation, release, and npm publishing workflows.

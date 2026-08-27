@@ -132,14 +132,14 @@ export const pvpCoinflipCreateInputSchema = commonBuildInputSchema
 
 export const pvpCoinflipJoinInputSchema = commonBuildInputSchema
 	.extend({
-		gameId: z.string().min(1).optional().describe('PvP coinflip game object id.'),
+		gameId: z.string().min(1).optional().describe('PvP Coinflip game object id.'),
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
 	})
 	.strict();
 
 export const pvpCoinflipCancelInputSchema = cancelBuildInputSchema
 	.extend({
-		gameId: z.string().min(1).optional().describe('PvP coinflip game object id.'),
+		gameId: z.string().min(1).optional().describe('PvP Coinflip game object id.'),
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
 	})
 	.strict();

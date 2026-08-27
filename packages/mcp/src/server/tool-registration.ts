@@ -354,7 +354,7 @@ const toolDefinitions = [
 		name: 'build_pvp_coinflip_create_transaction',
 		title: 'Build PvP Coinflip Create',
 		description:
-			'Build, dry-run, or inspect an unsigned Suigar PvP coinflip lobby creation transaction.',
+			'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip lobby creation transaction.',
 		inputSchema: pvpCoinflipCreateInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCreateTransactionTool,
@@ -363,7 +363,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_join_transaction',
 		title: 'Build PvP Coinflip Join',
-		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip join transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip join transaction.',
 		inputSchema: pvpCoinflipJoinInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipJoinTransactionTool,
@@ -372,7 +372,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_cancel_transaction',
 		title: 'Build PvP Coinflip Cancel',
-		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip cancel transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip cancel transaction.',
 		inputSchema: pvpCoinflipCancelInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,

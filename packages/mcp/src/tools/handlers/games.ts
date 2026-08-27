@@ -260,7 +260,7 @@ export async function buildPvpCoinflipCreateTransactionTool(
 				action: 'create',
 				requiredInputs: ['owner', 'stake', 'creatorSide'],
 				notes: [
-					'Creates an unresolved PvP coinflip lobby without signing or executing the transaction.',
+					'Creates an unresolved PvP Coinflip lobby without signing or executing the transaction.',
 				],
 			}),
 		);

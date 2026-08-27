@@ -128,7 +128,7 @@ export function buildPvPCoinflipTransaction(
 
 		default:
 			throw new RangeError(
-				`Unsupported PvP coinflip action: ${(options as { action?: string })?.action}`,
+				`Unsupported PvP Coinflip action: ${(options as { action?: string })?.action}`,
 			);
 	}
 }

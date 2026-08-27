@@ -8,7 +8,7 @@ It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
 - Referral claimable-amount reads and unsigned claim builders
-- Unsigned transaction builders for standard Suigar games and PvP coinflip
+- Unsigned transaction builders for standard Suigar games and PvP Coinflip
 - `build`, `dry-run`, and `read-only` modes
 - A compact MCP App UI resource for compatible hosts
 - Text and structured-content fallbacks for normal MCP clients
@@ -252,4 +252,4 @@ Transaction `metadata` values must be JSON-compatible strings, numbers, or boole
 
 - Coin object ids and explicit coin sourcing are intentionally not exposed.
 - The MCP package uses `@suigar/sdk` public builders instead of copied internal transaction builders.
-- PvP coinflip join may need live object reads when serialized or dry-run, because the SDK resolves the current game stake from the game object.
+- PvP Coinflip join may need live object reads when serialized or dry-run, because the SDK resolves the current game stake from the game object.

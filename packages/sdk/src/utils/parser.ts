@@ -44,7 +44,7 @@ export function parseCoinType(type: string): string {
  * Resolves a supported Suigar event into its normalized SDK game id and event name.
  *
  * This helper recognizes all supported Suigar event names in `GAME_EVENTS`.
- * Standard `BetResultEvent` payloads encode the game family through the core client event module or generic type parameter, while PvP coinflip events
+ * Standard `BetResultEvent` payloads encode the game family through the core client event module or generic type parameter, while PvP Coinflip events
  * resolve to the `pvp-coinflip` game id from their `pvp_coinflip` module.
  *
  * @param event Sui event returned by the core client.
