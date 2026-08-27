@@ -100,9 +100,12 @@ export function ReferralPage() {
 
 		setIsRefreshing(true);
 		setStatus(null);
-		const claims = await getReferralClaims(client, owner);
-		setClaimResult({ owner, claims });
-		setIsRefreshing(false);
+		try {
+			const claims = await getReferralClaims(client, owner);
+			setClaimResult({ owner, claims });
+		} finally {
+			setIsRefreshing(false);
+		}
 	}, [client, owner]);
 
 	React.useEffect(() => {
