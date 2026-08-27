@@ -11,7 +11,7 @@ export default function GlobalError({
 	reset: () => void;
 }) {
 	return (
-		<html lang="en">
+		<html lang="en" data-scroll-behavior="smooth">
 			<body className="min-h-dvh bg-background text-foreground">
 				<main className="mx-auto flex min-h-dvh w-full max-w-3xl items-center px-6 py-16">
 					<section className="w-full rounded-3xl border border-border/70 bg-card/90 p-8 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
