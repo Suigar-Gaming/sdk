@@ -11,7 +11,6 @@ export function buildCoinflipTransaction(
 ): Transaction {
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'coinflip',
 		buildRewardCoin: ({
 			config,
 			coinType,

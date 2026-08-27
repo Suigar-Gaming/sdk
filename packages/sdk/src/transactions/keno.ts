@@ -13,7 +13,6 @@ export function buildKenoTransaction(options: WithPartner<KenoTransactionOptions
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'keno',
 		buildRewardCoin: ({
 			config,
 			coinType,

@@ -16,7 +16,6 @@ export function buildSoccerTransaction(
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'soccer',
 		buildRewardCoin: ({
 			config,
 			coinType,

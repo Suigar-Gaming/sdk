@@ -14,7 +14,6 @@ export function buildRangeTransaction(options: WithPartner<RangeTransactionOptio
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'range',
 		buildRewardCoin: ({
 			config,
 			coinType,

@@ -14,7 +14,6 @@ export function buildPlinkoTransaction(
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'plinko',
 		buildRewardCoin: ({
 			config,
 			coinType,
