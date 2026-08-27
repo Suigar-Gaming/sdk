@@ -55,6 +55,11 @@ import {
 	requireString,
 } from './shared.js';
 
+type BetTransactionToolInput =
+	| StandardTransactionToolInput
+	| PvpCoinflipCreateInput
+	| PvpCoinflipJoinInput;
+
 export async function buildCoinflipTransactionTool(
 	input: CoinflipInput = {},
 ): Promise<ToolTextResult> {
@@ -337,7 +342,7 @@ export async function buildPvpCoinflipCancelTransactionTool(
 		gameInputs: { gameId },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.pvpCoinflip.cancelGame({
-				...(await gameTransactionOptions(input, bundle)),
+				...(await cancelTransactionOptions(input, bundle)),
 				gameId,
 			}),
 	});
@@ -419,14 +424,26 @@ function readOnlyPlan({
 }
 
 async function gameTransactionOptions(
-	input: TransactionToolInput,
+	input: BetTransactionToolInput,
 	bundle: SuigarClientBundle,
 ): Promise<
-	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
-		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
+	Required<Pick<BetTransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<BetTransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
 > {
+	return {
+		owner: await resolveTransactionOwner(input, bundle),
+		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
+		metadata: input.metadata,
+		gasBudget: input.gasBudget,
+		useGasCoin: input.useGasCoin,
+	};
+}
+
+async function resolveTransactionOwner(
+	input: Pick<TransactionToolInput, 'mode' | 'executionWallet' | 'owner' | 'sessionWalletId'>,
+	bundle: SuigarClientBundle,
+): Promise<string> {
 	const sessionExecution = getMode(input.mode) === 'execute' && input.executionWallet === 'session';
-	let owner: string;
 	if (sessionExecution) {
 		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
 		if (!sessionWallet) {
@@ -448,16 +465,23 @@ async function gameTransactionOptions(
 				);
 			}
 		}
-		owner = sessionAddress;
-	} else {
-		owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
+		return sessionAddress;
 	}
+
+	return resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
+}
+
+async function cancelTransactionOptions(
+	input: PvpCoinflipCancelInput,
+	bundle: SuigarClientBundle,
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'gasBudget'>
+> {
 	return {
-		owner,
+		owner: await resolveTransactionOwner(input, bundle),
 		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
-		metadata: input.metadata,
 		gasBudget: input.gasBudget,
-		useGasCoin: input.useGasCoin,
 	};
 }
 
@@ -502,8 +526,8 @@ async function stakeOptions(
 	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
 ): Promise<
-	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
-		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
+	Required<Pick<BetTransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<BetTransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
 			betCount?: number | bigint;
 			cashStake?: bigint;
 			stake: bigint;

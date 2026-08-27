@@ -43,6 +43,11 @@ const commonBuildInputSchema = configInputSchema
 	})
 	.strict();
 
+const cancelBuildInputSchema = commonBuildInputSchema.omit({
+	metadata: true,
+	useGasCoin: true,
+});
+
 const stakeBuildInputSchema = commonBuildInputSchema
 	.extend({
 		stake: currencyAmountSchema.optional().describe(`Logical wager. ${currencyAmountDescription}`),
@@ -132,7 +137,7 @@ export const pvpCoinflipJoinInputSchema = commonBuildInputSchema
 	})
 	.strict();
 
-export const pvpCoinflipCancelInputSchema = commonBuildInputSchema
+export const pvpCoinflipCancelInputSchema = cancelBuildInputSchema
 	.extend({
 		gameId: z.string().min(1).optional().describe('PvP coinflip game object id.'),
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),

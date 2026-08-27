@@ -456,14 +456,17 @@ const tx = client.suigar.tx.pvpCoinflip.cancelGame({
 });
 ```
 
-PvP coinflip create builds the stake coin from the owner's balance with Mysten coin intent helpers. Join derives the stake from `gameId` and uses the configured price info object id for `coinType`. Omit `useGasCoin` to use Mysten's default coin intent behavior.
+PvP Coinflip create builds the stake coin from the owner's balance with Mysten coin intent helpers. Join derives the stake from `gameId` and uses the configured price info object id for `coinType`. Omit `useGasCoin` to use Mysten's default coin intent behavior. Cancel does not build a bet coin or write metadata.
 
-PvP shared options:
+PvP Coinflip shared options:
 
 - `owner: string`
 - `coinType: string`
-- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
+
+PvP Coinflip create/join shared options:
+
+- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `useGasCoin?: boolean`
 
 Action-specific options:

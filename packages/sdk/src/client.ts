@@ -433,7 +433,6 @@ export class SuigarClient {
 					...options,
 					action: 'cancel',
 					config: this.#config,
-					partner: this.#partner,
 				});
 			},
 		},

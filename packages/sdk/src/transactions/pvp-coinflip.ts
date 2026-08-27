@@ -23,7 +23,9 @@ import { createBaseTransaction } from './shared.js';
 type BuildPvPCoinflipTransactionOptions<TAction extends PvPCoinflipAction = PvPCoinflipAction> = {
 	[Action in PvPCoinflipAction]: (Action extends 'join'
 		? WithClient<WithPartner<PvPCoinflipTransactionOptions<Action>>>
-		: WithPartner<PvPCoinflipTransactionOptions<Action>>) & {
+		: Action extends 'cancel'
+			? PvPCoinflipTransactionOptions<Action>
+			: WithPartner<PvPCoinflipTransactionOptions<Action>>) & {
 		action: Action;
 	};
 }[TAction];
@@ -56,17 +58,14 @@ export function buildPvPCoinflipTransaction(
 	options: BuildPvPCoinflipTransactionOptions,
 ): Transaction {
 	const tx = createBaseTransaction(options);
-	const { config, metadata, partner } = options;
+	const { config } = options;
 
 	const normalizedCoinType = normalizeStructTag(options.coinType);
-	const encodedMetadata = encodeBetMetadata({
-		metadata,
-		partner,
-	});
 
 	switch (options.action) {
 		case 'create': {
 			const stake = toBigInt(options.stake);
+			const encodedMetadata = encodeBetMetadata(options);
 
 			tx.add(
 				createGame({
@@ -90,6 +89,7 @@ export function buildPvPCoinflipTransaction(
 		}
 
 		case 'join': {
+			const encodedMetadata = encodeBetMetadata(options);
 			const priceInfoObjectId = resolvePriceInfoObjectId({
 				config,
 				coinType: normalizedCoinType,
