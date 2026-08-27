@@ -1,8 +1,8 @@
-import { bcs } from '@mysten/sui/bcs';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
 import { MoveStruct } from '../utils/index.js';
+import { bcs } from '@mysten/sui/bcs';
 import * as i64 from './i64.js';
 const $moduleName = '@suigar/core::float';
 export const Float = new MoveStruct({

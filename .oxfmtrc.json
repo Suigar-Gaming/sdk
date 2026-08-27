@@ -12,7 +12,8 @@
 		{
 			"files": ["packages/*/src/contracts/**"],
 			"options": {
-				"jsdoc": false
+				"jsdoc": false,
+				"sortImports": false
 			}
 		}
 	],

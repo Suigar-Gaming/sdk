@@ -1,9 +1,9 @@
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 const $moduleName = '@suigar/coinflip::coinflip';
 export const CoinFlipSettingsKey = new MoveStruct({
 	name: `${$moduleName}::CoinFlipSettingsKey`,

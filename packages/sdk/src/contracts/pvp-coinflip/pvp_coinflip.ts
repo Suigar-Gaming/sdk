@@ -1,12 +1,12 @@
-import { bcs } from '@mysten/sui/bcs';
-import { type Transaction } from '@mysten/sui/transactions';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
 import { MoveStruct, normalizeMoveArguments, type RawTransactionArgument } from '../utils/index.js';
-import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
-import * as balance from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/balance.js';
+import { bcs } from '@mysten/sui/bcs';
+import { type Transaction } from '@mysten/sui/transactions';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
+import * as balance from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/balance.js';
+import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
 const $moduleName = '@suigar/pvp-coinflip::pvp_coinflip';
 export const PvpCoinflipSettingsKey = new MoveStruct({
 	name: `${$moduleName}::PvpCoinflipSettingsKey`,
