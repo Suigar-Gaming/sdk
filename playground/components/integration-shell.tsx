@@ -393,7 +393,7 @@ function resolvePlayableConfigId(
 }
 
 const floatingActionNode = (
-	<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
+	<div className="fixed right-4 bottom-4 z-50 md:right-6 md:bottom-6">
 		<Button asChild className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5">
 			<a
 				href="https://suigar.com/docs/sdk"
@@ -432,14 +432,14 @@ function IntegrationHero({
 	onPvPActionChange: (value: PvPAction) => void;
 }) {
 	return (
-		<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+		<section className="border-border/70 bg-card/80 relative overflow-hidden rounded-3xl border px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<div className="relative flex flex-col gap-4">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 					<div className="space-y-2">
-						<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
+						<h1 className="text-foreground text-2xl leading-none md:text-4xl xl:text-5xl">
 							Suigar Game Playground
 						</h1>
-						<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+						<p className="text-muted-foreground max-w-2xl text-sm leading-6 md:text-base">
 							Build standard and PvP transactions, inspect the exact builder call, execute it, and
 							keep a shared decoded event log.
 						</p>
@@ -475,7 +475,7 @@ function IntegrationHero({
 									<Select value={standardGame} onValueChange={onStandardGameChange}>
 										<SelectTrigger
 											aria-label="Select standard game"
-											className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+											className="border-border/70 bg-background/55 h-11 rounded-full px-4"
 										>
 											<SelectValue />
 										</SelectTrigger>
@@ -494,7 +494,7 @@ function IntegrationHero({
 										<Select value={pvpGame} onValueChange={onPvPGameChange}>
 											<SelectTrigger
 												aria-label="Select PvP game"
-												className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+												className="border-border/70 bg-background/55 h-11 rounded-full px-4"
 											>
 												<SelectValue />
 											</SelectTrigger>
@@ -531,9 +531,9 @@ function IntegrationHero({
 					</div>
 				</div>
 
-				<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
-					Stake inputs use human values like <span className="font-medium text-foreground">1</span>{' '}
-					or <span className="font-medium text-foreground">2.5</span> and are converted to atomic
+				<div className="border-border/70 bg-background/35 text-muted-foreground rounded-2xl border px-4 py-3 text-sm">
+					Stake inputs use human values like <span className="text-foreground font-medium">1</span>{' '}
+					or <span className="text-foreground font-medium">2.5</span> and are converted to atomic
 					units in the generated transaction.
 				</div>
 			</div>
@@ -632,9 +632,9 @@ function IntegrationControls({
 }) {
 	const controlsIcon =
 		mode === 'standard' ? (
-			<Gamepad2 className="size-5 text-secondary dark:text-primary" />
+			<Gamepad2 className="text-secondary dark:text-primary size-5" />
 		) : (
-			<Swords className="size-5 text-secondary dark:text-primary" />
+			<Swords className="text-secondary dark:text-primary size-5" />
 		);
 
 	return (
@@ -662,7 +662,7 @@ function IntegrationControls({
 						variant="ghost"
 						size="sm"
 						onClick={openSettings}
-						className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
+						className="border-border/70 bg-background/45 text-muted-foreground hover:bg-accent hover:text-foreground h-10 rounded-full border px-4"
 					>
 						<Cog className="size-4" />
 						Settings
@@ -762,7 +762,7 @@ function IntegrationControls({
 							) : null}
 							{pvpAction === 'join' ? (
 								<>
-									<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
+									<div className="border-border/70 bg-background/45 rounded-2xl border p-4">
 										<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 											<div className="min-w-0 space-y-1">
 												<FieldLabel htmlFor="join-private-lobbies">Show private lobbies</FieldLabel>
@@ -774,7 +774,7 @@ function IntegrationControls({
 											<Switch
 												id="join-private-lobbies"
 												size="default"
-												className="mt-0.5 justify-self-end self-start"
+												className="mt-0.5 self-start justify-self-end"
 												checked={showPrivateJoinLobbies}
 												onCheckedChange={setShowPrivateJoinLobbies}
 											/>
@@ -1703,7 +1703,7 @@ function useIntegrationState({
 const loadingNavNode = <AppHeader />;
 
 const loadingHeroNode = (
-	<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+	<section className="border-border/70 bg-card/80 relative overflow-hidden rounded-3xl border px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 		<div className="relative flex flex-col gap-4">
 			<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 				<div className="space-y-2">
@@ -1727,7 +1727,7 @@ const loadingHeroNode = (
 const loadingControlsNode = (
 	<SectionShell
 		title="Loading controls"
-		icon={<Gamepad2 className="size-5 text-secondary dark:text-primary" />}
+		icon={<Gamepad2 className="text-secondary dark:text-primary size-5" />}
 		description="Preparing the current route state and playground controls."
 	>
 		<div className="space-y-4">

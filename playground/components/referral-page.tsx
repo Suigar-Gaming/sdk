@@ -229,14 +229,14 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 				</div>
 			</div>
 
-			<main className="mx-auto mt-2 w-full max-w-[1500px] px-3 pb-8 pt-20 md:px-5 md:pt-24 lg:px-8">
-				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
+			<main className="mx-auto mt-2 w-full max-w-[1500px] px-3 pt-20 pb-8 md:px-5 md:pt-24 lg:px-8">
+				<section className="border-border/70 bg-card/80 mb-6 rounded-4xl border p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
 							<h1 className="text-2xl leading-none md:text-4xl xl:text-5xl">
 								Suigar Rewards Claim
 							</h1>
-							<p className="mt-3 max-w-2xl text-muted-foreground">
+							<p className="text-muted-foreground mt-3 max-w-2xl">
 								Amounts are simulated from the current on-chain referral state before you sign a
 								claim.
 							</p>
@@ -305,7 +305,7 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 								</CardHeader>
 								<CardContent className="space-y-4">
 									<div>
-										<p className="text-sm text-muted-foreground">Claimable now</p>
+										<p className="text-muted-foreground text-sm">Claimable now</p>
 										{isLoading ? (
 											<Skeleton className="mt-2 h-9 w-32" />
 										) : (
@@ -314,7 +314,7 @@ await dAppKit.signAndExecuteTransaction({ transaction: commissionTx });`;
 											</p>
 										)}
 									</div>
-									{claim.error ? <p className="text-sm text-destructive">{claim.error}</p> : null}
+									{claim.error ? <p className="text-destructive text-sm">{claim.error}</p> : null}
 									<Button
 										className="w-full"
 										disabled={

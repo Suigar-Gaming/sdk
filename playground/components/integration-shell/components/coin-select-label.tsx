@@ -17,7 +17,7 @@ export function CoinSelectLabel({
 		<div className="flex min-w-0 items-center gap-2 whitespace-nowrap">
 			<CoinIcon coinKey={coinKey} className="size-5 shrink-0" />
 			<div className="flex min-w-0 items-center gap-1.5 leading-none">
-				<span className="min-w-0 truncate font-medium tabular-nums leading-none text-foreground">
+				<span className="text-foreground min-w-0 truncate leading-none font-medium tabular-nums">
 					{amount}
 				</span>
 				<span

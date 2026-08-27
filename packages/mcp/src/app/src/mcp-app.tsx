@@ -172,7 +172,7 @@ export function SuigarInspectorApp(): JSX.Element | null {
 			<main className={shellClassName}>
 				<Header status="Connecting" title="Suigar MCP" />
 				<Panel title="Connection">
-					<p className="text-xs leading-5 font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs leading-5 font-semibold">
 						Waiting for host context.
 					</p>
 				</Panel>

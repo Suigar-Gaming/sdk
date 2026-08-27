@@ -97,12 +97,12 @@ function CopyableValue({
 
 	return (
 		<div className="flex items-center gap-2">
-			<span className="font-mono text-muted-foreground">{compactAddress(displayValue)}</span>
+			<span className="text-muted-foreground font-mono">{compactAddress(displayValue)}</span>
 			<Button
 				type="button"
 				variant="outline"
 				size="icon-sm"
-				className="size-7 text-muted-foreground rounded-full"
+				className="text-muted-foreground size-7 rounded-full"
 				onClick={copyValue}
 				title={`Copy ${label}`}
 				aria-label={`Copy ${label}`}
@@ -114,7 +114,7 @@ function CopyableValue({
 					asChild
 					variant="outline"
 					size="icon-sm"
-					className="size-7 text-muted-foreground rounded-full"
+					className="text-muted-foreground size-7 rounded-full"
 				>
 					<a
 						href={explorerHref}
@@ -139,7 +139,7 @@ export function EventsTable() {
 			<CardHeader className="relative">
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
-						<ListTree className="size-5 text-secondary dark:text-primary" />
+						<ListTree className="text-secondary dark:text-primary size-5" />
 						Decoded events
 					</CardTitle>
 					<CardDescription>
@@ -155,29 +155,29 @@ export function EventsTable() {
 				</CardAction>
 			</CardHeader>
 			<CardContent className="min-h-[12rem]">
-				<div className="overflow-hidden border-border/70 rounded-2xl border">
+				<div className="border-border/70 overflow-hidden rounded-2xl border">
 					<div className="max-h-[28rem] overflow-auto">
-						<Table className="min-w-[44rem] md:min-w-full bg-background">
+						<Table className="bg-background min-w-[44rem] md:min-w-full">
 							<TableHeader className="bg-accent">
 								<TableRow className="hover:bg-transparent">
-									<TableHead className="sticky top-0 z-10 bg-accent">Type</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">Date</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">Digest</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">Game ID</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">Player</TableHead>
-									<TableHead className="sticky top-0 z-10 bg-accent">Details</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Type</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Date</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Digest</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Game ID</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Player</TableHead>
+									<TableHead className="bg-accent sticky top-0 z-10">Details</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{rows.length === 0 ? (
 									<TableRow>
-										<TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+										<TableCell colSpan={6} className="text-muted-foreground py-10 text-center">
 											Execute a transaction to start filling the shared event log.
 										</TableCell>
 									</TableRow>
 								) : (
 									rows.map((row) => (
-										<TableRow key={row.id} className="align-top odd:bg-accent/35 even:bg-card/55">
+										<TableRow key={row.id} className="odd:bg-accent/35 even:bg-card/55 align-top">
 											<TableCell className="font-medium">{row.eventType}</TableCell>
 											<TableCell className="text-muted-foreground">
 												{formatEventTimestamp(row.timestamp)}
@@ -193,7 +193,7 @@ export function EventsTable() {
 											<TableCell className="text-xs">
 												<CopyableValue label="game id" value={row.gameId} onCopied={handleCopied} />
 											</TableCell>
-											<TableCell className="text-xs text-muted-foreground">
+											<TableCell className="text-muted-foreground text-xs">
 												<CopyableValue
 													label="player"
 													value={row.actor}

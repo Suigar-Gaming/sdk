@@ -178,12 +178,12 @@ const ownedNfts = page.objects.map(({ content }) =>
 				</div>
 			</div>
 
-			<main className="mx-auto mt-2 w-full max-w-[1500px] px-3 pb-8 pt-20 md:px-5 md:pt-24 lg:px-8">
-				<section className="mb-6 rounded-4xl border border-border/70 bg-card/80 p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
+			<main className="mx-auto mt-2 w-full max-w-[1500px] px-3 pt-20 pb-8 md:px-5 md:pt-24 lg:px-8">
+				<section className="border-border/70 bg-card/80 mb-6 rounded-4xl border p-6 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>
 							<h1 className="text-2xl leading-none md:text-4xl xl:text-5xl">Suigar NFTs</h1>
-							<p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+							<p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6 md:text-base">
 								Browse the configured Suigar NFT collection, inspect live factory supply, and see
 								which specs are already held by the connected wallet.
 							</p>
@@ -248,7 +248,7 @@ const ownedNfts = page.objects.map(({ content }) =>
 													/>
 												</div>
 											) : (
-												<div className="mx-auto mb-3 aspect-square w-full max-w-80 rounded-2xl bg-background/35" />
+												<div className="bg-background/35 mx-auto mb-3 aspect-square w-full max-w-80 rounded-2xl" />
 											)}
 											<div className="flex w-full items-center justify-between gap-3">
 												<CardTitle>{name}</CardTitle>
@@ -267,9 +267,9 @@ const ownedNfts = page.objects.map(({ content }) =>
 											<CardDescription className="mt-2">{description}</CardDescription>
 										</CardHeader>
 										<CardContent className="space-y-3 p-4 pt-0">
-											<div className="flex items-center justify-between text-sm text-muted-foreground">
+											<div className="text-muted-foreground flex items-center justify-between text-sm">
 												<span>Available</span>
-												<span className="font-medium text-foreground">
+												<span className="text-foreground font-medium">
 													{spec.available ?? '—'}
 													{spec.supply ? ` / ${spec.supply}` : ''}
 												</span>

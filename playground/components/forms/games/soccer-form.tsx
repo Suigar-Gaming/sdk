@@ -49,7 +49,7 @@ export function SoccerForm({
 						<SelectTrigger
 							id="soccerConfigId"
 							aria-label="Select Soccer config"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -68,7 +68,7 @@ export function SoccerForm({
 						min="0"
 						max="255"
 						step="1"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
+						className="bg-background/55 h-11 rounded-2xl px-4"
 						value={value.configId}
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>
@@ -100,7 +100,7 @@ export function SoccerForm({
 							<SelectTrigger
 								id="soccerCountryId"
 								aria-label="Select Soccer country"
-								className="h-11 px-4 bg-background/55 rounded-2xl"
+								className="bg-background/55 h-11 rounded-2xl px-4"
 							>
 								<SelectValue />
 							</SelectTrigger>
@@ -119,7 +119,7 @@ export function SoccerForm({
 							min="0"
 							max="65535"
 							step="1"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 							value={value.countryId}
 							onChange={(event) => onChange({ countryId: event.target.value })}
 						/>
@@ -138,7 +138,7 @@ export function SoccerForm({
 							<SelectTrigger
 								id="soccerShotZoneId"
 								aria-label="Select Soccer shot zone"
-								className="h-11 px-4 bg-background/55 rounded-2xl"
+								className="bg-background/55 h-11 rounded-2xl px-4"
 							>
 								<SelectValue />
 							</SelectTrigger>
@@ -157,7 +157,7 @@ export function SoccerForm({
 							min="0"
 							max="255"
 							step="1"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 							value={value.shotZoneId}
 							onChange={(event) => onChange({ shotZoneId: event.target.value })}
 						/>

@@ -87,7 +87,7 @@ export default function RootLayout({
 			suppressHydrationWarning
 			className={`${sans.variable} ${serif.variable} ${mono.variable} h-full`}
 		>
-			<body className="min-h-full antialiased bg-background text-foreground">
+			<body className="bg-background text-foreground min-h-full antialiased">
 				<AppProviders>{children}</AppProviders>
 			</body>
 		</html>

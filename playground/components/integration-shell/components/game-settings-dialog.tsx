@@ -43,17 +43,17 @@ function SettingsSummaryCard({
 	isLoading?: boolean;
 }) {
 	return (
-		<Card className="bg-background/40 shadow-none rounded-2xl">
+		<Card className="bg-background/40 rounded-2xl shadow-none">
 			<CardContent className="p-4">
-				<div className="flex items-center gap-1.5 text-xs font-medium uppercase text-muted-foreground">
+				<div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium uppercase">
 					<span>{title}</span>
 					{isLoading ? <Spinner data-icon="size-3.5" /> : null}
 				</div>
-				<div className="flex flex-wrap items-center text-lg font-semibold mt-2 gap-2 text-foreground">
+				<div className="text-foreground mt-2 flex flex-wrap items-center gap-2 text-lg font-semibold">
 					{value}
 				</div>
 				{description ? (
-					<div className="text-sm mt-1 text-muted-foreground">{description}</div>
+					<div className="text-muted-foreground mt-1 text-sm">{description}</div>
 				) : null}
 			</CardContent>
 		</Card>
@@ -69,7 +69,7 @@ function SettingsStateCard({
 }) {
 	return (
 		<Card className={className}>
-			<CardContent className="text-sm p-5">{children}</CardContent>
+			<CardContent className="p-5 text-sm">{children}</CardContent>
 		</Card>
 	);
 }
@@ -92,7 +92,7 @@ function GameSettingsDialogHeader({
 	onRefresh?: () => void;
 }) {
 	return (
-		<DialogHeader className="z-10 gap-4 border-b border-border/70 bg-card/95 px-4 py-4 md:px-6 md:py-5">
+		<DialogHeader className="border-border/70 bg-card/95 z-10 gap-4 border-b px-4 py-4 md:px-6 md:py-5">
 			<div className="flex flex-wrap items-start justify-between gap-3">
 				<div className="flex flex-wrap items-center gap-2.5">
 					<Badge variant="default" className="px-3 py-1">
@@ -192,7 +192,7 @@ function GameSettingsOverview({
 									<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
 								</>
 							)}
-							<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-widest text-muted-foreground">
+							<span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
 								<CoinIcon coinKey={coinKey} className="size-4" />
 								{coinLabel}
 							</span>
@@ -234,12 +234,12 @@ function GameSettingsOverview({
 								</PopoverTrigger>
 								<PopoverContent
 									align="start"
-									className="w-[min(22rem,calc(100vw-3rem))] gap-3 rounded-2xl border border-border/70 bg-popover/98 p-4"
+									className="border-border/70 bg-popover/98 w-[min(22rem,calc(100vw-3rem))] gap-3 rounded-2xl border p-4"
 								>
 									<div className="space-y-3 text-sm">
 										<div className="min-w-0 overflow-x-auto">
-											<div className="flex w-max min-w-full flex-nowrap items-center gap-1 text-muted-foreground">
-												<span className="shrink-0 font-medium text-foreground">Stake range:</span>
+											<div className="text-muted-foreground flex w-max min-w-full flex-nowrap items-center gap-1">
+												<span className="text-foreground shrink-0 font-medium">Stake range:</span>
 												<FieldCode className="shrink-0">
 													{activeConfigOption.stakeRange.min}
 												</FieldCode>
@@ -247,7 +247,7 @@ function GameSettingsOverview({
 												<FieldCode className="shrink-0">
 													{activeConfigOption.stakeRange.max}
 												</FieldCode>
-												<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium uppercase tracking-widest">
+												<span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
 													<CoinIcon coinKey={coinKey} className="size-4" />
 													{coinLabel}
 												</span>
@@ -258,7 +258,7 @@ function GameSettingsOverview({
 												{activeConfigDetails.map((detail) => (
 													<div
 														key={`active-config-${detail.label}`}
-														className="flex items-center gap-1 text-muted-foreground"
+														className="text-muted-foreground flex items-center gap-1"
 													>
 														<span>{detail.label}: </span>
 														<FieldCode>{detail.value}</FieldCode>
@@ -268,7 +268,7 @@ function GameSettingsOverview({
 										) : null}
 										{activeMultiplierValues.length ? (
 											<>
-												<div className="mb-2 flex items-center gap-1 text-foreground">
+												<div className="text-foreground mb-2 flex items-center gap-1">
 													<span>Multipliers:</span>
 													<FieldCode className="font-medium">
 														{activeMultiplierValues.length}
@@ -334,10 +334,10 @@ function GameSettingsPanels({
 	return (
 		<Accordion
 			type="multiple"
-			className="overflow-hidden rounded-2xl border border-border/70 bg-background/30"
+			className="border-border/70 bg-background/30 overflow-hidden rounded-2xl border"
 			defaultValue={['request']}
 		>
-			<AccordionItem value="request" className="border-b border-border/70 px-5 last:border-b-0">
+			<AccordionItem value="request" className="border-border/70 border-b px-5 last:border-b-0">
 				<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 					Lookup request
 				</AccordionTrigger>
@@ -352,12 +352,12 @@ function GameSettingsPanels({
 			</AccordionItem>
 
 			{configOptions?.length ? (
-				<AccordionItem value="configs" className="border-b border-border/70 px-5 last:border-b-0">
+				<AccordionItem value="configs" className="border-border/70 border-b px-5 last:border-b-0">
 					<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 						Config options
 					</AccordionTrigger>
 					<AccordionContent className="space-y-1">
-						<p className="text-sm text-muted-foreground">
+						<p className="text-muted-foreground text-sm">
 							Playable configs stay enabled in the form selector.
 						</p>
 						<GameSettingsConfigList
@@ -369,13 +369,13 @@ function GameSettingsPanels({
 				</AccordionItem>
 			) : null}
 
-			<AccordionItem value="payload" className="border-b border-border/70 px-5 last:border-b-0">
+			<AccordionItem value="payload" className="border-border/70 border-b px-5 last:border-b-0">
 				<AccordionTrigger className="rounded-none border-0 px-0 hover:no-underline">
 					Raw payload
 				</AccordionTrigger>
 				<AccordionContent>
 					{isLoading && !serializedGameSettings ? (
-						<SettingsStateCard className="inline-flex bg-background/40 text-muted-foreground shadow-none">
+						<SettingsStateCard className="bg-background/40 text-muted-foreground inline-flex shadow-none">
 							<div className="flex items-center gap-1">
 								<Spinner />
 								Loading game settings from on-chain parameters.
@@ -448,7 +448,7 @@ export function GameSettingsDialog({
 			<DialogContent
 				size="xl"
 				showCloseButton={false}
-				className="flex h-[84dvh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden p-0 border-border/80 bg-card/92 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] border sm:h-[94dvh]"
+				className="border-border/80 bg-card/92 flex h-[84dvh] w-[min(96vw,1600px)] max-w-[min(96vw,1600px)] flex-col overflow-hidden border p-0 shadow-[0_32px_90px_-44px_rgba(8,47,91,0.48)] sm:h-[94dvh]"
 			>
 				<GameSettingsDialogHeader
 					coinKey={coinKey}

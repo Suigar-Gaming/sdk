@@ -18,13 +18,13 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 		return (
 			<section className="grid grid-cols-1 gap-3.5">
 				<Panel title="Set up your session wallet">
-					<p className="text-xs font-semibold leading-5 text-muted-foreground">
+					<p className="text-muted-foreground text-xs leading-5 font-semibold">
 						{typeof sessionWallet.note === 'string'
 							? sessionWallet.note
 							: 'Create or recover the session wallet shared by mainnet and testnet.'}
 					</p>
 					<a
-						className="inline-flex min-h-10 w-max items-center justify-center rounded-md border border-primary/75 bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
+						className="border-primary/75 bg-primary text-primary-foreground inline-flex min-h-10 w-max items-center justify-center rounded-md border px-4 py-2 text-sm font-extrabold"
 						href={setupUrl}
 						rel="noreferrer"
 						target="_blank"
@@ -50,7 +50,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 			</Panel>
 			<Panel title="Balances">
 				{balances.length === 0 ? (
-					<p className="text-xs font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs font-semibold">
 						No balances found for this wallet.
 					</p>
 				) : (
@@ -60,7 +60,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 							return (
 								<div className="flex justify-between gap-3 text-xs" key={String(balance.coinType)}>
 									<dt
-										className="truncate font-mono text-muted-foreground"
+										className="text-muted-foreground truncate font-mono"
 										title={String(balance.coinType)}
 									>
 										{String(balance.symbol ?? balance.coinType)}
@@ -80,19 +80,19 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 					<div className="grid justify-items-center gap-3">
 						<img
 							alt="QR code for the session wallet address"
-							className="size-48 rounded-md border border-border/70 bg-white p-2"
+							className="border-border/70 size-48 rounded-md border bg-white p-2"
 							height={192}
 							src={qrCode}
 							width={192}
 						/>
-						<p className="text-center text-xs font-semibold leading-5 text-muted-foreground">
+						<p className="text-muted-foreground text-center text-xs leading-5 font-semibold">
 							{typeof funding.note === 'string'
 								? funding.note
 								: 'Scan this code in a Sui wallet to fund the session wallet.'}
 						</p>
 						{fundingUrl ? (
 							<a
-								className="inline-flex min-h-10 items-center justify-center rounded-md border border-primary/75 bg-primary px-4 py-2 text-sm font-extrabold text-primary-foreground"
+								className="border-primary/75 bg-primary text-primary-foreground inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-extrabold"
 								href={fundingUrl}
 								rel="noreferrer"
 								target="_blank"
@@ -102,7 +102,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 						) : null}
 					</div>
 				) : (
-					<p className="text-xs font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs font-semibold">
 						No funding QR code is available.
 					</p>
 				)}

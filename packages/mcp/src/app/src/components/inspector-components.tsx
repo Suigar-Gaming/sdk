@@ -31,23 +31,23 @@ export function Header({
 	title?: string;
 }) {
 	return (
-		<header className="flex min-w-0 flex-col gap-4 rounded-lg border border-border/70 bg-card/88 p-4 sm:flex-row sm:items-center sm:justify-between">
+		<header className="border-border/70 bg-card/88 flex min-w-0 flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
+				<p className="text-muted-foreground mb-1 text-xs font-extrabold tracking-widest uppercase">
 					Suigar MCP
 				</p>
-				<h1 className="text-2xl leading-tight font-extrabold text-foreground">{title}</h1>
+				<h1 className="text-foreground text-2xl leading-tight font-extrabold">{title}</h1>
 			</div>
 			<div className="flex max-w-full flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
 				{coinBadge ? (
 					<div
-						className="w-max max-w-full rounded-full border border-secondary/75 bg-secondary px-3 py-1.5 font-mono text-xs leading-tight font-extrabold text-secondary-foreground"
+						className="border-secondary/75 bg-secondary text-secondary-foreground w-max max-w-full rounded-full border px-3 py-1.5 font-mono text-xs leading-tight font-extrabold"
 						title={`Coin ${coinBadge}`}
 					>
 						{coinBadge}
 					</div>
 				) : null}
-				<div className="w-max max-w-full rounded-full border border-primary/75 bg-primary px-3 py-1.5 text-xs leading-tight font-extrabold text-primary-foreground">
+				<div className="border-primary/75 bg-primary text-primary-foreground w-max max-w-full rounded-full border px-3 py-1.5 text-xs leading-tight font-extrabold">
 					{status.toLowerCase()}
 				</div>
 			</div>
@@ -63,15 +63,15 @@ export function ExecutionApproval({ url }: { url: string | null }) {
 	return (
 		<section className={cn(panelClassName, 'justify-items-center px-4 py-5 text-center')}>
 			<div>
-				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">
+				<h2 className="text-card-foreground text-sm leading-tight font-extrabold">
 					Transaction approval
 				</h2>
-				<p className="mt-1 text-xs leading-5 font-semibold text-muted-foreground">
+				<p className="text-muted-foreground mt-1 text-xs leading-5 font-semibold">
 					Review the transaction in your wallet before submitting it.
 				</p>
 			</div>
 			<a
-				className="inline-flex min-h-10 items-center justify-center rounded-md border border-primary/75 bg-primary px-5 py-2 text-sm font-extrabold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+				className="border-primary/75 bg-primary text-primary-foreground focus-visible:outline-ring inline-flex min-h-10 items-center justify-center rounded-md border px-5 py-2 text-sm font-extrabold transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2"
 				href={url}
 				rel="noreferrer"
 				target="_blank"
@@ -100,7 +100,7 @@ export function Panel({
 	return (
 		<section className={cn(panelClassName, className)}>
 			<div className="flex min-w-0 items-center justify-between gap-3">
-				<h2 className="text-sm leading-tight font-extrabold text-card-foreground">{title}</h2>
+				<h2 className="text-card-foreground text-sm leading-tight font-extrabold">{title}</h2>
 			</div>
 			{children}
 		</section>
@@ -120,7 +120,7 @@ export function DefinitionList({ entries }: { entries: Array<DefinitionEntry> })
 				const tone = valueTone(label, value);
 				return (
 					<div className="contents" key={label}>
-						<dt className="flex min-h-8 items-center text-xs leading-5 font-bold text-muted-foreground">
+						<dt className="text-muted-foreground flex min-h-8 items-center text-xs leading-5 font-bold">
 							{label}
 						</dt>
 						<dd
@@ -165,10 +165,10 @@ export function ListPanel({
 export function RawPayload({ payload }: { payload: unknown }) {
 	return (
 		<details className={cn(panelClassName, 'block')}>
-			<summary className="cursor-pointer list-inside text-xs font-extrabold text-muted-foreground outline-ring focus-visible:rounded-md focus-visible:outline-2 focus-visible:outline-offset-2">
+			<summary className="text-muted-foreground outline-ring cursor-pointer list-inside text-xs font-extrabold focus-visible:rounded-md focus-visible:outline-2 focus-visible:outline-offset-2">
 				Raw payload
 			</summary>
-			<pre className="mt-3 max-h-105 overflow-auto rounded-lg border border-border/70 bg-background/75 p-3 font-mono text-xs leading-5 text-foreground">
+			<pre className="border-border/70 bg-background/75 text-foreground mt-3 max-h-105 overflow-auto rounded-lg border p-3 font-mono text-xs leading-5">
 				{stringify(payload)}
 			</pre>
 		</details>

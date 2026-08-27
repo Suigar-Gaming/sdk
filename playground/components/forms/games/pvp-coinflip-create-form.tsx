@@ -26,7 +26,7 @@ export function PvPCoinflipCreateForm({
 }) {
 	return (
 		<div className="space-y-6">
-			<FieldGroup className="grid md:grid-cols-2 gap-4">
+			<FieldGroup className="grid gap-4 md:grid-cols-2">
 				<Field>
 					<FieldLabel>Creator side</FieldLabel>
 					<Select
@@ -35,7 +35,7 @@ export function PvPCoinflipCreateForm({
 					>
 						<SelectTrigger
 							aria-label="Select creator side"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -45,7 +45,7 @@ export function PvPCoinflipCreateForm({
 						</SelectContent>
 					</Select>
 				</Field>
-				<Field className="h-full p-4 border-border/70 bg-background/45 rounded-2xl border">
+				<Field className="border-border/70 bg-background/45 h-full rounded-2xl border p-4">
 					<div className="flex items-center justify-between gap-3">
 						<FieldLabel htmlFor="pvp-private-lobby">Private lobby</FieldLabel>
 						<Switch

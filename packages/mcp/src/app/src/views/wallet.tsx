@@ -7,7 +7,7 @@ import { asRecord } from '../lib/format.js';
 
 function WalletTable({ children, headers }: { children: ReactNode; headers: Array<string> }) {
 	return (
-		<div className="overflow-x-auto rounded-md border border-border/70">
+		<div className="border-border/70 overflow-x-auto rounded-md border">
 			<table className="min-w-full border-collapse text-left text-xs leading-5">
 				<thead className="bg-background/75 text-muted-foreground">
 					<tr>
@@ -18,7 +18,7 @@ function WalletTable({ children, headers }: { children: ReactNode; headers: Arra
 						))}
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-border/70">{children}</tbody>
+				<tbody className="divide-border/70 divide-y">{children}</tbody>
 			</table>
 		</div>
 	);
@@ -44,7 +44,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 			</Panel>
 			<Panel hidden={!('balances' in wallet)} title="Balances">
 				{balances.length === 0 ? (
-					<p className="text-xs font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs font-semibold">
 						No balances found for this wallet.
 					</p>
 				) : (
@@ -71,7 +71,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 			</Panel>
 			<Panel hidden={!('coins' in wallet)} title="Coin objects">
 				{coins.length === 0 ? (
-					<p className="text-xs font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs font-semibold">
 						No coin objects found for this page.
 					</p>
 				) : (

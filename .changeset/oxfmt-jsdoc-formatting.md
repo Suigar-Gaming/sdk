@@ -3,4 +3,4 @@
 '@suigar/mcp': patch
 ---
 
-Enable Oxfmt JSDoc formatting and normalize package JSDoc comments without changing runtime APIs.
+Enable Oxfmt JSDoc formatting and Tailwind CSS class sorting, then normalize package comments and class lists without changing runtime APIs.

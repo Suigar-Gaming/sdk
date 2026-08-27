@@ -15,7 +15,7 @@ function NftTable({
 	headers: Array<string>;
 }): JSX.Element {
 	return (
-		<div className="overflow-x-auto rounded-md border border-border/70">
+		<div className="border-border/70 overflow-x-auto rounded-md border">
 			<table className="min-w-full border-collapse text-left text-xs leading-5">
 				<thead className="bg-background/75 text-muted-foreground">
 					<tr>
@@ -26,7 +26,7 @@ function NftTable({
 						))}
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-border/70">{children}</tbody>
+				<tbody className="divide-border/70 divide-y">{children}</tbody>
 			</table>
 		</div>
 	);
@@ -47,7 +47,7 @@ function NftImage({ name, url }: { name: string; url: unknown }): JSX.Element {
 
 	if (failed) {
 		return (
-			<span className="block max-w-48 truncate font-mono text-muted-foreground" title={imageUrl}>
+			<span className="text-muted-foreground block max-w-48 truncate font-mono" title={imageUrl}>
 				{imageUrl || 'No image URL'}
 			</span>
 		);
@@ -56,7 +56,7 @@ function NftImage({ name, url }: { name: string; url: unknown }): JSX.Element {
 	return (
 		<img
 			alt={`${name} NFT`}
-			className="size-14 rounded-md border border-border/70 bg-background object-cover"
+			className="border-border/70 bg-background size-14 rounded-md border object-cover"
 			height={56}
 			loading="lazy"
 			onError={() => setFailed(true)}
@@ -93,7 +93,7 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 								</td>
 								<td className="px-3 py-2 font-bold">
 									<div>{String(nft.name)}</div>
-									<div className="font-mono text-muted-foreground" title={String(nft.id)}>
+									<div className="text-muted-foreground font-mono" title={String(nft.id)}>
 										{formatAddress(String(nft.id))}
 									</div>
 								</td>
@@ -109,7 +109,7 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 			</Panel>
 			<Panel className="md:col-span-2" title="Owned NFTs">
 				{ownedNfts.length === 0 ? (
-					<p className="text-xs font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs font-semibold">
 						This address does not own any Suigar NFTs.
 					</p>
 				) : (

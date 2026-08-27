@@ -81,7 +81,7 @@ export function KenoForm({
 						<SelectTrigger
 							id="kenoConfigId"
 							aria-label="Select Keno config"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -98,7 +98,7 @@ export function KenoForm({
 						id="kenoConfigId"
 						type="number"
 						step="1"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
+						className="bg-background/55 h-11 rounded-2xl px-4"
 						value={value.configId}
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>
@@ -132,7 +132,7 @@ export function KenoForm({
 							<Eraser className="size-3.5" aria-hidden />
 							Clear
 						</Button>
-						<span className="text-xs font-medium text-muted-foreground">
+						<span className="text-muted-foreground text-xs font-medium">
 							{selectedPicks.length}/{maxPicks}
 						</span>
 					</div>

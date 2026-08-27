@@ -21,7 +21,7 @@ function CodeSampleCard({
 			<CardHeader>
 				<div className="space-y-2">
 					<CardTitle className="flex items-center gap-2">
-						<FileCode2 className="size-5 text-secondary dark:text-primary" />
+						<FileCode2 className="text-secondary dark:text-primary size-5" />
 						{title}
 					</CardTitle>
 					<CardDescription>{description}</CardDescription>
@@ -58,7 +58,7 @@ export function CodeSample({
 export function CodeSampleSkeleton() {
 	return (
 		<CodeSampleCard>
-			<div className="space-y-3 rounded-2xl border border-border/70 bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] p-4">
+			<div className="border-border/70 space-y-3 rounded-2xl border bg-[linear-gradient(180deg,rgba(7,14,25,.92),rgba(11,21,37,.98))] p-4">
 				{SKELETON_LINE_WIDTHS.map((width) => (
 					<Skeleton key={width} className="h-4 bg-white/10" style={{ width }} />
 				))}

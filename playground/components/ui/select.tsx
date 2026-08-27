@@ -43,7 +43,7 @@ function SelectTrigger({
 		>
 			{children}
 			<SelectPrimitive.Icon asChild>
-				<ChevronDown className="size-4 pointer-events-none text-muted-foreground" />
+				<ChevronDown className="text-muted-foreground pointer-events-none size-4" />
 			</SelectPrimitive.Icon>
 		</SelectPrimitive.Trigger>
 	);
@@ -111,7 +111,7 @@ function SelectItem({
 			)}
 			{...props}
 		>
-			<span className="absolute right-2 flex size-4 items-center justify-center pointer-events-none">
+			<span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center">
 				<SelectPrimitive.ItemIndicator>
 					<Check className="pointer-events-none" />
 				</SelectPrimitive.ItemIndicator>
