@@ -99,7 +99,7 @@ function parseKenoPicks(value: Array<string> | string) {
 				.filter(Boolean);
 	const picks = rawPicks.map(Number);
 
-	if (picks.length === 0 || picks.some((pick) => !Number.isSafeInteger(pick))) {
+	if (picks.some((pick) => !Number.isSafeInteger(pick))) {
 		throw new Error('Keno picks must be comma-separated whole numbers.');
 	}
 
