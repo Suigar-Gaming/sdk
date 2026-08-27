@@ -6,7 +6,16 @@
 	"semi": true,
 	"proseWrap": "never",
 	"sortPackageJson": true,
+	"jsdoc": true,
 	"ignorePatterns": ["**/.next/**", "**/build/**", "**/coverage/**", "**/out/**"],
+	"overrides": [
+		{
+			"files": ["packages/*/src/contracts/**"],
+			"options": {
+				"jsdoc": false
+			}
+		}
+	],
 	"sortImports": {
 		"newlinesBetween": false,
 		"customGroups": [

@@ -32,7 +32,8 @@ export type GameEvent = (typeof GAME_EVENTS)[number];
 /**
  * A supported Suigar game event.
  *
- * Standard games emit only `BetResultEvent`, while PvP game modules can emit every event in `GAME_EVENTS`.
+ * Standard games emit only `BetResultEvent`, while PvP game modules can emit every event in
+ * `GAME_EVENTS`.
  */
 export type SuigarGameEvent =
 	| {

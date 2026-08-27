@@ -5,8 +5,8 @@ import type { GameParameterValue } from '../types/index.js';
 import { fromMoveFloat, isMoveFloat } from '../utils/numeric.js';
 
 /**
- * Recursively converts generated Move float structs within game parameters to
- * JavaScript numbers while preserving on-chain integer strings.
+ * Recursively converts generated Move float structs within game parameters to JavaScript numbers
+ * while preserving on-chain integer strings.
  */
 export function normalizeGameParameterValues<TGameParameters>(
 	value: TGameParameters,

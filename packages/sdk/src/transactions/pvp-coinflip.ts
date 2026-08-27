@@ -33,7 +33,8 @@ type BuildPvPCoinflipTransactionOptions<TAction extends PvPCoinflipAction = PvPC
 /**
  * Creates the asynchronous coin-selection thunk used when joining a PvP game.
  *
- * The stake is read from the on-chain game when the transaction is built, which keeps transaction construction compatible with wallet interaction flows.
+ * The stake is read from the on-chain game when the transaction is built, which keeps transaction
+ * construction compatible with wallet interaction flows.
  */
 function buildPvPCoinflipJoinBetCoin(
 	options: WithClient<
