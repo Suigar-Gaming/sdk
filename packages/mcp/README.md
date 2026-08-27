@@ -190,7 +190,7 @@ For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui 
 
 `coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
 
-Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `useGasCoin` for native SUI bets. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings.
+Optional shared transaction input is `gasBudget` in MIST. Bet-building workflows also accept `metadata`. Workflows that source native SUI coins, including native SUI bets and NFT V1 mint, accept `useGasCoin`. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings. PvP Coinflip cancel does not create a bet coin or write metadata, so its tool does not accept `metadata` or `useGasCoin`.
 
 When `betCount` is provided for Keno, Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
@@ -205,10 +205,11 @@ When `betCount` is provided for Keno, Limbo, Plinko, Range, Soccer, or Wheel, th
 | Soccer | `configId`, `countryId`, `shotZoneId` | — | — |
 | Range | `leftPoint`, `rightPoint` | `outOfRange` | — |
 | PvP Coinflip Create | `creatorSide` | `isPrivate` | — |
-| PvP Coinflip Join, Cancel | `gameId` | — | — |
+| PvP Coinflip Join | `gameId` | — | Resolves the live game stake when built. |
+| PvP Coinflip Cancel | `gameId` | — | Does not accept `metadata` or `useGasCoin`. |
 | Referral Commission Claim | `owner` | `coinType` | `coinType` defaults to configured SUI. |
 | Referral Level-up USD Rewards Claim | `owner` | — | Uses configured USDC. |
-| NFT V1 Mint | `owner`, `specId` | — | Resolves the specification's SUI price from the configured NFT factory when built. |
+| NFT V1 Mint | `owner`, `specId` | `useGasCoin` | Resolves the specification's SUI price from the configured NFT factory when built. |
 
 ## Config
 
@@ -246,7 +247,7 @@ Game, referral, and core calls use the `@suigar/*` MVR package names by default.
 
 Partner attribution should be passed as top-level `partner`; the MCP server forwards it through `suigar({ partner })`.
 
-Transaction `metadata` values must be JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
+Transaction tools that accept `metadata` require JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
 
 ## Notes
 

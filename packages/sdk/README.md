@@ -211,7 +211,7 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 );
 ```
 
-If `partner` is configured, the SDK automatically writes that partner wallet address into the on-chain metadata vec-map. Transaction builder options may also include `metadata`, but reserved keys such as `partner` and `referrer` are ignored with a warning when provided manually.
+If `partner` is configured, the SDK automatically writes that partner wallet address into supported on-chain bet metadata vec-maps. Bet transaction builder options may also include `metadata`, but reserved keys such as `partner` and `referrer` are ignored with a warning when provided manually.
 
 `cacheTtl` controls the SDK cache for on-chain reads such as parsed game parameters. It is expressed in milliseconds and defaults to 30 minutes.
 
