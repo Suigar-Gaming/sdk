@@ -24,6 +24,7 @@
 	"devDependencies": {
 		"@changesets/changelog-github": "^1.0.0",
 		"@changesets/cli": "^3.0.1",
+		"@changesets/config": "^4.0.0",
 		"@manypkg/cli": "^0.25.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.3.0",
