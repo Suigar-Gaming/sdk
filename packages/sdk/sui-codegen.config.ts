@@ -13,15 +13,7 @@ const SUIGAR_PACKAGES_CONFIGURATION: SuiCodegenConfig['packages'] = SUIGAR_PACKA
 		packageName: packageInfo.packageName,
 		network: NETWORK,
 		generate: {
-			modules: Object.fromEntries(
-				packageInfo.modules.map((moduleInfo) => [
-					moduleInfo.module,
-					{
-						types: moduleInfo.types ?? false,
-						functions: moduleInfo.functions ?? { private: 'entry' },
-					},
-				]),
-			),
+			modules: packageInfo.modules,
 		},
 	}),
 );
