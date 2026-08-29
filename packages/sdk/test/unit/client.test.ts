@@ -580,7 +580,7 @@ function createSuigarTestClient({
 		...dynamicFieldLookups,
 	];
 
-	return client.$extend(suigar({ partner, cacheTtl, config })) as SuigarTestClient;
+	return client.$extend(suigar({ partner, cacheTtl, config }));
 }
 
 describe('SuigarClient', () => {
@@ -662,7 +662,7 @@ describe('SuigarClient', () => {
 		);
 		const { suigar: mockedSuigar } = await import('../../src/client.js');
 		const partner = normalizeSuiAddress('0x456');
-		const client = new TestClient().$extend(mockedSuigar({ partner })) as SuigarTestClient;
+		const client = new TestClient().$extend(mockedSuigar({ partner }));
 		const coinType = client.suigar.getConfig().coins.sui.coinType;
 		client.suigar.tx.createGameBet({
 			game: 'coinflip',
@@ -1046,12 +1046,8 @@ describe('SuigarClient', () => {
 				childId: '0x111',
 			},
 		];
-		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
-			shared: SuigarClient;
-		};
-		const second = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
-			shared: SuigarClient;
-		};
+		const first = baseClient.$extend(suigar({ name: 'shared' }));
+		const second = baseClient.$extend(suigar({ name: 'shared' }));
 
 		await first.shared.getGameParameters({
 			game: 'coinflip',
@@ -1087,12 +1083,8 @@ describe('SuigarClient', () => {
 				childId: '0x111',
 			},
 		];
-		const first = baseClient.$extend(suigar({ name: 'first' })) as TestClient & {
-			first: SuigarClient;
-		};
-		const second = baseClient.$extend(suigar({ name: 'second' })) as TestClient & {
-			second: SuigarClient;
-		};
+		const first = baseClient.$extend(suigar({ name: 'first' }));
+		const second = baseClient.$extend(suigar({ name: 'second' }));
 
 		await first.first.getGameParameters({
 			game: 'coinflip',
@@ -1138,9 +1130,7 @@ describe('SuigarClient', () => {
 				childId: '0x111',
 			},
 		];
-		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
-			shared: SuigarClient;
-		};
+		const first = baseClient.$extend(suigar({ name: 'shared' }));
 		const second = baseClient.$extend(
 			suigar({
 				name: 'shared',
@@ -1150,9 +1140,7 @@ describe('SuigarClient', () => {
 					},
 				},
 			}),
-		) as TestClient & {
-			shared: SuigarClient;
-		};
+		);
 
 		await first.shared.getGameParameters({
 			game: 'coinflip',
@@ -1256,9 +1244,7 @@ describe('SuigarClient', () => {
 				nameType: `${pvpCoinflipPackageId}::pvp_coinflip::PvpCoinflipRegistryKey`,
 			},
 		];
-		const first = baseClient.$extend(suigar({ name: 'shared' })) as TestClient & {
-			shared: SuigarClient;
-		};
+		const first = baseClient.$extend(suigar({ name: 'shared' }));
 		const second = baseClient.$extend(
 			suigar({
 				name: 'shared',
@@ -1268,9 +1254,7 @@ describe('SuigarClient', () => {
 					},
 				},
 			}),
-		) as TestClient & {
-			shared: SuigarClient;
-		};
+		);
 
 		await first.shared.getPvPCoinflipGames();
 		await second.shared.getPvPCoinflipGames();

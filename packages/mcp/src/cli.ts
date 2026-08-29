@@ -67,7 +67,7 @@ function getBridgeOptions(args: BridgeArgs): BridgeOptions {
 	};
 }
 
-export async function runSuigarCli(argv = hideBin(process.argv)): Promise<void> {
+export async function runSuigarCli(argv: Array<string> = hideBin(process.argv)): Promise<void> {
 	const parser = yargs(argv)
 		.scriptName('')
 		.strict()

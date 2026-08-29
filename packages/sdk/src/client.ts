@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { InferBcsType } from '@mysten/bcs';
-import type { ClientCache, ClientWithCoreApi, SuiClientTypes } from '@mysten/sui/client';
+import type {
+	ClientCache,
+	ClientWithCoreApi,
+	SuiClientRegistration,
+	SuiClientTypes,
+} from '@mysten/sui/client';
 import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
@@ -58,12 +63,16 @@ import type {
 import { SUPPORTED_SUI_NETWORKS } from './types/network.type.js';
 import { DEFAULT_QUERY_LIMIT, parseCoinType } from './utils/index.js';
 
-export function suigar<const Name = 'suigar'>({
+export function suigar<const Name extends string = 'suigar'>({
 	name = 'suigar' as Name,
 	config,
 	partner,
 	cacheTtl,
-}: SuigarExtensionOptions<Name> = {}) {
+}: SuigarExtensionOptions<Name> = {}): SuiClientRegistration<
+	ClientWithCoreApi,
+	Name,
+	SuigarClient
+> {
 	return {
 		name,
 		register: (client: ClientWithCoreApi): SuigarClient => {
@@ -464,7 +473,7 @@ export class SuigarClient {
 			getCommission: async ({
 				owner,
 				coinType,
-			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>) => {
+			}: Omit<ClaimReferralCommissionOptions, 'gasBudget'>): Promise<bigint> => {
 				try {
 					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
 						transaction: this.tx.referral.claimCommission({
@@ -479,7 +488,7 @@ export class SuigarClient {
 			},
 			getLevelUpUsdRewards: async ({
 				owner,
-			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>) => {
+			}: Omit<ClaimReferralLevelUpUsdRewardsOptions, 'gasBudget'>): Promise<bigint> => {
 				try {
 					const claimCoinBcs = await this.#getSimulatedCommandReturnValue({
 						transaction: this.tx.referral.claimLevelUpUsdRewards({
