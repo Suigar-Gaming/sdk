@@ -1,17 +1,16 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SuiCodegenConfig } from '@mysten/codegen';
 import { PACKAGE_IDS as TESTNET_PACKAGE_IDS } from './src/configs/testnet/packages.ts';
-
-interface SuigarPackageModule {
-	types: boolean | Array<string>;
-	functions: boolean | Array<string>;
-}
 
 interface SuigarPackage {
 	package: string;
 	packageName: string;
-	modules: Record<string, SuigarPackageModule>;
+	modules: Extract<
+		NonNullable<SuiCodegenConfig['packages'][number]['generate']>['modules'],
+		Record<string, unknown>
+	>;
 }
 
 export const SUIGAR_PACKAGES: Array<SuigarPackage> = [
