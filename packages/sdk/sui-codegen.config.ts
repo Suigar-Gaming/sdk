@@ -7,21 +7,24 @@ import { SUIGAR_PACKAGES } from './suigar-packages.ts';
 
 const NETWORK = 'testnet';
 
-const SUIGAR_PACKAGES_CONFIGURATION: SuiCodegenConfig['packages'] = Object.entries(
-	SUIGAR_PACKAGES,
-).map(([module, packageInfo]) => ({
-	package: packageInfo.package,
-	packageName: packageInfo.packageName,
-	network: NETWORK,
-	generate: {
-		modules: {
-			[module]: {
-				types: packageInfo.types ?? false,
-				functions: packageInfo.functions ?? { private: 'entry' },
-			},
+const SUIGAR_PACKAGES_CONFIGURATION: SuiCodegenConfig['packages'] = SUIGAR_PACKAGES.map(
+	(packageInfo) => ({
+		package: packageInfo.package,
+		packageName: packageInfo.packageName,
+		network: NETWORK,
+		generate: {
+			modules: Object.fromEntries(
+				packageInfo.modules.map((moduleInfo) => [
+					moduleInfo.module,
+					{
+						types: moduleInfo.types ?? false,
+						functions: moduleInfo.functions ?? { private: 'entry' },
+					},
+				]),
+			),
 		},
-	},
-}));
+	}),
+);
 
 const config: SuiCodegenConfig = {
 	output: './src/contracts',
