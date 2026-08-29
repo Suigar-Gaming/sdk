@@ -35,6 +35,7 @@ import {
 import type {
 	CoinflipInput,
 	ConfigIdInput,
+	KenoInput,
 	LimboInput,
 	PvpCoinflipCancelInput,
 	PvpCoinflipCreateInput,
@@ -53,6 +54,11 @@ import {
 	getSuigarPackageId,
 	requireString,
 } from './shared.js';
+
+type BetTransactionToolInput =
+	| StandardTransactionToolInput
+	| PvpCoinflipCreateInput
+	| PvpCoinflipJoinInput;
 
 export async function buildCoinflipTransactionTool(
 	input: CoinflipInput = {},
@@ -110,6 +116,35 @@ export async function buildLimboTransactionTool(input: LimboInput = {}): Promise
 				game: 'limbo',
 				...(await stakeOptions(input, bundle)),
 				targetMultiplier,
+			}),
+	});
+}
+
+export async function buildKenoTransactionTool(input: KenoInput = {}): Promise<ToolTextResult> {
+	if (getMode(input.mode) === 'read-only') {
+		return asTextResponse(
+			readOnlyPlan({
+				input,
+				game: 'keno',
+				requiredInputs: ['owner', 'stake', 'configId', 'picks'],
+				notes: ['Config id and picks select the on-chain Keno board configuration and numbers.'],
+			}),
+		);
+	}
+
+	const configId = requireNumber(input.configId, 'configId');
+	const picks = requireNumberArray(input.picks, 'picks');
+	return buildTransactionTool({
+		input,
+		game: 'keno',
+		stakeDisplay: toCurrencyAmountText(input.stake, 'stake'),
+		gameInputs: { configId, picks },
+		createTransaction: async (bundle) =>
+			bundle.client.suigar.tx.createGameBet({
+				game: 'keno',
+				...(await stakeOptions(input, bundle)),
+				configId,
+				picks,
 			}),
 	});
 }
@@ -225,7 +260,7 @@ export async function buildPvpCoinflipCreateTransactionTool(
 				action: 'create',
 				requiredInputs: ['owner', 'stake', 'creatorSide'],
 				notes: [
-					'Creates an unresolved PvP coinflip lobby without signing or executing the transaction.',
+					'Creates an unresolved PvP Coinflip lobby without signing or executing the transaction.',
 				],
 			}),
 		);
@@ -307,7 +342,7 @@ export async function buildPvpCoinflipCancelTransactionTool(
 		gameInputs: { gameId },
 		createTransaction: async (bundle) =>
 			bundle.client.suigar.tx.pvpCoinflip.cancelGame({
-				...(await gameTransactionOptions(input, bundle)),
+				...(await cancelTransactionOptions(input, bundle)),
 				gameId,
 			}),
 	});
@@ -320,7 +355,8 @@ const BET_COUNT_LIMITS: Partial<Record<Game, { parameter: string; label: string 
 	soccer: { parameter: 'max_number_of_shots', label: 'shots' },
 	wheel: { parameter: 'max_number_of_spins', label: 'spins' },
 };
-export function toPositiveInteger(value: unknown, fieldName: string): number | bigint {
+
+function toPositiveInteger(value: unknown, fieldName: string): number | bigint {
 	if (typeof value === 'number' && Number.isSafeInteger(value) && value > 0) {
 		return value;
 	}
@@ -329,12 +365,25 @@ export function toPositiveInteger(value: unknown, fieldName: string): number | b
 	}
 	throw new TypeError(`Missing or invalid ${fieldName}. Provide a positive integer.`);
 }
-export function requireNumber(value: unknown, fieldName: string): number {
+
+function requireNumber(value: unknown, fieldName: string): number {
 	if (typeof value === 'number' && Number.isFinite(value)) {
 		return value;
 	}
 	throw new TypeError(`Missing or invalid numeric field: ${fieldName}.`);
 }
+
+function requireNumberArray(value: unknown, fieldName: string): Array<number> {
+	if (
+		Array.isArray(value) &&
+		value.length > 0 &&
+		value.every((item) => typeof item === 'number' && Number.isFinite(item))
+	) {
+		return value;
+	}
+	throw new TypeError(`Missing or invalid numeric array field: ${fieldName}.`);
+}
+
 function getTarget(config: McpConfig, game: Game, action?: PvPCoinflipAction): string {
 	const packageId = getSuigarPackageId(config, game);
 	if (game === 'pvp-coinflip') {
@@ -343,7 +392,8 @@ function getTarget(config: McpConfig, game: Game, action?: PvPCoinflipAction): s
 	}
 	return `${packageId}::${game}::play`;
 }
-export function readOnlyPlan({
+
+function readOnlyPlan({
 	input,
 	game,
 	action,
@@ -374,14 +424,26 @@ export function readOnlyPlan({
 }
 
 async function gameTransactionOptions(
-	input: TransactionToolInput,
+	input: BetTransactionToolInput,
 	bundle: SuigarClientBundle,
 ): Promise<
-	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
-		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
+	Required<Pick<BetTransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<BetTransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'>
 > {
+	return {
+		owner: await resolveTransactionOwner(input, bundle),
+		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
+		metadata: input.metadata,
+		gasBudget: input.gasBudget,
+		useGasCoin: input.useGasCoin,
+	};
+}
+
+async function resolveTransactionOwner(
+	input: Pick<TransactionToolInput, 'mode' | 'executionWallet' | 'owner' | 'sessionWalletId'>,
+	bundle: SuigarClientBundle,
+): Promise<string> {
 	const sessionExecution = getMode(input.mode) === 'execute' && input.executionWallet === 'session';
-	let owner: string;
 	if (sessionExecution) {
 		const sessionWallet = await loadSessionWallet(input.sessionWalletId);
 		if (!sessionWallet) {
@@ -403,16 +465,23 @@ async function gameTransactionOptions(
 				);
 			}
 		}
-		owner = sessionAddress;
-	} else {
-		owner = await resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
+		return sessionAddress;
 	}
+
+	return resolveOwnerAddress(requireString(input.owner, 'owner'), bundle);
+}
+
+async function cancelTransactionOptions(
+	input: PvpCoinflipCancelInput,
+	bundle: SuigarClientBundle,
+): Promise<
+	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<TransactionToolInput, 'gasBudget'>
+> {
 	return {
-		owner,
+		owner: await resolveTransactionOwner(input, bundle),
 		coinType: resolveDefaultCoinType(bundle.config, input.coinType),
-		metadata: input.metadata,
 		gasBudget: input.gasBudget,
-		useGasCoin: input.useGasCoin,
 	};
 }
 
@@ -453,12 +522,12 @@ async function enforceBetCountLimit(
 	}
 }
 
-export async function stakeOptions(
+async function stakeOptions(
 	input: StandardTransactionToolInput,
 	bundle: SuigarClientBundle,
 ): Promise<
-	Required<Pick<TransactionToolInput, 'owner' | 'coinType'>> &
-		Pick<TransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
+	Required<Pick<BetTransactionToolInput, 'owner' | 'coinType'>> &
+		Pick<BetTransactionToolInput, 'metadata' | 'gasBudget' | 'useGasCoin'> & {
 			betCount?: number | bigint;
 			cashStake?: bigint;
 			stake: bigint;
@@ -477,7 +546,7 @@ export async function stakeOptions(
 	};
 }
 
-export async function buildTransactionTool({
+async function buildTransactionTool({
 	input,
 	game,
 	action,

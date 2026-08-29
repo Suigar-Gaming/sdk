@@ -77,7 +77,7 @@ Numeric helper behavior:
 - `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
 - `isMoveFloat(value)` checks whether an unknown value has the generated Move float shape
 - `parseCoinType(type)` extracts the normalized first generic coin type from a Move object type string and throws `TypeError` when no coin type can be parsed
-- `parseGameDetails({ game, gameDetails })` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, and boolean values while preserving the original on-chain keys
+- `parseGameDetails({ game, gameDetails })` decodes standard `BetResultEvent.game_details` byte arrays into the expected string, number, bigint, boolean, and address values while preserving the original on-chain keys
 
 Game-specific type exports are available from the dedicated `games` subpath:
 
@@ -96,7 +96,7 @@ import type {
 
 Current game-type subpath exports:
 
-- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `CreateGameBetOptions`, `CoinflipTransactionOptions`, `LimboTransactionOptions`, `PlinkoTransactionOptions`, `RangeTransactionOptions`, `SoccerTransactionOptions`, `WheelTransactionOptions`, `CreatePvPCoinflipTransactionOptions`, `JoinPvPCoinflipTransactionOptions`, `CancelPvPCoinflipTransactionOptions`
+- `@suigar/sdk/games`: `GAMES`, `Game`, `StandardGame`, `PvPGame`, `CoinSide`, `PvPCoinflipAction`, `CreateGameBetOptions`, `CoinflipTransactionOptions`, `KenoTransactionOptions`, `LimboTransactionOptions`, `PlinkoTransactionOptions`, `RangeTransactionOptions`, `SoccerTransactionOptions`, `WheelTransactionOptions`, `CreatePvPCoinflipTransactionOptions`, `JoinPvPCoinflipTransactionOptions`, `CancelPvPCoinflipTransactionOptions`
 
 What you actually use at runtime is the registered extension instance:
 
@@ -211,7 +211,7 @@ const client = new SuiGrpcClient({ network, baseUrl }).$extend(
 );
 ```
 
-If `partner` is configured, the SDK automatically writes that partner wallet address into the on-chain metadata vec-map. Transaction builder options may also include `metadata`, but reserved keys such as `partner` and `referrer` are ignored with a warning when provided manually.
+If `partner` is configured, the SDK automatically writes that partner wallet address into supported on-chain bet metadata vec-maps. Bet transaction builder options may also include `metadata`, but reserved keys such as `partner` and `referrer` are ignored with a warning when provided manually.
 
 `cacheTtl` controls the SDK cache for on-chain reads such as parsed game parameters. It is expressed in milliseconds and defaults to 30 minutes.
 
@@ -278,11 +278,11 @@ const base64 = await client.suigar.serializeTransactionToBase64({
 
 ### `getPvPCoinflipGames(options?)`
 
-Lists unresolved PvP coinflip games from the configured PvP registry.
+Lists unresolved PvP Coinflip games from the configured PvP registry.
 
 This reads the registry dynamic fields for the active network and resolves each entry into parsed game state through a bulk `client.core.getObjects()` lookup. Registry membership is the unresolved-state signal: once a match is joined and resolved, the Move flow removes it from the registry and deletes the live `Game` object.
 
-Use this when a product needs the current set of open PvP coinflip matches for browsing or lobby views.
+Use this when a product needs the current set of open PvP Coinflip matches for browsing or lobby views.
 
 By default, per-object fetch or parse failures are skipped so one broken or already-deleted registry entry does not reject the full lookup. Pass `throwOnError: true` if you want the call to reject instead.
 
@@ -319,6 +319,7 @@ Transaction builders live under `client.suigar.tx`.
 Use `createGameBet({ game, ...options })` for:
 
 - `coinflip`
+- `keno`
 - `limbo`
 - `plinko`
 - `range`
@@ -362,13 +363,15 @@ Error behavior:
 
 - `RangeError` when `gameId` is unsupported
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
-- `RangeError` when a Plinko or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Keno, Plinko, or Wheel `configId` is not a `u8` integer (`0..255`)
+- `RangeError` when a Keno `picks` value is not a `u8` integer (`0..255`)
 - `RangeError` when a Soccer `configId` or `shotZoneId` is not a `u8` integer (`0..255`), or its `countryId` is not a `u16` integer (`0..65535`)
 - `TypeError` when those selection values are not finite numbers or plain integer strings
 
 Per-game options:
 
 - `coinflip`: `side: 'heads' | 'tails'`
+- `keno`: `configId: number`, `picks: number[]`
 - `limbo`: `targetMultiplier: number`, `scale?: number`
 - `plinko`: `configId: number`
 - `range`: `leftPoint: number`, `rightPoint: number`, `outOfRange?: boolean`, `scale?: number`
@@ -404,7 +407,7 @@ const rangeTx = client.suigar.tx.createGameBet({
 > - `range` converts each point with `Math.round(value * scale)`
 > - `range` points are bounded by the contract limit exposed as `RANGE_POINT_LIMIT`
 > - With the default `range` scale `1_000_000`, exposed as `DEFAULT_RANGE_SCALE`, valid UI values are `0` to `100`
-> - `plinko`, `soccer`, and `wheel` `configId` values must fit in `u8`; `soccer` `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
+> - `keno`, `plinko`, `soccer`, and `wheel` `configId` values must fit in `u8`; Keno `picks` values must fit in `u8`; `soccer` `countryId` must fit in `u16`, and `shotZoneId` must fit in `u8`
 
 > **Tip:**
 >
@@ -415,7 +418,7 @@ const rangeTx = client.suigar.tx.createGameBet({
 
 #### PvP Coinflip
 
-Use the action-specific `pvpCoinflip` builders for PvP coinflip flows:
+Use the action-specific `pvpCoinflip` builders for PvP Coinflip flows:
 
 - `createGame`
 - `joinGame`
@@ -453,14 +456,17 @@ const tx = client.suigar.tx.pvpCoinflip.cancelGame({
 });
 ```
 
-PvP coinflip create builds the stake coin from the owner's balance with Mysten coin intent helpers. Join derives the stake from `gameId` and uses the configured price info object id for `coinType`. Omit `useGasCoin` to use Mysten's default coin intent behavior.
+PvP Coinflip create builds the stake coin from the owner's balance with Mysten coin intent helpers. Join derives the stake from `gameId` and uses the configured price info object id for `coinType`. Omit `useGasCoin` to use Mysten's default coin intent behavior. Cancel does not build a bet coin or write metadata.
 
-PvP shared options:
+PvP Coinflip shared options:
 
 - `owner: string`
 - `coinType: string`
-- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `gasBudget?: number | bigint`
+
+PvP Coinflip create/join shared options:
+
+- `metadata?: Record<string, string | number | boolean | bigint | Uint8Array | number[] | null | undefined>`
 - `useGasCoin?: boolean`
 
 Action-specific options:
@@ -540,11 +546,11 @@ Current exposed helpers:
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
-- `PvPCoinflipGame` parses a PvP coinflip game object's `content`
+- `PvPCoinflipGame` parses a PvP Coinflip game object's `content`
 - `fromMoveI64(float.exp)` converts a generated Move `i64` exponent to a JavaScript number
 - `fromMoveFloat(float)` converts a generated Move `Float` struct to a JavaScript number
-- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
-- `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, and boolean values
+- `parseCoinType(type)` extracts the normalized coin type from generic Move object type strings such as PvP Coinflip `Game<T>` and throws `TypeError` when the type string does not include a first generic coin type
+- `parseGameDetails({ game, gameDetails })` decodes `BetResultEvent.game_details` entries into the expected string, number, bigint, boolean, and address values
 
 ### Parse PvP Coinflip Game Object Data
 
@@ -630,8 +636,8 @@ const gameDetails = parseGameDetails({
 
 `parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
 
-- `{ gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
-- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP coinflip events
+- `{ gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
+- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP Coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 
 When the extension is configured with `partner`, decoded event `metadata` will contain that partner wallet address under the `partner` entry.
@@ -651,7 +657,7 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 
 ### Parse PvP Coinflip Event Data
 
-Use the matching helper for each PvP coinflip event payload found in `transactionResult.events`:
+Use the matching helper for each PvP Coinflip event payload found in `transactionResult.events`:
 
 - `client.suigar.bcs.PvPCoinflipGameCreatedEvent`
 - `client.suigar.bcs.PvPCoinflipGameResolvedEvent`

@@ -13,7 +13,6 @@ export function buildLimboTransaction(options: WithPartner<LimboTransactionOptio
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'limbo',
 		buildRewardCoin: ({
 			config,
 			coinType,

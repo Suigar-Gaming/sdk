@@ -3,7 +3,8 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import type { BetResultGameDetails } from '../../../src/types/game-details.type.js';
+import type { BetResultGameDetails, GameDetail } from '../../../src/types/game-details.type.js';
+import { GAME_DETAIL_BCS } from '../../../src/types/game-details.type.js';
 import type { SuigarGameEvent } from '../../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../../src/types/game.type.js';
 import { parseCoinType, parseGameDetails, parseGameEvent } from '../../../src/utils/index.js';
@@ -28,7 +29,7 @@ describe('parseGameEvent', () => {
 	it('models valid game and event combinations as a discriminated union', () => {
 		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
 			| {
-					gameId: 'coinflip' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
 					eventName: 'BetResultEvent';
 			  }
 			| {
@@ -74,7 +75,15 @@ describe('parseGameEvent', () => {
 	});
 
 	it('parses every supported standard bet result game family', () => {
-		for (const gameId of ['coinflip', 'limbo', 'plinko', 'range', 'soccer', 'wheel'] as const) {
+		for (const gameId of [
+			'coinflip',
+			'keno',
+			'limbo',
+			'plinko',
+			'range',
+			'soccer',
+			'wheel',
+		] as const) {
 			expect(
 				parseGameEvent(
 					createEvent({
@@ -182,6 +191,24 @@ describe('parseCoinType', () => {
 });
 
 describe('parseGameDetails', () => {
+	it('supports address scalar and vector detail types', () => {
+		const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+
+		expect(
+			GAME_DETAIL_BCS.address.parse(GAME_DETAIL_BCS.address.serialize(address).toBytes()),
+		).toBe(address);
+		expectTypeOf<GameDetail<'address'>>().toEqualTypeOf<string>();
+		expectTypeOf<GameDetail<'vector<address>'>>().toEqualTypeOf<Array<string>>();
+	});
+
+	it('models numeric detail runtime types', () => {
+		expectTypeOf<GameDetail<'u8'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u16'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u32'>>().toEqualTypeOf<number>();
+		expectTypeOf<GameDetail<'u64'>>().toEqualTypeOf<bigint>();
+		expectTypeOf<GameDetail<'u128'>>().toEqualTypeOf<bigint>();
+	});
+
 	it('parses known detail types and preserves unknown event keys', () => {
 		expect(
 			parseGameDetails({
@@ -212,7 +239,7 @@ describe('parseGameDetails', () => {
 		});
 
 		expect(rangeDetails).toMatchObject({
-			roll_value: 42,
+			roll_value: 42n,
 			win: true,
 			range_mode: 2,
 			payout_multiplier: 2.5,
@@ -243,6 +270,38 @@ describe('parseGameDetails', () => {
 			shot_zone_id: 4,
 			is_goal: true,
 		});
+	});
+
+	it('decodes Keno board and draw detail values', () => {
+		expect(
+			parseGameDetails({
+				game: 'keno',
+				gameDetails: gameDetails([
+					{ key: 'board_size', value: [40] },
+					{ key: 'draw_count', value: [10] },
+					{ key: 'picks', value: [5, 1, 2, 3, 4, 5] },
+					{ key: 'drawn_numbers', value: [10, 6, 36, 1, 25, 22, 37, 4, 30, 33, 40] },
+					{ key: 'hit_count', value: [2] },
+					{ key: 'actual_rtp', value: encodeFloat(0.97) },
+				]),
+			}),
+		).toEqual({
+			board_size: 40,
+			draw_count: 10,
+			picks: [1, 2, 3, 4, 5],
+			drawn_numbers: [6, 36, 1, 25, 22, 37, 4, 30, 33, 40],
+			hit_count: 2,
+			actual_rtp: 0.97,
+		});
+	});
+
+	it('rejects malformed Keno vector detail values', () => {
+		expect(() =>
+			parseGameDetails({
+				game: 'keno',
+				gameDetails: gameDetails([{ key: 'picks', value: [1, 2, 3, 4, 5] }]),
+			}),
+		).toThrow('Invalid BCS vector<u8> game detail value.');
 	});
 
 	it('narrows parsed detail keys and value types by game id', () => {

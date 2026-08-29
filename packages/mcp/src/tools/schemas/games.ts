@@ -43,6 +43,11 @@ const commonBuildInputSchema = configInputSchema
 	})
 	.strict();
 
+const cancelBuildInputSchema = commonBuildInputSchema.omit({
+	metadata: true,
+	useGasCoin: true,
+});
+
 const stakeBuildInputSchema = commonBuildInputSchema
 	.extend({
 		stake: currencyAmountSchema.optional().describe(`Logical wager. ${currencyAmountDescription}`),
@@ -59,6 +64,16 @@ const stakeBuildInputSchema = commonBuildInputSchema
 export const coinflipInputSchema = stakeBuildInputSchema
 	.extend({
 		side: z.enum(['heads', 'tails']).optional().describe('Selected coinflip side.'),
+	})
+	.strict();
+
+export const kenoInputSchema = stakeBuildInputSchema
+	.extend({
+		configId: z.number().int().min(0).max(255).optional().describe('On-chain Keno config id.'),
+		picks: z
+			.array(z.number().int().min(0).max(255))
+			.optional()
+			.describe('Keno board positions selected by the player.'),
 	})
 	.strict();
 
@@ -117,20 +132,21 @@ export const pvpCoinflipCreateInputSchema = commonBuildInputSchema
 
 export const pvpCoinflipJoinInputSchema = commonBuildInputSchema
 	.extend({
-		gameId: z.string().min(1).optional().describe('PvP coinflip game object id.'),
+		gameId: z.string().min(1).optional().describe('PvP Coinflip game object id.'),
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
 	})
 	.strict();
 
-export const pvpCoinflipCancelInputSchema = commonBuildInputSchema
+export const pvpCoinflipCancelInputSchema = cancelBuildInputSchema
 	.extend({
-		gameId: z.string().min(1).optional().describe('PvP coinflip game object id.'),
+		gameId: z.string().min(1).optional().describe('PvP Coinflip game object id.'),
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
 	})
 	.strict();
 
 export type CommonBuildInput = z.input<typeof commonBuildInputSchema>;
 export type CoinflipInput = z.input<typeof coinflipInputSchema>;
+export type KenoInput = z.input<typeof kenoInputSchema>;
 export type LimboInput = z.input<typeof limboInputSchema>;
 export type ConfigIdInput = z.input<typeof configIdInputSchema>;
 export type RangeInput = z.input<typeof rangeInputSchema>;
@@ -141,6 +157,7 @@ export type PvpCoinflipCancelInput = z.input<typeof pvpCoinflipCancelInputSchema
 
 export type TransactionToolInput =
 	| CoinflipInput
+	| KenoInput
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput
@@ -151,6 +168,7 @@ export type TransactionToolInput =
 
 export type StandardTransactionToolInput =
 	| CoinflipInput
+	| KenoInput
 	| LimboInput
 	| ConfigIdInput
 	| RangeInput

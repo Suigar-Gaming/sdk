@@ -39,13 +39,13 @@ export function CopyableGameIdField({ id, label, placeholder, value }: CopyableG
 					value={value}
 					readOnly
 					aria-readonly="true"
-					className="h-11 pl-4 pr-12 font-mono text-xs md:text-sm bg-muted/35 cursor-default rounded-2xl"
+					className="bg-muted/35 h-11 cursor-default rounded-2xl pr-12 pl-4 font-mono text-xs md:text-sm"
 				/>
 				<Button
 					type="button"
 					variant="ghost"
 					size="icon-sm"
-					className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+					className="text-muted-foreground absolute top-1/2 right-1.5 -translate-y-1/2"
 					onClick={() => void copyGameId(value)}
 					disabled={!value}
 					aria-label="Copy selected PvP game id"

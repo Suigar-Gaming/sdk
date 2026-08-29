@@ -19,6 +19,7 @@ import type { ConfigInput, ReadConfigInput } from '../schemas/index.js';
 
 export const GAME_LABELS = {
 	coinflip: 'Coinflip',
+	keno: 'Keno',
 	limbo: 'Limbo',
 	plinko: 'Plinko',
 	range: 'Range',
@@ -32,6 +33,7 @@ type ResolvablePackage = Game | 'referral' | 'nftV1';
 
 const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 	coinflip: 'coinflip',
+	keno: 'keno',
 	limbo: 'limbo',
 	nftV1: 'nftV1',
 	plinko: 'plinko',
@@ -44,6 +46,7 @@ const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 
 const SUIGAR_PACKAGE_FALLBACKS: Partial<Record<ResolvablePackage, string>> = {
 	coinflip: '@suigar/coinflip',
+	keno: '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a',
 	limbo: '@suigar/limbo',
 	plinko: '@suigar/plinko',
 	range: '@suigar/range',
@@ -55,6 +58,7 @@ const SUIGAR_PACKAGE_FALLBACKS: Partial<Record<ResolvablePackage, string>> = {
 
 const GAME_TO_TOOLS = {
 	coinflip: ['build_coinflip_transaction'],
+	keno: ['build_keno_transaction'],
 	limbo: ['build_limbo_transaction'],
 	plinko: ['build_plinko_transaction'],
 	range: ['build_range_transaction'],

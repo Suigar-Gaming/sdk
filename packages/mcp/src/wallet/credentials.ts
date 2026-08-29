@@ -70,8 +70,8 @@ export function credentialsPath(): string {
 }
 
 /**
- * Reads the configured network without requiring callers to load full credentials.
- * This is intentionally synchronous because runtime client creation is synchronous.
+ * Reads the configured network without requiring callers to load full credentials. This is
+ * intentionally synchronous because runtime client creation is synchronous.
  */
 export function readPersistedDefaultNetwork(): SuigarNetwork {
 	try {

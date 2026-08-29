@@ -70,6 +70,7 @@ describe('public source subpath modules', () => {
 		expect(Object.keys(module)).toEqual(['GAMES']);
 		expect(module.GAMES).toEqual([
 			'coinflip',
+			'keno',
 			'limbo',
 			'plinko',
 			'pvp-coinflip',

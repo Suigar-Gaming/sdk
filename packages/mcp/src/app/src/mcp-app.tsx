@@ -1,14 +1,9 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-	App,
-	applyDocumentTheme,
-	applyHostFonts,
-	applyHostStyleVariables,
-} from '@modelcontextprotocol/ext-apps';
+import { useApp, useHostStyles, type McpUiHostContext } from '@modelcontextprotocol/ext-apps/react';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { StrictMode, useEffect, useReducer, useRef, useState, type JSX } from 'react';
+import { StrictMode, useEffect, useReducer, type JSX } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
 	ExecutionApproval,
@@ -36,16 +31,6 @@ function textErrors(result: CallToolResult): Array<string> {
 	);
 }
 
-type McpUiHostContext = {
-	theme?: Parameters<typeof applyDocumentTheme>[0];
-	styles?: {
-		variables?: Parameters<typeof applyHostStyleVariables>[0];
-		css?: {
-			fonts?: Parameters<typeof applyHostFonts>[0];
-		};
-	};
-};
-
 type AppViewState = {
 	error: Error | null;
 	hostContext: McpUiHostContext | undefined;
@@ -53,10 +38,6 @@ type AppViewState = {
 };
 
 type AppViewAction =
-	| {
-			type: 'connection-error';
-			error: Error;
-	  }
 	| {
 			type: 'host-context';
 			context: McpUiHostContext | undefined;
@@ -77,8 +58,6 @@ type AppViewAction =
 
 function reducer(state: AppViewState, action: AppViewAction): AppViewState {
 	switch (action.type) {
-		case 'connection-error':
-			return { ...state, error: action.error };
 		case 'host-context':
 			return { ...state, hostContext: action.context };
 		case 'tool-input':
@@ -110,109 +89,80 @@ function reducer(state: AppViewState, action: AppViewAction): AppViewState {
 	}
 }
 
-function applyHostContext(context: McpUiHostContext | undefined): void {
-	if (!context) {
-		return;
-	}
-	if (context.theme) {
-		applyDocumentTheme(context.theme);
-	}
-	if (context.styles?.variables) {
-		applyHostStyleVariables(context.styles.variables);
-	}
-	if (context.styles?.css?.fonts) {
-		applyHostFonts(context.styles.css.fonts);
-	}
-}
-
 export function SuigarInspectorApp(): JSX.Element | null {
 	const [viewState, dispatch] = useReducer(reducer, {
 		error: null,
 		hostContext: undefined,
 		inspector: null,
 	});
-	const [app] = useState(
-		() =>
-			new App(
-				{
-					name: 'suigar-mcp-app',
-					version: __SUIGAR_MCP_APP_VERSION__,
-				},
-				{},
-			),
-	);
-	const connectStarted = useRef(false);
+	const { app, error } = useApp({
+		appInfo: {
+			name: 'suigar-mcp-app',
+			version: __SUIGAR_MCP_APP_VERSION__,
+		},
+		capabilities: {},
+		onAppCreated: (createdApp) => {
+			// oxlint-disable-next-line typescript/no-deprecated
+			createdApp.ontoolinput = () => {
+				dispatch({ type: 'tool-input' });
+			};
+
+			// oxlint-disable-next-line typescript/no-deprecated
+			createdApp.ontoolresult = (result) => {
+				if (result.isError) {
+					const errors = textErrors(result);
+					dispatch({
+						type: 'tool-error',
+						payload: result,
+						errors: errors.length > 0 ? errors : ['Tool call failed.'],
+					});
+					return;
+				}
+
+				const payload = result.structuredContent ?? {};
+				const record =
+					payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
+				const execution = asRecord(record.execution);
+				dispatch({
+					type: 'tool-result',
+					status:
+						typeof record.mode === 'string'
+							? record.mode
+							: typeof execution.status === 'string'
+								? execution.status
+								: 'read',
+					payload,
+				});
+			};
+
+			// oxlint-disable-next-line typescript/no-deprecated
+			createdApp.onhostcontextchanged = (context: McpUiHostContext) => {
+				dispatch({ type: 'host-context', context });
+			};
+		},
+	});
+	const hostContext = app?.getHostContext() as McpUiHostContext | undefined;
+	useHostStyles(app, hostContext);
 
 	useEffect(() => {
-		if (connectStarted.current) {
+		if (!app) {
 			return;
 		}
-		connectStarted.current = true;
-
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.ontoolinput = () => {
-			dispatch({ type: 'tool-input' });
-		};
-
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.ontoolresult = (result) => {
-			if (result.isError) {
-				const errors = textErrors(result);
-				dispatch({
-					type: 'tool-error',
-					payload: result,
-					errors: errors.length > 0 ? errors : ['Tool call failed.'],
-				});
-				return;
-			}
-
-			const payload = result.structuredContent ?? {};
-			const record =
-				payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
-			const execution = asRecord(record.execution);
-			dispatch({
-				type: 'tool-result',
-				status:
-					typeof record.mode === 'string'
-						? record.mode
-						: typeof execution.status === 'string'
-							? execution.status
-							: 'read',
-				payload,
-			});
-		};
-
-		// oxlint-disable-next-line typescript/no-deprecated
-		app.onhostcontextchanged = ({ context }) => {
-			dispatch({ type: 'host-context', context });
-			applyHostContext(context);
-		};
-
-		app
-			.connect()
-			.then(() => {
-				const context = app.getHostContext();
-				dispatch({ type: 'host-context', context });
-				applyHostContext(context);
-			})
-			.catch((connectError: unknown) => {
-				dispatch({
-					type: 'connection-error',
-					error: connectError instanceof Error ? connectError : new Error(String(connectError)),
-				});
-			});
+		const context = app.getHostContext() as McpUiHostContext | undefined;
+		dispatch({ type: 'host-context', context });
 	}, [app]);
 
 	const inspector = viewState.inspector ?? initialState;
 	const { coinBadge, title, View } = resolveAppView(inspector.payload);
 	const execution = asRecord(asRecord(inspector.payload).execution);
 	const approvalUrl = typeof execution.approvalUrl === 'string' ? execution.approvalUrl : null;
+	const viewError = error ?? viewState.error;
 
-	if (viewState.error) {
+	if (viewError) {
 		return (
 			<main className={shellClassName}>
 				<Header status="Error" title={title} />
-				<ListPanel className="errors" items={[viewState.error.message]} title="Errors" />
+				<ListPanel className="errors" items={[viewError.message]} title="Errors" />
 			</main>
 		);
 	}
@@ -222,7 +172,7 @@ export function SuigarInspectorApp(): JSX.Element | null {
 			<main className={shellClassName}>
 				<Header status="Connecting" title="Suigar MCP" />
 				<Panel title="Connection">
-					<p className="text-xs leading-5 font-semibold text-muted-foreground">
+					<p className="text-muted-foreground text-xs leading-5 font-semibold">
 						Waiting for host context.
 					</p>
 				</Panel>

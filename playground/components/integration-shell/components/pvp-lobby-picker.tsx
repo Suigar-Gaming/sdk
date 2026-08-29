@@ -43,7 +43,7 @@ export function PvPLobbyPicker({
 	return (
 		<Card className="bg-background/45">
 			<CardHeader className="gap-3">
-				<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+				<div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
 					<div className="space-y-1">
 						<CardTitle className="text-base">{title}</CardTitle>
 						<CardDescription>{description}</CardDescription>
@@ -52,7 +52,7 @@ export function PvPLobbyPicker({
 						type="button"
 						variant="outline"
 						size="sm"
-						className="h-10 px-4 rounded-full"
+						className="h-10 rounded-full px-4"
 						onClick={onRefresh}
 						disabled={isLoading}
 					>
@@ -67,19 +67,19 @@ export function PvPLobbyPicker({
 			</CardHeader>
 			<CardContent className="space-y-3">
 				{error ? (
-					<div className="text-sm px-4 py-3 border-destructive/40 bg-destructive/10 text-destructive rounded-2xl border">
+					<div className="border-destructive/40 bg-destructive/10 text-destructive rounded-2xl border px-4 py-3 text-sm">
 						{error}
 					</div>
 				) : null}
 
 				{!error && games.length === 0 && !isLoading ? (
-					<div className="text-sm px-4 py-5 border-dashed border-border/70 bg-background/50 text-muted-foreground rounded-2xl border">
+					<div className="border-border/70 bg-background/50 text-muted-foreground rounded-2xl border border-dashed px-4 py-5 text-sm">
 						{emptyMessage}
 					</div>
 				) : null}
 
 				{games.length > 0 ? (
-					<div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
+					<div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
 						{games.map((game) => {
 							const creatorSide = game.creator_is_tails ? 'tails' : 'heads';
 							const amount = formatAmount(
@@ -103,16 +103,16 @@ export function PvPLobbyPicker({
 										type="button"
 										variant="ghost"
 										onClick={() => onSelectGame(game)}
-										className="absolute inset-0 z-0 h-auto w-auto rounded-2xl border-0 bg-transparent p-0 hover:bg-transparent active:translate-y-0 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+										className="focus-visible:ring-ring/50 absolute inset-0 z-0 h-auto w-auto rounded-2xl border-0 bg-transparent p-0 hover:bg-transparent focus-visible:ring-[3px] focus-visible:outline-none active:translate-y-0"
 										aria-label={`Select PvP lobby ${compactAddress(game.id)}`}
 									/>
 									<div className="pointer-events-none relative z-10 flex flex-col gap-2">
 										<div className="flex items-start justify-between gap-3">
 											<div className="min-w-0 space-y-1">
-												<p className="text-sm uppercase text-muted-foreground">Amount</p>
-												<div className="flex min-w-0 items-center whitespace-nowrap text-sm font-semibold tabular-nums gap-1 text-foreground">
+												<p className="text-muted-foreground text-sm uppercase">Amount</p>
+												<div className="text-foreground flex min-w-0 items-center gap-1 text-sm font-semibold whitespace-nowrap tabular-nums">
 													<span className="min-w-0 truncate">{amount}</span>
-													<span className="inline-flex shrink-0 items-center font-medium gap-1 text-xs text-muted-foreground">
+													<span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium">
 														{coinKey ? (
 															<CoinIcon coinKey={coinKey} className="size-3.5 shrink-0" />
 														) : null}
@@ -130,8 +130,8 @@ export function PvPLobbyPicker({
 
 										<div className="flex items-center justify-between gap-3">
 											<div className="space-y-1">
-												<p className="text-xs uppercase text-muted-foreground">Creator side</p>
-												<p className="text-xs font-medium capitalize text-foreground">
+												<p className="text-muted-foreground text-xs uppercase">Creator side</p>
+												<p className="text-foreground text-xs font-medium capitalize">
 													{creatorSide}
 												</p>
 											</div>

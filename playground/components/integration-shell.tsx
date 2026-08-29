@@ -9,6 +9,7 @@ import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { AppHeader } from '@/components/app-header';
 import { EventsTable } from '@/components/events-table';
 import { CoinflipForm } from '@/components/forms/games/coinflip-form';
+import { KenoForm } from '@/components/forms/games/keno-form';
 import { LimboForm } from '@/components/forms/games/limbo-form';
 import { PlinkoForm } from '@/components/forms/games/plinko-form';
 import { PvPCoinflipCancelForm } from '@/components/forms/games/pvp-coinflip-cancel-form';
@@ -85,6 +86,7 @@ import type {
 	PvPCoinflipLobbyGame,
 	PvPGameId,
 	PvPGameParametersSummary,
+	GameConfigOption,
 	StakeRangeSummary,
 	StandardForms,
 	StandardGameId,
@@ -126,6 +128,41 @@ function clampBetCount<T extends StandardSharedFields>(form: T, max: bigint): T 
 
 	return nextBetCount === form.betCount ? form : { ...form, betCount: nextBetCount };
 }
+
+function normalizeKenoPickValues(value: unknown): Array<string> {
+	const rawValues = Array.isArray(value)
+		? value
+		: typeof value === 'string'
+			? value.split(',')
+			: DEFAULT_STANDARD_FORMS.keno.picks;
+	const picks = new Set<string>();
+
+	for (const rawValue of rawValues) {
+		const pick = String(rawValue).trim();
+		if (pick) {
+			picks.add(pick);
+		}
+	}
+
+	return [...picks].sort((left, right) => Number(left) - Number(right));
+}
+
+function clampKenoPicks(picks: Array<string>, configOption: GameConfigOption | null) {
+	const kenoConfig = configOption?.keno;
+	if (!kenoConfig) {
+		return picks;
+	}
+
+	return picks
+		.filter((pick) => {
+			const numericPick = Number(pick);
+			return (
+				Number.isSafeInteger(numericPick) && numericPick >= 1 && numericPick <= kenoConfig.boardSize
+			);
+		})
+		.slice(0, kenoConfig.maxPicks);
+}
+
 type LobbyState = {
 	games: Array<PvPCoinflipLobbyGame>;
 	error: string | null;
@@ -356,7 +393,7 @@ function resolvePlayableConfigId(
 }
 
 const floatingActionNode = (
-	<div className="fixed bottom-4 right-4 z-50 md:bottom-6 md:right-6">
+	<div className="fixed right-4 bottom-4 z-50 md:right-6 md:bottom-6">
 		<Button asChild className="h-12 rounded-full px-4 shadow-lg md:h-14 md:px-5">
 			<a
 				href="https://suigar.com/docs/sdk"
@@ -395,14 +432,14 @@ function IntegrationHero({
 	onPvPActionChange: (value: PvPAction) => void;
 }) {
 	return (
-		<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+		<section className="border-border/70 bg-card/80 relative overflow-hidden rounded-3xl border px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 			<div className="relative flex flex-col gap-4">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 					<div className="space-y-2">
-						<h1 className="text-2xl leading-none text-foreground md:text-4xl xl:text-5xl">
-							Suigar SDK playground
+						<h1 className="text-foreground text-2xl leading-none md:text-4xl xl:text-5xl">
+							Suigar Game Playground
 						</h1>
-						<p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+						<p className="text-muted-foreground max-w-2xl text-sm leading-6 md:text-base">
 							Build standard and PvP transactions, inspect the exact builder call, execute it, and
 							keep a shared decoded event log.
 						</p>
@@ -438,7 +475,7 @@ function IntegrationHero({
 									<Select value={standardGame} onValueChange={onStandardGameChange}>
 										<SelectTrigger
 											aria-label="Select standard game"
-											className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+											className="border-border/70 bg-background/55 h-11 rounded-full px-4"
 										>
 											<SelectValue />
 										</SelectTrigger>
@@ -457,7 +494,7 @@ function IntegrationHero({
 										<Select value={pvpGame} onValueChange={onPvPGameChange}>
 											<SelectTrigger
 												aria-label="Select PvP game"
-												className="h-11 rounded-full border-border/70 bg-background/55 px-4"
+												className="border-border/70 bg-background/55 h-11 rounded-full px-4"
 											>
 												<SelectValue />
 											</SelectTrigger>
@@ -494,9 +531,9 @@ function IntegrationHero({
 					</div>
 				</div>
 
-				<div className="rounded-2xl border border-border/70 bg-background/35 px-4 py-3 text-sm text-muted-foreground">
-					Stake inputs use human values like <span className="font-medium text-foreground">1</span>{' '}
-					or <span className="font-medium text-foreground">2.5</span> and are converted to atomic
+				<div className="border-border/70 bg-background/35 text-muted-foreground rounded-2xl border px-4 py-3 text-sm">
+					Stake inputs use human values like <span className="text-foreground font-medium">1</span>{' '}
+					or <span className="text-foreground font-medium">2.5</span> and are converted to atomic
 					units in the generated transaction.
 				</div>
 			</div>
@@ -542,6 +579,7 @@ function IntegrationControls({
 	standardGameParametersError,
 	stakeDescription,
 	limboTargetMultiplierDescription,
+	kenoPicksDescription,
 	rangeBoundsDescription,
 	pvpStakeDescription,
 	showPrivateJoinLobbies,
@@ -572,6 +610,7 @@ function IntegrationControls({
 	standardGameParametersError: string | null;
 	stakeDescription: React.ReactNode;
 	limboTargetMultiplierDescription: React.ReactNode;
+	kenoPicksDescription: React.ReactNode;
 	rangeBoundsDescription: React.ReactNode;
 	pvpStakeDescription: React.ReactNode;
 	showPrivateJoinLobbies: boolean;
@@ -593,9 +632,9 @@ function IntegrationControls({
 }) {
 	const controlsIcon =
 		mode === 'standard' ? (
-			<Gamepad2 className="size-5 text-secondary dark:text-primary" />
+			<Gamepad2 className="text-secondary dark:text-primary size-5" />
 		) : (
-			<Swords className="size-5 text-secondary dark:text-primary" />
+			<Swords className="text-secondary dark:text-primary size-5" />
 		);
 
 	return (
@@ -623,7 +662,7 @@ function IntegrationControls({
 						variant="ghost"
 						size="sm"
 						onClick={openSettings}
-						className="h-10 rounded-full border border-border/70 bg-background/45 px-4 text-muted-foreground hover:bg-accent hover:text-foreground"
+						className="border-border/70 bg-background/45 text-muted-foreground hover:bg-accent hover:text-foreground h-10 rounded-full border px-4"
 					>
 						<Cog className="size-4" />
 						Settings
@@ -653,6 +692,18 @@ function IntegrationControls({
 									onStakeBlur={() => onStandardStakeBlur('limbo')}
 									stakeDescription={stakeDescription}
 									targetMultiplierDescription={limboTargetMultiplierDescription}
+								/>
+							) : null}
+							{standardGame === 'keno' ? (
+								<KenoForm
+									value={effectiveStandardForms.keno}
+									onChange={(patch) => updateStandardForm('keno', patch)}
+									onStakeBlur={() => onStandardStakeBlur('keno')}
+									configOptions={standardGameParameters?.configOptions}
+									isConfigLoading={isStandardGameParametersLoading}
+									configError={standardGameParametersError}
+									stakeDescription={stakeDescription}
+									picksDescription={kenoPicksDescription}
 								/>
 							) : null}
 							{standardGame === 'plinko' ? (
@@ -711,7 +762,7 @@ function IntegrationControls({
 							) : null}
 							{pvpAction === 'join' ? (
 								<>
-									<div className="rounded-2xl border border-border/70 bg-background/45 p-4">
+									<div className="border-border/70 bg-background/45 rounded-2xl border p-4">
 										<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
 											<div className="min-w-0 space-y-1">
 												<FieldLabel htmlFor="join-private-lobbies">Show private lobbies</FieldLabel>
@@ -723,7 +774,7 @@ function IntegrationControls({
 											<Switch
 												id="join-private-lobbies"
 												size="default"
-												className="mt-0.5 justify-self-end self-start"
+												className="mt-0.5 self-start justify-self-end"
 												checked={showPrivateJoinLobbies}
 												onCheckedChange={setShowPrivateJoinLobbies}
 											/>
@@ -1042,7 +1093,10 @@ function useIntegrationState({
 	const normalizedCurrentAccount = currentAccount?.address.toLowerCase() ?? null;
 	const selectedStandardForm = standardForms[standardGame] ?? DEFAULT_STANDARD_FORMS[standardGame];
 	const activeConfigId =
-		standardGame === 'plinko' || standardGame === 'soccer' || standardGame === 'wheel'
+		standardGame === 'keno' ||
+		standardGame === 'plinko' ||
+		standardGame === 'soccer' ||
+		standardGame === 'wheel'
 			? resolvePlayableConfigId(
 					(selectedStandardForm as { configId: string }).configId,
 					standardGameParameters?.configOptions,
@@ -1171,6 +1225,27 @@ function useIntegrationState({
 			</FieldDescription>
 		);
 	}, [standardGame, standardGameParameters, standardForms.range.scale]);
+	const kenoPicksDescription = React.useMemo(() => {
+		if (standardGame !== 'keno' || !activeConfigOption) {
+			return null;
+		}
+
+		const picks = activeConfigOption.details?.find((detail) => detail.label === 'Picks')?.value;
+		const boardSize = activeConfigOption.details?.find(
+			(detail) => detail.label === 'Board size',
+		)?.value;
+
+		if (!picks || !boardSize) {
+			return null;
+		}
+
+		return (
+			<FieldDescription size="sm">
+				Select <FieldCode>{picks}</FieldCode> positions from a <FieldCode>{boardSize}</FieldCode>{' '}
+				slot board
+			</FieldDescription>
+		);
+	}, [activeConfigOption, standardGame]);
 
 	const effectiveStandardForms = React.useMemo<StandardForms>(() => {
 		let nextForms: StandardForms = {
@@ -1178,6 +1253,7 @@ function useIntegrationState({
 				...DEFAULT_STANDARD_FORMS.coinflip,
 				...standardForms.coinflip,
 			},
+			keno: { ...DEFAULT_STANDARD_FORMS.keno, ...standardForms.keno },
 			limbo: { ...DEFAULT_STANDARD_FORMS.limbo, ...standardForms.limbo },
 			plinko: { ...DEFAULT_STANDARD_FORMS.plinko, ...standardForms.plinko },
 			range: { ...DEFAULT_STANDARD_FORMS.range, ...standardForms.range },
@@ -1185,16 +1261,27 @@ function useIntegrationState({
 			wheel: { ...DEFAULT_STANDARD_FORMS.wheel, ...standardForms.wheel },
 		};
 
+		if (standardGame === 'keno') {
+			nextForms.keno.configId = resolvePlayableConfigId(
+				nextForms.keno.configId,
+				standardGameParameters?.configOptions,
+			);
+			nextForms.keno.picks = clampKenoPicks(
+				normalizeKenoPickValues(nextForms.keno.picks),
+				findGameConfigOption(standardGameParameters, nextForms.keno.configId),
+			);
+		}
+
 		if (standardGame === 'plinko') {
 			nextForms.plinko.configId = resolvePlayableConfigId(
-				standardForms.plinko.configId,
+				nextForms.plinko.configId,
 				standardGameParameters?.configOptions,
 			);
 		}
 
 		if (standardGame === 'wheel') {
 			nextForms.wheel.configId = resolvePlayableConfigId(
-				standardForms.wheel.configId,
+				nextForms.wheel.configId,
 				standardGameParameters?.configOptions,
 			);
 		}
@@ -1219,6 +1306,12 @@ function useIntegrationState({
 					nextForms = {
 						...nextForms,
 						limbo: clampBetCount(nextForms.limbo, betCountLimit.max),
+					};
+					break;
+				case 'keno':
+					nextForms = {
+						...nextForms,
+						keno: clampBetCount(nextForms.keno, betCountLimit.max),
 					};
 					break;
 				case 'plinko':
@@ -1554,6 +1647,7 @@ function useIntegrationState({
 		standardGameParametersError,
 		stakeDescription,
 		limboTargetMultiplierDescription,
+		kenoPicksDescription,
 		rangeBoundsDescription,
 		pvpStakeDescription,
 		showPrivateJoinLobbies,
@@ -1609,7 +1703,7 @@ function useIntegrationState({
 const loadingNavNode = <AppHeader />;
 
 const loadingHeroNode = (
-	<section className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/80 px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
+	<section className="border-border/70 bg-card/80 relative overflow-hidden rounded-3xl border px-4 py-4 shadow-[0_28px_80px_-48px_rgba(8,47,91,0.42)] backdrop-blur-xl md:rounded-4xl md:px-5 md:py-5 dark:shadow-[0_28px_80px_-48px_rgba(0,0,0,0.6)]">
 		<div className="relative flex flex-col gap-4">
 			<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
 				<div className="space-y-2">
@@ -1633,7 +1727,7 @@ const loadingHeroNode = (
 const loadingControlsNode = (
 	<SectionShell
 		title="Loading controls"
-		icon={<Gamepad2 className="size-5 text-secondary dark:text-primary" />}
+		icon={<Gamepad2 className="text-secondary dark:text-primary size-5" />}
 		description="Preparing the current route state and playground controls."
 	>
 		<div className="space-y-4">
@@ -1735,6 +1829,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 					standardGameParametersError={integration.standardGameParametersError}
 					stakeDescription={integration.stakeDescription}
 					limboTargetMultiplierDescription={integration.limboTargetMultiplierDescription}
+					kenoPicksDescription={integration.kenoPicksDescription}
 					rangeBoundsDescription={integration.rangeBoundsDescription}
 					pvpStakeDescription={integration.pvpStakeDescription}
 					showPrivateJoinLobbies={integration.showPrivateJoinLobbies}

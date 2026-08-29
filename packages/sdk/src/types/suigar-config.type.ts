@@ -18,15 +18,15 @@ export interface SuigarExtensionOptions<Name = 'suigar'> {
 	/**
 	 * Network-resolved configuration overrides.
 	 *
-	 * Use this to patch package ids, object ids, supported coins, or price info object
-	 * ids when on-chain deployments move faster than MVR or the published SDK defaults.
+	 * Use this to patch package ids, object ids, supported coins, or price info object ids when
+	 * on-chain deployments move faster than MVR or the published SDK defaults.
 	 */
 	config?: SuigarConfigOverrides;
 	/**
 	 * Partner wallet address injected into bet metadata for attribution.
 	 *
-	 * Configure this once when registering the `suigar()` client extension
-	 * instead of passing partner data through per-transaction metadata.
+	 * Configure this once when registering the `suigar()` client extension instead of passing partner
+	 * data through per-transaction metadata.
 	 */
 	partner?: string;
 	/**
@@ -46,6 +46,7 @@ export type SuigarPackage =
 	| 'core'
 	| 'referral'
 	| 'coinflip'
+	| 'keno'
 	| 'limbo'
 	| 'plinko'
 	| 'pvpCoinflip'

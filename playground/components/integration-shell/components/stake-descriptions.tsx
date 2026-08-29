@@ -50,7 +50,7 @@ export function StakeDescription({
 						<FieldCode className="shrink-0">{stakeRange.min}</FieldCode>
 						<span className="shrink-0">to</span>
 						<FieldCode className="shrink-0">{stakeRange.max}</FieldCode>
-						<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-widest">
+						<span className="inline-flex shrink-0 items-center gap-1 tracking-widest whitespace-nowrap uppercase">
 							<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
 							{effectiveSelectedCoin}
 						</span>
@@ -104,7 +104,7 @@ export function PvPStakeDescription({
 			<span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 align-middle">
 				<span className="shrink-0">On-chain stake minimum:</span>
 				<FieldCode className="shrink-0">{stakeRange.min}</FieldCode>
-				<span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap uppercase tracking-widest">
+				<span className="inline-flex shrink-0 items-center gap-1 tracking-widest whitespace-nowrap uppercase">
 					<CoinIcon coinKey={effectiveSelectedCoin} className="size-4" />
 					{effectiveSelectedCoin}
 				</span>

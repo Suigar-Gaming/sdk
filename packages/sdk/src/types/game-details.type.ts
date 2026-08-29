@@ -9,31 +9,64 @@ import type { Game } from './game.type.js';
 
 export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
 
-export type GameDetailValueType = 'u8' | 'u16' | 'u64' | 'bool' | 'float' | 'string';
-export type GameDetailsSchema = Record<string, GameDetailValueType>;
+export type GameDetailValueType =
+	| 'u8'
+	| 'u16'
+	| 'u32'
+	| 'u64'
+	| 'u128'
+	| 'bool'
+	| 'float'
+	| 'string'
+	| 'address';
+export type GameDetailVectorValueType = `vector<${GameDetailValueType}>`;
+export type GameDetailSchemaValueType = GameDetailValueType | GameDetailVectorValueType;
+type GameDetailsSchema = Record<string, GameDetailSchemaValueType>;
 
-export type GameDetail<TValueType extends GameDetailValueType> = TValueType extends 'float' | 'u64'
-	? number
-	: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
+type ScalarGameDetail<TValueType extends GameDetailValueType> = TValueType extends 'u64' | 'u128'
+	? bigint
+	: TValueType extends 'float'
+		? number
+		: InferBcsType<(typeof GAME_DETAIL_BCS)[TValueType]>;
+
+export type GameDetail<TValueType extends GameDetailSchemaValueType> =
+	TValueType extends `vector<${infer TElementType extends GameDetailValueType}>`
+		? Array<ScalarGameDetail<TElementType>>
+		: ScalarGameDetail<TValueType & GameDetailValueType>;
 
 export type GameDetails<TGame extends Game> = {
 	[K in keyof (typeof GAME_DETAILS_SCHEMAS)[TGame]]: GameDetail<
-		(typeof GAME_DETAILS_SCHEMAS)[TGame][K] & GameDetailValueType
+		(typeof GAME_DETAILS_SCHEMAS)[TGame][K] & GameDetailSchemaValueType
 	>;
 };
 
 export const GAME_DETAIL_BCS = {
 	u8: bcs.U8,
 	u16: bcs.U16,
+	u32: bcs.U32,
 	u64: bcs.U64,
+	u128: bcs.U128,
 	bool: bcs.Bool,
 	float: Float,
 	string: bcs.String,
+	address: bcs.Address,
 } as const satisfies Record<GameDetailValueType, BcsType<any>>;
 
 const COINFLIP_GAME_DETAILS_SCHEMA = {
 	player_bet: 'string',
 	coin_outcome: 'string',
+} satisfies GameDetailsSchema;
+
+const KENO_GAME_DETAILS_SCHEMA = {
+	keno_config: 'u8',
+	board_size: 'u8',
+	draw_count: 'u8',
+	picks: 'vector<u8>',
+	drawn_numbers: 'vector<u8>',
+	hit_count: 'u8',
+	multiplier: 'float',
+	payout_amount: 'u64',
+	actual_rtp: 'float',
 } satisfies GameDetailsSchema;
 
 const PVP_COINFLIP_GAME_DETAILS_SCHEMA = {
@@ -95,6 +128,7 @@ const SOCCER_GAME_DETAILS_SCHEMA = {
 
 export const GAME_DETAILS_SCHEMAS = {
 	coinflip: COINFLIP_GAME_DETAILS_SCHEMA,
+	keno: KENO_GAME_DETAILS_SCHEMA,
 	limbo: LIMBO_GAME_DETAILS_SCHEMA,
 	plinko: PLINKO_GAME_DETAILS_SCHEMA,
 	'pvp-coinflip': PVP_COINFLIP_GAME_DETAILS_SCHEMA,

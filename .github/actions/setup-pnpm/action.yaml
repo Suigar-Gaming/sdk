@@ -9,7 +9,7 @@ inputs:
   doctor:
     description: Run pnpm diagnostics after pnpm setup.
     required: false
-    default: 'false'
+    default: 'true'
   install:
     description: Install workspace dependencies from the repository root.
     required: false
@@ -18,14 +18,16 @@ inputs:
     description: Node.js version to install.
     required: false
     default: '24'
+
 runs:
   using: composite
   steps:
     - name: Setup pnpm
-      uses: pnpm/setup@v2.0.2
+      uses: pnpm/setup@v2.1.0
       with:
         cache: ${{ inputs.cache }}
         install: false
+        require-lockfile: true
         runtime: node@${{ inputs.node-version }}
 
     - name: Run pnpm installation diagnostics

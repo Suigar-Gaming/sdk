@@ -17,7 +17,6 @@ import type {
 	StakeTransactionOptions,
 	TransactionSenderOptions,
 	WithCoinType,
-	WithGame,
 	WithPartner,
 } from '../types/index.js';
 import { DEFAULT_GAS_BUDGET_MIST } from '../utils/constants.js';
@@ -37,13 +36,11 @@ type SharedBetTransactionContext = WithCoinType<
 >;
 
 type StandardGameBetTransactionOptions = WithPartner<
-	WithGame<
-		SharedBetTransactionOptions & {
-			buildRewardCoin: (
-				context: SharedBetTransactionContext,
-			) => (tx: Transaction) => TransactionResult;
-		}
-	>
+	SharedBetTransactionOptions & {
+		buildRewardCoin: (
+			context: SharedBetTransactionContext,
+		) => (tx: Transaction) => TransactionResult;
+	}
 >;
 
 /** Creates a transaction with its sender and default gas budget configured. */

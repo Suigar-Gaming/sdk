@@ -12,21 +12,20 @@ catalogs:
     'tailwind-merge': ^3.6.0
   mysten:
     '@mysten/bcs': ^2.1.1
-    '@mysten/codegen': ^0.12.3
-    '@mysten/sui': ^2.26.2
+    '@mysten/codegen': ^0.12.5
+    '@mysten/sui': ^2.27.1
   test:
-    'vitest': ^4.1.10
+    'vitest': ^4.1.11
   tooling:
     '@tailwindcss/postcss': ^4.3.3
     '@tailwindcss/vite': ^4.3.3
-    'oxfmt': ^0.63.0
     'react-doctor': ^0.9.12
     'tailwindcss': ^4.3.3
     'tsdown': ^0.22.14
   typescript:
-    '@types/node': ^24.0.0
+    '@types/node': ^24.13.3
     '@types/react': ^19.2.18
-    '@types/react-dom': ^19.2.4
+    '@types/react-dom': ^19.2.5
     'typescript': ^7.0.2
 
 allowBuilds:
@@ -43,10 +42,6 @@ minimumReleaseAge: 2880
 
 minimumReleaseAgeExclude:
   - '@mysten/*'
-
-overrides:
-  'postcss': 8.5.26
-  'sharp': 0.35.3
 
 peerDependencyRules:
   allowAny:

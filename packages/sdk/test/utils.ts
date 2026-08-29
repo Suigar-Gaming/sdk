@@ -15,6 +15,7 @@ export const TEST_CONFIG = {
 		core: '0xcore',
 		referral: '0x6',
 		coinflip: '0xabc',
+		keno: '0x8',
 		limbo: '0x1',
 		plinko: '0x2',
 		pvpCoinflip: '0x3',

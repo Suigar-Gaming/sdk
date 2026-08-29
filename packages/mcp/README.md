@@ -8,7 +8,7 @@ It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
 - Referral claimable-amount reads and unsigned claim builders
-- Unsigned transaction builders for standard Suigar games and PvP coinflip
+- Unsigned transaction builders for standard Suigar games and PvP Coinflip
 - `build`, `dry-run`, and `read-only` modes
 - A compact MCP App UI resource for compatible hosts
 - Text and structured-content fallbacks for normal MCP clients
@@ -114,6 +114,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_referral_level_up_usd_rewards_claim_transaction`
 - `build_nft_v1_mint_transaction`
 - `build_coinflip_transaction`
+- `build_keno_transaction`
 - `build_limbo_transaction`
 - `build_plinko_transaction`
 - `build_soccer_transaction`
@@ -170,7 +171,7 @@ In an App-capable host, the NFT view presents catalog and owned-NFT tables separ
 All transaction tools accept the shared config inputs and support these `mode` values:
 
 - `read-only`: resolves SDK config and returns the intended Move target, type arguments, required inputs, and notes.
-- `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
+- `build`: returns unsigned transaction bytes as base64 plus a transaction summary with resolved shared inputs and game-specific `gameInputs` such as coinflip `side`, Keno `configId` and `picks`, limbo `targetMultiplier`, plinko/wheel `configId`, and range points.
 - `dry-run`: simulates the unsigned transaction through Mysten client APIs and returns a JSON-safe raw `dryRun` result plus a stable `dryRunSummary`. Failed dry-runs include an `errors` array extracted from the failed transaction status.
 - `execute`: by default opens a paired-wallet approval request. Set `executionWallet: "session"` for game tools to have MCP sign and execute immediately with the local session wallet instead.
 
@@ -189,24 +190,26 @@ For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui 
 
 `coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
 
-Optional shared transaction inputs are `metadata`, `gasBudget` (in MIST), and `useGasCoin` for native SUI bets. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings.
+Optional shared transaction input is `gasBudget` in MIST. Bet-building workflows also accept `metadata`. Workflows that source native SUI coins, including native SUI bets and NFT V1 mint, accept `useGasCoin`. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings. PvP Coinflip cancel does not create a bet coin or write metadata, so its tool does not accept `metadata` or `useGasCoin`.
 
-When `betCount` is provided for Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
+When `betCount` is provided for Keno, Limbo, Plinko, Range, Soccer, or Wheel, the MCP server reads the active on-chain parameters and rejects a value above that game's declared maximum. Coinflip does not declare a maximum bet count.
 
 ### Workflow-specific inputs
 
 | Workflow | Required inputs | Optional inputs | Notes |
 | --- | --- | --- | --- |
 | Coinflip | `side` | — | — |
+| Keno | `configId`, `picks` | — | `picks` is an array of board positions. |
 | Limbo | `targetMultiplier` | — | — |
 | Plinko, Wheel | `configId` | — | — |
 | Soccer | `configId`, `countryId`, `shotZoneId` | — | — |
 | Range | `leftPoint`, `rightPoint` | `outOfRange` | — |
 | PvP Coinflip Create | `creatorSide` | `isPrivate` | — |
-| PvP Coinflip Join, Cancel | `gameId` | — | — |
+| PvP Coinflip Join | `gameId` | — | Resolves the live game stake when built. |
+| PvP Coinflip Cancel | `gameId` | — | Does not accept `metadata` or `useGasCoin`. |
 | Referral Commission Claim | `owner` | `coinType` | `coinType` defaults to configured SUI. |
 | Referral Level-up USD Rewards Claim | `owner` | — | Uses configured USDC. |
-| NFT V1 Mint | `owner`, `specId` | — | Resolves the specification's SUI price from the configured NFT factory when built. |
+| NFT V1 Mint | `owner`, `specId` | `useGasCoin` | Resolves the specification's SUI price from the configured NFT factory when built. |
 
 ## Config
 
@@ -221,6 +224,7 @@ Optional `config` input follows the public SDK extension override shape:
 		core?: string;
 		referral?: string;
 		coinflip?: string;
+		keno?: string;
 		limbo?: string;
 		plinko?: string;
 		pvpCoinflip?: string;
@@ -243,10 +247,10 @@ Game, referral, and core calls use the `@suigar/*` MVR package names by default.
 
 Partner attribution should be passed as top-level `partner`; the MCP server forwards it through `suigar({ partner })`.
 
-Transaction `metadata` values must be JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
+Transaction tools that accept `metadata` require JSON-compatible strings, numbers, or booleans. Send large integer metadata values as strings.
 
 ## Notes
 
 - Coin object ids and explicit coin sourcing are intentionally not exposed.
 - The MCP package uses `@suigar/sdk` public builders instead of copied internal transaction builders.
-- PvP coinflip join may need live object reads when serialized or dry-run, because the SDK resolves the current game stake from the game object.
+- PvP Coinflip join may need live object reads when serialized or dry-run, because the SDK resolves the current game stake from the game object.

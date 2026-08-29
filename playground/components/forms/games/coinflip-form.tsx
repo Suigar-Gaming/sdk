@@ -33,7 +33,7 @@ export function CoinflipForm({
 				>
 					<SelectTrigger
 						aria-label="Select coinflip side"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
+						className="bg-background/55 h-11 rounded-2xl px-4"
 					>
 						<SelectValue />
 					</SelectTrigger>

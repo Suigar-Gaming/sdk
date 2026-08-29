@@ -31,7 +31,6 @@ describe('shared transaction helpers', () => {
 		const partner = normalizeSuiAddress('0x123');
 		const tx = buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
-			game: 'coinflip',
 			owner: '0xabc',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
@@ -80,7 +79,6 @@ describe('shared transaction helpers', () => {
 
 		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
-			game: 'coinflip',
 			owner: '0xabc',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
@@ -97,7 +95,6 @@ describe('shared transaction helpers', () => {
 
 		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
-			game: 'coinflip',
 			owner: '0xabc',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
@@ -121,7 +118,6 @@ describe('shared transaction helpers', () => {
 
 		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
-			game: 'coinflip',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,
@@ -158,7 +154,6 @@ describe('shared transaction helpers', () => {
 
 		buildSharedStandardGameBetTransaction({
 			config: TEST_CONFIG,
-			game: 'coinflip',
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
 			stake: 1000,

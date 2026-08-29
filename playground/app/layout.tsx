@@ -22,8 +22,8 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	applicationName: 'Suigar SDK Playground',
-	title: 'Suigar SDK Playground',
+	applicationName: 'Suigar Game Playground',
+	title: 'Suigar Game Playground',
 	description:
 		'Interactive Next.js example showing standard and PvP Coinflip Suigar SDK transactions with dApp Kit.',
 	icons: {
@@ -83,10 +83,11 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
+			data-scroll-behavior="smooth"
 			suppressHydrationWarning
 			className={`${sans.variable} ${serif.variable} ${mono.variable} h-full`}
 		>
-			<body className="min-h-full antialiased bg-background text-foreground">
+			<body className="bg-background text-foreground min-h-full antialiased">
 				<AppProviders>{children}</AppProviders>
 			</body>
 		</html>

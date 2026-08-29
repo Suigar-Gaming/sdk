@@ -12,7 +12,6 @@ export function buildWheelTransaction(options: WithPartner<WheelTransactionOptio
 
 	return buildSharedStandardGameBetTransaction({
 		...options,
-		game: 'wheel',
 		buildRewardCoin: ({
 			config,
 			coinType,

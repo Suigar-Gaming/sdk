@@ -29,7 +29,7 @@ export function ExecuteTransactionCard({ onExecute, isExecuting, status, error }
 		<Card>
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<SendHorizontal className="size-5 text-secondary dark:text-primary" />
+					<SendHorizontal className="text-secondary dark:text-primary size-5" />
 					Execute transaction
 				</CardTitle>
 				<CardDescription>
@@ -40,7 +40,7 @@ export function ExecuteTransactionCard({ onExecute, isExecuting, status, error }
 				<div className="flex flex-col items-center gap-4">
 					<Button
 						size="lg"
-						className="h-10 px-5 rounded-2xl"
+						className="h-10 rounded-2xl px-5"
 						onClick={onExecute}
 						disabled={isExecuteDisabled}
 					>
@@ -55,7 +55,7 @@ export function ExecuteTransactionCard({ onExecute, isExecuting, status, error }
 						<Alert variant="success" className="w-full">
 							<CheckCircle2 />
 							<AlertTitle>Executed</AlertTitle>
-							<AlertDescription className="font-mono text-xs break-all text-foreground">
+							<AlertDescription className="text-foreground font-mono text-xs break-all">
 								{status}
 							</AlertDescription>
 						</Alert>
@@ -63,7 +63,7 @@ export function ExecuteTransactionCard({ onExecute, isExecuting, status, error }
 				</div>
 
 				{error ? (
-					<div className="text-sm px-4 py-3 border-destructive/50 bg-destructive/10 text-destructive rounded-2xl border">
+					<div className="border-destructive/50 bg-destructive/10 text-destructive rounded-2xl border px-4 py-3 text-sm">
 						{error}
 					</div>
 				) : null}

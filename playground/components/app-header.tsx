@@ -88,12 +88,11 @@ export function AppHeader({
 		Partial<Record<SupportedCoinKey, CoinBalanceState>>
 	>({});
 	const activeCoin = selectedCoin ?? localSelectedCoin;
-	const activeBalances = coinBalances ?? localBalances;
+	const activeBalances = account ? (coinBalances ?? localBalances) : {};
 	const activeBalanceOwner = coinBalances ? (balanceOwner ?? null) : (account?.address ?? null);
 
 	React.useEffect(() => {
 		if (coinBalances || !account) {
-			if (!account) setLocalBalances({});
 			return;
 		}
 
@@ -143,7 +142,7 @@ export function AppHeader({
 			<Select value={activeCoin} onValueChange={handleCoinChange}>
 				<SelectTrigger
 					aria-label="Select active coin"
-					className="h-10 w-full min-w-0 max-w-[10.5rem] rounded-full border-border/70 bg-background/55 px-3 sm:w-auto sm:min-w-[8.75rem] sm:max-w-none"
+					className="border-border/70 bg-background/55 h-10 w-full max-w-[10.5rem] min-w-0 rounded-full px-3 sm:w-auto sm:max-w-none sm:min-w-[8.75rem]"
 				>
 					<CoinSelectLabel
 						coinKey={activeCoin}
@@ -183,7 +182,7 @@ export function AppHeader({
 	) : null;
 
 	return (
-		<nav className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border/65 bg-card/58 px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl supports-backdrop-filter:bg-card/45 sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:border-border/75 dark:bg-card/42 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
+		<nav className="border-border/65 bg-card/58 supports-backdrop-filter:bg-card/45 dark:border-border/75 dark:bg-card/42 flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border px-3 py-2 shadow-[0_18px_45px_-36px_rgba(8,47,91,0.5)] backdrop-blur-2xl sm:flex-nowrap sm:px-4 md:rounded-3xl md:py-2.5 dark:shadow-[0_18px_45px_-36px_rgba(0,0,0,0.72)]">
 			<Link
 				href="/standard?game=coinflip"
 				className="inline-flex min-w-0 shrink-0 items-center gap-2 rounded-full p-1"
@@ -206,7 +205,7 @@ export function AppHeader({
 				/>
 			</Link>
 
-			<div className="ml-auto flex min-w-0 w-full flex-1 items-center justify-end gap-2 sm:w-auto">
+			<div className="ml-auto flex w-full min-w-0 flex-1 items-center justify-end gap-2 sm:w-auto">
 				<div className="hidden items-center gap-2 md:flex">
 					{links.map((link) => (
 						<Button
@@ -236,7 +235,7 @@ export function AppHeader({
 						<PopoverContent
 							align="end"
 							collisionPadding={12}
-							className="w-56 rounded-2xl border border-border/70 p-2"
+							className="border-border/70 w-56 rounded-2xl border p-2"
 						>
 							<div className="flex flex-col gap-1">
 								{links.map((link) => (
@@ -251,8 +250,8 @@ export function AppHeader({
 										{link.label}
 									</Link>
 								))}
-								<div className="flex items-center justify-between border-t border-border/70 px-2 pt-2">
-									<span className="text-sm font-medium text-foreground">Theme</span>
+								<div className="border-border/70 flex items-center justify-between border-t px-2 pt-2">
+									<span className="text-foreground text-sm font-medium">Theme</span>
 									<ThemeToggle className="size-9" />
 								</div>
 							</div>

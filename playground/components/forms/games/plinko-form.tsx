@@ -46,7 +46,7 @@ export function PlinkoForm({
 						<SelectTrigger
 							id="plinkoConfigId"
 							aria-label="Select Plinko board config"
-							className="h-11 px-4 bg-background/55 rounded-2xl"
+							className="bg-background/55 h-11 rounded-2xl px-4"
 						>
 							<SelectValue />
 						</SelectTrigger>
@@ -63,7 +63,7 @@ export function PlinkoForm({
 						id="plinkoConfigId"
 						type="number"
 						step="1"
-						className="h-11 px-4 bg-background/55 rounded-2xl"
+						className="bg-background/55 h-11 rounded-2xl px-4"
 						value={value.configId}
 						onChange={(event) => onChange({ configId: event.target.value })}
 					/>

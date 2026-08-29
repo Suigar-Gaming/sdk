@@ -81,6 +81,46 @@ function toConfigOptions<TEntry extends ConfigEntry>(
 	});
 }
 
+function toKenoPaytableMultipliers({
+	paytable,
+	minPicks,
+	maxPicks,
+}: {
+	paytable: Array<number>;
+	minPicks: number;
+	maxPicks: number;
+}): NonNullable<GameConfigOption['multiplierValues']> {
+	const expectedLength = Array.from(
+		{ length: maxPicks - minPicks + 1 },
+		(_value, index) => minPicks + index + 1,
+	).reduce((total, item) => total + item, 0);
+
+	if (expectedLength !== paytable.length) {
+		return paytable.map((value, index) => ({
+			id: String(index),
+			label: `Entry ${index}`,
+			value: String(value),
+		}));
+	}
+
+	let offset = 0;
+	return Array.from({ length: maxPicks - minPicks + 1 }, (_value, pickIndex) => {
+		const pickCount = minPicks + pickIndex;
+		return Array.from({ length: pickCount + 1 }, (_hitValue, hitCount) => {
+			const value = paytable[offset];
+			const id = `${pickCount}-${hitCount}`;
+			offset += 1;
+			return {
+				id,
+				label: `${pickCount} pick${pickCount === 1 ? '' : 's'}, ${hitCount} hit${
+					hitCount === 1 ? '' : 's'
+				}`,
+				value: String(value),
+			};
+		});
+	}).flat();
+}
+
 export function summarizeStandardGameParameters(
 	game: StandardGameId,
 	parameters: StandardGameParametersResult,
@@ -119,6 +159,81 @@ export function summarizeStandardGameParameters(
 					min: limboParameters.min_target_multiplier,
 					max: limboParameters.max_target_multiplier,
 				},
+			};
+		}
+		case 'keno': {
+			const kenoParameters = parameters as StakeParameters & {
+				configs: {
+					contents: Array<
+						ConfigEntry & {
+							value: ConfigEntry['value'] & {
+								board_size: number;
+								draw_count: number;
+								min_picks: number;
+								max_picks: number;
+								paytable: Array<number>;
+								max_number_of_games: bigint | string | number;
+								min_rtp: number;
+								max_rtp: number;
+							};
+						}
+					>;
+				};
+			};
+			const stakeRange = toStakeRange(
+				toBigInt(kenoParameters.min_stake),
+				toBigInt(kenoParameters.max_stake),
+				decimals,
+			);
+			const configs = toConfigOptions(kenoParameters.configs.contents, decimals, (entry) => ({
+				label: `Config ${entry.key}`,
+				details: [
+					{ label: 'Board size', value: String(entry.value.board_size) },
+					{ label: 'Draw count', value: String(entry.value.draw_count) },
+					{
+						label: 'Picks',
+						value: `${entry.value.min_picks}-${entry.value.max_picks}`,
+					},
+					{ label: 'Paytable entries', value: String(entry.value.paytable.length) },
+				],
+				multiplierValues: toKenoPaytableMultipliers({
+					paytable: entry.value.paytable,
+					minPicks: entry.value.min_picks,
+					maxPicks: entry.value.max_picks,
+				}),
+				keno: {
+					boardSize: entry.value.board_size,
+					drawCount: entry.value.draw_count,
+					minPicks: entry.value.min_picks,
+					maxPicks: entry.value.max_picks,
+				},
+			}));
+			const firstPlayableConfig = configs.find((config) => config.isPlayable) ?? configs[0];
+			const firstConfig = firstPlayableConfig
+				? kenoParameters.configs.contents.find(
+						(entry) => String(entry.key) === firstPlayableConfig.id,
+					)
+				: undefined;
+
+			return {
+				stakeRange,
+				betCountLimit: firstConfig
+					? {
+							max: toBigInt(firstConfig.value.max_number_of_games),
+							label: 'games',
+						}
+					: undefined,
+				configOptions: configs,
+				kenoBounds: firstConfig
+					? {
+							boardSize: firstConfig.value.board_size,
+							drawCount: firstConfig.value.draw_count,
+							minPicks: firstConfig.value.min_picks,
+							maxPicks: firstConfig.value.max_picks,
+							minRtp: firstConfig.value.min_rtp,
+							maxRtp: firstConfig.value.max_rtp,
+						}
+					: undefined,
 			};
 		}
 		case 'range': {
@@ -352,7 +467,7 @@ export function resolveStakeRangeForGame(
 		return null;
 	}
 
-	if ((game === 'plinko' || game === 'wheel') && configId) {
+	if ((game === 'keno' || game === 'plinko' || game === 'wheel') && configId) {
 		return findGameConfigOption(parameters, configId)?.stakeRange ?? parameters.stakeRange;
 	}
 

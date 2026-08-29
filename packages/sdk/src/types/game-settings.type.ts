@@ -7,6 +7,7 @@ import {
 	Parameters as CoinflipParameters,
 	CoinFlipSettingsKey,
 } from '../contracts/coinflip/coinflip.js';
+import { Parameters as KenoParameters, KenoSettingsKey } from '../contracts/keno/keno.js';
 import { Parameters as LimboParameters, LimboSettingsKey } from '../contracts/limbo/limbo.js';
 import { Parameters as PlinkoParameters, PlinkoSettingsKey } from '../contracts/plinko/plinko.js';
 import {
@@ -27,6 +28,11 @@ export const GAME_SETTINGS = {
 		packageId: 'coinflip',
 		settingsKey: CoinFlipSettingsKey,
 		parameters: CoinflipParameters,
+	},
+	keno: {
+		packageId: 'keno',
+		settingsKey: KenoSettingsKey,
+		parameters: KenoParameters,
 	},
 	limbo: {
 		packageId: 'limbo',

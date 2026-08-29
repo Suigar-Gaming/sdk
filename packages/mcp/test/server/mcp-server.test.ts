@@ -13,6 +13,7 @@ import { createSuigarMcpServer } from '../../src/server/mcp-server.js';
 
 const publicToolNames = [
 	'build_coinflip_transaction',
+	'build_keno_transaction',
 	'build_limbo_transaction',
 	'build_nft_v1_mint_transaction',
 	'build_plinko_transaction',

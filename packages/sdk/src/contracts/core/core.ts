@@ -1,11 +1,11 @@
-import { bcs } from '@mysten/sui/bcs';
 /**************************************************************
  * THIS FILE IS GENERATED AND SHOULD NOT BE MANUALLY MODIFIED *
  **************************************************************/
 import { MoveStruct } from '../utils/index.js';
+import { bcs } from '@mysten/sui/bcs';
 import * as type_name from './deps/0x0000000000000000000000000000000000000000000000000000000000000001/type_name.js';
-import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
 import * as float from './float.js';
+import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
 const $moduleName = '@suigar/core::core';
 export const BetResultEvent = new MoveStruct({
 	name: `${$moduleName}::BetResultEvent<phantom T0>`,

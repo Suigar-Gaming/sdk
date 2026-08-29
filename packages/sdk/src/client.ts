@@ -30,6 +30,7 @@ import {
 	buildClaimReferralCommissionTransaction,
 	buildClaimReferralLevelUpUsdRewardsTransaction,
 	buildCoinflipTransaction,
+	buildKenoTransaction,
 	buildLimboTransaction,
 	buildMintNftV1Transaction,
 	buildPlinkoTransaction,
@@ -113,9 +114,8 @@ export class SuigarClient {
 	/**
 	 * Returns the resolved SDK configuration for the connected network.
 	 *
-	 * This is primarily useful for debugging or inspecting which package ids,
-	 * object ids, supported coin metadata, and price info object ids the SDK
-	 * resolved for the current client network.
+	 * This is primarily useful for debugging or inspecting which package ids, object ids, supported
+	 * coin metadata, and price info object ids the SDK resolved for the current client network.
 	 *
 	 * @returns Network-resolved Suigar configuration.
 	 */
@@ -126,21 +126,23 @@ export class SuigarClient {
 	/**
 	 * Clears all cached data for this Suigar client extension instance.
 	 *
-	 * Use this to force subsequent SDK reads to fetch fresh on-chain data,
-	 * including cached game parameters and PvP coinflip registry lookups.
+	 * Use this to force subsequent SDK reads to fetch fresh on-chain data, including cached game
+	 * parameters and PvP Coinflip registry lookups.
 	 */
 	reset(): void {
 		this.#cache.clear();
 	}
 
 	/**
-	 * Builds a transaction with the configured Sui client and encodes the resulting BCS bytes as base64.
+	 * Builds a transaction with the configured Sui client and encodes the resulting BCS bytes as
+	 * base64.
 	 *
-	 * Use this when an external wallet, API, or transport expects the built transaction payload as a base64 string
-	 * instead of raw bytes. The SDK always injects the configured Sui client, so `options` accepts the standard
-	 * transaction build options except for `client`.
+	 * Use this when an external wallet, API, or transport expects the built transaction payload as a
+	 * base64 string instead of raw bytes. The SDK always injects the configured Sui client, so
+	 * `options` accepts the standard transaction build options except for `client`.
 	 *
-	 * @param options Transaction to build and optional build options forwarded to `transaction.build()`, excluding `client`.
+	 * @param options Transaction to build and optional build options forwarded to
+	 *   `transaction.build()`, excluding `client`.
 	 * @returns Base64-encoded transaction bytes ready to send over the wire.
 	 */
 	async serializeTransactionToBase64({
@@ -156,12 +158,11 @@ export class SuigarClient {
 	/**
 	 * Reads on-chain game parameters for the requested game.
 	 *
-	 * The SDK first reads the selected game's settings object from SweetHouse,
-	 * then reads that game's coin-specific `Parameters<T>` object. Results are
-	 * cached according to the extension `cacheTtl` option. Pass
-	 * `ignoreCache: true` to refresh the on-chain read and replace the cached
-	 * value. Generated Move float fields are decoded into JavaScript numbers,
-	 * including floats nested in game configs.
+	 * The SDK first reads the selected game's settings object from SweetHouse, then reads that game's
+	 * coin-specific `Parameters<T>` object. Results are cached according to the extension `cacheTtl`
+	 * option. Pass `ignoreCache: true` to refresh the on-chain read and replace the cached value.
+	 * Generated Move float fields are decoded into JavaScript numbers, including floats nested in
+	 * game configs.
 	 *
 	 * @param options Game id, required coin type, plus optional cache override and abort signal.
 	 * @returns Parsed game parameters typed for the requested game.
@@ -253,25 +254,23 @@ export class SuigarClient {
 	}
 
 	/**
-	 * Lists unresolved PvP coinflip games from the resolved registry and resolves
-	 * each entry into parsed on-chain game state.
+	 * Lists unresolved PvP Coinflip games from the resolved registry and resolves each entry into
+	 * parsed on-chain game state.
 	 *
-	 * This fetches dynamic fields from the PvP coinflip registry object, then bulk
-	 * loads the referenced game objects through `client.core.getObjects()`. Registry
-	 * membership is the unresolved-state signal: when a game is joined and resolved,
-	 * the Move flow removes it from the registry and deletes the live `Game` object.
-	 * Use this when a product needs the current set of open PvP coinflip matches for
-	 * browsing or lobby views.
+	 * This fetches dynamic fields from the PvP Coinflip registry object, then bulk loads the
+	 * referenced game objects through `client.core.getObjects()`. Registry membership is the
+	 * unresolved-state signal: when a game is joined and resolved, the Move flow removes it from the
+	 * registry and deletes the live `Game` object. Use this when a product needs the current set of
+	 * open PvP Coinflip matches for browsing or lobby views.
 	 *
-	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding `parentId`.
-	 * Supported options such as `limit`, `cursor`, and `signal` are forwarded to the
-	 * underlying lookup calls. Pass `throwOnError: true` to fail the whole lookup
-	 * when any referenced game object cannot be fetched or parsed. By default,
-	 * failed per-object lookups are skipped and only successfully parsed unresolved
-	 * games are returned.
-	 * @returns Parsed unresolved PvP coinflip game objects for the requested
-	 * registry page. When `throwOnError` is `false`, entries that fail object fetch
-	 * or parse are omitted from the returned array.
+	 * @param options Optional dynamic field pagination forwarded to `listDynamicFields()`, excluding
+	 *   `parentId`. Supported options such as `limit`, `cursor`, and `signal` are forwarded to the
+	 *   underlying lookup calls. Pass `throwOnError: true` to fail the whole lookup when any
+	 *   referenced game object cannot be fetched or parsed. By default, failed per-object lookups are
+	 *   skipped and only successfully parsed unresolved games are returned.
+	 * @returns Parsed unresolved PvP Coinflip game objects for the requested registry page. When
+	 *   `throwOnError` is `false`, entries that fail object fetch or parse are omitted from the
+	 *   returned array.
 	 */
 	async getPvPCoinflipGames(
 		options: WithThrowOnError<Omit<SuiClientTypes.ListDynamicFieldsOptions, 'parentId'>> = {
@@ -299,7 +298,7 @@ export class SuigarClient {
 				}
 
 				if (!object.content) {
-					throw new Error('Unable to resolve PvP coinflip game from retrieved object');
+					throw new Error('Unable to resolve PvP Coinflip game from retrieved object');
 				}
 
 				return {
@@ -350,9 +349,7 @@ export class SuigarClient {
 		return returnValue;
 	}
 
-	/**
-	 * Transaction builders for Suigar games and referrals.
-	 */
+	/** Transaction builders for Suigar games and referrals. */
 	tx = {
 		/**
 		 * Creates a standard game transaction for the provided game.
@@ -364,6 +361,12 @@ export class SuigarClient {
 			switch (options.game) {
 				case 'coinflip':
 					return buildCoinflipTransaction({
+						...options,
+						config: this.#config,
+						partner: this.#partner,
+					});
+				case 'keno':
+					return buildKenoTransaction({
 						...options,
 						config: this.#config,
 						partner: this.#partner,
@@ -402,7 +405,7 @@ export class SuigarClient {
 					throw new RangeError(`Unsupported game: ${(options as { game?: string })?.game}`);
 			}
 		},
-		/** PvP coinflip transaction builders, grouped by game action. */
+		/** PvP Coinflip transaction builders, grouped by game action. */
 		pvpCoinflip: {
 			createGame: (options: PvPCoinflipGameOptions<'create'>): Transaction => {
 				return buildPvPCoinflipTransaction({
@@ -426,7 +429,6 @@ export class SuigarClient {
 					...options,
 					action: 'cancel',
 					config: this.#config,
-					partner: this.#partner,
 				});
 			},
 		},
@@ -495,43 +497,37 @@ export class SuigarClient {
 	/**
 	 * BCS struct constructors for decoding on-chain objects and events related to Suigar games.
 	 *
-	 * These can be used to parse the `content` field of on-chain objects and events into structured data with the
-	 * expected types. For example, use `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` to decode a PvP
-	 * coinflip game object.
+	 * These can be used to parse the `content` field of on-chain objects and events into structured
+	 * data with the expected types. For example, use
+	 * `client.suigar.bcs.PvPCoinflipGame.parse(object.content)` to decode a PvP coinflip game
+	 * object.
 	 *
-	 * Note that these constructors are not meant for encoding transaction arguments, as the SDK's transaction
-	 * builders handle argument serialization internally. Use these primarily for decoding and parsing on-chain data.
+	 * Note that these constructors are not meant for encoding transaction arguments, as the SDK's
+	 * transaction builders handle argument serialization internally. Use these primarily for decoding
+	 * and parsing on-chain data.
 	 */
 	bcs = {
 		// Objects
-		/**
-		 * Shared factory containing Suigar NFT V1 specifications.
-		 */
+		/** Shared factory containing Suigar NFT V1 specifications. */
 		NftV1Factory,
-		/**
-		 * Minted Suigar NFT V1 owned directly by an address.
-		 */
+		/** Minted Suigar NFT V1 owned directly by an address. */
 		NftV1,
-		/**
-		 * Object representing the state of a PvP coinflip game, as stored on-chain.
-		 */
+		/** Object representing the state of a PvP Coinflip game, as stored on-chain. */
 		PvPCoinflipGame,
 		// Events
 		/**
-		 * Event emitted at the end of a standard game (e.g., Coinflip, Limbo), containing the result and payout information.
+		 * Event emitted at the end of a standard game (e.g., Coinflip, Limbo), containing the result
+		 * and payout information.
 		 */
 		BetResultEvent,
 		/**
-		 * Event emitted when a PvP Coinflip game is created, containing the game configuration and initial state.
+		 * Event emitted when a PvP Coinflip game is created, containing the game configuration and
+		 * initial state.
 		 */
 		PvPCoinflipGameCreatedEvent,
-		/**
-		 * Event emitted when a PvP Coinflip game is resolved, containing the final outcome.
-		 */
+		/** Event emitted when a PvP Coinflip game is resolved, containing the final outcome. */
 		PvPCoinflipGameResolvedEvent,
-		/**
-		 * Event emitted when a PvP Coinflip game is cancelled.
-		 */
+		/** Event emitted when a PvP Coinflip game is cancelled. */
 		PvPCoinflipGameCancelledEvent,
 		/** Event emitted when a referrer claims commission for a wager coin. */
 		ReferrerClaimCommissionBalanceEvent,

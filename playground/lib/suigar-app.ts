@@ -17,6 +17,11 @@ export const DEFAULT_STANDARD_FORMS: StandardForms = {
 		...DEFAULT_STANDARD_SHARED_FIELDS,
 		side: 'heads',
 	},
+	keno: {
+		...DEFAULT_STANDARD_SHARED_FIELDS,
+		configId: '',
+		picks: ['1', '2', '3', '4', '5'],
+	},
 	limbo: {
 		...DEFAULT_STANDARD_SHARED_FIELDS,
 		targetMultiplier: '2.5',

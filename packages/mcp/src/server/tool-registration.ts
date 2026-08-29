@@ -7,6 +7,7 @@ import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types.js';
 import type { ToolTextResult } from '../runtime/index.js';
 import {
 	buildCoinflipTransactionTool,
+	buildKenoTransactionTool,
 	buildLimboTransactionTool,
 	buildNftV1MintTransactionInputSchema,
 	buildNftV1MintTransactionTool,
@@ -35,6 +36,7 @@ import {
 	getSessionWalletTool,
 	getWalletBalancesInputSchema,
 	getWalletBalancesTool,
+	kenoInputSchema,
 	limboInputSchema,
 	listNftsInputSchema,
 	listNftsTool,
@@ -304,6 +306,15 @@ const toolDefinitions = [
 		isAppTool: true,
 	},
 	{
+		name: 'build_keno_transaction',
+		title: 'Build Keno Transaction',
+		description: 'Build, dry-run, or inspect an unsigned Suigar Keno transaction.',
+		inputSchema: kenoInputSchema,
+		annotations: transactionToolAnnotations,
+		handler: buildKenoTransactionTool,
+		isAppTool: true,
+	},
+	{
 		name: 'build_plinko_transaction',
 		title: 'Build Plinko Transaction',
 		description: 'Build, dry-run, or inspect an unsigned Suigar plinko transaction.',
@@ -343,7 +354,7 @@ const toolDefinitions = [
 		name: 'build_pvp_coinflip_create_transaction',
 		title: 'Build PvP Coinflip Create',
 		description:
-			'Build, dry-run, or inspect an unsigned Suigar PvP coinflip lobby creation transaction.',
+			'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip lobby creation transaction.',
 		inputSchema: pvpCoinflipCreateInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCreateTransactionTool,
@@ -352,7 +363,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_join_transaction',
 		title: 'Build PvP Coinflip Join',
-		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip join transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip join transaction.',
 		inputSchema: pvpCoinflipJoinInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipJoinTransactionTool,
@@ -361,7 +372,7 @@ const toolDefinitions = [
 	{
 		name: 'build_pvp_coinflip_cancel_transaction',
 		title: 'Build PvP Coinflip Cancel',
-		description: 'Build, dry-run, or inspect an unsigned Suigar PvP coinflip cancel transaction.',
+		description: 'Build, dry-run, or inspect an unsigned Suigar PvP Coinflip cancel transaction.',
 		inputSchema: pvpCoinflipCancelInputSchema,
 		annotations: transactionToolAnnotations,
 		handler: buildPvpCoinflipCancelTransactionTool,

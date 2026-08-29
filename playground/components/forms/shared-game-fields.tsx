@@ -97,7 +97,7 @@ function BetCountField({
 				max={betCountLimit?.max.toString()}
 				disabled={isBetCountFixed || isLoading}
 				inputMode="numeric"
-				className="h-11 px-4 bg-background/55 rounded-2xl"
+				className="bg-background/55 h-11 rounded-2xl px-4"
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
 				placeholder="defaults to 1"
@@ -144,7 +144,7 @@ function StakeField({
 				type="number"
 				step="any"
 				inputMode="decimal"
-				className="h-11 px-4 bg-background/55 rounded-2xl"
+				className="bg-background/55 h-11 rounded-2xl px-4"
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
 				onBlur={onBlur}

@@ -61,6 +61,11 @@ export type CoinflipTransactionOptions = SharedBetTransactionOptions & {
 	side: CoinSide;
 };
 
+export type KenoTransactionOptions = SharedBetTransactionOptions & {
+	configId: number;
+	picks: Array<number>;
+};
+
 export type LimboTransactionOptions = SharedBetTransactionOptions & {
 	targetMultiplier: number;
 	scale?: number;
@@ -87,21 +92,23 @@ export type WheelTransactionOptions = SharedBetTransactionOptions & {
 	configId: number;
 };
 
-type SharedPvPCoinflipTransactionOptions = BaseTransactionOptions & CoinTransactionOptions;
+type SharedPvPCoinflipBetTransactionOptions = BaseTransactionOptions & CoinTransactionOptions;
 
 export type CreatePvPCoinflipTransactionOptions = Pick<StakeTransactionOptions, 'stake'> &
-	SharedPvPCoinflipTransactionOptions & {
+	SharedPvPCoinflipBetTransactionOptions & {
 		side: CoinSide;
 		isPrivate?: boolean;
 	};
 
-export type JoinPvPCoinflipTransactionOptions = SharedPvPCoinflipTransactionOptions & {
+export type JoinPvPCoinflipTransactionOptions = SharedPvPCoinflipBetTransactionOptions & {
 	gameId: string;
 };
 
-export type CancelPvPCoinflipTransactionOptions = SharedPvPCoinflipTransactionOptions & {
-	gameId: string;
-};
+export type CancelPvPCoinflipTransactionOptions = WithConfig<
+	WithCoinType<TransactionSenderOptions> & {
+		gameId: string;
+	}
+>;
 
 export type PvPCoinflipTransactionOptions<Action extends PvPCoinflipAction = PvPCoinflipAction> =
 	Action extends 'create'

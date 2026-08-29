@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export * from './coinflip.js';
+export * from './keno.js';
 export * from './limbo.js';
 export * from './nft-v1.js';
 export * from './plinko.js';

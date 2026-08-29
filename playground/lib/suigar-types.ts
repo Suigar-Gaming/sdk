@@ -33,6 +33,15 @@ export type RangeBoundsSummary = {
 	maxRtp: number;
 };
 
+export type KenoBoundsSummary = {
+	boardSize: number;
+	drawCount: number;
+	minPicks: number;
+	maxPicks: number;
+	minRtp: number;
+	maxRtp: number;
+};
+
 export type GameConfigOption = {
 	id: string;
 	label: string;
@@ -43,8 +52,15 @@ export type GameConfigOption = {
 	}>;
 	multiplierValues?: Array<{
 		id: string;
+		label?: string;
 		value: string;
 	}>;
+	keno?: {
+		boardSize: number;
+		drawCount: number;
+		minPicks: number;
+		maxPicks: number;
+	};
 	isPlayable: boolean;
 	stakeRange: StakeRangeSummary;
 };
@@ -72,6 +88,7 @@ export type StandardGameParametersSummary = {
 	topLevelDetails?: Array<GameSettingsDetail>;
 	targetMultiplierRange?: NumberRangeSummary;
 	rangeBounds?: RangeBoundsSummary;
+	kenoBounds?: KenoBoundsSummary;
 };
 
 export type PvPGameParametersSummary = {
@@ -81,6 +98,11 @@ export type PvPGameParametersSummary = {
 
 export type CoinflipFormValues = StandardSharedFields & {
 	side: CoinSide;
+};
+
+export type KenoFormValues = StandardSharedFields & {
+	configId: string;
+	picks: Array<string>;
 };
 
 export type LimboFormValues = StandardSharedFields & {
@@ -124,6 +146,7 @@ export type PvPCoinflipCancelFormValues = {
 
 export type StandardForms = {
 	coinflip: CoinflipFormValues;
+	keno: KenoFormValues;
 	limbo: LimboFormValues;
 	plinko: PlinkoFormValues;
 	range: RangeFormValues;
