@@ -13,7 +13,7 @@
 		"changeset:prerelease:beta": "changeset pre enter beta",
 		"changeset:prerelease:exit": "changeset pre exit",
 		"changeset:version": "changeset version && pnpm --filter '@suigar/*' run codegen:version",
-		"codegen:version": "node genversion.ts",
+		"codegen:version": "node genversion.mjs",
 		"publish:jsr": "pnpm --filter './packages/*' --if-present run publish:jsr",
 		"release": "turbo run build:ci --filter='./packages/*' && changeset publish && pnpm run publish:jsr",
 		"oxlint": "oxlint .",
