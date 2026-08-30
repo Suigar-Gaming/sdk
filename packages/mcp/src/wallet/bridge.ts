@@ -56,16 +56,6 @@ function sameState(left: string, right: string): boolean {
 	return timingSafeEqual(hex.decode(left), hex.decode(right));
 }
 
-function concatBytes(chunks: Array<Uint8Array>, length: number): Uint8Array {
-	const bytes = new Uint8Array(length);
-	let offset = 0;
-	for (const chunk of chunks) {
-		bytes.set(chunk, offset);
-		offset += chunk.length;
-	}
-	return bytes;
-}
-
 function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptions> {
 	return {
 		timeoutMs: resolvePositiveInteger(
@@ -88,7 +78,8 @@ async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
 
 function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
-		const chunks: Array<Uint8Array> = [];
+		const decoder = new TextDecoder();
+		let body = '';
 		let length = 0;
 		request.on('data', (chunk: Uint8Array) => {
 			length += chunk.length;
@@ -97,9 +88,9 @@ function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<strin
 				reject(new Error('Request body is too large.'));
 				return;
 			}
-			chunks.push(chunk);
+			body += decoder.decode(chunk, { stream: true });
 		});
-		request.on('end', () => resolve(new TextDecoder().decode(concatBytes(chunks, length))));
+		request.on('end', () => resolve(body + decoder.decode()));
 		request.on('error', reject);
 	});
 }
