@@ -10,6 +10,7 @@ interface PackageJson {
 const packageJsonPath = new URL('./package.json', import.meta.url);
 const mcpConfigPath = new URL('./plugin/.mcp.json', import.meta.url);
 const serverManifestPath = new URL('./server.json', import.meta.url);
+const sourceVersionPath = new URL('./src/version.ts', import.meta.url);
 const pluginManifestPaths = [
 	new URL('./plugin/plugin.json', import.meta.url),
 	new URL('./plugin/.claude-plugin/plugin.json', import.meta.url),
@@ -28,7 +29,7 @@ async function replaceInFile(
 	pattern: RegExp,
 	replacement: string,
 	missingMessage: string,
-) {
+): Promise<void> {
 	const source = await readFile(filePath, 'utf8');
 	const nextSource = source.replace(pattern, replacement);
 
@@ -69,4 +70,11 @@ await replaceInFile(
 	serverPackageVersionPattern,
 	`$1${packageJson.version}$2`,
 	'Missing @suigar/mcp package version',
+);
+
+await replaceInFile(
+	sourceVersionPath,
+	/(export const VERSION = ')[^']+(';)/,
+	`$1${packageJson.version}$2`,
+	'Missing source VERSION export',
 );

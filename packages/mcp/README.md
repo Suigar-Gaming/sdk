@@ -52,6 +52,12 @@ Install the package directly when you need to import its programmatic API or run
 npm install @suigar/mcp
 ```
 
+The package is also published on JSR for programmatic imports:
+
+```bash
+pnpm add jsr:@suigar/mcp
+```
+
 The package also ships `plugin/` manifests for plugin-capable hosts:
 
 - `plugin/.codex-plugin/plugin.json` for Codex
@@ -59,7 +65,7 @@ The package also ships `plugin/` manifests for plugin-capable hosts:
 - `plugin/.cursor-plugin/plugin.json` for Cursor
 - `plugin/plugin.json` for Antigravity-style plugin discovery
 
-The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp@<package-version>` stdio server. Plugin manifest versions and the MCP config package specifier are kept in sync with `packages/mcp/package.json` by `pnpm run changeset:version`.
+The Codex, Claude, and Cursor manifests use the bundled `.mcp.json` MCP config, which registers the `npx -y @suigar/mcp@<package-version>` stdio server. Plugin manifest versions, the MCP config package specifier, and package-local JSR config versions are kept in sync with `packages/mcp/package.json` by `pnpm run codegen:version`, which also runs during `pnpm run changeset:version`.
 
 Repository marketplace catalogs support GitHub installation and local plugin testing:
 

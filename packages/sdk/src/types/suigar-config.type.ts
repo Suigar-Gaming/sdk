@@ -13,7 +13,7 @@ export type SuigarCoinMetadata = {
 
 export type SuigarConfigOverrides = DeepPartial<SuigarConfig>;
 
-export interface SuigarExtensionOptions<Name = 'suigar'> {
+export interface SuigarExtensionOptions<Name extends string = 'suigar'> {
 	name?: Name;
 	/**
 	 * Network-resolved configuration overrides.

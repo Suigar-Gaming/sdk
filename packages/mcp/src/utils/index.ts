@@ -3,4 +3,3 @@
 
 export * from './amount.js';
 export * from './command.js';
-export * from './version.js';

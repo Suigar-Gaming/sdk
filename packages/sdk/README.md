@@ -14,6 +14,12 @@ For Sui client, transaction, and network APIs, visit the [Sui TypeScript SDK doc
 npm install --save @suigar/sdk @mysten/sui @mysten/bcs
 ```
 
+The SDK is also published on JSR:
+
+```bash
+pnpm add jsr:@suigar/sdk
+```
+
 Runtime requirements:
 
 - Node.js `^24.0.0 || ^26.0.0`

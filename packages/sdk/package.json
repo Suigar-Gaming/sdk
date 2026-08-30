@@ -78,10 +78,11 @@
 	"scripts": {
 		"build": "pnpm run clean && pnpm run codegen && tsdown",
 		"build:ci": "pnpm run clean && tsdown",
-		"clean": "rm -rf dist",
+		"clean": "rimraf dist",
 		"codegen": "sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
+		"publish:jsr": "jsr publish --allow-slow-types",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"oxfmt": "oxfmt . --check",

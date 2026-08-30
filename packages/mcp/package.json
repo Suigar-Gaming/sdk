@@ -79,11 +79,12 @@
 	"scripts": {
 		"build": "pnpm run clean && tsdown && vite build",
 		"build:ci": "pnpm run build",
-		"clean": "rm -rf dist",
+		"clean": "rimraf plugin",
 		"codegen:version": "node genversion.ts",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes",
+		"publish:jsr": "jsr publish",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"oxfmt": "oxfmt . --check",
