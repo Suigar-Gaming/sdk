@@ -49,11 +49,13 @@ describe('SweetHouse transaction builder', () => {
 		const tx = buildRedeemSweetHouseRequestTransaction({
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
-			hTokenCoinId: '0x333',
+			amount: 500,
 			config: SWEETHOUSE_CONFIG,
 		});
-		const call = tx.getData().commands[0].MoveCall!;
+		const data = tx.getData();
+		const call = data.commands[1].MoveCall!;
 
+		expect(data.commands[0].$kind).toBe('$Intent');
 		expect(call.package).toBe(normalizeSuiAddress(SWEETHOUSE_CONFIG.packageIds.core));
 		expect(call.module).toBe('sweethouse');
 		expect(call.function).toBe('redeem_request');

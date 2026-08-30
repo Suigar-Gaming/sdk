@@ -135,7 +135,7 @@ export type DepositSweetHouseOptions = TransactionSenderOptions &
 
 export type RedeemSweetHouseRequestOptions = TransactionSenderOptions &
 	WithCoinType<{
-		hTokenCoinId: string;
+		amount: number | bigint;
 	}>;
 
 export type ClaimOwnSweetHouseRedeemRequestAfterDelayOptions = TransactionSenderOptions &

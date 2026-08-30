@@ -511,7 +511,7 @@ Redeem:
 const redeem = client.suigar.tx.sweethouse.redeemRequest({
 	owner: '0x123',
 	coinType: usdcType,
-	hTokenCoinId: '0xHTOKEN_COIN_ID',
+	amount: 10_000_000n,
 });
 ```
 
@@ -525,7 +525,7 @@ const claim = client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
 });
 ```
 
-Amounts are in base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` builds the payment coin from the owner's balance with Mysten coin intent helpers and transfers the returned hToken coin back to `owner` in the same transaction. `redeemRequest` and `claimOwnRedeemRequestAfterDelay` supply the Sui Clock automatically. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
+Deposit amounts are in the underlying coin's base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Redeem request amounts are hToken base units for the same pool. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` transfers the returned hToken coin back to `owner`, while `redeemRequest` spends hTokens from `owner` and creates a redeem request. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
 
 ### Referral claims
 
@@ -585,6 +585,7 @@ BCS helpers live under `client.suigar.bcs`.
 Current exposed helpers:
 
 - `PvPCoinflipGame`
+- `StakedCoin`
 - `BetResultEvent`
 - `PvPCoinflipGameCreatedEvent`
 - `PvPCoinflipGameResolvedEvent`

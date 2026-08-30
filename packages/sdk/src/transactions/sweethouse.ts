@@ -3,6 +3,7 @@
 
 import { coinWithBalance, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
+import { StakedCoin } from '../contracts/core/house.js';
 import {
 	claimOwnRedeemRequestAfterDelay,
 	depositPublicPoolAndMintStakedCoins,
@@ -53,15 +54,26 @@ export function buildRedeemSweetHouseRequestTransaction({
 	owner,
 	gasBudget,
 	coinType,
-	hTokenCoinId,
+	amount,
 }: WithConfig<RedeemSweetHouseRequestOptions>): Transaction {
 	const tx = createBaseTransaction({ owner, gasBudget });
+	const normalizedCoinType = normalizeStructTag(coinType);
 
 	tx.add(
 		redeemRequest({
 			package: config.packageIds.core,
-			typeArguments: [normalizeStructTag(coinType)],
-			arguments: [config.objectIds.sweetHouse, hTokenCoinId],
+			typeArguments: [normalizedCoinType],
+			arguments: [
+				config.objectIds.sweetHouse,
+				coinWithBalance({
+					type: StakedCoin.typeTag({
+						package: config.packageIds.core,
+						typeArguments: [normalizedCoinType],
+					}),
+					balance: toBigInt(amount),
+					useGasCoin: false,
+				}),
+			],
 		}),
 	);
 

@@ -12,6 +12,7 @@ import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
+import { StakedCoin } from './contracts/core/house.js';
 import { RedeemRequestCreatedEvent } from './contracts/core/sweethouse.js';
 import { Nft as NftV1, Factory as NftV1Factory } from './contracts/nft-v1/nft.js';
 import {
@@ -551,6 +552,8 @@ export class SuigarClient {
 		NftV1Factory,
 		/** Minted Suigar NFT V1 owned directly by an address. */
 		NftV1,
+		/** HToken receipt coin type representing a SweetHouse public pool share. */
+		StakedCoin,
 		/** Object representing the state of a PvP Coinflip game, as stored on-chain. */
 		PvPCoinflipGame,
 		// Events

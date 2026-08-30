@@ -742,7 +742,7 @@ describe('SuigarClient', () => {
 			client.suigar.tx.sweethouse.redeemRequest({
 				owner: '0x123',
 				coinType,
-				hTokenCoinId: '0x456',
+				amount: 1000,
 			}),
 		).toBeInstanceOf(Transaction);
 		expect(
@@ -1367,6 +1367,7 @@ describe('SuigarClient', () => {
 			).specs.contents[0]?.value.url.url,
 		).toBe('https://suigar.com/cane.png');
 		expect(client.suigar.bcs.PvPCoinflipGame).toBeDefined();
+		expect(client.suigar.bcs.StakedCoin).toBeDefined();
 		expect(client.suigar.bcs.BetResultEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameCreatedEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameResolvedEvent).toBeDefined();

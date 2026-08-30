@@ -30,7 +30,9 @@ export const SUIGAR_PACKAGES: Array<SuigarPackage> = [
 		modules: {
 			core: {
 				types: ['BetResultEvent'],
-				functions: false,
+			},
+			house: {
+				types: ['StakedCoin'],
 			},
 			sweethouse: {
 				types: ['RedeemRequestCreatedEvent'],
