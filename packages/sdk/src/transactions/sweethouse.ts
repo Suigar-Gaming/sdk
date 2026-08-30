@@ -29,7 +29,7 @@ export function buildDepositSweetHouseTransaction({
 	const tx = createBaseTransaction({ owner, gasBudget });
 	const normalizedCoinType = normalizeStructTag(coinType);
 
-	const hTokens = tx.add(
+	const stakedCoins = tx.add(
 		depositPublicPoolAndMintStakedCoins({
 			package: config.packageIds.core,
 			typeArguments: [normalizedCoinType],
@@ -44,7 +44,7 @@ export function buildDepositSweetHouseTransaction({
 		}),
 	);
 
-	tx.transferObjects([hTokens], tx.pure.address(normalizeSuiAddress(owner)));
+	tx.transferObjects([stakedCoins], tx.pure.address(normalizeSuiAddress(owner)));
 
 	return tx;
 }

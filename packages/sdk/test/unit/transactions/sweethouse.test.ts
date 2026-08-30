@@ -24,7 +24,7 @@ const SWEETHOUSE_CONFIG = {
 };
 
 describe('SweetHouse transaction builder', () => {
-	it('builds a public pool deposit and transfers returned hTokens to the owner', () => {
+	it('builds a public pool deposit and transfers returned staked coins to the owner', () => {
 		const tx = buildDepositSweetHouseTransaction({
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',
@@ -45,7 +45,7 @@ describe('SweetHouse transaction builder', () => {
 		expect(data.commands[2].TransferObjects).toBeDefined();
 	});
 
-	it('builds a redeem request with the hToken coin and Clock', () => {
+	it('builds a redeem request with the staked coin and Clock', () => {
 		const tx = buildRedeemSweetHouseRequestTransaction({
 			owner: '0x123',
 			coinType: '0x2::sui::SUI',

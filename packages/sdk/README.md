@@ -525,7 +525,7 @@ const claim = client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
 });
 ```
 
-Deposit amounts are in the underlying coin's base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Redeem request amounts are hToken base units for the same pool. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` transfers the returned hToken coin back to `owner`, while `redeemRequest` spends hTokens from `owner` and creates a redeem request. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
+Deposit amounts are in the underlying coin's base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Redeem request amounts are staked coin base units for the same pool. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` transfers the returned staked coin back to `owner`, while `redeemRequest` spends staked coins from `owner` and creates a redeem request. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
 
 ### Referral claims
 

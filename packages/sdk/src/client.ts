@@ -552,7 +552,7 @@ export class SuigarClient {
 		NftV1Factory,
 		/** Minted Suigar NFT V1 owned directly by an address. */
 		NftV1,
-		/** HToken receipt coin type representing a SweetHouse public pool share. */
+		/** Staked coin receipt type representing a SweetHouse public pool share. */
 		StakedCoin,
 		/** Object representing the state of a PvP Coinflip game, as stored on-chain. */
 		PvPCoinflipGame,
