@@ -43,7 +43,7 @@ export function parseCoinType(type: string): string {
 }
 
 /**
- * Resolves a supported Suigar event into its normalized SDK game id and event name.
+ * Resolves a supported Suigar event into its normalized SDK game and event name.
  *
  * This helper recognizes all supported Suigar event names in `GAME_EVENTS`. Standard
  * `BetResultEvent` payloads encode the game family through the core client event module or generic
@@ -51,25 +51,25 @@ export function parseCoinType(type: string): string {
  * `pvp_coinflip` module.
  *
  * @param event Sui event returned by the core client.
- * @returns Parsed SDK game id and raw Move event name, or `null` when the event name is unsupported
- *   or the game id cannot be resolved.
+ * @returns Parsed SDK game and raw Move event name, or `null` when the event name is unsupported or
+ *   the game cannot be resolved.
  */
-export function parseGameEvent(event: SuiClientTypes.Event): SuigarGameEvent | null {
-	const { name: eventName, typeParams } = parseStructTag(event.eventType);
-	const module = event.module.replaceAll('_', '-');
-	const gameId = GAMES.includes(module as Game) ? module : typeParams[0];
+export function parseGameEvent(suiEvent: SuiClientTypes.Event): SuigarGameEvent | null {
+	const { name: event, typeParams } = parseStructTag(suiEvent.eventType);
+	const module = suiEvent.module.replaceAll('_', '-');
+	const game = GAMES.includes(module as Game) ? module : typeParams[0];
 
 	if (
-		!GAME_EVENTS.includes(eventName as GameEvent) ||
-		typeof gameId !== 'string' ||
-		(gameId !== 'pvp-coinflip' && eventName !== 'BetResultEvent')
+		!GAME_EVENTS.includes(event as GameEvent) ||
+		typeof game !== 'string' ||
+		(game !== 'pvp-coinflip' && event !== 'BetResultEvent')
 	) {
 		return null;
 	}
 
 	return {
-		gameId,
-		eventName,
+		game,
+		event,
 	} as SuigarGameEvent;
 }
 
@@ -163,11 +163,11 @@ function parseGameDetail<TValueType extends GameDetailSchemaValueType>({
  *
  * Use this only with the `game_details` field from a decoded `BetResultEvent`. Suigar stores those
  * entries as `VecMap<string, vector<u8>>`, so raw BCS decoding leaves each value as bytes. This
- * helper uses the provided `gameId` to narrow the known detail schema, parses each byte array into
+ * helper uses the provided `game` to narrow the known detail schema, parses each byte array into
  * the expected runtime type, and preserves the original on-chain keys in the returned object.
  * Unknown keys fall back to string decoding so newer detail fields remain readable by default.
  *
- * Call `parseGameEvent(event)` first when you need to derive the matching `gameId` from the raw
+ * Call `parseGameEvent(event)` first when you need to derive the matching `game` from the raw
  * `SuiClientTypes.Event` before decoding `decoded.game_details`.
  *
  * @param options Game and game details from a decoded `BetResultEvent`.

@@ -29,16 +29,12 @@ describe('parseGameEvent', () => {
 	it('models valid game and event combinations as a discriminated union', () => {
 		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
 			| {
-					gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
-					eventName: 'BetResultEvent';
+					game: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					event: 'BetResultEvent';
 			  }
 			| {
-					gameId: 'pvp-coinflip';
-					eventName:
-						| 'BetResultEvent'
-						| 'GameCreatedEvent'
-						| 'GameResolvedEvent'
-						| 'GameCancelledEvent';
+					game: 'pvp-coinflip';
+					event: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent';
 			  }
 		>();
 	});
@@ -53,8 +49,8 @@ describe('parseGameEvent', () => {
 				}),
 			),
 		).toEqual({
-			gameId: 'coinflip',
-			eventName: 'BetResultEvent',
+			game: 'coinflip',
+			event: 'BetResultEvent',
 		});
 	});
 
@@ -68,14 +64,14 @@ describe('parseGameEvent', () => {
 					}),
 				),
 			).toEqual({
-				gameId: 'pvp-coinflip',
-				eventName,
+				game: 'pvp-coinflip',
+				event: eventName,
 			});
 		}
 	});
 
 	it('parses every supported standard bet result game family', () => {
-		for (const gameId of [
+		for (const game of [
 			'coinflip',
 			'keno',
 			'limbo',
@@ -87,18 +83,18 @@ describe('parseGameEvent', () => {
 			expect(
 				parseGameEvent(
 					createEvent({
-						module: gameId,
-						eventType: `0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc::core::BetResultEvent<0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::${gameId}::Game>`,
+						module: game,
+						eventType: `0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc::core::BetResultEvent<0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::${game}::Game>`,
 					}),
 				),
 			).toEqual({
-				gameId,
-				eventName: 'BetResultEvent',
+				game,
+				event: 'BetResultEvent',
 			});
 		}
 	});
 
-	it('returns null when a supported event name cannot be mapped to a game id', () => {
+	it('returns null when a supported event name cannot be mapped to a game', () => {
 		expect(
 			parseGameEvent(
 				createEvent({
@@ -167,8 +163,8 @@ describe('parseGameEvent', () => {
 				}),
 			),
 		).toEqual({
-			gameId: 'pvp-coinflip',
-			eventName: 'GameResolvedEvent',
+			game: 'pvp-coinflip',
+			event: 'GameResolvedEvent',
 		});
 	});
 });
