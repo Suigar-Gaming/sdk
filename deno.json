@@ -1,4 +1,10 @@
 {
 	"$schema": "https://raw.githubusercontent.com/denoland/deno/main/cli/schemas/config-file.v1.json",
-	"workspace": ["packages/*"]
+	"workspace": ["packages/*"],
+	"nodeModulesDir": "manual",
+	"preferPackageJson": true,
+	"publish": false,
+	"fmt": {
+		"exclude": ["pnpm-lock.yaml"]
+	}
 }
