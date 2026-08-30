@@ -32,14 +32,14 @@ export const SUIGAR_PACKAGES: Array<SuigarPackage> = [
 				types: ['BetResultEvent'],
 				functions: false,
 			},
-			// sweethouse: {
-			// 	types: ['RedeemRequestCreatedEvent'],
-			// 	functions: [
-			// 		'deposit_public_pool_and_mint_staked_coins',
-			// 		'redeem_request',
-			// 		'claim_own_redeem_request_after_delay',
-			// 	],
-			// },
+			sweethouse: {
+				types: ['RedeemRequestCreatedEvent'],
+				functions: [
+					'deposit_public_pool_and_mint_staked_coins',
+					'redeem_request',
+					'claim_own_redeem_request_after_delay',
+				],
+			},
 		},
 	},
 	{
