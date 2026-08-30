@@ -1,15 +1,26 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it } from 'vitest';
-import {
+import { describe, expect, it, vi } from 'vitest';
+
+const mocks = vi.hoisted(() => ({
+	readFile: vi.fn<(path: URL, encoding: 'utf8') => Promise<string>>(),
+}));
+
+vi.mock('node:fs/promises', () => ({
+	readFile: mocks.readFile,
+}));
+
+const {
 	createSuigarMcpAppResourceResult,
 	NFT_IMAGE_RESOURCE_DOMAINS,
 	SUIGAR_MCP_APP_RESOURCE_URI,
-} from '../../src/server/app-resource.js';
+} = await import('../../src/server/app-resource.js');
 
 describe('MCP App resource', () => {
-	it('serves MCP App HTML with text fallback and CSP metadata', async () => {
+	it('serves bundled MCP App HTML with CSP metadata', async () => {
+		mocks.readFile.mockResolvedValue('<html><title>Suigar MCP Console</title></html>');
+
 		const result = await createSuigarMcpAppResourceResult();
 		const [content] = result.contents;
 
