@@ -45,7 +45,6 @@ minimumReleaseAgeExclude:
 
 peerDependencyRules:
   allowAny:
-    - graphql
     - typescript
   ignoreMissing:
     - eslint
