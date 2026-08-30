@@ -52,7 +52,9 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 }
 
 function sameState(left: string, right: string): boolean {
-	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) return false;
+	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) {
+		return false;
+	}
 	return timingSafeEqual(hex.decode(left), hex.decode(right));
 }
 
@@ -73,7 +75,9 @@ function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptio
 }
 
 async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
-	if (shouldOpen) await open(url).catch(() => undefined);
+	if (shouldOpen) {
+		await open(url).catch(() => undefined);
+	}
 }
 
 function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<string> {
@@ -156,7 +160,9 @@ export async function createLoginBridge({
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
-		if (!loopback.authorize(request, response)) return;
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/handshake') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {
@@ -246,7 +252,9 @@ export async function createExecutionBridge({
 	}, options.timeoutMs).unref();
 	server.on('request', async (request, response) => {
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
-		if (!loopback.authorize(request, response)) return;
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
 		if (!sameState(url.searchParams.get('state') ?? '', state) && request.method === 'GET') {
 			respond(response, 403, { error: 'Invalid approval state' });
 			return;
@@ -336,7 +344,9 @@ export async function createLogoutBridge({
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
-		if (!loopback.authorize(request, response)) return;
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/request') {
 			if (!sameState(url.searchParams.get('state') ?? '', state)) {
@@ -363,8 +373,11 @@ export async function createLogoutBridge({
 				respond(response, 403, { error: 'Invalid logout callback' });
 				return;
 			}
-			if (all) await clearCredentials();
-			else if (network) await removeProfile(network);
+			if (all) {
+				await clearCredentials();
+			} else if (network) {
+				await removeProfile(network);
+			}
 			clearTimeout(timeout);
 			respond(response, 200, { ok: true });
 			resolve({ network, all });
@@ -378,7 +391,9 @@ export async function createLogoutBridge({
 	url.searchParams.set('port', String(port));
 	url.searchParams.set('state', state);
 	url.searchParams.set('action', 'logout');
-	if (all) url.searchParams.set('all', 'true');
+	if (all) {
+		url.searchParams.set('all', 'true');
+	}
 	const bridgeUrl = url.toString();
 	await openBridgeUrl(bridgeUrl, options.open);
 	return { url: bridgeUrl, done, close };

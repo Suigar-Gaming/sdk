@@ -27,10 +27,18 @@ import {
 
 function connectionBridgeArgs(input: ConnectionInput): Array<string> {
 	const args: Array<string> = [];
-	if (input.webUrl) args.push('--web-url', input.webUrl);
-	if (input.timeoutMs !== undefined) args.push('--timeout-ms', String(input.timeoutMs));
-	if (input.maxBodyBytes !== undefined) args.push('--max-body-bytes', String(input.maxBodyBytes));
-	if (input.noOpen === true || input.open === false) args.push('--no-open');
+	if (input.webUrl) {
+		args.push('--web-url', input.webUrl);
+	}
+	if (input.timeoutMs !== undefined) {
+		args.push('--timeout-ms', String(input.timeoutMs));
+	}
+	if (input.maxBodyBytes !== undefined) {
+		args.push('--max-body-bytes', String(input.maxBodyBytes));
+	}
+	if (input.noOpen === true || input.open === false) {
+		args.push('--no-open');
+	}
 	return args;
 }
 
