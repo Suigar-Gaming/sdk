@@ -1,6 +1,6 @@
 # `@suigar/sdk`
 
-TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
+TypeScript SDK for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.
 
 ## Documentation
 
@@ -65,10 +65,12 @@ import {
 	isMoveI64,
 	parseCoinType,
 	parseGameDetails,
+	parseSuigarEvent,
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
 	toU16,
+	toU32,
 } from '@suigar/sdk/utils';
 ```
 
@@ -78,6 +80,7 @@ Numeric helper behavior:
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` inputs and returns a normalized non-negative `bigint` while throwing `TypeError` for invalid input shapes and `RangeError` for negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
+- `toU32(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..4294967295` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a JavaScript `number`; `getGameParameters()` already applies this conversion to all float fields, including nested game configs
 - `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
@@ -485,6 +488,48 @@ Error behavior:
 
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
 
+### SweetHouse
+
+SweetHouse public pool transaction builders live under `client.suigar.tx.sweetHouse`:
+
+- `deposit`
+- `redeemRequest`
+- `claimOwnRedeemRequestAfterDelay`
+
+Deposit:
+
+```ts
+const usdcType = client.suigar.getConfig().coins.usdc.coinType;
+
+const deposit = client.suigar.tx.sweetHouse.deposit({
+	owner: '0x123',
+	coinType: usdcType,
+	amount: 10_000_000n,
+});
+```
+
+Redeem:
+
+```ts
+const redeem = client.suigar.tx.sweetHouse.redeemRequest({
+	owner: '0x123',
+	coinType: usdcType,
+	amount: 10_000_000n,
+});
+```
+
+Delayed fallback claim:
+
+```ts
+const claim = client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay({
+	owner: '0x123',
+	coinType: usdcType,
+	requestId: '0xREDEEM_REQUEST_ID',
+});
+```
+
+Deposit amounts are in the underlying coin's base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Redeem request amounts are staked coin base units for the same pool. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` transfers the returned staked coin back to `owner`, while `redeemRequest` spends staked coins from `owner` and creates a redeem request. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
+
 ### Referral claims
 
 Referrers can claim commission accrued for any supported wager coin, and separately claim their USD-denominated level-up reward in the configured dollar coin (`coins.usdc`). Each builder sets `owner` as the transaction sender and transfers the returned claim coin back to that same address.
@@ -549,6 +594,7 @@ Current exposed helpers:
 - `PvPCoinflipGameCancelledEvent`
 - `ReferrerClaimCommissionBalanceEvent`
 - `ReferrerClaimLevelUpUsdRewardsEvent`
+- `RedeemRequestCreatedEvent`
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
@@ -573,17 +619,28 @@ console.log(game.json);
 
 ### Parse Standard Bet Result Data
 
+Use the Sui client's `signAndExecuteTransaction` method with a signer supplied by a wallet or keypair, then wait for the finalized result before parsing events. Assume `client` is the configured SDK client, `accountAddress` is the connected wallet address, and `signer` implements the Sui signing interface:
+
 ```ts
-const executeResult = await client.core.executeTransaction({
-	transaction: transactionBytes,
-	signatures: [signature],
-	include: {
-		events: true,
-	},
+const tx = client.suigar.tx.createGameBet({
+	game: 'coinflip',
+	owner: accountAddress,
+	coinType: client.suigar.getConfig().coins.usdc.coinType,
+	stake: 10_000_000n,
+	side: 'heads',
 });
 
-const finalResult = await client.core.waitForTransaction({
-	result: executeResult,
+const execution = await client.signAndExecuteTransaction({
+	transaction: tx,
+	signer,
+});
+
+if (execution.$kind === 'FailedTransaction') {
+	throw new Error(execution.FailedTransaction.status.error?.message);
+}
+
+const finalResult = await client.waitForTransaction({
+	digest: execution.Transaction.digest,
 	include: {
 		effects: true,
 		events: true,
@@ -621,29 +678,29 @@ Parsed fields include:
 - `game_details`
 - `metadata`
 
-`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameEvent(event)` from `@suigar/sdk/utils` to retrieve the normalized `gameId` and `eventName`, then pass that `gameId` to `parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` for game-specific key and value typing.
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseSuigarEvent(event)` from `@suigar/sdk/utils` to identify and decode supported Suigar events. For a `BetResultEvent`, it also returns decoded, game-specific `gameDetails`.
 
 ```ts
-import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { parseSuigarEvent } from '@suigar/sdk/utils';
 
-const { gameId, eventName } = parseGameEvent(event)!;
-const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails({
-	game: gameId,
-	gameDetails: decoded.game_details,
-});
+const suigarEvent = parseSuigarEvent(event);
+
+if (suigarEvent?.event.type === 'BetResultEvent') {
+	console.log(suigarEvent.event.data.outcome_amount);
+	console.log(suigarEvent.gameDetails.payout_amount);
+}
 ```
 
 `parseGameDetails` preserves the on-chain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
-`parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` narrows based on the parsed event game id. For example, when `gameId === 'coinflip'` it narrows to:
+`suigarEvent.gameDetails` narrows based on the event game. For example, when `suigarEvent.game === 'coinflip'` it narrows to:
 
 - `{ player_bet: string; coin_outcome: string }`
 
-`parseGameEvent(event)` returns the normalized game id and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
+`parseGameEvent(event)` remains available when only the normalized game and raw Move event name are needed. It returns:
 
-- `{ gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', eventName: 'BetResultEvent' }` for standard bet result events
-- `{ gameId: 'pvp-coinflip', eventName: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP Coinflip events
+- `{ game: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', event: 'BetResultEvent' }` for standard bet result events
+- `{ game: 'pvp-coinflip', event: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP Coinflip events
 - `null` for unsupported event names or non-Suigar event payloads
 
 When the extension is configured with `partner`, decoded event `metadata` will contain that partner wallet address under the `partner` entry.
@@ -654,12 +711,67 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 > - Unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
 > - Parse emitted events from the unwrapped transaction result
 > - Use `event.bcs` for consistent decoding across transports
-> - Use `const { gameId } = parseGameEvent(event)!` and then `parseGameDetails({ game: gameId, gameDetails: decoded.game_details })` instead of hand-decoding standard game detail byte arrays
+> - Use `parseSuigarEvent(event)` when you want the decoded payload and game details in one step
 
 > **Tip:**
 >
-> - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
+> - `waitForTransaction({ digest, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
 > - These helpers decode the event payload itself, not a full transaction response
+
+### Parse SweetHouse Redeem Request Data
+
+SweetHouse emits `RedeemRequestCreatedEvent` when a redeem request is created. Decode the event payload and read `request_id` to obtain the request ID needed by `client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay`:
+
+The signer must correspond to `accountAddress`, which is also the transaction owner; no additional transaction party is required.
+
+```ts
+const redeem = client.suigar.tx.sweetHouse.redeemRequest({
+	owner: accountAddress,
+	coinType: client.suigar.getConfig().coins.usdc.coinType,
+	amount: 10_000_000n,
+});
+
+const execution = await client.signAndExecuteTransaction({
+	transaction: redeem,
+	signer,
+});
+
+if (execution.$kind === 'FailedTransaction') {
+	throw new Error(execution.FailedTransaction.status.error?.message);
+}
+
+const finalResult = await client.waitForTransaction({
+	digest: execution.Transaction.digest,
+	include: {
+		effects: true,
+		events: true,
+	},
+});
+
+if (finalResult.$kind === 'FailedTransaction') {
+	throw new Error(finalResult.FailedTransaction.status.error?.message);
+}
+
+const transactionResult = finalResult.Transaction;
+const redeemRequests = [];
+
+for (const event of transactionResult.events ?? []) {
+	try {
+		const decoded = client.suigar.bcs.RedeemRequestCreatedEvent.parse(event.bcs);
+		redeemRequests.push({
+			requestId: decoded.request_id,
+			player: decoded.player,
+			coinType: decoded.coin_type.name,
+			amount: decoded.staked_amount,
+			createdAtMs: decoded.created_at_ms,
+		});
+	} catch {
+		// Ignore non-SweetHouse RedeemRequestCreatedEvent payloads.
+	}
+}
+```
+
+The decoded event contains `request_id`, `player`, `coin_type.name`, `staked_amount`, and `created_at_ms`. `staked_amount` is in the selected staked coin's base units.
 
 ### Parse PvP Coinflip Event Data
 

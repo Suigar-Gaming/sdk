@@ -1,11 +1,11 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SuiClientTypes } from '@mysten/sui/client';
 import { SUI_DECIMALS } from '@mysten/sui/utils';
 import { GAMES, type Game } from '@suigar/sdk/games';
-import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { parseGameEvent, parseSuigarEvent } from '@suigar/sdk/utils';
 import { formatAmount, isAmountFieldName } from '../utils/index.js';
-import type { SuigarClientBundle } from './client.js';
 import type {
 	DryRunEventSummary,
 	DryRunSummary,
@@ -177,33 +177,29 @@ function parseDryRunEvent(
 	}
 
 	try {
-		const parsedEvent = parseGameEvent({
+		const gameEvent = parseGameEvent({
 			...event,
 			eventType,
 			module,
 		} as never);
-		if (parsedEvent) {
-			return parsedEvent;
+		if (gameEvent) {
+			return gameEvent;
 		}
 	} catch {
 		// Fall back to string matching below for JSON-only simulated events.
 	}
 
 	const standardBetResult = /::BetResultEvent<[^>]+::([^:<>,]+)::Game>/u.exec(eventType);
-	const gameId = standardBetResult?.[1]?.replaceAll('_', '-');
-	return gameId && GAMES.includes(gameId as Game)
+	const game = standardBetResult?.[1]?.replaceAll('_', '-');
+	return game && GAMES.includes(game as Game)
 		? {
-				gameId: gameId as Game,
-				eventName: 'BetResultEvent',
+				game: game as Game,
+				event: 'BetResultEvent',
 			}
 		: null;
 }
 
-function summarizeDryRunEvent(
-	event: unknown,
-	client: SuigarClientBundle['client'],
-	decimals?: number,
-): DryRunEventSummary | null {
+function summarizeDryRunEvent(event: unknown, decimals?: number): DryRunEventSummary | null {
 	if (!isRecord(event)) {
 		return null;
 	}
@@ -217,26 +213,35 @@ function summarizeDryRunEvent(
 	const baseSummary = {
 		type: eventType,
 	};
-	let parsedEvent: ReturnType<typeof parseDryRunEvent> = null;
+	const module =
+		typeof event.module === 'string'
+			? event.module
+			: eventType.includes('::core::')
+				? 'core'
+				: eventType.includes('::pvp_coinflip::')
+					? 'pvp_coinflip'
+					: '';
+	let gameEvent: ReturnType<typeof parseDryRunEvent> = null;
 
 	try {
-		parsedEvent = parseDryRunEvent(event, eventType);
-		if (parsedEvent && event.bcs instanceof Uint8Array) {
-			const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-			const details = parseGameDetails({
-				game: parsedEvent.gameId,
-				gameDetails: decoded.game_details,
-			});
+		gameEvent = parseDryRunEvent(event, eventType);
+		if (gameEvent && event.bcs instanceof Uint8Array) {
+			const suigarEvent = parseSuigarEvent({
+				...event,
+				eventType,
+				module,
+			} as SuiClientTypes.Event);
+			if (!suigarEvent) {
+				return null;
+			}
+			const data = suigarEvent.event.data;
+			const details = 'gameDetails' in suigarEvent ? suigarEvent.gameDetails : undefined;
 			return {
 				...baseSummary,
-				game: parsedEvent.gameId,
-				eventName: parsedEvent.eventName,
+				game: suigarEvent.game,
+				event: suigarEvent.event.type,
 				fields: eventFields(
-					{
-						...decoded,
-						game_details: details,
-						...details,
-					},
+					{ ...data, ...(details ? { game_details: details, ...details } : {}) },
 					decimals,
 				),
 			};
@@ -253,10 +258,10 @@ function summarizeDryRunEvent(
 	return json
 		? {
 				...baseSummary,
-				...(parsedEvent
+				...(gameEvent
 					? {
-							game: parsedEvent.gameId,
-							eventName: parsedEvent.eventName,
+							game: gameEvent.game,
+							event: gameEvent.event,
 						}
 					: {}),
 				fields: eventFields(json, decimals),
@@ -266,7 +271,6 @@ function summarizeDryRunEvent(
 
 export function summarizeDryRun(
 	dryRun: RawDryRunResult,
-	client: SuigarClientBundle['client'],
 	context: TransactionSummaryFormattingContext = {},
 ): DryRunSummary {
 	const transaction = getDryRunTransaction(dryRun);
@@ -309,7 +313,7 @@ export function summarizeDryRun(
 		: [];
 	const events = Array.isArray(transactionRecord.events)
 		? transactionRecord.events.reduce<Array<DryRunEventSummary>>((summaries, event) => {
-				const summary = summarizeDryRunEvent(event, client, context.coinDecimals);
+				const summary = summarizeDryRunEvent(event, context.coinDecimals);
 				if (summary) {
 					summaries.push(summary);
 				}

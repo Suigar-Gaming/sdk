@@ -3,11 +3,22 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import type { BetResultGameDetails, GameDetail } from '../../../src/types/game-details.type.js';
+import { GameCancelledEvent } from '../../../src/contracts/pvp-coinflip/pvp_coinflip.js';
+import type { BetResultSuigarEvent } from '../../../src/types/event.type.js';
+import type {
+	BetResultGameDetails,
+	GameDetail,
+	GameDetails,
+} from '../../../src/types/game-details.type.js';
 import { GAME_DETAIL_BCS } from '../../../src/types/game-details.type.js';
-import type { SuigarGameEvent } from '../../../src/types/game.type.js';
+import type { Game, SuigarGameEvent } from '../../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../../src/types/game.type.js';
-import { parseCoinType, parseGameDetails, parseGameEvent } from '../../../src/utils/index.js';
+import {
+	parseCoinType,
+	parseGameDetails,
+	parseGameEvent,
+	parseSuigarEvent,
+} from '../../../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from '../../utils.js';
 
 function gameDetails(contents: Array<{ key: string; value: Array<number> }>): BetResultGameDetails {
@@ -29,16 +40,12 @@ describe('parseGameEvent', () => {
 	it('models valid game and event combinations as a discriminated union', () => {
 		expectTypeOf<SuigarGameEvent>().toEqualTypeOf<
 			| {
-					gameId: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
-					eventName: 'BetResultEvent';
+					game: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel';
+					event: 'BetResultEvent';
 			  }
 			| {
-					gameId: 'pvp-coinflip';
-					eventName:
-						| 'BetResultEvent'
-						| 'GameCreatedEvent'
-						| 'GameResolvedEvent'
-						| 'GameCancelledEvent';
+					game: 'pvp-coinflip';
+					event: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent';
 			  }
 		>();
 	});
@@ -53,8 +60,8 @@ describe('parseGameEvent', () => {
 				}),
 			),
 		).toEqual({
-			gameId: 'coinflip',
-			eventName: 'BetResultEvent',
+			game: 'coinflip',
+			event: 'BetResultEvent',
 		});
 	});
 
@@ -68,14 +75,14 @@ describe('parseGameEvent', () => {
 					}),
 				),
 			).toEqual({
-				gameId: 'pvp-coinflip',
-				eventName,
+				game: 'pvp-coinflip',
+				event: eventName,
 			});
 		}
 	});
 
 	it('parses every supported standard bet result game family', () => {
-		for (const gameId of [
+		for (const game of [
 			'coinflip',
 			'keno',
 			'limbo',
@@ -87,18 +94,18 @@ describe('parseGameEvent', () => {
 			expect(
 				parseGameEvent(
 					createEvent({
-						module: gameId,
-						eventType: `0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc::core::BetResultEvent<0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::${gameId}::Game>`,
+						module: game,
+						eventType: `0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc::core::BetResultEvent<0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea::${game}::Game>`,
 					}),
 				),
 			).toEqual({
-				gameId,
-				eventName: 'BetResultEvent',
+				game,
+				event: 'BetResultEvent',
 			});
 		}
 	});
 
-	it('returns null when a supported event name cannot be mapped to a game id', () => {
+	it('returns null when a supported event name cannot be mapped to a game', () => {
 		expect(
 			parseGameEvent(
 				createEvent({
@@ -167,8 +174,42 @@ describe('parseGameEvent', () => {
 				}),
 			),
 		).toEqual({
-			gameId: 'pvp-coinflip',
-			eventName: 'GameResolvedEvent',
+			game: 'pvp-coinflip',
+			event: 'GameResolvedEvent',
+		});
+	});
+});
+
+describe('parseSuigarEvent', () => {
+	it('models bet result events for every supported game', () => {
+		expectTypeOf<BetResultSuigarEvent['game']>().toEqualTypeOf<Game>();
+		expectTypeOf<BetResultSuigarEvent['event']['type']>().toEqualTypeOf<'BetResultEvent'>();
+		expectTypeOf<BetResultSuigarEvent['gameDetails']>().toEqualTypeOf<GameDetails<Game>>();
+	});
+
+	it('decodes a PvP event in one step', () => {
+		const event = createEvent({
+			module: 'pvp_coinflip',
+			eventType:
+				'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip::GameCancelledEvent<0x2::sui::SUI>',
+		});
+		const bytes = GameCancelledEvent.serialize({
+			game_id: '0x1',
+			creator: '0x2',
+			creator_is_tails: false,
+			is_private: false,
+			stake_per_player: 1n,
+			coin_type: { name: '0x2::sui::SUI' },
+		}).toBytes();
+
+		const suigarEvent = parseSuigarEvent({ ...event, bcs: bytes });
+
+		expect(suigarEvent?.game).toBe('pvp-coinflip');
+		expect(suigarEvent?.event.type).toBe('GameCancelledEvent');
+		expect(suigarEvent && 'gameDetails' in suigarEvent).toBe(false);
+		expect(suigarEvent?.event.data).toMatchObject({
+			game_id: `0x${'1'.padStart(64, '0')}`,
+			stake_per_player: '1',
 		});
 	});
 });

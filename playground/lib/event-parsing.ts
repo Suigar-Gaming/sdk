@@ -1,18 +1,16 @@
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { fromBase64 } from '@mysten/sui/utils';
 import type { SuigarClient } from '@suigar/sdk';
-import { fromMoveFloat, isMoveFloat, parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { fromMoveFloat, isMoveFloat, parseSuigarEvent } from '@suigar/sdk/utils';
 import { bigintToString } from '@/lib/suigar-app';
 import type { EventLogRow } from '@/lib/suigar-types';
 
-type ParsedEvent = {
+type EventWithBcsPayload = {
 	bcs?: string | Uint8Array;
 	contents?: {
 		value?: string | Uint8Array | Array<number>;
 	};
 };
-
-type BcsApi = SuigarClient['bcs'];
 
 const textDecoder = new TextDecoder();
 
@@ -21,8 +19,8 @@ function bytesFromEvent(event: unknown) {
 		return undefined;
 	}
 
-	const parsedEvent = event as ParsedEvent;
-	const value = parsedEvent.bcs ?? parsedEvent.contents?.value;
+	const eventWithBcsPayload = event as EventWithBcsPayload;
+	const value = eventWithBcsPayload.bcs ?? eventWithBcsPayload.contents?.value;
 	if (!value) {
 		return undefined;
 	}
@@ -63,7 +61,7 @@ function formatVecMap(value: unknown) {
 		.join(' | ');
 }
 
-function formatParsedMap(value: Record<string, unknown>) {
+function formatGameDetails(value: Record<string, unknown>) {
 	return Object.entries(value)
 		.map(([key, parsedValue]) => `${key}: ${String(parsedValue)}`)
 		.join(' | ');
@@ -102,126 +100,57 @@ function createRow(
 	};
 }
 
-function createBetResultRow(
-	bcsApi: BcsApi,
-	digest: string,
-	gameEvent: NonNullable<ReturnType<typeof parseGameEvent>>,
-	bytes: Uint8Array,
-) {
-	const payload = bcsApi.BetResultEvent.parse(bytes);
-	const gameDetails = parseGameDetails({
-		game: gameEvent.gameId,
-		gameDetails: payload.game_details,
-	});
-	const details = [
-		`game: ${gameEvent.gameId}`,
-		`coin: ${payload.coin_type.name ?? 'unknown'}`,
-		`stake: ${bigintToString(payload.stake_amount)}`,
-		`outcome: ${bigintToString(payload.outcome_amount)}`,
-		`unsafe oracle price: ${formatOraclePrice(payload.unsafe_oracle_usd_coin_price)}`,
-		`adjusted oracle price: ${formatOraclePrice(payload.adjusted_oracle_usd_coin_price)}`,
-		formatParsedMap(gameDetails),
-		formatVecMap(payload.metadata),
-	]
-		.filter(Boolean)
-		.join(' | ');
-
-	console.log('Suigar BetResultEvent', payload);
-	return createRow(digest, 'BetResultEvent', payload, details, {
-		actor: String(payload.player),
-	});
-}
-
-function createGameCreatedRow(
-	bcsApi: BcsApi,
-	digest: string,
-	gameEvent: NonNullable<ReturnType<typeof parseGameEvent>>,
-	bytes: Uint8Array,
-) {
-	const payload = bcsApi.PvPCoinflipGameCreatedEvent.parse(bytes);
-	const side = payload.creator_is_tails ? 'tails' : 'heads';
-	const details = [
-		`game: ${gameEvent.gameId}`,
-		`creator side: ${side}`,
-		`stake: ${bigintToString(payload.stake_per_player)}`,
-		`private: ${payload.is_private}`,
-	].join(' | ');
-
-	console.log('Suigar PvPCoinflipGameCreatedEvent', payload);
-	return createRow(digest, gameEvent.eventName, payload, details, {
-		gameId: String(payload.game_id),
-		actor: String(payload.creator),
-	});
-}
-
-function createGameResolvedRow(
-	bcsApi: BcsApi,
-	digest: string,
-	gameEvent: NonNullable<ReturnType<typeof parseGameEvent>>,
-	bytes: Uint8Array,
-) {
-	const payload = bcsApi.PvPCoinflipGameResolvedEvent.parse(bytes);
-	const details = [
-		`game: ${gameEvent.gameId}`,
-		`winner: ${String(payload.winner)}`,
-		`pot: ${bigintToString(payload.total_pot)}`,
-		`payout: ${bigintToString(payload.payout_amount)}`,
-	].join(' | ');
-
-	console.log('Suigar PvPCoinflipGameResolvedEvent', payload);
-	return createRow(digest, gameEvent.eventName, payload, details, {
-		gameId: String(payload.game_id),
-		actor: String(payload.winner),
-	});
-}
-
-function createGameCancelledRow(
-	bcsApi: BcsApi,
-	digest: string,
-	gameEvent: NonNullable<ReturnType<typeof parseGameEvent>>,
-	bytes: Uint8Array,
-) {
-	const payload = bcsApi.PvPCoinflipGameCancelledEvent.parse(bytes);
-	const details = [
-		`game: ${gameEvent.gameId}`,
-		`stake: ${bigintToString(payload.stake_per_player)}`,
-		`private: ${payload.is_private}`,
-	].join(' | ');
-
-	console.log('Suigar PvPCoinflipGameCancelledEvent', payload);
-	return createRow(digest, gameEvent.eventName, payload, details, {
-		gameId: String(payload.game_id),
-		actor: String(payload.creator),
-	});
-}
-
-function createEventRow(
-	bcsApi: BcsApi,
-	digest: string,
-	event: SuiClientTypes.Event,
-): EventLogRow | null {
+function createEventRow(digest: string, event: SuiClientTypes.Event): EventLogRow | null {
 	const bytes = bytesFromEvent(event);
 	if (!bytes) {
 		return null;
 	}
 
-	const gameEvent = parseGameEvent(event);
-	if (!gameEvent) {
+	const suigarEvent = parseSuigarEvent({ ...event, bcs: bytes });
+	if (!suigarEvent) {
 		return null;
 	}
 
-	switch (gameEvent.eventName) {
-		case 'BetResultEvent':
-			return createBetResultRow(bcsApi, digest, gameEvent, bytes);
-		case 'GameCreatedEvent':
-			return createGameCreatedRow(bcsApi, digest, gameEvent, bytes);
-		case 'GameResolvedEvent':
-			return createGameResolvedRow(bcsApi, digest, gameEvent, bytes);
-		case 'GameCancelledEvent':
-			return createGameCancelledRow(bcsApi, digest, gameEvent, bytes);
-		default:
-			return null;
-	}
+	const payload = suigarEvent.event.data as Record<string, unknown>;
+	const gameDetails = 'gameDetails' in suigarEvent ? suigarEvent.gameDetails : undefined;
+	const eventType = suigarEvent.event.type;
+	const details = [
+		`game: ${suigarEvent.game}`,
+		...(eventType === 'BetResultEvent'
+			? [
+					`coin: ${String((payload.coin_type as { name?: string })?.name ?? 'unknown')}`,
+					`stake: ${bigintToString(payload.stake_amount)}`,
+					`outcome: ${bigintToString(payload.outcome_amount)}`,
+					`unsafe oracle price: ${formatOraclePrice(payload.unsafe_oracle_usd_coin_price)}`,
+					`adjusted oracle price: ${formatOraclePrice(payload.adjusted_oracle_usd_coin_price)}`,
+					gameDetails ? formatGameDetails(gameDetails) : '',
+					formatVecMap(payload.metadata),
+				]
+			: eventType === 'GameCreatedEvent'
+				? [
+						`creator side: ${payload.creator_is_tails ? 'tails' : 'heads'}`,
+						`stake: ${bigintToString(payload.stake_per_player)}`,
+						`private: ${String(payload.is_private)}`,
+					]
+				: eventType === 'GameResolvedEvent'
+					? [
+							`winner: ${String(payload.winner)}`,
+							`pot: ${bigintToString(payload.total_pot)}`,
+							`payout: ${bigintToString(payload.payout_amount)}`,
+						]
+					: [
+							`stake: ${bigintToString(payload.stake_per_player)}`,
+							`private: ${String(payload.is_private)}`,
+						]),
+	]
+		.filter(Boolean)
+		.join(' | ');
+
+	console.log(`Suigar ${eventType}`, payload);
+	return createRow(digest, eventType, payload, details, {
+		actor: String(payload.player ?? payload.winner ?? payload.creator),
+		...(typeof payload.game_id === 'string' ? { gameId: payload.game_id } : {}),
+	});
 }
 
 export function parseSuigarEvents(
@@ -230,7 +159,7 @@ export function parseSuigarEvents(
 	events: Array<SuiClientTypes.Event> | undefined,
 ) {
 	const rows = (events ?? [])
-		.map((event) => createEventRow(client.suigar.bcs, digest, event))
+		.map((event) => createEventRow(digest, event))
 		.filter((row): row is EventLogRow => row !== null);
 
 	return rows;

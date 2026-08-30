@@ -17,7 +17,7 @@ export function createSuigarMcpServer(): McpServer {
 		name: 'suigar',
 		version: VERSION,
 		description:
-			'AI agent MCP server for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.',
+			'AI agent MCP server for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.',
 	});
 
 	registerAppResource(
@@ -27,7 +27,7 @@ export function createSuigarMcpServer(): McpServer {
 		{
 			title: 'Suigar MCP Console',
 			description:
-				'Compact MCP App UI for inspecting wallet balances and coin objects, Suigar config, game metadata, NFT and referral data, and transaction plans, summaries, dry-runs, and serialized bytes.',
+				'Compact MCP App UI for inspecting wallet balances and coin objects, Suigar config, game metadata, SweetHouse, NFT and referral data, and transaction plans, summaries, dry-runs, and serialized bytes.',
 			_meta: createSuigarMcpAppResourceMeta(),
 		},
 		createSuigarMcpAppResourceResult,

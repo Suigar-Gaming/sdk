@@ -5,6 +5,7 @@ import {
 	buildTransactionResult,
 	createSuigarClient,
 	resolveOwnerAddress,
+	type McpConfig,
 	type ReferralClaimKind,
 	type ReferralClaimReadOnlyPlan,
 	type ReferralClaimReadResult,
@@ -24,9 +25,14 @@ import {
 	getConfigInput,
 	getMode,
 	getSuigarPackageId,
-	referralClaimTarget,
 	requireString,
 } from './shared.js';
+
+function referralClaimTarget(config: McpConfig, kind: ReferralClaimKind): string {
+	return `${getSuigarPackageId(config, 'referral')}::referral::${
+		kind === 'commission' ? 'claim_commission_balance' : 'claim_referrer_level_up_usd_rewards'
+	}`;
+}
 
 async function referralClaimReadResult({
 	input,

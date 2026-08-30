@@ -12,6 +12,7 @@ import { BuildTransactionOptions, Transaction } from '@mysten/sui/transactions';
 import { normalizeStructTag, toBase64 } from '@mysten/sui/utils';
 import { CoinStruct } from './bcs/index.js';
 import { BetResultEvent } from './contracts/core/core.js';
+import { RedeemRequestCreatedEvent } from './contracts/core/sweethouse.js';
 import { Nft as NftV1, Factory as NftV1Factory } from './contracts/nft-v1/nft.js';
 import {
 	Game as PvPCoinflipGame,
@@ -42,19 +43,25 @@ import {
 	buildPvPCoinflipTransaction,
 	buildRangeTransaction,
 	buildSoccerTransaction,
+	buildClaimOwnSweetHouseRedeemRequestAfterDelayTransaction,
+	buildDepositSweetHouseTransaction,
+	buildRedeemSweetHouseRequestTransaction,
 	buildWheelTransaction,
 } from './transactions/index.js';
 import { GAME_SETTINGS } from './types/game-settings.type.js';
 import type {
 	ClaimReferralCommissionOptions,
 	ClaimReferralLevelUpUsdRewardsOptions,
+	ClaimOwnSweetHouseRedeemRequestAfterDelayOptions,
 	CreateGameBetOptions,
+	DepositSweetHouseOptions,
 	Game,
 	GameParameters,
 	GetGameParametersOptions,
 	MintNftV1Options,
 	OnChainGameParameters,
 	PvPCoinflipGameOptions,
+	RedeemSweetHouseRequestOptions,
 	SuigarConfig,
 	SuigarExtensionOptions,
 	SuigarNetwork,
@@ -465,6 +472,29 @@ export class SuigarClient {
 				});
 			},
 		},
+		/** SweetHouse public pool transaction builders. */
+		sweetHouse: {
+			deposit: (options: DepositSweetHouseOptions): Transaction => {
+				return buildDepositSweetHouseTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+			redeemRequest: (options: RedeemSweetHouseRequestOptions): Transaction => {
+				return buildRedeemSweetHouseRequestTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+			claimOwnRedeemRequestAfterDelay: (
+				options: ClaimOwnSweetHouseRedeemRequestAfterDelayOptions,
+			): Transaction => {
+				return buildClaimOwnSweetHouseRedeemRequestAfterDelayTransaction({
+					...options,
+					config: this.#config,
+				});
+			},
+		},
 	};
 
 	/** Read-only referral claim amounts produced by simulating the real claim transaction. */
@@ -542,5 +572,7 @@ export class SuigarClient {
 		ReferrerClaimCommissionBalanceEvent,
 		/** Event emitted when a referrer claims a USD-denominated level-up reward. */
 		ReferrerClaimLevelUpUsdRewardsEvent,
+		/** Event emitted when a SweetHouse redemption request is created. */
+		RedeemRequestCreatedEvent,
 	};
 }

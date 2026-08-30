@@ -27,7 +27,7 @@ describe('createInspectorViewModel', () => {
 					success: true,
 					events: [
 						{
-							eventName: 'BetResultEvent',
+							event: 'BetResultEvent',
 							fields: { coin_outcome: 'tails' },
 						},
 					],
@@ -41,6 +41,73 @@ describe('createInspectorViewModel', () => {
 		expect(view.dryRunEntries).toContainEqual(['Coin Outcome', 'tails']);
 		expect(view.targets).toEqual(['0x1::coinflip::play', '0x1::coinflip::play']);
 		expect(view.notes).toEqual(['Review before approving.']);
+	});
+
+	it('presents SweetHouse and NFT transaction plans with feature context', () => {
+		const sweetHouseView = createInspectorViewModel(
+			{
+				network: 'testnet',
+				plan: {
+					target: '0x1::sweethouse::redeem_request',
+					typeArguments: ['0x2::usdc::USDC'],
+					requiredInputs: ['owner', 'amount'],
+				},
+				sweethouse: {
+					action: 'redeem-request',
+					coinType: '0x2::usdc::USDC',
+					packageId: '0x1',
+					sweetHouseId: '0x2',
+				},
+			},
+			[],
+		);
+		const nftView = createInspectorViewModel(
+			{
+				network: 'testnet',
+				plan: { target: '0x1::nft::mint_to_sender', requiredInputs: ['owner', 'specId'] },
+				nft: { packageId: '0x1', factoryId: '0x2' },
+			},
+			[],
+		);
+
+		expect(sweetHouseView.contextEntries).toContainEqual(['Feature', 'SweetHouse']);
+		expect(sweetHouseView.contextEntries).toContainEqual(['Action', 'redeem-request']);
+		expect(sweetHouseView.transactionEntries).toContainEqual([
+			'Required inputs',
+			['owner', 'amount'],
+		]);
+		expect(nftView.contextEntries).toContainEqual(['Feature', 'NFT']);
+	});
+
+	it('recognizes feature metadata carried in built transaction summaries', () => {
+		const sweetHouseView = createInspectorViewModel(
+			{
+				summary: {
+					coinType: '0x2::usdc::USDC',
+					stake: '10000000',
+					stakeDisplay: '10 USDC',
+					gameInputs: { sweetHouseAction: 'deposit' },
+				},
+			},
+			[],
+		);
+		const nftView = createInspectorViewModel(
+			{ summary: { gameInputs: { nftSpecId: '0xspec' } } },
+			[],
+		);
+		const referralView = createInspectorViewModel(
+			{ summary: { gameInputs: { referralClaim: 'commission' } } },
+			[],
+		);
+
+		expect(sweetHouseView.contextEntries).toContainEqual(['Feature', 'SweetHouse']);
+		expect(sweetHouseView.contextEntries).toContainEqual(['Action', 'deposit']);
+		expect(sweetHouseView.transactionEntries).toContainEqual([
+			'Amount',
+			'10 USDC (10000000 base units)',
+		]);
+		expect(nftView.contextEntries).toContainEqual(['Feature', 'NFT']);
+		expect(referralView.contextEntries).toContainEqual(['Feature', 'Referral']);
 	});
 
 	it('prioritizes explicit host errors over errors in the tool payload', () => {
@@ -83,5 +150,12 @@ describe('execution views', () => {
 				},
 			}),
 		).toMatchObject({ title: 'Transaction Status' });
+	});
+
+	it('uses the transaction inspector for SweetHouse and NFT plans', () => {
+		expect(resolveAppView({ sweethouse: {}, plan: {} })).toMatchObject({
+			title: 'SweetHouse Transaction',
+		});
+		expect(resolveAppView({ nft: {}, plan: {} })).toMatchObject({ title: 'NFT Transaction' });
 	});
 });

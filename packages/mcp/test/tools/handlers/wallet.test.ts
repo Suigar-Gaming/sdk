@@ -31,17 +31,21 @@ vi.mock('../../../src/runtime/index.js', () => ({
 	}),
 }));
 
-vi.mock('../../../src/utils/index.js', () => ({
-	formatBaseUnitAmount: (value: string) =>
-		value === '1200000000'
-			? '1.2'
-			: value === '1000000000'
-				? '1'
-				: value === '2500000'
-					? '0.0025'
-					: value,
-	runSuigarCommand: mocks.runSuigarCommand,
-}));
+vi.mock('../../../src/utils/index.js', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('../../../src/utils/index.js')>();
+	return {
+		...actual,
+		formatBaseUnitAmount: (value: string) =>
+			value === '1200000000'
+				? '1.2'
+				: value === '1000000000'
+					? '1'
+					: value === '2500000'
+						? '0.0025'
+						: value,
+		runSuigarCommand: mocks.runSuigarCommand,
+	};
+});
 
 vi.mock('../../../src/wallet/index.js', () => ({
 	createSessionWalletSetup: mocks.createSessionWalletSetup,

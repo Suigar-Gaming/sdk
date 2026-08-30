@@ -21,7 +21,7 @@ function resultEventFields(structuredContent: AnyRecord): AnyRecord {
 	const events = Array.isArray(dryRunSummary.events) ? dryRunSummary.events : [];
 	const eventRecords = events.map(asRecord);
 	const event =
-		eventRecords.find((item) => item.eventName === 'BetResultEvent') ??
+		eventRecords.find((item) => item.event === 'BetResultEvent') ??
 		eventRecords.find((item) => {
 			const fields = asRecord(item.fields);
 			return (
@@ -88,6 +88,10 @@ function scalarText(value: unknown): string {
 		: '';
 }
 
+function firstString(...values: Array<unknown>): string | undefined {
+	return values.find((value): value is string => typeof value === 'string' && value !== '');
+}
+
 export function createInspectorViewModel(
 	payload: unknown,
 	explicitErrors: Array<string>,
@@ -101,28 +105,51 @@ export function createInspectorViewModel(
 	const eventFields = resultEventFields(record);
 	const plan = asRecord(record.plan);
 	const game = asRecord(record.game);
+	const sweethouse = asRecord(record.sweethouse);
+	const nft = asRecord(record.nft);
+	const referral = asRecord(record.referral);
 	const typeArguments = Array.isArray(plan.typeArguments) ? plan.typeArguments : null;
 	const requiredInputs = Array.isArray(plan.requiredInputs) ? plan.requiredInputs : null;
+	const sweetHouseAction = firstString(sweethouse.action, gameInputs.sweetHouseAction);
+	const nftAction = firstString(gameInputs.nftSpecId);
+	const referralAction = firstString(gameInputs.referralClaim, referral.kind);
+	const action = firstString(
+		record.action,
+		summary.action,
+		sweetHouseAction,
+		nftAction,
+		referralAction,
+	);
+	const feature = sweetHouseAction
+		? 'SweetHouse'
+		: nft.packageId || nftAction
+			? 'NFT'
+			: referralAction
+				? 'Referral'
+				: null;
 	const coinType = summary.coinType ?? game.coinType ?? (typeArguments ? typeArguments[0] : null);
+	const amountLabel = feature === 'SweetHouse' ? 'Amount' : 'Stake';
 
 	return {
 		coinBadge: coinBadgeFor(coinType),
 		contextEntries: [
 			['Network', record.network ?? config.network],
+			['Feature', feature],
 			['Game', game.id ?? summary.game],
 			['Label', game.label],
-			['Action', record.action ?? summary.action],
+			['Action', action],
 			['Coin type', coinType],
-			['Package ID', game.packageId],
+			['Package ID', game.packageId ?? sweethouse.packageId ?? nft.packageId ?? referral.packageId],
 		],
 		transactionEntries: [
 			['Sender', summary.sender],
 			[
-				'Stake',
+				amountLabel,
 				summary.stakeDisplay
 					? `${scalarText(summary.stakeDisplay)} (${scalarText(summary.stake)} base units)`
 					: summary.stake,
 			],
+			['Required inputs', requiredInputs],
 			...dynamicEntries(gameInputs),
 			['Commands', summary.commandCount ?? (plan.target ? 'planned' : null)],
 			['Inputs', summary.inputs ?? requiredInputs],

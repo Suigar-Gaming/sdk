@@ -5,6 +5,8 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import packageJson from '../package.json' with { type: 'json' };
 
+const MANIFEST_DESCRIPTION_LIMIT = 100;
+
 describe('package exports', () => {
 	it('exposes only the package root as the public import path', () => {
 		expect(Object.keys(packageJson.exports).sort()).toEqual(['.']);
@@ -77,6 +79,7 @@ describe('package exports', () => {
 				},
 			],
 		});
+		expect(serverManifest.description.length).toBeLessThanOrEqual(MANIFEST_DESCRIPTION_LIMIT);
 
 		const manifestUrls = [
 			new URL('../plugin/plugin.json', import.meta.url),
@@ -89,6 +92,7 @@ describe('package exports', () => {
 			expect(manifest.name).toBe('suigar-mcp');
 			expect(manifest.version).toBe(packageJson.version);
 			expect(manifest.license).toBe('Apache-2.0');
+			expect(manifest.description.length).toBeLessThanOrEqual(MANIFEST_DESCRIPTION_LIMIT);
 		}
 
 		const mcpConfig = JSON.parse(

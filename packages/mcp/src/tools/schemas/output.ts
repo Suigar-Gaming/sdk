@@ -30,6 +30,7 @@ export const toolOutputSchema = z.looseObject({
 	nftCatalog: unknownJsonSchema.optional(),
 	ownedNfts: unknownJsonSchema.optional(),
 	referral: unknownJsonSchema.optional(),
+	sweethouse: unknownJsonSchema.optional(),
 	wallet: unknownJsonSchema.optional(),
 	connection: unknownJsonSchema.optional(),
 	sessionWallet: unknownJsonSchema.optional(),

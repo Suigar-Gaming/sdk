@@ -17,6 +17,7 @@ import {
 	CoinFlipSettingsKey,
 	Parameters as GeneratedCoinflipParameters,
 } from '../../src/contracts/coinflip/coinflip.js';
+import { RedeemRequestCreatedEvent as GeneratedRedeemRequestCreatedEvent } from '../../src/contracts/core/sweethouse.js';
 import {
 	Parameters as GeneratedLimboParameters,
 	LimboSettingsKey,
@@ -254,9 +255,9 @@ function createPvPCoinflipGameObjectWithoutContent(gameId: string): SuiClientTyp
 	};
 }
 
-type ParsedPvPCoinflipGame = ReturnType<typeof GeneratedPvPCoinflipGame.parse>;
+type DecodedPvPCoinflipGame = ReturnType<typeof GeneratedPvPCoinflipGame.parse>;
 
-function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
+function createDecodedPvPCoinflipGame(gameId: string): DecodedPvPCoinflipGame {
 	return {
 		id: gameId,
 		creator: '0xcreator',
@@ -268,7 +269,7 @@ function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
 		stake_per_player: '1',
 		house_edge_bps: '100',
 		stake_pot: { value: '2' },
-	} as ParsedPvPCoinflipGame;
+	} as DecodedPvPCoinflipGame;
 }
 
 type SuigarTestClient = TestClient & { suigar: SuigarClient };
@@ -706,6 +707,9 @@ describe('SuigarClient', () => {
 		expect(client.suigar.tx.pvpCoinflip.joinGame).toBeTypeOf('function');
 		expect(client.suigar.tx.pvpCoinflip.cancelGame).toBeTypeOf('function');
 		expect(client.suigar.tx.nftV1.mint).toBeTypeOf('function');
+		expect(client.suigar.tx.sweetHouse.deposit).toBeTypeOf('function');
+		expect(client.suigar.tx.sweetHouse.redeemRequest).toBeTypeOf('function');
+		expect(client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay).toBeTypeOf('function');
 		expect(
 			client.suigar.tx.pvpCoinflip.createGame({
 				owner: '0x123',
@@ -726,6 +730,27 @@ describe('SuigarClient', () => {
 				owner: '0x123',
 				coinType,
 				gameId: '0x456',
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweetHouse.deposit({
+				owner: '0x123',
+				coinType,
+				amount: 1000,
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweetHouse.redeemRequest({
+				owner: '0x123',
+				coinType,
+				amount: 1000,
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay({
+				owner: '0x123',
+				coinType,
+				requestId: '0x456',
 			}),
 		).toBeInstanceOf(Transaction);
 	});
@@ -1168,8 +1193,8 @@ describe('SuigarClient', () => {
 			dynamicFields: [createDynamicField('0xopen'), createDynamicField('0xpending')],
 		});
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
@@ -1274,7 +1299,7 @@ describe('SuigarClient', () => {
 		const controller = new AbortController();
 		const getObjectsSpy = vi.spyOn(client, 'getObjects');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
-			createParsedPvPCoinflipGame('0xopen'),
+			createDecodedPvPCoinflipGame('0xopen'),
 		);
 
 		await client.suigar.getPvPCoinflipGames({
@@ -1305,8 +1330,8 @@ describe('SuigarClient', () => {
 			],
 		});
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
@@ -1347,6 +1372,16 @@ describe('SuigarClient', () => {
 		expect(client.suigar.bcs.PvPCoinflipGameCreatedEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameResolvedEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameCancelledEvent).toBeDefined();
+		const redeemRequestEvent = client.suigar.bcs.RedeemRequestCreatedEvent.parse(
+			GeneratedRedeemRequestCreatedEvent.serialize({
+				request_id: '0x3',
+				player: '0x1',
+				coin_type: { name: '0x2::sui::SUI' },
+				staked_amount: 10n,
+				created_at_ms: 20n,
+			}).toBytes(),
+		);
+		expect(redeemRequestEvent.request_id).toBe(normalizeSuiAddress('0x3'));
 	});
 
 	it('rejects unresolved PvP Coinflip games when throwOnError is true', async () => {
@@ -1367,7 +1402,7 @@ describe('SuigarClient', () => {
 		const controller = new AbortController();
 		const getObjectsSpy = vi.spyOn(client, 'getObjects');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
-			createParsedPvPCoinflipGame('0xopen'),
+			createDecodedPvPCoinflipGame('0xopen'),
 		);
 
 		await client.suigar.getPvPCoinflipGames({

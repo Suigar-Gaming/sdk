@@ -53,6 +53,7 @@ import {
 	toBigInt,
 	toU8,
 	toU16,
+	toU32,
 } from '../../src/utils/index.js';
 
 describe('public source subpath modules', () => {
@@ -106,6 +107,8 @@ describe('public source subpath modules', () => {
 		expect(toU8('1')).toBe(1);
 		expect(toU16(65_535)).toBe(65_535);
 		expect(toU16('1')).toBe(1);
+		expect(toU32(4_294_967_295)).toBe(4_294_967_295);
+		expect(toU32('1')).toBe(1);
 	});
 
 	it('exposes only the intended package subpaths', () => {

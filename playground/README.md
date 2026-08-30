@@ -34,7 +34,7 @@ The example reflects the current package export split:
 - Copyable NFT lookup and referral read/claim code previews that mirror the calls used by their respective routes
 - A dedicated execute-transaction card that reads the connected wallet state directly from the new Mysten dApp Kit
 - Decoding of `BetResultEvent`, `PvPCoinflipGameCreatedEvent`, `PvPCoinflipGameResolvedEvent`, and `PvPCoinflipGameCancelledEvent`
-- Oracle price formatting with `fromMoveFloat` and game detail decoding with `parseGameDetails` from `@suigar/sdk/utils`
+- Oracle price formatting with `fromMoveFloat` and unified event decoding with `parseSuigarEvent` from `@suigar/sdk/utils`
 - Shared persistent event table across route and game changes
 
 ## Development

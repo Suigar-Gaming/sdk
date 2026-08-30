@@ -37,10 +37,10 @@ export type GameEvent = (typeof GAME_EVENTS)[number];
  */
 export type SuigarGameEvent =
 	| {
-			gameId: StandardGame;
-			eventName: 'BetResultEvent';
+			game: StandardGame;
+			event: 'BetResultEvent';
 	  }
 	| {
-			gameId: PvPGame;
-			eventName: GameEvent;
+			game: PvPGame;
+			event: GameEvent;
 	  };

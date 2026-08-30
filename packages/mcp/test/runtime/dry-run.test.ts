@@ -96,7 +96,7 @@ describe('dry-run summaries', () => {
 			},
 		};
 
-		const summary = summarizeDryRun(dryRun as never, {} as never, {
+		const summary = summarizeDryRun(dryRun as never, {
 			coinDecimals: 9,
 		});
 
@@ -175,7 +175,7 @@ describe('dry-run summaries', () => {
 			},
 		};
 
-		const summary = summarizeDryRun(dryRun as never, {} as never, {
+		const summary = summarizeDryRun(dryRun as never, {
 			coinDecimals: 9,
 		});
 
@@ -191,7 +191,7 @@ describe('dry-run summaries', () => {
 			{
 				type: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
 				game: 'coinflip',
-				eventName: 'BetResultEvent',
+				event: 'BetResultEvent',
 				fields: {
 					player_bet: 'tails',
 					coin_outcome: 'tails',
@@ -219,7 +219,6 @@ describe('dry-run summaries', () => {
 					},
 				},
 			} as never,
-			{} as never,
 			{ coinDecimals: 9 },
 		);
 

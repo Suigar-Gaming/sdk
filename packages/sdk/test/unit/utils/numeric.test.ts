@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, expect, it } from 'vitest';
-import { toBigInt, toU8, toU16 } from '../../../src/utils/index.js';
+import { toBigInt, toU8, toU16, toU32 } from '../../../src/utils/index.js';
 
 describe('toBigInt', () => {
 	it('accepts bigint, number, integer string, and boolean inputs', () => {
@@ -103,5 +103,35 @@ describe('toU16', () => {
 		expect(() => toU16(-1)).toThrow('Value must be a u16 integer');
 		expect(() => toU16(65_536)).toThrow('Value must be a u16 integer');
 		expect(() => toU16('65536')).toThrow('Value must be a u16 integer');
+	});
+});
+
+describe('toU32', () => {
+	it('accepts valid u32 numbers and integer strings', () => {
+		expect(toU32(0)).toBe(0);
+		expect(toU32(4_294_967_295)).toBe(4_294_967_295);
+		expect(toU32('1')).toBe(1);
+		expect(toU32('0001')).toBe(1);
+		expect(toU32('1e3')).toBe(1000);
+	});
+
+	it('rejects unsupported input types', () => {
+		expect(() => toU32(undefined)).toThrow('Value must be a finite number or integer string');
+		expect(() => toU32(true)).toThrow('Value must be a u32 integer');
+	});
+
+	it('rejects non-finite numbers and invalid strings', () => {
+		expect(() => toU32(Number.NaN)).toThrow('Value must be a finite number or integer string');
+		expect(() => toU32(Number.NEGATIVE_INFINITY)).toThrow(
+			'Value must be a finite number or integer string',
+		);
+		expect(() => toU32('1.5')).toThrow('Value must be a u32 integer');
+	});
+
+	it('rejects non-integer and out-of-range numbers', () => {
+		expect(() => toU32(1.5)).toThrow('Value must be a u32 integer');
+		expect(() => toU32(-1)).toThrow('Value must be a u32 integer');
+		expect(() => toU32(4_294_967_296)).toThrow('Value must be a u32 integer');
+		expect(() => toU32('4294967296')).toThrow('Value must be a u32 integer');
 	});
 });
