@@ -38,11 +38,20 @@ function hasErrorCode(error: unknown, code: string): error is Error & { code: st
 
 async function readSuigarMcpAppHtml(): Promise<string> {
 	try {
+		return await readFile(new URL('../../dist/app/index.html', import.meta.url), 'utf8');
+	} catch (error) {
+		if (!hasErrorCode(error, 'ENOENT')) {
+			throw error;
+		}
+	}
+
+	try {
 		return await readFile(new URL('../app/index.html', import.meta.url), 'utf8');
 	} catch (error) {
 		if (!hasErrorCode(error, 'ENOENT')) {
 			throw error;
 		}
+
 		throw new Error('Unable to find bundled Suigar MCP App HTML.', {
 			cause: error,
 		});

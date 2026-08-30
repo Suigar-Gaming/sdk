@@ -21,7 +21,7 @@ vi.mock('node:child_process', () => ({
 	spawn: mocks.spawn,
 }));
 
-const { runSuigarCommand } = await import('../../src/utils/index.js');
+const { runSuigarCommand } = await import('../../src/utils/command.js');
 
 describe('runSuigarCommand', () => {
 	it('starts the current MCP package version with npx', () => {
