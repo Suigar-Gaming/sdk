@@ -133,10 +133,7 @@ export type DepositSweetHouseOptions = TransactionSenderOptions &
 		amount: number | bigint;
 	};
 
-export type RedeemSweetHouseRequestOptions = TransactionSenderOptions &
-	WithCoinType<{
-		amount: number | bigint;
-	}>;
+export type RedeemSweetHouseRequestOptions = Omit<DepositSweetHouseOptions, 'useGasCoin'>;
 
 export type ClaimOwnSweetHouseRedeemRequestAfterDelayOptions = TransactionSenderOptions &
 	WithCoinType<{
