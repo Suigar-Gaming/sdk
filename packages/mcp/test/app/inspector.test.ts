@@ -79,6 +79,37 @@ describe('createInspectorViewModel', () => {
 		expect(nftView.contextEntries).toContainEqual(['Feature', 'NFT']);
 	});
 
+	it('recognizes feature metadata carried in built transaction summaries', () => {
+		const sweetHouseView = createInspectorViewModel(
+			{
+				summary: {
+					coinType: '0x2::usdc::USDC',
+					stake: '10000000',
+					stakeDisplay: '10 USDC',
+					gameInputs: { sweetHouseAction: 'deposit' },
+				},
+			},
+			[],
+		);
+		const nftView = createInspectorViewModel(
+			{ summary: { gameInputs: { nftSpecId: '0xspec' } } },
+			[],
+		);
+		const referralView = createInspectorViewModel(
+			{ summary: { gameInputs: { referralClaim: 'commission' } } },
+			[],
+		);
+
+		expect(sweetHouseView.contextEntries).toContainEqual(['Feature', 'SweetHouse']);
+		expect(sweetHouseView.contextEntries).toContainEqual(['Action', 'deposit']);
+		expect(sweetHouseView.transactionEntries).toContainEqual([
+			'Amount',
+			'10 USDC (10000000 base units)',
+		]);
+		expect(nftView.contextEntries).toContainEqual(['Feature', 'NFT']);
+		expect(referralView.contextEntries).toContainEqual(['Feature', 'Referral']);
+	});
+
 	it('prioritizes explicit host errors over errors in the tool payload', () => {
 		const view = createInspectorViewModel({ errors: ['Server-side error'] }, [
 			'RangeError: unsupported coin',

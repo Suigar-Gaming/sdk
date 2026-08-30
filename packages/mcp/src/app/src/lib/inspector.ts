@@ -111,12 +111,20 @@ export function createInspectorViewModel(
 	const typeArguments = Array.isArray(plan.typeArguments) ? plan.typeArguments : null;
 	const requiredInputs = Array.isArray(plan.requiredInputs) ? plan.requiredInputs : null;
 	const sweetHouseAction = firstString(sweethouse.action, gameInputs.sweetHouseAction);
-	const action = firstString(record.action, summary.action, sweetHouseAction, referral.kind);
-	const feature = sweethouse.action
+	const nftAction = firstString(gameInputs.nftSpecId);
+	const referralAction = firstString(gameInputs.referralClaim, referral.kind);
+	const action = firstString(
+		record.action,
+		summary.action,
+		sweetHouseAction,
+		nftAction,
+		referralAction,
+	);
+	const feature = sweetHouseAction
 		? 'SweetHouse'
-		: nft.packageId
+		: nft.packageId || nftAction
 			? 'NFT'
-			: referral.kind
+			: referralAction
 				? 'Referral'
 				: null;
 	const coinType = summary.coinType ?? game.coinType ?? (typeArguments ? typeArguments[0] : null);
