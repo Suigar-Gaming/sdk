@@ -487,7 +487,7 @@ Error behavior:
 
 ### SweetHouse
 
-SweetHouse public pool transaction builders live under `client.suigar.tx.sweethouse`:
+SweetHouse public pool transaction builders live under `client.suigar.tx.sweetHouse`:
 
 - `deposit`
 - `redeemRequest`
@@ -498,7 +498,7 @@ Deposit:
 ```ts
 const usdcType = client.suigar.getConfig().coins.usdc.coinType;
 
-const deposit = client.suigar.tx.sweethouse.deposit({
+const deposit = client.suigar.tx.sweetHouse.deposit({
 	owner: '0x123',
 	coinType: usdcType,
 	amount: 10_000_000n,
@@ -508,7 +508,7 @@ const deposit = client.suigar.tx.sweethouse.deposit({
 Redeem:
 
 ```ts
-const redeem = client.suigar.tx.sweethouse.redeemRequest({
+const redeem = client.suigar.tx.sweetHouse.redeemRequest({
 	owner: '0x123',
 	coinType: usdcType,
 	amount: 10_000_000n,
@@ -518,7 +518,7 @@ const redeem = client.suigar.tx.sweethouse.redeemRequest({
 Delayed fallback claim:
 
 ```ts
-const claim = client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
+const claim = client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay({
 	owner: '0x123',
 	coinType: usdcType,
 	requestId: '0xREDEEM_REQUEST_ID',
@@ -616,17 +616,28 @@ console.log(game.json);
 
 ### Parse Standard Bet Result Data
 
+Use the Sui client's `signAndExecuteTransaction` method with a signer supplied by a wallet or keypair, then wait for the finalized result before parsing events. Assume `client` is the configured SDK client, `accountAddress` is the connected wallet address, and `signer` implements the Sui signing interface:
+
 ```ts
-const executeResult = await client.core.executeTransaction({
-	transaction: transactionBytes,
-	signatures: [signature],
-	include: {
-		events: true,
-	},
+const tx = client.suigar.tx.createGameBet({
+	game: 'coinflip',
+	owner: accountAddress,
+	coinType: client.suigar.getConfig().coins.usdc.coinType,
+	stake: 10_000_000n,
+	side: 'heads',
 });
 
-const finalResult = await client.core.waitForTransaction({
-	result: executeResult,
+const execution = await client.signAndExecuteTransaction({
+	transaction: tx,
+	signer,
+});
+
+if (execution.$kind === 'FailedTransaction') {
+	throw new Error(execution.FailedTransaction.status.error?.message);
+}
+
+const finalResult = await client.waitForTransaction({
+	digest: execution.Transaction.digest,
 	include: {
 		effects: true,
 		events: true,
@@ -701,8 +712,63 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 
 > **Tip:**
 >
-> - `waitForTransaction({ result, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
+> - `waitForTransaction({ digest, include: { effects: true, events: true } })` is useful when you want the finalized transaction result before decoding
 > - These helpers decode the event payload itself, not a full transaction response
+
+### Parse SweetHouse Redeem Request Data
+
+SweetHouse emits `RedeemRequestCreatedEvent` when a redeem request is created. Decode the event payload and read `request_id` to obtain the request ID needed by `client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay`:
+
+The signer must correspond to `accountAddress`, which is also the transaction owner; no additional transaction party is required.
+
+```ts
+const redeem = client.suigar.tx.sweetHouse.redeemRequest({
+	owner: accountAddress,
+	coinType: client.suigar.getConfig().coins.usdc.coinType,
+	amount: 10_000_000n,
+});
+
+const execution = await client.signAndExecuteTransaction({
+	transaction: redeem,
+	signer,
+});
+
+if (execution.$kind === 'FailedTransaction') {
+	throw new Error(execution.FailedTransaction.status.error?.message);
+}
+
+const finalResult = await client.waitForTransaction({
+	digest: execution.Transaction.digest,
+	include: {
+		effects: true,
+		events: true,
+	},
+});
+
+if (finalResult.$kind === 'FailedTransaction') {
+	throw new Error(finalResult.FailedTransaction.status.error?.message);
+}
+
+const transactionResult = finalResult.Transaction;
+const redeemRequests = [];
+
+for (const event of transactionResult.events ?? []) {
+	try {
+		const decoded = client.suigar.bcs.RedeemRequestCreatedEvent.parse(event.bcs);
+		redeemRequests.push({
+			requestId: decoded.request_id,
+			player: decoded.player,
+			coinType: decoded.coin_type.name,
+			amount: decoded.staked_amount,
+			createdAtMs: decoded.created_at_ms,
+		});
+	} catch {
+		// Ignore non-SweetHouse RedeemRequestCreatedEvent payloads.
+	}
+}
+```
+
+The decoded event contains `request_id`, `player`, `coin_type.name`, `staked_amount`, and `created_at_ms`. `staked_amount` is in the selected staked coin's base units.
 
 ### Parse PvP Coinflip Event Data
 
