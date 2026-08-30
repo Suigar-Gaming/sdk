@@ -1,9 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import QRCode from 'qrcode';
 import { createSuigarClient, type ToolTextResult } from '../../runtime/index.js';
-import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
+import { createQrCodeDataUrl, formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {
 	createSessionWalletSetup,
 	getExecutionStatus,
@@ -236,9 +235,9 @@ export async function getSessionWalletTool(input: SessionWalletInput): Promise<T
 			),
 		),
 	);
-	const addressQrCodeDataUrl = await QRCode.toDataURL(wallet.address, {
-		errorCorrectionLevel: 'M',
-		margin: 1,
+	const addressQrCodeDataUrl = createQrCodeDataUrl(wallet.address, {
+		errorCorrectionLevel: 'medium',
+		border: 1,
 	});
 	const pairedWallet = credentials.profiles[bundle.config.network];
 	const fundingUrl = pairedWallet
