@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { base64 } from '@scure/base';
-import encodeQR from 'qr';
+import encodeQR, { type QrOpts, type SvgQrOpts } from 'qr';
 
 const TEXT_ENCODER: TextEncoder = new TextEncoder();
-type QrOptions = NonNullable<Parameters<typeof encodeQR>[2]>;
 
-export function createQrCodeDataUrl(value: string, options: QrOptions = {}): string {
+export function createQrCodeDataUrl(value: string, options: QrOpts & SvgQrOpts = {}): string {
 	const svg = encodeQR(value, 'svg', {
 		...options,
 		ecc: options.ecc ?? 'medium',
