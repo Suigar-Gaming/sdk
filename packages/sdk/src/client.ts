@@ -473,7 +473,7 @@ export class SuigarClient {
 			},
 		},
 		/** SweetHouse public pool transaction builders. */
-		sweethouse: {
+		sweetHouse: {
 			deposit: (options: DepositSweetHouseOptions): Transaction => {
 				return buildDepositSweetHouseTransaction({
 					...options,

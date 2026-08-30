@@ -230,7 +230,7 @@ export async function buildSweetHouseDepositTransactionTool(
 		input,
 		createTransaction: async (bundle) => {
 			const coin = coinMetadataForAmount(bundle.config, input.coinType);
-			return bundle.client.suigar.tx.sweethouse.deposit({
+			return bundle.client.suigar.tx.sweetHouse.deposit({
 				owner: await resolveTransactionOwner(input, bundle),
 				coinType: coin.coinType,
 				amount: toBaseUnits(input.amount, 'amount', coin.decimals),
@@ -271,7 +271,7 @@ export async function buildSweetHouseRedeemRequestTransactionTool(
 		input,
 		createTransaction: async (bundle) => {
 			const coin = coinMetadataForAmount(bundle.config, input.coinType);
-			return bundle.client.suigar.tx.sweethouse.redeemRequest({
+			return bundle.client.suigar.tx.sweetHouse.redeemRequest({
 				owner: await resolveTransactionOwner(input, bundle),
 				coinType: coin.coinType,
 				amount: toBaseUnits(input.amount, 'amount', coin.decimals),
@@ -314,7 +314,7 @@ export async function buildSweetHouseClaimOwnRedeemRequestAfterDelayTransactionT
 		input,
 		createTransaction: async (bundle) => {
 			const coinType = resolveDefaultCoinType(bundle.config, input.coinType);
-			return bundle.client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
+			return bundle.client.suigar.tx.sweetHouse.claimOwnRedeemRequestAfterDelay({
 				owner: await resolveTransactionOwner(input, bundle),
 				coinType,
 				requestId,
