@@ -127,3 +127,18 @@ export type MintNftV1Options = TransactionSenderOptions &
 	Pick<CoinTransactionOptions, 'useGasCoin'> & {
 		specId: string;
 	};
+
+export type DepositSweetHouseOptions = TransactionSenderOptions &
+	CoinTransactionOptions & {
+		amount: number | bigint;
+	};
+
+export type RedeemSweetHouseRequestOptions = TransactionSenderOptions &
+	WithCoinType<{
+		hTokenCoinId: string;
+	}>;
+
+export type ClaimOwnSweetHouseRedeemRequestAfterDelayOptions = TransactionSenderOptions &
+	WithCoinType<{
+		requestId: string;
+	}>;
