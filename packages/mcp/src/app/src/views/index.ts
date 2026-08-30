@@ -44,6 +44,12 @@ export function resolveAppView(payload: unknown): ResolvedAppView {
 	if (Array.isArray(result.ownedNfts)) {
 		return { coinBadge, title: 'NFT Collection', View: NftView };
 	}
+	if (result.sweethouse && !result.summary) {
+		return { coinBadge, title: 'SweetHouse Transaction', View: TransactionView };
+	}
+	if (result.nft && !result.summary) {
+		return { coinBadge, title: 'NFT Transaction', View: TransactionView };
+	}
 	if (result.game && !result.summary) {
 		return { coinBadge, title: 'Game Metadata', View: GameMetadataView };
 	}

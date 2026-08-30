@@ -2,19 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
-import { CURRENCY_AMOUNT_PATTERN, POSITIVE_INTEGER_PATTERN } from '../../utils/index.js';
+import { POSITIVE_INTEGER_PATTERN } from '../../utils/index.js';
 import { configInputSchema } from './config.js';
 import {
 	ADDRESS_DESCRIPTION,
 	BUILDER_MODES,
 	COIN_TYPE_DESCRIPTION,
 	CURRENCY_AMOUNT_DESCRIPTION,
+	currencyAmountSchema,
 } from './shared.js';
-
-const currencyAmountSchema = z.union([
-	z.number().nonnegative(),
-	z.string().regex(CURRENCY_AMOUNT_PATTERN),
-]);
 
 const metadataSchema = z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]));
 

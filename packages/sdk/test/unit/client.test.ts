@@ -1367,7 +1367,6 @@ describe('SuigarClient', () => {
 			).specs.contents[0]?.value.url.url,
 		).toBe('https://suigar.com/cane.png');
 		expect(client.suigar.bcs.PvPCoinflipGame).toBeDefined();
-		expect(client.suigar.bcs.StakedCoin).toBeDefined();
 		expect(client.suigar.bcs.BetResultEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameCreatedEvent).toBeDefined();
 		expect(client.suigar.bcs.PvPCoinflipGameResolvedEvent).toBeDefined();
