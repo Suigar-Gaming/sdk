@@ -103,7 +103,7 @@ describe('package exports', () => {
 		).resolves.toContain('<svg');
 		await expect(
 			readFile(new URL('../plugin/assets/logo.png', import.meta.url)),
-		).resolves.toBeInstanceOf(Buffer);
+		).resolves.toBeInstanceOf(Uint8Array);
 		expect(mcpConfig).toEqual({
 			mcpServers: {
 				suigar: {

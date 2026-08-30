@@ -4,6 +4,7 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
+import { hex } from '@scure/base';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
 import {
@@ -52,7 +53,17 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 
 function sameState(left: string, right: string): boolean {
 	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) return false;
-	return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
+	return timingSafeEqual(hex.decode(left), hex.decode(right));
+}
+
+function concatBytes(chunks: Array<Uint8Array>, length: number): Uint8Array {
+	const bytes = new Uint8Array(length);
+	let offset = 0;
+	for (const chunk of chunks) {
+		bytes.set(chunk, offset);
+		offset += chunk.length;
+	}
+	return bytes;
 }
 
 function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptions> {
@@ -77,9 +88,9 @@ async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
 
 function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
-		const chunks: Array<Buffer> = [];
+		const chunks: Array<Uint8Array> = [];
 		let length = 0;
-		request.on('data', (chunk: Buffer) => {
+		request.on('data', (chunk: Uint8Array) => {
 			length += chunk.length;
 			if (length > maxBodyBytes) {
 				request.destroy();
@@ -88,7 +99,7 @@ function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<strin
 			}
 			chunks.push(chunk);
 		});
-		request.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+		request.on('end', () => resolve(new TextDecoder().decode(concatBytes(chunks, length))));
 		request.on('error', reject);
 	});
 }

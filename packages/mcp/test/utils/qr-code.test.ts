@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { Buffer } from 'node:buffer';
 import { describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -26,14 +25,14 @@ describe('createQrCodeDataUrl', () => {
 			border: 1,
 			scale: 2,
 		});
-		expect(Buffer.from(encoded, 'base64').toString('utf8')).toBe('<svg viewBox="0 0 10 10"></svg>');
+		expect(encoded).toBe('PHN2ZyB2aWV3Qm94PSIwIDAgMTAgMTAiPjwvc3ZnPg==');
 	});
 
 	it('passes through QR rendering options', () => {
 		mocks.encodeQR.mockReturnValue('<svg></svg>');
 
 		createQrCodeDataUrl('suigar', {
-			errorCorrectionLevel: 'high',
+			ecc: 'high',
 			border: 4,
 			scale: 6,
 		});
