@@ -6,7 +6,7 @@ import { bcs } from '@mysten/sui/bcs';
 import { type Transaction } from '@mysten/sui/transactions';
 import * as float from './deps/0xf391858d2a08473e8d4defcc8df89976bd7b123d3865c6b9341b237f7853dbbc/float.js';
 import * as vec_map from './deps/0x0000000000000000000000000000000000000000000000000000000000000002/vec_map.js';
-const $moduleName = '0x2efd6d200a2b6e70834fe98e3e25e9ede37fc4fae704d3f3ff0baa9b99d34c6c::keno';
+const $moduleName = '@suigar/keno::keno';
 export const KenoSettingsKey = new MoveStruct({
 	name: `${$moduleName}::KenoSettingsKey`,
 	fields: {
@@ -55,8 +55,7 @@ export interface PlayV2Options {
 	typeArguments: [string];
 }
 export function playV2(options: PlayV2Options) {
-	const packageAddress =
-		options.package ?? '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a';
+	const packageAddress = options.package ?? '@suigar/keno';
 	const argumentsTypes = [
 		null,
 		'u64',
