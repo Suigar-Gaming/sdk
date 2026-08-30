@@ -3,11 +3,11 @@
 
 import type { BcsType, InferBcsType } from '@mysten/bcs';
 import { bcs } from '@mysten/sui/bcs';
-import type { BetResultEvent } from '../contracts/core/core.js';
 import { Float } from '../contracts/core/float.js';
+import { BetResultEventData } from './event.type.js';
 import type { Game } from './game.type.js';
 
-export type BetResultGameDetails = InferBcsType<typeof BetResultEvent>['game_details'];
+export type BetResultGameDetails = BetResultEventData['game_details'];
 
 export type GameDetailValueType =
 	| 'u8'

@@ -132,9 +132,9 @@ export function toBigInt(value: unknown): bigint {
  *
  * Accepted inputs: - finite `number` - base-10 integer `string`
  *
- * This internal helper powers the public `toU8()` and `toU16()` helpers. It accepts stringified
- * integers such as `'1'` for parsed values, but rejects booleans, empty strings, fractional values,
- * and out-of-range numbers.
+ * This internal helper powers the public `toU8()`, `toU16()`, and `toU32()` helpers. It accepts
+ * stringified integers such as `'1'` for parsed values, but rejects booleans, empty strings,
+ * fractional values, and out-of-range numbers.
  *
  * @param options Value, inclusive upper bound, and Move integer label used in error messages.
  * @returns The validated integer as a JavaScript `number`.
@@ -200,4 +200,22 @@ export function toU8(value: unknown): number {
  */
 export function toU16(value: unknown): number {
 	return toBoundedInt({ value, max: 65535, typeName: 'u16' });
+}
+
+/**
+ * Validates that a value can be safely used as a Move `u32` in the `0..4294967295` range.
+ *
+ * Accepted inputs: - finite `number` - base-10 integer `string`
+ *
+ * String inputs are accepted for parsed values such as `'1'`, but only when they are plain
+ * non-negative integer strings. This helper does not accept booleans and does not truncate
+ * fractional values.
+ *
+ * @param value Value to validate.
+ * @returns The validated `u32` value as a JavaScript `number`.
+ * @throws When `value` is not a finite number or integer string.
+ * @throws When `value` is not an integer between `0` and `4294967295`.
+ */
+export function toU32(value: unknown): number {
+	return toBoundedInt({ value, max: 4_294_967_295, typeName: 'u32' });
 }

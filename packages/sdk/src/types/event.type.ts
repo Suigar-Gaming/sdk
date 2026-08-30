@@ -16,19 +16,17 @@ export type PvPCoinflipGameCreatedEventData = InferBcsType<typeof GameCreatedEve
 export type PvPCoinflipGameResolvedEventData = InferBcsType<typeof GameResolvedEvent>;
 export type PvPCoinflipGameCancelledEventData = InferBcsType<typeof GameCancelledEvent>;
 
-export type BetResultSuigarEvent<TGame extends Game = Game> = TGame extends Game
-	? {
-			game: TGame;
-			event: {
-				type: 'BetResultEvent';
-				data: BetResultEventData;
-			};
-			gameDetails: GameDetails<TGame>;
-		}
-	: never;
+export type BetResultSuigarEvent = {
+	game: Game;
+	event: {
+		type: 'BetResultEvent';
+		data: BetResultEventData;
+	};
+	gameDetails: GameDetails<Game>;
+};
 
 export type SuigarEvent =
-	| BetResultSuigarEvent<Game>
+	| BetResultSuigarEvent
 	| {
 			game: 'pvp-coinflip';
 			event: {

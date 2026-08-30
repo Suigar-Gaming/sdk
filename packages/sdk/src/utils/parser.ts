@@ -81,10 +81,16 @@ export function parseGameEvent(suiEvent: SuiClientTypes.Event): SuigarGameEvent 
 }
 
 /**
- * Parses a supported Suigar event, decodes its BCS payload, and decodes game details when the event
- * is a `BetResultEvent`.
+ * Parses a supported Suigar event into the SDK's normalized event shape.
  *
- * Returns `null` for unsupported events or events without a BCS payload.
+ * This helper first resolves the emitted Move event to a Suigar `game` and event `type`, then
+ * decodes the event BCS payload with the matching generated schema. For `BetResultEvent` payloads,
+ * it also decodes `game_details` into game-specific application values under `gameDetails`.
+ *
+ * @param suiEvent Sui event returned by the core client with its BCS payload included.
+ * @returns A decoded Suigar event with `{ game, event: { type, data } }`, plus `gameDetails` for
+ *   `BetResultEvent`; or `null` when the event is unsupported, cannot be mapped to a Suigar game,
+ *   or does not include a `Uint8Array` BCS payload.
  */
 export function parseSuigarEvent(suiEvent: SuiClientTypes.Event): SuigarEvent | null {
 	const gameEvent = parseGameEvent(suiEvent);

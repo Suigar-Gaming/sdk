@@ -70,6 +70,7 @@ import {
 	toBigInt,
 	toU8,
 	toU16,
+	toU32,
 } from '@suigar/sdk/utils';
 ```
 
@@ -79,6 +80,7 @@ Numeric helper behavior:
 - `toBigInt(value)` accepts `bigint`, finite `number`, non-negative integer `string`, and `boolean` inputs and returns a normalized non-negative `bigint` while throwing `TypeError` for invalid input shapes and `RangeError` for negative values
 - `toU8(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..255` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `toU16(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..65535` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
+- `toU32(value)` accepts a finite integer `number` or plain integer `string` in the inclusive `0..4294967295` range, throwing `TypeError` for non-numeric input and `RangeError` for booleans, fractional values, or out-of-range integers
 - `fromMoveI64(value)` converts a generated Move `i64` wrapper into a JavaScript `number`
 - `fromMoveFloat(value)` converts a generated Move float struct into a JavaScript `number`; `getGameParameters()` already applies this conversion to all float fields, including nested game configs
 - `isMoveI64(value)` checks whether an unknown value has the generated Move `i64` shape
