@@ -63,7 +63,7 @@ export const SUIGAR_PACKAGES: Array<SuigarPackage> = [
 		},
 	},
 	{
-		package: '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a',
+		package: '@suigar/keno',
 		packageName: 'keno',
 		modules: {
 			keno: {
