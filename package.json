@@ -15,7 +15,6 @@
 		"changeset:version": "changeset version && pnpm --filter '@suigar/*' run codegen:version",
 		"codegen:version": "node genversion.ts",
 		"publish:jsr": "pnpm --filter './packages/*' --if-present run publish:jsr",
-		"publish:jsr:dry-run": "pnpm --dir packages/sdk exec jsr publish --dry-run --allow-slow-types --allow-dirty && pnpm --dir packages/mcp exec jsr publish --dry-run --allow-dirty",
 		"release": "turbo run build:ci --filter='./packages/*' && changeset publish && pnpm run publish:jsr",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",

@@ -84,13 +84,13 @@
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes",
+		"publish:jsr": "jsr publish",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"oxfmt": "oxfmt . --check",
 		"oxfmt:fix": "oxfmt .",
 		"lint": "pnpm run oxlint && pnpm run oxfmt",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix",
-		"publish:jsr": "jsr publish"
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/ext-apps": "^1.7.5",

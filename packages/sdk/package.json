@@ -82,13 +82,13 @@
 		"codegen": "sui-ts-codegen generate && pnpm run lint:fix",
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
+		"publish:jsr": "jsr publish --allow-slow-types",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"oxfmt": "oxfmt . --check",
 		"oxfmt:fix": "oxfmt .",
 		"lint": "pnpm run oxlint && pnpm run oxfmt",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix",
-		"publish:jsr": "jsr publish --allow-slow-types"
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
 	},
 	"devDependencies": {
 		"@mysten/bcs": "catalog:mysten",
