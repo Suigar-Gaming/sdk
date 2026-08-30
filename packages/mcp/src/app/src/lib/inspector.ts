@@ -21,7 +21,7 @@ function resultEventFields(structuredContent: AnyRecord): AnyRecord {
 	const events = Array.isArray(dryRunSummary.events) ? dryRunSummary.events : [];
 	const eventRecords = events.map(asRecord);
 	const event =
-		eventRecords.find((item) => item.eventName === 'BetResultEvent') ??
+		eventRecords.find((item) => item.event === 'BetResultEvent') ??
 		eventRecords.find((item) => {
 			const fields = asRecord(item.fields);
 			return (

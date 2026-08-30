@@ -216,7 +216,7 @@ export async function buildTransactionResult({
 	if (mode === 'dry-run') {
 		const rawDryRun = await dryRunTransaction(transaction, client);
 		const dryRun = toJsonValue(rawDryRun) as DryRunResult;
-		const dryRunSummary = summarizeDryRun(rawDryRun, client, context);
+		const dryRunSummary = summarizeDryRun(rawDryRun, context);
 		const errors = extractDryRunErrors(rawDryRun);
 		return {
 			mode,

@@ -3,11 +3,18 @@
 
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
+import { GameCancelledEvent } from '../../../src/contracts/pvp-coinflip/pvp_coinflip.js';
+import type { BetResultSuigarEvent } from '../../../src/types/event.type.js';
 import type { BetResultGameDetails, GameDetail } from '../../../src/types/game-details.type.js';
 import { GAME_DETAIL_BCS } from '../../../src/types/game-details.type.js';
 import type { SuigarGameEvent } from '../../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../../src/types/game.type.js';
-import { parseCoinType, parseGameDetails, parseGameEvent } from '../../../src/utils/index.js';
+import {
+	parseCoinType,
+	parseGameDetails,
+	parseGameEvent,
+	parseSuigarEvent,
+} from '../../../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from '../../utils.js';
 
 function gameDetails(contents: Array<{ key: string; value: Array<number> }>): BetResultGameDetails {
@@ -165,6 +172,47 @@ describe('parseGameEvent', () => {
 		).toEqual({
 			game: 'pvp-coinflip',
 			event: 'GameResolvedEvent',
+		});
+	});
+});
+
+describe('parseSuigarEvent', () => {
+	it('models bet result events as a game-discriminated union', () => {
+		expectTypeOf<BetResultSuigarEvent>().toEqualTypeOf<
+			| BetResultSuigarEvent<'coinflip'>
+			| BetResultSuigarEvent<'keno'>
+			| BetResultSuigarEvent<'limbo'>
+			| BetResultSuigarEvent<'plinko'>
+			| BetResultSuigarEvent<'pvp-coinflip'>
+			| BetResultSuigarEvent<'range'>
+			| BetResultSuigarEvent<'soccer'>
+			| BetResultSuigarEvent<'wheel'>
+		>();
+	});
+
+	it('decodes a PvP event in one step', () => {
+		const event = createEvent({
+			module: 'pvp_coinflip',
+			eventType:
+				'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip::GameCancelledEvent<0x2::sui::SUI>',
+		});
+		const bytes = GameCancelledEvent.serialize({
+			game_id: '0x1',
+			creator: '0x2',
+			creator_is_tails: false,
+			is_private: false,
+			stake_per_player: 1n,
+			coin_type: { name: '0x2::sui::SUI' },
+		}).toBytes();
+
+		const suigarEvent = parseSuigarEvent({ ...event, bcs: bytes });
+
+		expect(suigarEvent?.game).toBe('pvp-coinflip');
+		expect(suigarEvent?.event.type).toBe('GameCancelledEvent');
+		expect(suigarEvent && 'gameDetails' in suigarEvent).toBe(false);
+		expect(suigarEvent?.event.data).toMatchObject({
+			game_id: `0x${'1'.padStart(64, '0')}`,
+			stake_per_player: '1',
 		});
 	});
 });

@@ -1,5 +1,6 @@
 ---
 '@suigar/sdk': major
+'@suigar/mcp': major
 ---
 
-Rename the normalized fields returned by `parseGameEvent` and exposed by `SuigarGameEvent` from `gameId` and `eventName` to `game` and `event`.
+Rename normalized event fields from `gameId` and `eventName` to `game` and `event`, add `parseSuigarEvent` for decoded event payloads and game details, and update MCP dry-run event summaries to expose `event`.

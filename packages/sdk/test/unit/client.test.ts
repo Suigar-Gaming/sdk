@@ -255,9 +255,9 @@ function createPvPCoinflipGameObjectWithoutContent(gameId: string): SuiClientTyp
 	};
 }
 
-type ParsedPvPCoinflipGame = ReturnType<typeof GeneratedPvPCoinflipGame.parse>;
+type DecodedPvPCoinflipGame = ReturnType<typeof GeneratedPvPCoinflipGame.parse>;
 
-function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
+function createDecodedPvPCoinflipGame(gameId: string): DecodedPvPCoinflipGame {
 	return {
 		id: gameId,
 		creator: '0xcreator',
@@ -269,7 +269,7 @@ function createParsedPvPCoinflipGame(gameId: string): ParsedPvPCoinflipGame {
 		stake_per_player: '1',
 		house_edge_bps: '100',
 		stake_pot: { value: '2' },
-	} as ParsedPvPCoinflipGame;
+	} as DecodedPvPCoinflipGame;
 }
 
 type SuigarTestClient = TestClient & { suigar: SuigarClient };
@@ -1193,8 +1193,8 @@ describe('SuigarClient', () => {
 			dynamicFields: [createDynamicField('0xopen'), createDynamicField('0xpending')],
 		});
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
@@ -1299,7 +1299,7 @@ describe('SuigarClient', () => {
 		const controller = new AbortController();
 		const getObjectsSpy = vi.spyOn(client, 'getObjects');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
-			createParsedPvPCoinflipGame('0xopen'),
+			createDecodedPvPCoinflipGame('0xopen'),
 		);
 
 		await client.suigar.getPvPCoinflipGames({
@@ -1330,8 +1330,8 @@ describe('SuigarClient', () => {
 			],
 		});
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse')
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xopen'))
-			.mockReturnValueOnce(createParsedPvPCoinflipGame('0xpending'));
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xopen'))
+			.mockReturnValueOnce(createDecodedPvPCoinflipGame('0xpending'));
 
 		const games = await client.suigar.getPvPCoinflipGames();
 
@@ -1402,7 +1402,7 @@ describe('SuigarClient', () => {
 		const controller = new AbortController();
 		const getObjectsSpy = vi.spyOn(client, 'getObjects');
 		vi.spyOn(client.suigar.bcs.PvPCoinflipGame, 'parse').mockReturnValueOnce(
-			createParsedPvPCoinflipGame('0xopen'),
+			createDecodedPvPCoinflipGame('0xopen'),
 		);
 
 		await client.suigar.getPvPCoinflipGames({

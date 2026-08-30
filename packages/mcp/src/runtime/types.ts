@@ -77,7 +77,7 @@ export type TransactionSummary = {
 export type DryRunEventSummary = {
 	type: string;
 	game?: Game;
-	eventName?: string;
+	event?: string;
 	fields: Record<string, JsonValue>;
 };
 

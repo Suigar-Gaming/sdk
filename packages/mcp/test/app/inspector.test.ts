@@ -27,7 +27,7 @@ describe('createInspectorViewModel', () => {
 					success: true,
 					events: [
 						{
-							eventName: 'BetResultEvent',
+							event: 'BetResultEvent',
 							fields: { coin_outcome: 'tails' },
 						},
 					],

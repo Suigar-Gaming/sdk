@@ -65,6 +65,7 @@ import {
 	isMoveI64,
 	parseCoinType,
 	parseGameDetails,
+	parseSuigarEvent,
 	RANGE_POINT_LIMIT,
 	toBigInt,
 	toU8,
@@ -675,26 +676,26 @@ Parsed fields include:
 - `game_details`
 - `metadata`
 
-`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseGameEvent(event)` from `@suigar/sdk/utils` to retrieve the normalized `game` and `event`, then pass that `game` to `parseGameDetails({ game, gameDetails: decoded.game_details })` for game-specific key and value typing.
+`game_details` and `metadata` decode as `VecMap<string, vector<u8>>`-shaped data, so values come back as byte arrays. Use `parseSuigarEvent(event)` from `@suigar/sdk/utils` to identify and decode supported Suigar events. For a `BetResultEvent`, it also returns decoded, game-specific `gameDetails`.
 
 ```ts
-import { parseGameDetails, parseGameEvent } from '@suigar/sdk/utils';
+import { parseSuigarEvent } from '@suigar/sdk/utils';
 
-const parsedEvent = parseGameEvent(event)!;
-const decoded = client.suigar.bcs.BetResultEvent.parse(event.bcs);
-const gameDetails = parseGameDetails({
-	game: parsedEvent.game,
-	gameDetails: decoded.game_details,
-});
+const suigarEvent = parseSuigarEvent(event);
+
+if (suigarEvent?.event.type === 'BetResultEvent') {
+	console.log(suigarEvent.event.data.outcome_amount);
+	console.log(suigarEvent.gameDetails.payout_amount);
+}
 ```
 
 `parseGameDetails` preserves the on-chain keys and only changes the value representation. For example, coinflip details keep keys such as `player_bet` and `coin_outcome`; range details keep keys such as `roll_value`, `win`, and `payout_multiplier`.
 
-`parseGameDetails({ game, gameDetails: decoded.game_details })` narrows based on the parsed event game. For example, when `game === 'coinflip'` it narrows to:
+`suigarEvent.gameDetails` narrows based on the event game. For example, when `suigarEvent.game === 'coinflip'` it narrows to:
 
 - `{ player_bet: string; coin_outcome: string }`
 
-`parseGameEvent(event)` returns the normalized game and raw Move event name for every supported Suigar event in `GAME_EVENTS`:
+`parseGameEvent(event)` remains available when only the normalized game and raw Move event name are needed. It returns:
 
 - `{ game: 'coinflip' | 'keno' | 'limbo' | 'plinko' | 'range' | 'soccer' | 'wheel', event: 'BetResultEvent' }` for standard bet result events
 - `{ game: 'pvp-coinflip', event: 'BetResultEvent' | 'GameCreatedEvent' | 'GameResolvedEvent' | 'GameCancelledEvent' }` for PvP Coinflip events
@@ -708,7 +709,7 @@ When the extension is configured with `partner`, decoded event `metadata` will c
 > - Unwrap the core API union with `result.$kind`, `result.Transaction`, and `result.FailedTransaction`
 > - Parse emitted events from the unwrapped transaction result
 > - Use `event.bcs` for consistent decoding across transports
-> - Use `const { game } = parseGameEvent(event)!` and then `parseGameDetails({ game, gameDetails: decoded.game_details })` instead of hand-decoding standard game detail byte arrays
+> - Use `parseSuigarEvent(event)` when you want the decoded payload and game details in one step
 
 > **Tip:**
 >

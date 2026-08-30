@@ -4,6 +4,13 @@
 import { bcs } from '@mysten/sui/bcs';
 import type { SuiClientTypes } from '@mysten/sui/client';
 import { normalizeStructTag, parseStructTag } from '@mysten/sui/utils';
+import { BetResultEvent } from '../contracts/core/core.js';
+import {
+	GameCancelledEvent as PvPCoinflipGameCancelledEvent,
+	GameCreatedEvent as PvPCoinflipGameCreatedEvent,
+	GameResolvedEvent as PvPCoinflipGameResolvedEvent,
+} from '../contracts/pvp-coinflip/pvp_coinflip.js';
+import type { SuigarEvent } from '../types/event.type.js';
 import { GAME_DETAIL_BCS, GAME_DETAILS_SCHEMAS } from '../types/game-details.type.js';
 import { GAME_EVENTS, GAMES } from '../types/game.type.js';
 import type {
@@ -50,9 +57,9 @@ export function parseCoinType(type: string): string {
  * type parameter, while PvP Coinflip events resolve to the `pvp-coinflip` game id from their
  * `pvp_coinflip` module.
  *
- * @param event Sui event returned by the core client.
- * @returns Parsed SDK game and raw Move event name, or `null` when the event name is unsupported or
- *   the game cannot be resolved.
+ * @param suiEvent Sui event returned by the core client.
+ * @returns SDK game and raw Move event name, or `null` when the event name is unsupported or the
+ *   game cannot be resolved.
  */
 export function parseGameEvent(suiEvent: SuiClientTypes.Event): SuigarGameEvent | null {
 	const { name: event, typeParams } = parseStructTag(suiEvent.eventType);
@@ -71,6 +78,54 @@ export function parseGameEvent(suiEvent: SuiClientTypes.Event): SuigarGameEvent 
 		game,
 		event,
 	} as SuigarGameEvent;
+}
+
+/**
+ * Parses a supported Suigar event, decodes its BCS payload, and decodes game details when the event
+ * is a `BetResultEvent`.
+ *
+ * Returns `null` for unsupported events or events without a BCS payload.
+ */
+export function parseSuigarEvent(suiEvent: SuiClientTypes.Event): SuigarEvent | null {
+	const gameEvent = parseGameEvent(suiEvent);
+	if (!gameEvent || !(suiEvent.bcs instanceof Uint8Array)) {
+		return null;
+	}
+
+	switch (gameEvent.event) {
+		case 'BetResultEvent': {
+			const data = BetResultEvent.parse(suiEvent.bcs);
+			return {
+				game: gameEvent.game,
+				event: { type: gameEvent.event, data },
+				gameDetails: parseGameDetails({ game: gameEvent.game, gameDetails: data.game_details }),
+			} as SuigarEvent;
+		}
+		case 'GameCreatedEvent':
+			return {
+				game: gameEvent.game,
+				event: {
+					type: gameEvent.event,
+					data: PvPCoinflipGameCreatedEvent.parse(suiEvent.bcs),
+				},
+			};
+		case 'GameResolvedEvent':
+			return {
+				game: gameEvent.game,
+				event: {
+					type: gameEvent.event,
+					data: PvPCoinflipGameResolvedEvent.parse(suiEvent.bcs),
+				},
+			};
+		case 'GameCancelledEvent':
+			return {
+				game: gameEvent.game,
+				event: {
+					type: gameEvent.event,
+					data: PvPCoinflipGameCancelledEvent.parse(suiEvent.bcs),
+				},
+			};
+	}
 }
 
 function parseStringGameDetail(value: Array<number>): string {
