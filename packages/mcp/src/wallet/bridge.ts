@@ -3,11 +3,10 @@
 
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { equalBytes } from '@noble/ciphers/utils.js';
 import { hex } from '@scure/base';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
-import { randomHex } from '../utils/crypto.js';
+import { equalBytes, randomHex } from '../utils/crypto.js';
 import {
 	clearCredentials,
 	loadCredentials,
@@ -52,7 +51,7 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 	return EXECUTIONS.get(requestId) ?? null;
 }
 
-function sameState(left: string, right: string): boolean {
+async function sameState(left: string, right: string): Promise<boolean> {
 	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) {
 		return false;
 	}
@@ -166,7 +165,7 @@ export async function createLoginBridge({
 		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/handshake') {
-			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+			if (!(await sameState(url.searchParams.get('state') ?? '', state))) {
 				respond(response, 403, { ok: false, error: 'Invalid pairing state' });
 				return;
 			}
@@ -187,7 +186,7 @@ export async function createLoginBridge({
 				string,
 				unknown
 			>;
-			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
+			if (typeof payload.state !== 'string' || !(await sameState(payload.state, state))) {
 				respond(response, 403, { error: 'Invalid pairing state' });
 				return;
 			}
@@ -256,7 +255,10 @@ export async function createExecutionBridge({
 		if (!loopback.authorize(request, response)) {
 			return;
 		}
-		if (!sameState(url.searchParams.get('state') ?? '', state) && request.method === 'GET') {
+		if (
+			!(await sameState(url.searchParams.get('state') ?? '', state)) &&
+			request.method === 'GET'
+		) {
 			respond(response, 403, { error: 'Invalid approval state' });
 			return;
 		}
@@ -285,7 +287,7 @@ export async function createExecutionBridge({
 			>;
 			if (
 				typeof payload.state !== 'string' ||
-				!sameState(payload.state, state) ||
+				!(await sameState(payload.state, state)) ||
 				payload.address !== profile.address
 			) {
 				respond(response, 403, { error: 'Invalid approval callback' });
@@ -350,7 +352,7 @@ export async function createLogoutBridge({
 		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/request') {
-			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+			if (!(await sameState(url.searchParams.get('state') ?? '', state))) {
 				respond(response, 403, { error: 'Invalid logout state' });
 				return;
 			}
@@ -370,7 +372,7 @@ export async function createLogoutBridge({
 				string,
 				unknown
 			>;
-			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
+			if (typeof payload.state !== 'string' || !(await sameState(payload.state, state))) {
 				respond(response, 403, { error: 'Invalid logout callback' });
 				return;
 			}

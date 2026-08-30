@@ -1,11 +1,24 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { bytesToHex, randomBytes } from '@noble/ciphers/utils.js';
+import { bytesToHex, equalBytes as nobleEqualBytes, randomBytes } from '@noble/ciphers/utils.js';
 
 const UUID_BYTE_TO_HEX = Array.from({ length: 256 }, (_, byte) =>
 	byte.toString(16).padStart(2, '0'),
 );
+
+const nodeTimingSafeEqual = import('node:crypto')
+	.then(({ timingSafeEqual }) => timingSafeEqual)
+	.catch(() => null);
+
+export async function equalBytes(a: Uint8Array, b: Uint8Array): Promise<boolean> {
+	if (a.length !== b.length) {
+		return false;
+	}
+
+	const timingSafeEqual = await nodeTimingSafeEqual;
+	return timingSafeEqual === null ? nobleEqualBytes(a, b) : timingSafeEqual(a, b);
+}
 
 export function randomHex(byteLength: number): string {
 	return bytesToHex(randomBytes(byteLength));
