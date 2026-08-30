@@ -706,6 +706,9 @@ describe('SuigarClient', () => {
 		expect(client.suigar.tx.pvpCoinflip.joinGame).toBeTypeOf('function');
 		expect(client.suigar.tx.pvpCoinflip.cancelGame).toBeTypeOf('function');
 		expect(client.suigar.tx.nftV1.mint).toBeTypeOf('function');
+		expect(client.suigar.tx.sweethouse.deposit).toBeTypeOf('function');
+		expect(client.suigar.tx.sweethouse.redeemRequest).toBeTypeOf('function');
+		expect(client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay).toBeTypeOf('function');
 		expect(
 			client.suigar.tx.pvpCoinflip.createGame({
 				owner: '0x123',
@@ -726,6 +729,27 @@ describe('SuigarClient', () => {
 				owner: '0x123',
 				coinType,
 				gameId: '0x456',
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweethouse.deposit({
+				owner: '0x123',
+				coinType,
+				amount: 1000,
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweethouse.redeemRequest({
+				owner: '0x123',
+				coinType,
+				hTokenCoinId: '0x456',
+			}),
+		).toBeInstanceOf(Transaction);
+		expect(
+			client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
+				owner: '0x123',
+				coinType,
+				requestId: '0x456',
 			}),
 		).toBeInstanceOf(Transaction);
 	});
