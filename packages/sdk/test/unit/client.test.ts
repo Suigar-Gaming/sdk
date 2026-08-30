@@ -6,6 +6,7 @@ import { CoreClient, type SuiClientTypes } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import {
 	deriveDynamicFieldID,
+	fromHex,
 	normalizeStructTag,
 	normalizeSuiAddress,
 	SUI_ADDRESS_LENGTH,
@@ -677,7 +678,7 @@ describe('SuigarClient', () => {
 			arguments: Array<unknown>;
 		}>(playV2);
 		expect(options.arguments[5]).toEqual(['partner']);
-		expect(options.arguments[6]).toEqual([Array.from(Buffer.from(partner.slice(2), 'hex'))]);
+		expect(options.arguments[6]).toEqual([Array.from(fromHex(partner))]);
 	});
 
 	it('exposes standard, PvP, and NFT transaction factories', () => {

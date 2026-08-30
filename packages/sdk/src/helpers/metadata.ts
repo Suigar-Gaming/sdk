@@ -12,13 +12,14 @@ import type {
 const PARTNER_METADATA_KEY = 'partner';
 
 const RESERVED_METADATA_KEYS: Set<string> = new Set([PARTNER_METADATA_KEY, 'referrer']);
-const textEncoder: TextEncoder = new TextEncoder();
+
+const TEXT_ENCODER: TextEncoder = new TextEncoder();
 
 function encodeString(value: string): Uint8Array<ArrayBuffer> {
 	try {
 		return fromHex(value);
 	} catch {
-		return textEncoder.encode(value);
+		return TEXT_ENCODER.encode(value);
 	}
 }
 

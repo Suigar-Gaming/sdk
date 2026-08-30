@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
+import { fromHex, normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { describe, expect, it, vi } from 'vitest';
 import { createBaseTransaction } from '../../../src/transactions/shared.js';
 import { encodeUtf8, TEST_CONFIG } from '../../utils.js';
@@ -58,7 +58,7 @@ describe('shared transaction helpers', () => {
 		expect(context!.priceInfoObjectId).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
 		expect(context!.metadata).toEqual({
 			keys: ['partner', 'label'],
-			values: [Array.from(Buffer.from(partner.slice(2), 'hex')), encodeUtf8('vip')],
+			values: [Array.from(fromHex(partner)), encodeUtf8('vip')],
 		});
 	});
 
@@ -164,7 +164,7 @@ describe('shared transaction helpers', () => {
 			buildRewardCoin: (resolvedContext) => {
 				expect(resolvedContext.metadata).toEqual({
 					keys: ['accountManager', 'label'],
-					values: [Array.from(Buffer.from(accountManager.slice(2), 'hex')), encodeUtf8('vip')],
+					values: [Array.from(fromHex(accountManager)), encodeUtf8('vip')],
 				});
 				return createZeroCoinThunk(resolvedContext.coinType);
 			},
