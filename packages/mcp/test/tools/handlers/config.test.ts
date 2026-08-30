@@ -38,6 +38,14 @@ describe('read_config', () => {
 						'build_referral_commission_claim_transaction',
 					]),
 				}),
+				expect.objectContaining({
+					id: 'sweethouse',
+					tools: [
+						'build_sweethouse_deposit_transaction',
+						'build_sweethouse_redeem_request_transaction',
+						'build_sweethouse_claim_own_redeem_request_after_delay_transaction',
+					],
+				}),
 			]),
 		);
 	});

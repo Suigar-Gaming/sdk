@@ -133,7 +133,7 @@ export type ReadConfigResult = {
 		tools: Array<string>;
 	}>;
 	supportedFeatures: Array<{
-		id: 'nfts' | 'referrals';
+		id: 'nfts' | 'referrals' | 'sweethouse';
 		label: string;
 		tools: Array<string>;
 	}>;
@@ -218,6 +218,19 @@ export type NftV1MintReadOnlyPlan = {
 	};
 };
 
+export type SweetHouseReadOnlyPlan = {
+	mode: 'read-only';
+	network: SuigarNetwork;
+	config: McpConfig;
+	plan: ReadOnlyPlan['plan'];
+	sweethouse: {
+		action: string;
+		coinType: string;
+		packageId: string;
+		sweetHouseId: string;
+	};
+};
+
 export type WalletReadResult = {
 	network: SuigarNetwork;
 	config: McpConfig;
@@ -290,6 +303,7 @@ export type ToolStructuredResult =
 	| ReferralClaimReadResult
 	| ReferralClaimReadOnlyPlan
 	| NftV1MintReadOnlyPlan
+	| SweetHouseReadOnlyPlan
 	| ReadOnlyPlan
 	| BuildTransactionResult
 	| WalletReadResult

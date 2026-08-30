@@ -4,10 +4,12 @@
 import { z } from 'zod/v4';
 import { CURRENCY_AMOUNT_PATTERN, POSITIVE_INTEGER_PATTERN } from '../../utils/index.js';
 import { configInputSchema } from './config.js';
-import { ADDRESS_DESCRIPTION, BUILDER_MODES, COIN_TYPE_DESCRIPTION } from './shared.js';
-
-const currencyAmountDescription =
-	'Currency amount in the chosen coin, converted to base units using the configured coin decimals.';
+import {
+	ADDRESS_DESCRIPTION,
+	BUILDER_MODES,
+	COIN_TYPE_DESCRIPTION,
+	CURRENCY_AMOUNT_DESCRIPTION,
+} from './shared.js';
 
 const currencyAmountSchema = z.union([
 	z.number().nonnegative(),
@@ -50,10 +52,12 @@ const cancelBuildInputSchema = commonBuildInputSchema.omit({
 
 const stakeBuildInputSchema = commonBuildInputSchema
 	.extend({
-		stake: currencyAmountSchema.optional().describe(`Logical wager. ${currencyAmountDescription}`),
+		stake: currencyAmountSchema
+			.optional()
+			.describe(`Logical wager. ${CURRENCY_AMOUNT_DESCRIPTION}`),
 		cashStake: currencyAmountSchema
 			.optional()
-			.describe(`Optional withdrawn amount. ${currencyAmountDescription}`),
+			.describe(`Optional withdrawn amount. ${CURRENCY_AMOUNT_DESCRIPTION}`),
 		betCount: z
 			.union([z.number().int().positive(), z.string().regex(POSITIVE_INTEGER_PATTERN)])
 			.optional()
@@ -124,7 +128,7 @@ export const pvpCoinflipCreateInputSchema = commonBuildInputSchema
 	.extend({
 		stake: currencyAmountSchema
 			.optional()
-			.describe(`Stake per player. ${currencyAmountDescription}`),
+			.describe(`Stake per player. ${CURRENCY_AMOUNT_DESCRIPTION}`),
 		creatorSide: z.enum(['heads', 'tails']).optional().describe('Creator side.'),
 		isPrivate: z.boolean().optional().describe('Whether the PvP lobby is private.'),
 	})

@@ -6,3 +6,5 @@ export const ADDRESS_DESCRIPTION: string =
 	'Sui address or SuiNS name such as 0xabc..., name.sui, or sub.name.sui; required for build and dry-run modes.';
 export const COIN_TYPE_DESCRIPTION: string =
 	'Move coin type such as 0x2::sui::SUI. Defaults to the SDK-configured SUI coin type.';
+export const CURRENCY_AMOUNT_DESCRIPTION: string =
+	'Currency amount in the chosen coin, converted to base units using the configured coin decimals.';

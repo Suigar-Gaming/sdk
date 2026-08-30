@@ -1,6 +1,6 @@
 # `@suigar/mcp`
 
-AI agent MCP server for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
+AI agent MCP server for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.
 
 The server targets the MCP [`2025-11-25`](https://modelcontextprotocol.io/specification/2025-11-25) specification and registers tools/resources through the modern MCP server and MCP Apps APIs. Tool calls return tool execution errors (`isError: true`) for retryable validation or config failures rather than signing or executing transactions.
 
@@ -8,7 +8,7 @@ It provides:
 
 - SDK-backed tools for reading Suigar config and live game metadata
 - Referral claimable-amount reads and unsigned claim builders
-- Unsigned transaction builders for standard Suigar games and PvP Coinflip
+- Unsigned transaction builders for standard Suigar games, PvP Coinflip, and SweetHouse
 - `build`, `dry-run`, and `read-only` modes
 - A compact MCP App UI resource for compatible hosts
 - Text and structured-content fallbacks for normal MCP clients
@@ -119,6 +119,9 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_referral_commission_claim_transaction`
 - `build_referral_level_up_usd_rewards_claim_transaction`
 - `build_nft_v1_mint_transaction`
+- `build_sweethouse_deposit_transaction`
+- `build_sweethouse_redeem_request_transaction`
+- `build_sweethouse_claim_own_redeem_request_after_delay_transaction`
 - `build_coinflip_transaction`
 - `build_keno_transaction`
 - `build_limbo_transaction`
@@ -130,7 +133,7 @@ This builds the local workspace dependencies, MCP server, and bundled MCP App. R
 - `build_pvp_coinflip_join_transaction`
 - `build_pvp_coinflip_cancel_transaction`
 
-All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, referral rewards, or transaction inspection.
+All tools return `content` text plus `structuredContent`. App-capable hosts render purpose-built views from one bundled MCP App: config discovery, live game parameters, NFT catalog/ownership, referral rewards, SweetHouse plans, or transaction inspection.
 
 ### Wallet tools
 
@@ -194,7 +197,7 @@ Dry-run summaries include:
 
 For `build`, `dry-run`, and paired-wallet `execute`, provide `owner`, a raw Sui address, SuiNS name such as `name.sui`, or SuiNS subname such as `sub.name.sui`. SuiNS owners are resolved through the configured network before the unsigned transaction is built or dry-run. In session execution (`mode: "execute", executionWallet: "session"`), MCP uses the local session-wallet address and no owner is required. `read-only` can be used to inspect a tool's requirements before providing an owner.
 
-`coinType` defaults to configured SUI. Transaction `stake` and `cashStake` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
+`coinType` defaults to configured SUI. Transaction `stake`, `cashStake`, and SweetHouse `amount` inputs are currency amounts in the chosen coin, not base-unit integers. For example, `stake: 1` or `amount: 1` means `1` SUI or `1` USDC depending on the resolved coin type. The MCP server uses the configured coin `decimals` value to convert those amounts into base units before calling the SDK transaction builders.
 
 Optional shared transaction input is `gasBudget` in MIST. Bet-building workflows also accept `metadata`. Workflows that source native SUI coins, including native SUI bets and NFT V1 mint, accept `useGasCoin`. Metadata values must be JSON-compatible strings, numbers, or booleans; send large integers as strings. PvP Coinflip cancel does not create a bet coin or write metadata, so its tool does not accept `metadata` or `useGasCoin`.
 
@@ -216,6 +219,9 @@ When `betCount` is provided for Keno, Limbo, Plinko, Range, Soccer, or Wheel, th
 | Referral Commission Claim | `owner` | `coinType` | `coinType` defaults to configured SUI. |
 | Referral Level-up USD Rewards Claim | `owner` | — | Uses configured USDC. |
 | NFT V1 Mint | `owner`, `specId` | `useGasCoin` | Resolves the specification's SUI price from the configured NFT factory when built. |
+| SweetHouse Deposit | `owner`, `amount` | `coinType`, `useGasCoin` | Deposits into the public pool and returns staked coins to `owner`. |
+| SweetHouse Redeem Request | `owner`, `amount` | `coinType` | Spends staked coins from `owner` and creates a redeem request. |
+| SweetHouse Delayed Redeem Claim | `owner`, `requestId` | `coinType` | Must be signed by the address that created the redeem request. |
 
 ## Config
 

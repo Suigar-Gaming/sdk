@@ -29,10 +29,11 @@ export const GAME_LABELS = {
 } as const satisfies Record<Game, string>;
 
 type PackageKey = keyof McpConfig['sdk']['packageIds'];
-type ResolvablePackage = Game | 'referral' | 'nftV1';
+type ResolvablePackage = Game | 'referral' | 'nftV1' | 'core';
 
 const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 	coinflip: 'coinflip',
+	core: 'core',
 	keno: 'keno',
 	limbo: 'limbo',
 	nftV1: 'nftV1',
@@ -46,6 +47,7 @@ const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 
 const SUIGAR_PACKAGE_FALLBACKS: Partial<Record<ResolvablePackage, string>> = {
 	coinflip: '@suigar/coinflip',
+	core: '@suigar/core',
 	keno: '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a',
 	limbo: '@suigar/limbo',
 	plinko: '@suigar/plinko',
@@ -251,6 +253,15 @@ export function supportedFeatures(): ReadConfigResult['supportedFeatures'] {
 				'get_referral_level_up_usd_rewards',
 				'build_referral_commission_claim_transaction',
 				'build_referral_level_up_usd_rewards_claim_transaction',
+			],
+		},
+		{
+			id: 'sweethouse' as const,
+			label: 'SweetHouse',
+			tools: [
+				'build_sweethouse_deposit_transaction',
+				'build_sweethouse_redeem_request_transaction',
+				'build_sweethouse_claim_own_redeem_request_after_delay_transaction',
 			],
 		},
 	];

@@ -35,7 +35,7 @@ To configure an MCP client manually, use:
 
 ## Agent Skills
 
-Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository. The MCP-focused skill teaches agents how to install, configure, and operate `@suigar/mcp` for Suigar config reads, game metadata, NFT lookups, referral claim reads, unsigned transaction builders, and dry-runs.
+Suigar agent skills live in the separate `Suigar-Gaming/agent-skills` repository. The MCP-focused skill teaches agents how to install, configure, and operate `@suigar/mcp` for Suigar config reads, game metadata, NFT lookups, referral claim reads, SweetHouse transaction builders, unsigned transaction builders, and dry-runs.
 
 Install all Suigar skills with:
 
@@ -52,7 +52,7 @@ npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 ## Packages
 
 - `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.
-- `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config, game metadata, NFTs, and referral claim amounts, plus building unsigned Suigar transactions through the SDK.
+- `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config, game metadata, NFTs, and referral claim amounts, plus building unsigned Suigar and SweetHouse transactions through the SDK.
 
 Public packages are published to both [npm](https://www.npmjs.com/search?q=%40suigar) and [JSR](https://jsr.io/@suigar).
 
