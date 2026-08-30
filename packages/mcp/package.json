@@ -89,7 +89,8 @@
 		"oxfmt": "oxfmt . --check",
 		"oxfmt:fix": "oxfmt .",
 		"lint": "pnpm run oxlint && pnpm run oxfmt",
-		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix"
+		"lint:fix": "pnpm run oxlint:fix && pnpm run oxfmt:fix",
+		"publish:jsr": "jsr publish"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/ext-apps": "^1.7.5",
