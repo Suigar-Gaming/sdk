@@ -5,9 +5,13 @@ import type { SuiClientTypes } from '@mysten/sui/client';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { GameCancelledEvent } from '../../../src/contracts/pvp-coinflip/pvp_coinflip.js';
 import type { BetResultSuigarEvent } from '../../../src/types/event.type.js';
-import type { BetResultGameDetails, GameDetail } from '../../../src/types/game-details.type.js';
+import type {
+	BetResultGameDetails,
+	GameDetail,
+	GameDetails,
+} from '../../../src/types/game-details.type.js';
 import { GAME_DETAIL_BCS } from '../../../src/types/game-details.type.js';
-import type { SuigarGameEvent } from '../../../src/types/game.type.js';
+import type { Game, SuigarGameEvent } from '../../../src/types/game.type.js';
 import { GAME_EVENTS } from '../../../src/types/game.type.js';
 import {
 	parseCoinType,
@@ -177,17 +181,10 @@ describe('parseGameEvent', () => {
 });
 
 describe('parseSuigarEvent', () => {
-	it('models bet result events as a game-discriminated union', () => {
-		expectTypeOf<BetResultSuigarEvent>().toEqualTypeOf<
-			| BetResultSuigarEvent<'coinflip'>
-			| BetResultSuigarEvent<'keno'>
-			| BetResultSuigarEvent<'limbo'>
-			| BetResultSuigarEvent<'plinko'>
-			| BetResultSuigarEvent<'pvp-coinflip'>
-			| BetResultSuigarEvent<'range'>
-			| BetResultSuigarEvent<'soccer'>
-			| BetResultSuigarEvent<'wheel'>
-		>();
+	it('models bet result events for every supported game', () => {
+		expectTypeOf<BetResultSuigarEvent['game']>().toEqualTypeOf<Game>();
+		expectTypeOf<BetResultSuigarEvent['event']['type']>().toEqualTypeOf<'BetResultEvent'>();
+		expectTypeOf<BetResultSuigarEvent['gameDetails']>().toEqualTypeOf<GameDetails<Game>>();
 	});
 
 	it('decodes a PvP event in one step', () => {
