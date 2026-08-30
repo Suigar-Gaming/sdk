@@ -65,6 +65,14 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Debug versioning tools
+        run: |
+          command -v node
+          command -v pnpm
+          command -v jsr || true
+          command -v deno || true
+          pnpm why jsr
+
       - name: Validate versioning
         env:
           GITHUB_TOKEN: ${{ github.token }}
