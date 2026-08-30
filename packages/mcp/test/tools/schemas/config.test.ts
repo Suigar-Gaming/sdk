@@ -12,6 +12,12 @@ describe('config input schema', () => {
 		);
 	});
 
+	it('rejects own __proto__ keys on strict input objects', () => {
+		const input = JSON.parse('{"__proto__":true}');
+
+		expect(() => configInputSchema.parse(input)).toThrow(/Unrecognized key/u);
+	});
+
 	it('accepts only supported networks and valid provider URLs', () => {
 		expect(configInputSchema.parse({ network: 'mainnet' }).network).toBe('mainnet');
 		expect(() => configInputSchema.parse({ network: 'devnet' })).toThrow(/Invalid option/u);
