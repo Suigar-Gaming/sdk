@@ -48,7 +48,7 @@ const SUIGAR_PACKAGE_KEYS: Record<ResolvablePackage, PackageKey> = {
 const SUIGAR_PACKAGE_FALLBACKS: Partial<Record<ResolvablePackage, string>> = {
 	coinflip: '@suigar/coinflip',
 	core: '@suigar/core',
-	keno: '0x84dcf017dab56b1ce4a1322d40c52a581abc24861abd549e829da75aa5570b6a',
+	keno: '@suigar/keno',
 	limbo: '@suigar/limbo',
 	plinko: '@suigar/plinko',
 	range: '@suigar/range',
