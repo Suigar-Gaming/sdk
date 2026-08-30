@@ -585,7 +585,6 @@ BCS helpers live under `client.suigar.bcs`.
 Current exposed helpers:
 
 - `PvPCoinflipGame`
-- `StakedCoin`
 - `BetResultEvent`
 - `PvPCoinflipGameCreatedEvent`
 - `PvPCoinflipGameResolvedEvent`
