@@ -7,7 +7,13 @@
 	"proseWrap": "never",
 	"sortPackageJson": true,
 	"jsdoc": true,
-	"ignorePatterns": ["**/.next/**", "**/build/**", "**/coverage/**", "**/out/**"],
+	"ignorePatterns": [
+		"**/.next/**",
+		"**/build/**",
+		"**/coverage/**",
+		"**/out/**",
+		"**/pnpm-lock.yaml"
+	],
 	"overrides": [
 		{
 			"files": ["packages/*/src/contracts/**"],
