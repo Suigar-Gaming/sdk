@@ -51,7 +51,7 @@ npx skills add Suigar-Gaming/agent-skills --skill suigar-mcp --global --yes
 
 ## Packages
 
-- `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
+- `@suigar/sdk` in `packages/sdk`: ESM-only TypeScript SDK for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.
 - `@suigar/mcp` in `packages/mcp`: MCP stdio server and MCP App for reading Suigar config, game metadata, NFTs, and referral claim amounts, plus building unsigned Suigar transactions through the SDK.
 
 Public packages are published to both [npm](https://www.npmjs.com/search?q=%40suigar) and [JSR](https://jsr.io/@suigar).

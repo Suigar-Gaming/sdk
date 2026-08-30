@@ -1,6 +1,6 @@
 # `@suigar/sdk`
 
-TypeScript SDK for Suigar provably fair on-chain Sui casino game, NFT, referral transactions.
+TypeScript SDK for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.
 
 ## Documentation
 
@@ -485,6 +485,48 @@ Error behavior:
 
 - `RangeError` when `coinType` is not in the resolved supported-coin config for the active network
 
+### SweetHouse
+
+SweetHouse public pool transaction builders live under `client.suigar.tx.sweethouse`:
+
+- `deposit`
+- `redeemRequest`
+- `claimOwnRedeemRequestAfterDelay`
+
+Deposit:
+
+```ts
+const usdcType = client.suigar.getConfig().coins.usdc.coinType;
+
+const deposit = client.suigar.tx.sweethouse.deposit({
+	owner: '0x123',
+	coinType: usdcType,
+	amount: 10_000_000n,
+});
+```
+
+Redeem:
+
+```ts
+const redeem = client.suigar.tx.sweethouse.redeemRequest({
+	owner: '0x123',
+	coinType: usdcType,
+	hTokenCoinId: '0xHTOKEN_COIN_ID',
+});
+```
+
+Delayed fallback claim:
+
+```ts
+const claim = client.suigar.tx.sweethouse.claimOwnRedeemRequestAfterDelay({
+	owner: '0x123',
+	coinType: usdcType,
+	requestId: '0xREDEEM_REQUEST_ID',
+});
+```
+
+Amounts are in base units, so `10_000_000n` is 10 USDC for the default configured USDC coin. Each builder resolves the core package id and SweetHouse shared object from SDK configuration. `deposit` builds the payment coin from the owner's balance with Mysten coin intent helpers and transfers the returned hToken coin back to `owner` in the same transaction. `redeemRequest` and `claimOwnRedeemRequestAfterDelay` supply the Sui Clock automatically. The signer must be `owner`; delayed self-claims must be signed by the same address that created the redeem request.
+
 ### Referral claims
 
 Referrers can claim commission accrued for any supported wager coin, and separately claim their USD-denominated level-up reward in the configured dollar coin (`coins.usdc`). Each builder sets `owner` as the transaction sender and transfers the returned claim coin back to that same address.
@@ -549,6 +591,7 @@ Current exposed helpers:
 - `PvPCoinflipGameCancelledEvent`
 - `ReferrerClaimCommissionBalanceEvent`
 - `ReferrerClaimLevelUpUsdRewardsEvent`
+- `RedeemRequestCreatedEvent`
 
 These are generated Move event decoders. Use them to parse Suigar event payloads from transaction results. The `@suigar/sdk/utils` subpath also exposes parser helpers for generated BCS values:
 
