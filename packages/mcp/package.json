@@ -116,7 +116,7 @@
 		"@types/react": "catalog:typescript",
 		"@types/react-dom": "catalog:typescript",
 		"@types/yargs": "^17.0.35",
-		"@vitejs/plugin-react": "^6.1.0",
+		"@vitejs/plugin-react": "^6.1.1",
 		"react-doctor": "catalog:tooling",
 		"tailwindcss": "catalog:tooling",
 		"tsdown": "catalog:tooling",
