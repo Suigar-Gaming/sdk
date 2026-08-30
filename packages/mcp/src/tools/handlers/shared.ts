@@ -9,7 +9,6 @@ import {
 	type BuilderMode,
 	type McpConfig,
 	type ReadConfigResult,
-	type ReferralClaimKind,
 	type SuigarClientBundle,
 	type ToolTextResult,
 } from '../../runtime/index.js';
@@ -274,10 +273,4 @@ export function getSuigarPackageId(config: McpConfig, pkg: ResolvablePackage): s
 		throw new RangeError(`Missing Suigar package id for ${pkg}.`);
 	}
 	return packageId;
-}
-
-export function referralClaimTarget(config: McpConfig, kind: ReferralClaimKind): string {
-	return `${getSuigarPackageId(config, 'referral')}::referral::${
-		kind === 'commission' ? 'claim_commission_balance' : 'claim_referrer_level_up_usd_rewards'
-	}`;
 }
