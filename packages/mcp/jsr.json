@@ -6,6 +6,6 @@
 	"exports": "./src/index.ts",
 	"publish": {
 		"exclude": ["src/app"],
-		"include": ["src", "dist/app/index.html", "README.md"]
+		"include": ["src", "dist/app/index.html", "plugin", "CHANGELOG.md", "README.md"]
 	}
 }
