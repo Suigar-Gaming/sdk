@@ -1,12 +1,13 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
+import { equalBytes } from '@noble/ciphers/utils.js';
 import { hex } from '@scure/base';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
+import { randomHex } from '../utils/crypto.js';
 import {
 	clearCredentials,
 	loadCredentials,
@@ -55,7 +56,7 @@ function sameState(left: string, right: string): boolean {
 	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) {
 		return false;
 	}
-	return timingSafeEqual(hex.decode(left), hex.decode(right));
+	return equalBytes(hex.decode(left), hex.decode(right));
 }
 
 function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptions> {
@@ -149,7 +150,7 @@ export async function createLoginBridge({
 	webOrigin: string;
 } & BridgeOptions): Promise<LoginBridge> {
 	const options = resolveBridgeOptions(bridgeOptions);
-	const state = randomBytes(32).toString('hex');
+	const state = randomHex(32);
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let preflight = false;
@@ -241,8 +242,8 @@ export async function createExecutionBridge({
 	const profile = credentials.profiles[network];
 	if (!profile)
 		throw new Error(`No wallet is connected for ${network}. Call "suigar_login" first.`);
-	const state = randomBytes(32).toString('hex');
-	const requestId = randomBytes(16).toString('hex');
+	const state = randomHex(32);
+	const requestId = randomHex(16);
 	EXECUTIONS.set(requestId, { requestId, status: 'pending' });
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
@@ -327,7 +328,7 @@ export async function createLogoutBridge({
 	webOrigin: string;
 } & BridgeOptions): Promise<LogoutBridge> {
 	const options = resolveBridgeOptions(bridgeOptions);
-	const state = randomBytes(32).toString('hex');
+	const state = randomHex(32);
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	const {
