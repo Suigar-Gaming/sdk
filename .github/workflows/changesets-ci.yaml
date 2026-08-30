@@ -65,18 +65,9 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Debug versioning tools
-        run: |
-          command -v node
-          command -v pnpm
-          command -v jsr || true
-          command -v deno || true
-          pnpm why jsr
-
       - name: Validate versioning
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          NODE_DEBUG: child_process
         run: |
           if ! find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | grep -q .; then
             echo "No changesets found; skipping version validation."
