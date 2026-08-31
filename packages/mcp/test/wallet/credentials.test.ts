@@ -13,7 +13,9 @@ vi.mock('node:os', () => ({ homedir: () => testHome }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const frontendOrigin = 'http://localhost:5173';
-const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const address = testAddress('a');
+const zkLoginAddress = testAddress('b');
 
 beforeEach(async () => {
 	await rm(testHome, { force: true, recursive: true });
@@ -51,7 +53,7 @@ describe('wallet credentials', () => {
 			connectedAt: '2026-01-01T00:00:00.000Z',
 		});
 		await credentials.saveProfile('testnet', {
-			address: '0x0000000000000000000000000000000000000000000000000000000000000002',
+			address: zkLoginAddress,
 			walletType: 'zklogin',
 			frontendOrigin,
 			connectedAt: '2026-01-02T00:00:00.000Z',

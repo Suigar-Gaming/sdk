@@ -24,7 +24,7 @@ vi.mock('@mysten/sui/transactions', async (importOriginal) => {
 	};
 });
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const owner = `0x${'a'.repeat(64)}`;
 
 beforeEach(() => {
 	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));

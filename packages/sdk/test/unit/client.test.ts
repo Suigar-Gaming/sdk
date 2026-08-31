@@ -32,6 +32,11 @@ import { TypeName } from '../../src/contracts/stdlib/type_name.js';
 import type { SuigarConfigOverrides } from '../../src/types/index.js';
 import { createContractCallMock, getFirstMockArg, TEST_CONFIG } from '../utils.js';
 
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const TEST_ADDRESS = testAddress('a');
+const TEST_OBJECT_ID = testAddress('b');
+const TEST_SPEC_ID = testAddress('c');
+
 afterEach(() => {
 	vi.resetModules();
 	vi.clearAllMocks();
@@ -596,7 +601,7 @@ describe('SuigarClient', () => {
 
 	it('gets referral claim amounts by simulating the complete claim transaction', async () => {
 		const client = createSuigarTestClient();
-		const claimCoinBcs = CoinStruct.serialize({ id: '0x1', balance: 123n }).toBytes();
+		const claimCoinBcs = CoinStruct.serialize({ id: TEST_OBJECT_ID, balance: 123n }).toBytes();
 		client.mockSimulationResult = {
 			$kind: 'Transaction',
 			Transaction: {},
@@ -683,7 +688,7 @@ describe('SuigarClient', () => {
 					...createPvPCoinflipGameObject('0x456'),
 					content: GeneratedPvPCoinflipGame.serialize({
 						id: '0x456',
-						creator: '0x1',
+						creator: TEST_ADDRESS,
 						creator_is_tails: false,
 						is_private: false,
 						creator_metadata: { contents: [] },
@@ -1343,13 +1348,13 @@ describe('SuigarClient', () => {
 		expect(
 			client.suigar.bcs.NftV1Factory.parse(
 				client.suigar.bcs.NftV1Factory.serialize({
-					id: '0x1',
+					id: TEST_OBJECT_ID,
 					specs: {
 						contents: [
 							{
-								key: '0x2',
+								key: TEST_SPEC_ID,
 								value: {
-									id: '0x2',
+									id: TEST_SPEC_ID,
 									name: 'Suigar Cane',
 									description: 'A Suigar NFT V1',
 									url: { url: 'https://suigar.com/cane.png' },
@@ -1370,14 +1375,14 @@ describe('SuigarClient', () => {
 		expect(client.suigar.bcs.PvPCoinflipGameCancelledEvent).toBeDefined();
 		const redeemRequestEvent = client.suigar.bcs.RedeemRequestCreatedEvent.parse(
 			GeneratedRedeemRequestCreatedEvent.serialize({
-				request_id: '0x3',
-				player: '0x1',
+				request_id: TEST_OBJECT_ID,
+				player: TEST_ADDRESS,
 				coin_type: { name: '0x2::sui::SUI' },
 				staked_amount: 10n,
 				created_at_ms: 20n,
 			}).toBytes(),
 		);
-		expect(redeemRequestEvent.request_id).toBe(normalizeSuiAddress('0x3'));
+		expect(redeemRequestEvent.request_id).toBe(TEST_OBJECT_ID);
 	});
 
 	it('rejects unresolved PvP Coinflip games when throwOnError is true', async () => {

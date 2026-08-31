@@ -4,8 +4,9 @@
 import { describe, expect, it } from 'vitest';
 import { buildNftV1MintTransactionInputSchema } from '../../../src/tools/schemas/nft.js';
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const specId = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const specId = testAddress('b');
 
 describe('NFT input schemas', () => {
 	it('accepts NFT V1 mint inputs', () => {

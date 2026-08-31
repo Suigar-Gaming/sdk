@@ -54,6 +54,8 @@ vi.mock('../src/wallet/index.js', () => ({
 
 const { runSuigarCli } = await import('../src/cli.js');
 
+const address = `0x${'a'.repeat(64)}`;
+
 describe('suigar cli bridge options', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -64,7 +66,7 @@ describe('suigar cli bridge options', () => {
 		mocks.createLoginBridge.mockResolvedValue({
 			url: 'https://mcp.testnet.suigar.com/connection',
 			done: Promise.resolve({
-				address: '0x1',
+				address,
 				walletType: 'wallet',
 			}),
 		});

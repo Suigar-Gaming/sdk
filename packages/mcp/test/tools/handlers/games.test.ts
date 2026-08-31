@@ -32,7 +32,9 @@ vi.mock('@mysten/sui/transactions', async (importOriginal) => {
 	};
 });
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const gameId = testAddress('b');
 
 beforeEach(() => {
 	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));
@@ -81,7 +83,7 @@ describe('game transaction tools', () => {
 			() =>
 				buildPvpCoinflipJoinTransactionTool({
 					mode: 'read-only',
-					gameId: '0x1',
+					gameId,
 				}),
 		],
 		[
@@ -89,7 +91,7 @@ describe('game transaction tools', () => {
 			() =>
 				buildPvpCoinflipCancelTransactionTool({
 					mode: 'read-only',
-					gameId: '0x1',
+					gameId,
 				}),
 		],
 	])('returns a read-only plan for %s', async (_name, run) => {

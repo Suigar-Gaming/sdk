@@ -9,8 +9,9 @@ import {
 	soccerInputSchema,
 } from '../../../src/tools/schemas/games.js';
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const gameId = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const gameId = testAddress('b');
 
 describe('game input schemas', () => {
 	it('accepts decimal currency strings and rejects negative stake values', () => {

@@ -13,8 +13,10 @@ import {
 } from '../../src/runtime/client.js';
 import type { McpConfig } from '../../src/runtime/types.js';
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const resolvedOwner = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const resolvedOwner = testAddress('b');
+const customCoinType = `${testAddress('c')}::coin::COIN`;
 
 type ResolveNameServiceAddress = SuigarClientBundle['client']['core']['resolveNameServiceAddress'];
 
@@ -61,9 +63,7 @@ describe('coin type resolution', () => {
 		expect(resolveDefaultCoinType(config)).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
-		expect(resolveDefaultCoinType(config, '0x2::coin::COIN')).toBe(
-			'0x0000000000000000000000000000000000000000000000000000000000000002::coin::COIN',
-		);
+		expect(resolveDefaultCoinType(config, customCoinType)).toBe(customCoinType);
 	});
 });
 
@@ -71,7 +71,7 @@ describe('owner resolution', () => {
 	it('normalizes raw Sui addresses without a SuiNS lookup', async () => {
 		const lookup = vi.fn<ResolveNameServiceAddress>();
 
-		await expect(resolveOwnerAddress('0x1', createResolverBundle(lookup))).resolves.toBe(owner);
+		await expect(resolveOwnerAddress(owner, createResolverBundle(lookup))).resolves.toBe(owner);
 		expect(lookup).not.toHaveBeenCalled();
 	});
 

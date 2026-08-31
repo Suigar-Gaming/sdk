@@ -21,7 +21,7 @@ const crypto = await import('../../src/utils/crypto.js');
 const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
-const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const address = `0x${'a'.repeat(64)}`;
 
 const bridgeOrigin = (url: string, portParameter: string) => {
 	const port = new URL(url).searchParams.get(portParameter);

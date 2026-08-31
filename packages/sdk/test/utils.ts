@@ -8,20 +8,21 @@ import { vi } from 'vitest';
 
 type ContractCallMock = (options: unknown) => (tx: Transaction) => unknown;
 const textEncoder = new TextEncoder();
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
 
 export const TEST_CONFIG = {
 	packageIds: {
-		nftV1: '0xnft-v1',
-		core: '0xcore',
-		referral: '0x6',
-		coinflip: '0xabc',
-		keno: '0x8',
-		limbo: '0x1',
-		plinko: '0x2',
-		pvpCoinflip: '0x3',
-		range: '0x4',
-		soccer: '0x7',
-		wheel: '0x5',
+		nftV1: testAddress('a'),
+		core: testAddress('b'),
+		referral: testAddress('c'),
+		coinflip: testAddress('d'),
+		keno: testAddress('e'),
+		limbo: testAddress('f'),
+		plinko: `0x${'ab'.repeat(32)}`,
+		pvpCoinflip: `0x${'bc'.repeat(32)}`,
+		range: `0x${'cd'.repeat(32)}`,
+		soccer: `0x${'de'.repeat(32)}`,
+		wheel: `0x${'ef'.repeat(32)}`,
 	},
 	objectIds: {
 		sweetHouse: '0x456',

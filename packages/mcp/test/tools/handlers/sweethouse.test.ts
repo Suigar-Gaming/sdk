@@ -25,7 +25,9 @@ vi.mock('@mysten/sui/transactions', async (importOriginal) => {
 	};
 });
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const requestId = testAddress('b');
 
 beforeEach(() => {
 	mocks.buildTransactionBytes.mockResolvedValue(new Uint8Array([1]));
@@ -88,7 +90,7 @@ describe('SweetHouse transaction tools', () => {
 			buildSweetHouseClaimOwnRedeemRequestAfterDelayTransactionTool({
 				mode: 'build',
 				owner,
-				requestId: '0x123',
+				requestId,
 			}),
 		]);
 
@@ -100,7 +102,7 @@ describe('SweetHouse transaction tools', () => {
 		expect(redeemSummary.gameInputs).toEqual({ sweetHouseAction: 'redeem-request' });
 		expect(claimSummary.gameInputs).toEqual({
 			sweetHouseAction: 'claim-own-redeem-request-after-delay',
-			requestId: '0x123',
+			requestId,
 		});
 		expect(depositSummary.commands).toEqual([]);
 		expect(redeemSummary.commands).toEqual([]);

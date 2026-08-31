@@ -7,8 +7,9 @@ import {
 	buildSweetHouseDepositTransactionInputSchema,
 } from '../../../src/tools/schemas/sweethouse.js';
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const requestId = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const requestId = testAddress('b');
 
 describe('SweetHouse input schemas', () => {
 	it('requires deposit amount unless read-only planning is requested', () => {

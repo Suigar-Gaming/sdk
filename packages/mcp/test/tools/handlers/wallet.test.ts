@@ -73,8 +73,9 @@ const {
 	suigarLogoutTool,
 } = await import('../../../src/tools/handlers/wallet.js');
 
-const pairedAddress = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const sessionAddress = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const pairedAddress = testAddress('a');
+const sessionAddress = testAddress('b');
 const sessionWallet = {
 	id: 'wallet-1',
 	name: 'Daily bets',
