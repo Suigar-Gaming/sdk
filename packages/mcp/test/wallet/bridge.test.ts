@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { rm } from 'node:fs/promises';
+import { request as httpRequest } from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const testHome = vi.hoisted(
@@ -16,10 +17,11 @@ vi.mock('open', () => ({ default: mocks.open }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const bridge = await import('../../src/wallet/bridge.js');
+const crypto = await import('../../src/utils/crypto.js');
 const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
-const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const address = `0x${'a'.repeat(64)}`;
 
 const bridgeOrigin = (url: string, portParameter: string) => {
 	const port = new URL(url).searchParams.get(portParameter);
@@ -35,6 +37,36 @@ const postJson = (url: string, body: unknown) =>
 			'content-type': 'application/json',
 		},
 		body: JSON.stringify(body),
+	});
+
+const postChunks = (url: string, chunks: Array<Uint8Array>) =>
+	new Promise<{ body: string; status: number }>((resolve, reject) => {
+		const parsedUrl = new URL(url);
+		const request = httpRequest(
+			{
+				hostname: parsedUrl.hostname,
+				port: parsedUrl.port,
+				path: `${parsedUrl.pathname}${parsedUrl.search}`,
+				method: 'POST',
+				headers: {
+					origin: webOrigin,
+					'content-type': 'application/json',
+				},
+			},
+			(response) => {
+				let body = '';
+				response.setEncoding('utf8');
+				response.on('data', (chunk: string) => {
+					body += chunk;
+				});
+				response.on('end', () => resolve({ body, status: response.statusCode ?? 0 }));
+			},
+		);
+		request.on('error', reject);
+		for (const chunk of chunks) {
+			request.write(chunk);
+		}
+		request.end();
 	});
 
 beforeEach(async () => {
@@ -61,7 +93,7 @@ describe('wallet loopback bridges', () => {
 		expect(url.searchParams.get('action')).toBe('login');
 		expect(url.searchParams.has('network')).toBe(false);
 		const state = url.searchParams.get('state');
-		expect(state).toMatch(/^[a-f0-9]{64}$/u);
+		expect(state).toMatch(crypto.HEX_32_BYTE_PATTERN);
 
 		await expect(
 			postJson(`${origin}/callback`, {
@@ -204,5 +236,53 @@ describe('wallet loopback bridges', () => {
 				open: false,
 			}),
 		).rejects.toThrow('Maximum bridge request body size must be a positive integer.');
+	});
+
+	it('decodes UTF-8 characters split across request chunks', async () => {
+		const login = await bridge.createLoginBridge({
+			network: 'testnet',
+			webOrigin,
+			open: false,
+		});
+		const url = new URL(login.url);
+		const origin = bridgeOrigin(login.url, 'port');
+		const state = url.searchParams.get('state');
+
+		await expect(
+			fetch(`${origin}/handshake?state=${state}`, {
+				headers: { origin: webOrigin },
+			}),
+		).resolves.toMatchObject({ status: 200 });
+
+		const payload = JSON.stringify({ state, address, walletType: 'wallet', note: '💰' });
+		const encoded = new TextEncoder().encode(payload);
+		const noteOffset = new TextEncoder().encode(payload.slice(0, payload.indexOf('💰'))).length;
+		const response = await postChunks(origin + '/callback', [
+			encoded.slice(0, noteOffset + 1),
+			encoded.slice(noteOffset + 1),
+		]);
+
+		expect(response.status).toBe(200);
+		await expect(login.done).resolves.toMatchObject({ address, walletType: 'wallet' });
+	});
+
+	it('rejects request bodies larger than the configured limit', async () => {
+		const login = await bridge.createLoginBridge({
+			network: 'testnet',
+			webOrigin,
+			maxBodyBytes: 32,
+			open: false,
+		});
+		const url = new URL(login.url);
+		const origin = bridgeOrigin(login.url, 'port');
+		const state = url.searchParams.get('state');
+		const payload = new TextEncoder().encode(
+			JSON.stringify({ state, address, walletType: 'wallet' }),
+		);
+
+		await expect(
+			postChunks(origin + '/callback', [payload.slice(0, 16), payload.slice(16)]),
+		).rejects.toThrow('socket hang up');
+		login.close();
 	});
 });

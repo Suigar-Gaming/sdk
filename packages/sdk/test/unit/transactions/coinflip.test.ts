@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
+import { fromHex, normalizeStructTag, normalizeSuiAddress } from '@mysten/sui/utils';
 import { describe, expect, it } from 'vitest';
 import { buildCoinflipTransaction } from '../../../src/transactions/coinflip.js';
 import { createContractCallMock, encodeUtf8, getFirstMockArg, TEST_CONFIG } from '../../utils.js';
@@ -63,10 +63,7 @@ describe('coinflip transaction builder', () => {
 		expect(options.arguments[3]).toBe(2n);
 		expect(options.arguments[4]).toBe(true);
 		expect(options.arguments[5]).toEqual(['partner', 'label']);
-		expect(options.arguments[6]).toEqual([
-			Array.from(Buffer.from(partner.slice(2), 'hex')),
-			encodeUtf8('vip'),
-		]);
+		expect(options.arguments[6]).toEqual([Array.from(fromHex(partner)), encodeUtf8('vip')]);
 		expect(options.arguments[7]).toBe(TEST_CONFIG.coins.sui.priceInfoObjectId);
 	});
 });

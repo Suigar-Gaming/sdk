@@ -21,6 +21,12 @@ import {
 } from '../../../src/utils/index.js';
 import { encodeFloat, encodeString, writeU64 } from '../../utils.js';
 
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const eventSender = testAddress('a');
+const gameId = testAddress('b');
+const creator = testAddress('c');
+const pvpPackageId = testAddress('d');
+
 function gameDetails(contents: Array<{ key: string; value: Array<number> }>): BetResultGameDetails {
 	return { contents };
 }
@@ -29,7 +35,7 @@ function createEvent(options: { eventType: string; module: string }): SuiClientT
 	return {
 		packageId: '0xb35c5f286c443752afc8ccb40125a578a4f32df35617170ccfa17fe180ab80ea',
 		module: options.module,
-		sender: '0x0000000000000000000000000000000000000000000000000000000000000001',
+		sender: eventSender,
 		eventType: options.eventType,
 		bcs: new Uint8Array(),
 		json: null,
@@ -194,8 +200,8 @@ describe('parseSuigarEvent', () => {
 				'0xb43cf6583c0c15315c7e66f173af4be79ac40c38aad1fd92ec08638ab2026202::pvp_coinflip::GameCancelledEvent<0x2::sui::SUI>',
 		});
 		const bytes = GameCancelledEvent.serialize({
-			game_id: '0x1',
-			creator: '0x2',
+			game_id: gameId,
+			creator,
 			creator_is_tails: false,
 			is_private: false,
 			stake_per_player: 1n,
@@ -208,7 +214,7 @@ describe('parseSuigarEvent', () => {
 		expect(suigarEvent?.event.type).toBe('GameCancelledEvent');
 		expect(suigarEvent && 'gameDetails' in suigarEvent).toBe(false);
 		expect(suigarEvent?.event.data).toMatchObject({
-			game_id: `0x${'1'.padStart(64, '0')}`,
+			game_id: gameId,
 			stake_per_player: '1',
 		});
 	});
@@ -216,24 +222,26 @@ describe('parseSuigarEvent', () => {
 
 describe('parseCoinType', () => {
 	it('extracts and normalizes the first generic coin type', () => {
-		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
+		expect(parseCoinType(`${pvpPackageId}::pvp_coinflip::Game<0x2::sui::SUI>`)).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
 		expect(
 			parseCoinType(
-				'0x1::pvp_coinflip::Game<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>',
+				`${pvpPackageId}::pvp_coinflip::Game<0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI>`,
 			),
 		).toBe('0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI');
 	});
 
 	it('throws when the object type does not include a generic coin type', () => {
-		expect(() => parseCoinType('0x1::pvp_coinflip::Game')).toThrow('Unable to parse coin type');
+		expect(() => parseCoinType(`${pvpPackageId}::pvp_coinflip::Game`)).toThrow(
+			'Unable to parse coin type',
+		);
 	});
 });
 
 describe('parseGameDetails', () => {
 	it('supports address scalar and vector detail types', () => {
-		const address = '0x0000000000000000000000000000000000000000000000000000000000000001';
+		const address = eventSender;
 
 		expect(
 			GAME_DETAIL_BCS.address.parse(GAME_DETAIL_BCS.address.serialize(address).toBytes()),

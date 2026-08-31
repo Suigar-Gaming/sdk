@@ -4,7 +4,10 @@
 import { describe, expect, it } from 'vitest';
 import { extractDryRunErrors, summarizeDryRun, toJsonValue } from '../../src/runtime/dry-run.js';
 
-const owner = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const owner = testAddress('a');
+const packageId = testAddress('b');
+const gamePackageId = testAddress('c');
 
 describe('dry-run JSON conversion', () => {
 	it('converts dry-run payloads into JSON-safe values', () => {
@@ -84,7 +87,7 @@ describe('dry-run summaries', () => {
 				],
 				events: [
 					{
-						eventType: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+						eventType: `${packageId}::core::BetResultEvent<${gamePackageId}::coinflip::Game>`,
 						json: {
 							player_bet: 'heads',
 							coin_outcome: 'heads',
@@ -133,7 +136,7 @@ describe('dry-run summaries', () => {
 			],
 			events: [
 				{
-					type: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+					type: `${packageId}::core::BetResultEvent<${gamePackageId}::coinflip::Game>`,
 					fields: {
 						player_bet: 'heads',
 						coin_outcome: 'heads',
@@ -156,14 +159,14 @@ describe('dry-run summaries', () => {
 				},
 				events: [
 					{
-						eventType: '0x1::core::BetPlacedEvent',
+						eventType: `${packageId}::core::BetPlacedEvent`,
 						json: {
 							amount: '5000000',
-							game_type: '0x2::coinflip::CoinFlip',
+							game_type: `${gamePackageId}::coinflip::CoinFlip`,
 						},
 					},
 					{
-						eventType: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+						eventType: `${packageId}::core::BetResultEvent<${gamePackageId}::coinflip::Game>`,
 						json: {
 							player_bet: 'tails',
 							coin_outcome: 'tails',
@@ -181,15 +184,15 @@ describe('dry-run summaries', () => {
 
 		expect(summary.events).toMatchObject([
 			{
-				type: '0x1::core::BetPlacedEvent',
+				type: `${packageId}::core::BetPlacedEvent`,
 				fields: {
 					amount: '5000000',
 					amount_display: '0.005',
-					game_type: '0x2::coinflip::CoinFlip',
+					game_type: `${gamePackageId}::coinflip::CoinFlip`,
 				},
 			},
 			{
-				type: '0x1::core::BetResultEvent<0x2::coinflip::Game>',
+				type: `${packageId}::core::BetResultEvent<${gamePackageId}::coinflip::Game>`,
 				game: 'coinflip',
 				event: 'BetResultEvent',
 				fields: {

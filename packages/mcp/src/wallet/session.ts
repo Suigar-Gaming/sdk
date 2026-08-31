@@ -1,7 +1,6 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { randomBytes, randomUUID } from 'node:crypto';
 import { chmod, readFile, writeFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -12,8 +11,10 @@ import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Secp256k1Keypair } from '@mysten/sui/keypairs/secp256k1';
 import { Secp256r1Keypair } from '@mysten/sui/keypairs/secp256r1';
 import { Entry } from '@napi-rs/keyring';
+import { hex } from '@scure/base';
 import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
+import { equalBytes, randomHex, randomUuid } from '../utils/crypto.js';
 import { LOOPBACK_HOST, LOOPBACK_ORIGIN, loopbackOrigin } from './loopback.js';
 import { ensureSuigarMcpDataDirectory, SUIGAR_MCP_DATA_DIRECTORY } from './storage.js';
 import { resolvePositiveInteger } from './utils.js';
@@ -92,7 +93,7 @@ async function persistSessionWallet(
 	source: SessionWallet['source'],
 	name: string,
 ): Promise<SessionWallet> {
-	const id = randomUUID();
+	const id = randomUuid();
 	keychain(id).setPassword(signer.getSecretKey());
 	const wallet: SessionWallet = {
 		id,
@@ -201,7 +202,7 @@ export async function createSessionWalletSetup({
 		'Session wallet setup timeout',
 		DEFAULT_SESSION_SETUP_TIMEOUT_MS,
 	);
-	const state = randomBytes(32).toString('hex');
+	const state = randomHex(32);
 	const mnemonic = generateMnemonic(wordlist, 256);
 	const currentWallet = await loadSessionWallet();
 	const server = createServer(async (request, response) => {
@@ -223,7 +224,9 @@ export async function createSessionWalletSetup({
 		}
 		try {
 			const form = await readForm(request);
-			if (form.get('state') !== state) throw new Error('Invalid setup state.');
+			if (!(await equalBytes(hex.decode(form.get('state') ?? ''), hex.decode(state)))) {
+				throw new Error('Invalid setup state.');
+			}
 			const wallet =
 				url.pathname === '/import-private-key'
 					? await persistSessionWallet(

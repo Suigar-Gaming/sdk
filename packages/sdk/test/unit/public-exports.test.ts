@@ -97,7 +97,7 @@ describe('public source subpath modules', () => {
 		expect(isMoveFloat({ mant: '0', exp: { bits: '0' }, is_negative: false })).toBe(true);
 		expect(isMoveFloat({ mant: '0', exp: { bits: 0 }, is_negative: false })).toBe(false);
 		expect(parseGameEvent).toBeTypeOf('function');
-		expect(parseCoinType('0x1::pvp_coinflip::Game<0x2::sui::SUI>')).toBe(
+		expect(parseCoinType(`0x${'a'.repeat(64)}::pvp_coinflip::Game<0x2::sui::SUI>`)).toBe(
 			'0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
 		);
 		expect(toBigInt(1)).toBe(1n);

@@ -1,11 +1,12 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
+import { hex } from '@scure/base';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
+import { equalBytes, HEX_32_BYTE_PATTERN, randomHex } from '../utils/crypto.js';
 import {
 	clearCredentials,
 	loadCredentials,
@@ -50,9 +51,11 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 	return EXECUTIONS.get(requestId) ?? null;
 }
 
-function sameState(left: string, right: string): boolean {
-	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) return false;
-	return timingSafeEqual(Buffer.from(left, 'hex'), Buffer.from(right, 'hex'));
+async function sameState(left: string, right: string): Promise<boolean> {
+	if (left.length !== right.length || !HEX_32_BYTE_PATTERN.test(left)) {
+		return false;
+	}
+	return equalBytes(hex.decode(left), hex.decode(right));
 }
 
 function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptions> {
@@ -72,23 +75,26 @@ function resolveBridgeOptions(options: BridgeOptions = {}): Required<BridgeOptio
 }
 
 async function openBridgeUrl(url: string, shouldOpen: boolean): Promise<void> {
-	if (shouldOpen) await open(url).catch(() => undefined);
+	if (shouldOpen) {
+		await open(url).catch(() => undefined);
+	}
 }
 
 function readBody(request: IncomingMessage, maxBodyBytes: number): Promise<string> {
 	return new Promise<string>((resolve, reject) => {
-		const chunks: Array<Buffer> = [];
+		const decoder = new TextDecoder();
+		let body = '';
 		let length = 0;
-		request.on('data', (chunk: Buffer) => {
+		request.on('data', (chunk: Uint8Array) => {
 			length += chunk.length;
 			if (length > maxBodyBytes) {
 				request.destroy();
 				reject(new Error('Request body is too large.'));
 				return;
 			}
-			chunks.push(chunk);
+			body += decoder.decode(chunk, { stream: true });
 		});
-		request.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+		request.on('end', () => resolve(body + decoder.decode()));
 		request.on('error', reject);
 	});
 }
@@ -143,7 +149,7 @@ export async function createLoginBridge({
 	webOrigin: string;
 } & BridgeOptions): Promise<LoginBridge> {
 	const options = resolveBridgeOptions(bridgeOptions);
-	const state = randomBytes(32).toString('hex');
+	const state = randomHex(32);
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	let preflight = false;
@@ -154,10 +160,12 @@ export async function createLoginBridge({
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
-		if (!loopback.authorize(request, response)) return;
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/handshake') {
-			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+			if (!(await sameState(url.searchParams.get('state') ?? '', state))) {
 				respond(response, 403, { ok: false, error: 'Invalid pairing state' });
 				return;
 			}
@@ -178,7 +186,7 @@ export async function createLoginBridge({
 				string,
 				unknown
 			>;
-			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
+			if (typeof payload.state !== 'string' || !(await sameState(payload.state, state))) {
 				respond(response, 403, { error: 'Invalid pairing state' });
 				return;
 			}
@@ -233,8 +241,8 @@ export async function createExecutionBridge({
 	const profile = credentials.profiles[network];
 	if (!profile)
 		throw new Error(`No wallet is connected for ${network}. Call "suigar_login" first.`);
-	const state = randomBytes(32).toString('hex');
-	const requestId = randomBytes(16).toString('hex');
+	const state = randomHex(32);
+	const requestId = randomHex(16);
 	EXECUTIONS.set(requestId, { requestId, status: 'pending' });
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
@@ -244,8 +252,13 @@ export async function createExecutionBridge({
 	}, options.timeoutMs).unref();
 	server.on('request', async (request, response) => {
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
-		if (!loopback.authorize(request, response)) return;
-		if (!sameState(url.searchParams.get('state') ?? '', state) && request.method === 'GET') {
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
+		if (
+			!(await sameState(url.searchParams.get('state') ?? '', state)) &&
+			request.method === 'GET'
+		) {
 			respond(response, 403, { error: 'Invalid approval state' });
 			return;
 		}
@@ -274,7 +287,7 @@ export async function createExecutionBridge({
 			>;
 			if (
 				typeof payload.state !== 'string' ||
-				!sameState(payload.state, state) ||
+				!(await sameState(payload.state, state)) ||
 				payload.address !== profile.address
 			) {
 				respond(response, 403, { error: 'Invalid approval callback' });
@@ -317,7 +330,7 @@ export async function createLogoutBridge({
 	webOrigin: string;
 } & BridgeOptions): Promise<LogoutBridge> {
 	const options = resolveBridgeOptions(bridgeOptions);
-	const state = randomBytes(32).toString('hex');
+	const state = randomHex(32);
 	const loopback = await createLoopbackServer(webOrigin);
 	const { server, port, close } = loopback;
 	const {
@@ -334,10 +347,12 @@ export async function createLogoutBridge({
 	}, options.timeoutMs).unref();
 
 	server.on('request', async (request, response) => {
-		if (!loopback.authorize(request, response)) return;
+		if (!loopback.authorize(request, response)) {
+			return;
+		}
 		const url = new URL(request.url ?? '/', loopbackOrigin(port));
 		if (request.method === 'GET' && url.pathname === '/request') {
-			if (!sameState(url.searchParams.get('state') ?? '', state)) {
+			if (!(await sameState(url.searchParams.get('state') ?? '', state))) {
 				respond(response, 403, { error: 'Invalid logout state' });
 				return;
 			}
@@ -357,12 +372,15 @@ export async function createLogoutBridge({
 				string,
 				unknown
 			>;
-			if (typeof payload.state !== 'string' || !sameState(payload.state, state)) {
+			if (typeof payload.state !== 'string' || !(await sameState(payload.state, state))) {
 				respond(response, 403, { error: 'Invalid logout callback' });
 				return;
 			}
-			if (all) await clearCredentials();
-			else if (network) await removeProfile(network);
+			if (all) {
+				await clearCredentials();
+			} else if (network) {
+				await removeProfile(network);
+			}
 			clearTimeout(timeout);
 			respond(response, 200, { ok: true });
 			resolve({ network, all });
@@ -376,7 +394,9 @@ export async function createLogoutBridge({
 	url.searchParams.set('port', String(port));
 	url.searchParams.set('state', state);
 	url.searchParams.set('action', 'logout');
-	if (all) url.searchParams.set('all', 'true');
+	if (all) {
+		url.searchParams.set('all', 'true');
+	}
 	const bridgeUrl = url.toString();
 	await openBridgeUrl(bridgeUrl, options.open);
 	return { url: bridgeUrl, done, close };

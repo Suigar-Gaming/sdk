@@ -11,13 +11,12 @@ const mocks = vi.hoisted(() => ({
 	listSessionWallets: vi.fn<() => Promise<unknown>>(),
 	loadCredentials: vi.fn<() => Promise<unknown>>(),
 	loadSessionWallet: vi.fn<() => Promise<unknown>>(),
+	encodeQR: vi.fn<() => string>(),
 	runSuigarCommand: vi.fn<(...args: Array<string>) => { command: string; pid: number }>(),
 }));
 
-vi.mock('qrcode', () => ({
-	default: {
-		toDataURL: vi.fn<() => Promise<string>>(async () => 'data:image/png;base64,qr'),
-	},
+vi.mock('qr', () => ({
+	default: mocks.encodeQR,
 }));
 
 vi.mock('../../../src/runtime/index.js', () => ({
@@ -74,8 +73,9 @@ const {
 	suigarLogoutTool,
 } = await import('../../../src/tools/handlers/wallet.js');
 
-const pairedAddress = '0x0000000000000000000000000000000000000000000000000000000000000001';
-const sessionAddress = '0x0000000000000000000000000000000000000000000000000000000000000002';
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const pairedAddress = testAddress('a');
+const sessionAddress = testAddress('b');
 const sessionWallet = {
 	id: 'wallet-1',
 	name: 'Daily bets',
@@ -90,7 +90,9 @@ describe('wallet tools', () => {
 		mocks.listSessionWallets.mockReset();
 		mocks.loadCredentials.mockReset();
 		mocks.loadSessionWallet.mockReset();
+		mocks.encodeQR.mockReset();
 		mocks.runSuigarCommand.mockReset();
+		mocks.encodeQR.mockReturnValue('<svg viewBox="0 0 10 10"></svg>');
 		mocks.listSessionWallets.mockResolvedValue([sessionWallet]);
 		mocks.listBalances.mockResolvedValue({
 			balances: [{ coinType: '0x2::sui::SUI', balance: '1200000000' }],
@@ -236,7 +238,7 @@ describe('wallet tools', () => {
 					selectedSessionWalletId: string;
 					name: string;
 					balances: Array<{ balanceDisplay: string; symbol: string }>;
-					funding: { fundingUrl?: string };
+					funding: { addressQrCodeDataUrl: string; fundingUrl?: string };
 				};
 			};
 			const fundingUrl = new URL(content.sessionWallet.funding.fundingUrl!);
@@ -247,6 +249,14 @@ describe('wallet tools', () => {
 			expect(content.sessionWallet.balances).toEqual([
 				expect.objectContaining({ balanceDisplay: '1.2', symbol: 'SUI' }),
 			]);
+			expect(mocks.encodeQR).toHaveBeenCalledWith(sessionAddress, 'svg', {
+				ecc: 'medium',
+				border: 1,
+				scale: 2,
+			});
+			expect(content.sessionWallet.funding.addressQrCodeDataUrl).toMatch(
+				/^data:image\/svg\+xml;base64,/,
+			);
 			expect(fundingUrl.pathname).toBe('/fund-session-wallet');
 			expect(fundingUrl.searchParams.get('destination')).toBe(sessionAddress);
 			expect(fundingUrl.searchParams.get('owner')).toBe(pairedAddress);

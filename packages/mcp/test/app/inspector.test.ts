@@ -5,6 +5,12 @@ import { describe, expect, it } from 'vitest';
 import { createInspectorViewModel } from '../../src/app/src/lib/inspector.js';
 import { resolveAppView } from '../../src/app/src/views/index.js';
 
+const testAddress = (fill: string) => `0x${fill.repeat(64)}`;
+const address = testAddress('a');
+const packageId = testAddress('b');
+const objectId = testAddress('c');
+const usdcCoinType = `${testAddress('d')}::usdc::USDC`;
+
 describe('createInspectorViewModel', () => {
 	it('derives transaction, event, and display data from a transaction result', () => {
 		const view = createInspectorViewModel(
@@ -15,11 +21,11 @@ describe('createInspectorViewModel', () => {
 					coinType: '0x2::sui::SUI',
 					stake: '1000000000',
 					stakeDisplay: '1 SUI',
-					commands: [{ target: '0x1::coinflip::play' }],
+					commands: [{ target: `${packageId}::coinflip::play` }],
 					gameInputs: { side: 'tails' },
 				},
 				plan: {
-					target: '0x1::coinflip::play',
+					target: `${packageId}::coinflip::play`,
 					notes: ['Review before approving.'],
 				},
 				dryRun: {},
@@ -39,7 +45,7 @@ describe('createInspectorViewModel', () => {
 		expect(view.coinBadge).toBe('SUI');
 		expect(view.transactionEntries).toContainEqual(['Stake', '1 SUI (1000000000 base units)']);
 		expect(view.dryRunEntries).toContainEqual(['Coin Outcome', 'tails']);
-		expect(view.targets).toEqual(['0x1::coinflip::play', '0x1::coinflip::play']);
+		expect(view.targets).toEqual([`${packageId}::coinflip::play`, `${packageId}::coinflip::play`]);
 		expect(view.notes).toEqual(['Review before approving.']);
 	});
 
@@ -48,15 +54,15 @@ describe('createInspectorViewModel', () => {
 			{
 				network: 'testnet',
 				plan: {
-					target: '0x1::sweethouse::redeem_request',
-					typeArguments: ['0x2::usdc::USDC'],
+					target: `${packageId}::sweethouse::redeem_request`,
+					typeArguments: [usdcCoinType],
 					requiredInputs: ['owner', 'amount'],
 				},
 				sweethouse: {
 					action: 'redeem-request',
-					coinType: '0x2::usdc::USDC',
-					packageId: '0x1',
-					sweetHouseId: '0x2',
+					coinType: usdcCoinType,
+					packageId,
+					sweetHouseId: objectId,
 				},
 			},
 			[],
@@ -64,8 +70,8 @@ describe('createInspectorViewModel', () => {
 		const nftView = createInspectorViewModel(
 			{
 				network: 'testnet',
-				plan: { target: '0x1::nft::mint_to_sender', requiredInputs: ['owner', 'specId'] },
-				nft: { packageId: '0x1', factoryId: '0x2' },
+				plan: { target: `${packageId}::nft::mint_to_sender`, requiredInputs: ['owner', 'specId'] },
+				nft: { packageId, factoryId: objectId },
 			},
 			[],
 		);
@@ -83,7 +89,7 @@ describe('createInspectorViewModel', () => {
 		const sweetHouseView = createInspectorViewModel(
 			{
 				summary: {
-					coinType: '0x2::usdc::USDC',
+					coinType: usdcCoinType,
 					stake: '10000000',
 					stakeDisplay: '10 USDC',
 					gameInputs: { sweetHouseAction: 'deposit' },
@@ -124,7 +130,7 @@ describe('execution views', () => {
 		expect(
 			resolveAppView({
 				sessionWallet: {
-					address: '0x1',
+					address,
 					balances: [
 						{
 							coinType: '0x2::sui::SUI',
@@ -144,7 +150,7 @@ describe('execution views', () => {
 				summary: { game: 'coinflip' },
 				execution: {
 					wallet: 'session',
-					address: '0x1',
+					address,
 					status: 'success',
 					digest: 'digest',
 				},

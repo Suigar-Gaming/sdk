@@ -1,9 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import QRCode from 'qrcode';
 import { createSuigarClient, type ToolTextResult } from '../../runtime/index.js';
-import { formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
+import { createQrCodeDataUrl, formatBaseUnitAmount, runSuigarCommand } from '../../utils/index.js';
 import {
 	createSessionWalletSetup,
 	getExecutionStatus,
@@ -28,10 +27,18 @@ import {
 
 function connectionBridgeArgs(input: ConnectionInput): Array<string> {
 	const args: Array<string> = [];
-	if (input.webUrl) args.push('--web-url', input.webUrl);
-	if (input.timeoutMs !== undefined) args.push('--timeout-ms', String(input.timeoutMs));
-	if (input.maxBodyBytes !== undefined) args.push('--max-body-bytes', String(input.maxBodyBytes));
-	if (input.noOpen === true || input.open === false) args.push('--no-open');
+	if (input.webUrl) {
+		args.push('--web-url', input.webUrl);
+	}
+	if (input.timeoutMs !== undefined) {
+		args.push('--timeout-ms', String(input.timeoutMs));
+	}
+	if (input.maxBodyBytes !== undefined) {
+		args.push('--max-body-bytes', String(input.maxBodyBytes));
+	}
+	if (input.noOpen === true || input.open === false) {
+		args.push('--no-open');
+	}
 	return args;
 }
 
@@ -236,9 +243,9 @@ export async function getSessionWalletTool(input: SessionWalletInput): Promise<T
 			),
 		),
 	);
-	const addressQrCodeDataUrl = await QRCode.toDataURL(wallet.address, {
-		errorCorrectionLevel: 'M',
-		margin: 1,
+	const addressQrCodeDataUrl = createQrCodeDataUrl(wallet.address, {
+		ecc: 'medium',
+		border: 1,
 	});
 	const pairedWallet = credentials.profiles[bundle.config.network];
 	const fundingUrl = pairedWallet

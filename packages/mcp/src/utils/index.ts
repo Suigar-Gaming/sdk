@@ -3,3 +3,4 @@
 
 export * from './amount.js';
 export * from './command.js';
+export * from './qr-code.js';
