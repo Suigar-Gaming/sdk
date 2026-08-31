@@ -12,6 +12,9 @@ const panelClassName =
 const valueClassName =
 	'flex min-h-8 min-w-0 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-md border border-border/70 bg-background/75 px-2.5 py-1 font-mono text-xs leading-5 text-foreground';
 
+const actionLinkClassName =
+	'border-primary/75 bg-primary text-primary-foreground focus-visible:outline-ring inline-flex min-h-10 items-center justify-center rounded-md border px-5 py-2 text-sm font-extrabold transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2';
+
 const LIST_ITEM_CLASS_NAMES: Record<'errors' | 'notes' | 'targets', string> = {
 	errors:
 		'rounded-lg border border-l-4 border-destructive/70 bg-destructive/10 px-3 py-2 text-xs font-semibold leading-5 text-foreground',
@@ -70,15 +73,16 @@ export function ExecutionApproval({ url }: { url: string | null }) {
 					Review the transaction in your wallet before submitting it.
 				</p>
 			</div>
-			<a
-				className="border-primary/75 bg-primary text-primary-foreground focus-visible:outline-ring inline-flex min-h-10 items-center justify-center rounded-md border px-5 py-2 text-sm font-extrabold transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2"
-				href={url}
-				rel="noreferrer"
-				target="_blank"
-			>
-				Sign and Execute
-			</a>
+			<ActionLink href={url}>Sign and Execute</ActionLink>
 		</section>
+	);
+}
+
+export function ActionLink({ children, href }: { children: ReactNode; href: string }) {
+	return (
+		<a className={actionLinkClassName} href={href} rel="noreferrer" target="_blank">
+			{children}
+		</a>
 	);
 }
 
