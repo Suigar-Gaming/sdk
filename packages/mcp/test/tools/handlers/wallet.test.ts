@@ -251,8 +251,8 @@ describe('wallet tools', () => {
 			]);
 			expect(mocks.encodeQR).toHaveBeenCalledWith(sessionAddress, 'data-url', {
 				ecc: 'medium',
-				border: 1,
-				scale: 2,
+				border: 2,
+				scale: 4,
 			});
 			expect(content.sessionWallet.funding.addressQrCodeDataUrl).toMatch(
 				/^data:image\/gif;base64,/,

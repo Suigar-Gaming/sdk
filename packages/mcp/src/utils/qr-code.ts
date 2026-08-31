@@ -7,7 +7,7 @@ export function createQrCodeDataUrl(value: string, options: QrOpts = {}): string
 	return encodeQR(value, 'data-url', {
 		...options,
 		ecc: options.ecc ?? 'medium',
-		border: options.border ?? 1,
-		scale: options.scale ?? 2,
+		border: options.border ?? 2,
+		scale: options.scale ?? 4,
 	});
 }

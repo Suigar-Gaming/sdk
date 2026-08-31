@@ -21,14 +21,14 @@ describe('createQrCodeDataUrl', () => {
 
 		expect(mocks.encodeQR).toHaveBeenCalledWith('0xabc', 'data-url', {
 			ecc: 'medium',
-			border: 1,
-			scale: 2,
+			border: 2,
+			scale: 4,
 		});
 		expect(result).toBe('data:image/gif;base64,R0lGODlh');
 	});
 
 	it('passes through QR rendering options', () => {
-		mocks.encodeQR.mockReturnValue('<svg></svg>');
+		mocks.encodeQR.mockReturnValue('data:image/gif;base64,R0lGODlh');
 
 		createQrCodeDataUrl('suigar', {
 			ecc: 'high',
