@@ -12,6 +12,7 @@ import {
 	SUI_ADDRESS_LENGTH,
 } from '@mysten/sui/utils';
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { CoinStruct } from '../../src/bcs/index.js';
 import { suigar, type SuigarClient } from '../../src/client.js';
 import { COINS, OBJECT_IDS } from '../../src/configs/index.js';
 import {
@@ -595,13 +596,7 @@ describe('SuigarClient', () => {
 
 	it('gets referral claim amounts by simulating the complete claim transaction', async () => {
 		const client = createSuigarTestClient();
-		const claimCoinBcs = bcs
-			.struct('Coin', {
-				id: bcs.Address,
-				balance: bcs.u64(),
-			})
-			.serialize({ id: '0x1', balance: 123n })
-			.toBytes();
+		const claimCoinBcs = CoinStruct.serialize({ id: '0x1', balance: 123n }).toBytes();
 		client.mockSimulationResult = {
 			$kind: 'Transaction',
 			Transaction: {},

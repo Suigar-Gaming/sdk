@@ -5,5 +5,5 @@ import { bcs } from '@mysten/sui/bcs';
 
 export const CoinStruct = bcs.struct('Coin', {
 	id: bcs.Address,
-	balance: bcs.u64(),
+	balance: bcs.U64,
 });
