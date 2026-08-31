@@ -14,18 +14,17 @@ vi.mock('qr', () => ({
 const { createQrCodeDataUrl } = await import('../../src/utils/qr-code.js');
 
 describe('createQrCodeDataUrl', () => {
-	it('encodes an SVG QR code as a data URL with default options', () => {
-		mocks.encodeQR.mockReturnValue('<svg viewBox="0 0 10 10"></svg>');
+	it('uses the QR encoder data-url output with default options', () => {
+		mocks.encodeQR.mockReturnValue('data:image/gif;base64,R0lGODlh');
 
 		const result = createQrCodeDataUrl('0xabc');
-		const encoded = result.replace('data:image/svg+xml;base64,', '');
 
-		expect(mocks.encodeQR).toHaveBeenCalledWith('0xabc', 'svg', {
+		expect(mocks.encodeQR).toHaveBeenCalledWith('0xabc', 'data-url', {
 			ecc: 'medium',
 			border: 1,
 			scale: 2,
 		});
-		expect(encoded).toBe('PHN2ZyB2aWV3Qm94PSIwIDAgMTAgMTAiPjwvc3ZnPg==');
+		expect(result).toBe('data:image/gif;base64,R0lGODlh');
 	});
 
 	it('passes through QR rendering options', () => {
@@ -37,7 +36,7 @@ describe('createQrCodeDataUrl', () => {
 			scale: 6,
 		});
 
-		expect(mocks.encodeQR).toHaveBeenCalledWith('suigar', 'svg', {
+		expect(mocks.encodeQR).toHaveBeenCalledWith('suigar', 'data-url', {
 			ecc: 'high',
 			border: 4,
 			scale: 6,

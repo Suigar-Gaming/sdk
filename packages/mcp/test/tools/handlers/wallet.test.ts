@@ -92,7 +92,7 @@ describe('wallet tools', () => {
 		mocks.loadSessionWallet.mockReset();
 		mocks.encodeQR.mockReset();
 		mocks.runSuigarCommand.mockReset();
-		mocks.encodeQR.mockReturnValue('<svg viewBox="0 0 10 10"></svg>');
+		mocks.encodeQR.mockReturnValue('data:image/gif;base64,R0lGODlh');
 		mocks.listSessionWallets.mockResolvedValue([sessionWallet]);
 		mocks.listBalances.mockResolvedValue({
 			balances: [{ coinType: '0x2::sui::SUI', balance: '1200000000' }],
@@ -249,13 +249,13 @@ describe('wallet tools', () => {
 			expect(content.sessionWallet.balances).toEqual([
 				expect.objectContaining({ balanceDisplay: '1.2', symbol: 'SUI' }),
 			]);
-			expect(mocks.encodeQR).toHaveBeenCalledWith(sessionAddress, 'svg', {
+			expect(mocks.encodeQR).toHaveBeenCalledWith(sessionAddress, 'data-url', {
 				ecc: 'medium',
 				border: 1,
 				scale: 2,
 			});
 			expect(content.sessionWallet.funding.addressQrCodeDataUrl).toMatch(
-				/^data:image\/svg\+xml;base64,/,
+				/^data:image\/gif;base64,/,
 			);
 			expect(fundingUrl.pathname).toBe('/fund-session-wallet');
 			expect(fundingUrl.searchParams.get('destination')).toBe(sessionAddress);
