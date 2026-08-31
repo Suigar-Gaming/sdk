@@ -7,13 +7,13 @@
 		"source": "github",
 		"subfolder": "packages/mcp"
 	},
-	"version": "1.0.0-beta.25",
+	"version": "1.0.0-beta.26",
 	"websiteUrl": "https://mcp.suigar.com",
 	"packages": [
 		{
 			"registryType": "npm",
 			"identifier": "@suigar/mcp",
-			"version": "1.0.0-beta.25",
+			"version": "1.0.0-beta.26",
 			"runtimeHint": "npx",
 			"transport": {
 				"type": "stdio"

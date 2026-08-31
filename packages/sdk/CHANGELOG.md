@@ -1,5 +1,27 @@
 # @suigar/sdk
 
+## 2.0.0-beta.40
+
+### Major Changes
+
+- [#163](https://github.com/Suigar-Gaming/ts-sdks/pull/163) [`2897773`](https://github.com/Suigar-Gaming/ts-sdks/commit/28977730f01b8df72bced4c9ea4177c4dc420182) - Rename normalized event fields from `gameId` and `eventName` to `game` and `event`, add `parseSuigarEvent` for decoded event payloads and game details, expose `toU32` from SDK numeric utilities, and update MCP dry-run event summaries to expose `event`.
+
+- [#159](https://github.com/Suigar-Gaming/ts-sdks/pull/159) [`e3c787b`](https://github.com/Suigar-Gaming/ts-sdks/commit/e3c787bf028c5f0bcce051077e8506d6605a16a6) - Narrow PvP Coinflip cancel transaction inputs so `cancelGame` no longer accepts `metadata` or `useGasCoin`, since cancellation does not create a bet coin or write metadata on-chain. The MCP cancel transaction tool schema now follows the same narrower shape.
+
+### Minor Changes
+
+- [#159](https://github.com/Suigar-Gaming/ts-sdks/pull/159) [`e3c787b`](https://github.com/Suigar-Gaming/ts-sdks/commit/e3c787bf028c5f0bcce051077e8506d6605a16a6) - Add Keno as a standard game across the SDK and MCP. The SDK now exposes Keno game types, parameter parsing, numeric and `vector<u8>` event detail decoding, and `client.suigar.tx.createGameBet({ game: 'keno', configId, picks, ... })`; MCP adds the `build_keno_transaction` tool with read-only, build, dry-run, and execute support. Parsed `u64` and `u128` game detail values now return `bigint` to preserve integer precision.
+
+- [#163](https://github.com/Suigar-Gaming/ts-sdks/pull/163) [`2897773`](https://github.com/Suigar-Gaming/ts-sdks/commit/28977730f01b8df72bced4c9ea4177c4dc420182) - Add SweetHouse transaction builders for public pool deposits, redeem requests, and delayed self-claims under `client.suigar.tx.sweetHouse`, plus matching MCP tools for building, dry-running, inspecting, and executing those transactions.
+
+### Patch Changes
+
+- [#161](https://github.com/Suigar-Gaming/ts-sdks/pull/161) [`b0119c2`](https://github.com/Suigar-Gaming/ts-sdks/commit/b0119c2b78f02a939cb125415524a33e2dde6792) - Add JSR package configuration so public Suigar packages can be published to JSR alongside npm releases.
+
+- [#162](https://github.com/Suigar-Gaming/ts-sdks/pull/162) [`17a2808`](https://github.com/Suigar-Gaming/ts-sdks/commit/17a2808883143f7e0ee1e96ec311331d218bf31c) - Update the generated Keno bindings and package registry default to resolve Keno through the `@suigar/keno` MVR package name.
+
+- [#159](https://github.com/Suigar-Gaming/ts-sdks/pull/159) [`e3c787b`](https://github.com/Suigar-Gaming/ts-sdks/commit/e3c787bf028c5f0bcce051077e8506d6605a16a6) - Enable Oxfmt JSDoc formatting and Tailwind CSS class sorting, normalize package comments and class lists, and opt generated contract files out of JSDoc and import sorting to preserve their generated warning banners without changing runtime APIs.
+
 ## 2.0.0-beta.39
 
 ### Minor Changes
