@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { equalBytes, randomHex, randomUuid } from '../../src/utils/crypto.js';
+import { equalBytes, HEX_32_BYTE_PATTERN, randomHex, randomUuid } from '../../src/utils/crypto.js';
 
 describe('crypto utilities', () => {
 	it('generates cryptographically random hex values of the requested byte length', () => {
 		const value = randomHex(32);
 
-		expect(value).toMatch(/^[0-9a-f]{64}$/u);
+		expect(value).toMatch(HEX_32_BYTE_PATTERN);
 	});
 
 	it('generates RFC 9562 version 4 UUIDs', () => {

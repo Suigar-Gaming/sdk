@@ -17,6 +17,7 @@ vi.mock('open', () => ({ default: mocks.open }));
 
 const credentials = await import('../../src/wallet/credentials.js');
 const bridge = await import('../../src/wallet/bridge.js');
+const crypto = await import('../../src/utils/crypto.js');
 const loopback = await import('../../src/wallet/loopback.js');
 
 const webOrigin = 'http://localhost:5173';
@@ -92,7 +93,7 @@ describe('wallet loopback bridges', () => {
 		expect(url.searchParams.get('action')).toBe('login');
 		expect(url.searchParams.has('network')).toBe(false);
 		const state = url.searchParams.get('state');
-		expect(state).toMatch(/^[a-f0-9]{64}$/u);
+		expect(state).toMatch(crypto.HEX_32_BYTE_PATTERN);
 
 		await expect(
 			postJson(`${origin}/callback`, {

@@ -6,7 +6,7 @@ import type { AddressInfo } from 'node:net';
 import { hex } from '@scure/base';
 import open from 'open';
 import type { SuigarNetwork } from '@suigar/sdk';
-import { equalBytes, randomHex } from '../utils/crypto.js';
+import { equalBytes, HEX_32_BYTE_PATTERN, randomHex } from '../utils/crypto.js';
 import {
 	clearCredentials,
 	loadCredentials,
@@ -52,7 +52,7 @@ export function getExecutionStatus(requestId: string): ExecutionStatus | null {
 }
 
 async function sameState(left: string, right: string): Promise<boolean> {
-	if (left.length !== right.length || !/^[0-9a-f]{64}$/i.test(left)) {
+	if (left.length !== right.length || !HEX_32_BYTE_PATTERN.test(left)) {
 		return false;
 	}
 	return equalBytes(hex.decode(left), hex.decode(right));

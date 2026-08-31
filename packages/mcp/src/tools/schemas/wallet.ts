@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { z } from 'zod/v4';
+import { HEX_16_BYTE_PATTERN } from '../../utils/crypto.js';
 import { configInputSchema } from './config.js';
 import { COIN_TYPE_DESCRIPTION } from './shared.js';
 
@@ -34,7 +35,7 @@ export const listWalletCoinsInputSchema = configInputSchema
 
 export const getExecutionStatusInputSchema = configInputSchema
 	.extend({
-		requestId: z.string().regex(/^[0-9a-f]{32}$/i),
+		requestId: z.string().regex(HEX_16_BYTE_PATTERN),
 	})
 	.strict();
 

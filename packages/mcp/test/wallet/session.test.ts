@@ -29,6 +29,7 @@ vi.mock('@napi-rs/keyring', () => ({
 }));
 
 const session = await import('../../src/wallet/session.js');
+const crypto = await import('../../src/utils/crypto.js');
 
 beforeEach(async () => {
 	keychainEntries.clear();
@@ -48,7 +49,7 @@ describe('session wallet setup', () => {
 		const state = page.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
 		const mnemonic = page.match(/name="mnemonic" value="([^"]+)"/u)?.[1];
 
-		expect(state).toMatch(/^[0-9a-f]{64}$/u);
+		expect(state).toMatch(crypto.HEX_32_BYTE_PATTERN);
 		expect(mnemonic?.split(' ')).toHaveLength(24);
 		expect(page).toContain('SUIGAR MCP');
 		expect(page).toContain('shared by Suigar mainnet and testnet');

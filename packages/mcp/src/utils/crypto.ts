@@ -7,6 +7,9 @@ const UUID_BYTE_TO_HEX = Array.from({ length: 256 }, (_, byte) =>
 	byte.toString(16).padStart(2, '0'),
 );
 
+export const HEX_16_BYTE_PATTERN: RegExp = /^[0-9a-f]{32}$/iu;
+export const HEX_32_BYTE_PATTERN: RegExp = /^[0-9a-f]{64}$/iu;
+
 const nodeTimingSafeEqual = import('node:crypto')
 	.then(({ timingSafeEqual }) => timingSafeEqual)
 	.catch(() => null);
