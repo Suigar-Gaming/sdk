@@ -3,7 +3,7 @@
 
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 
-const packagesDir = new URL('./packages/', import.meta.url);
+const packagesDir = new URL('../packages/', import.meta.url);
 
 function hasErrorCode(error, code) {
 	return error instanceof Error && 'code' in error && error.code === code;
