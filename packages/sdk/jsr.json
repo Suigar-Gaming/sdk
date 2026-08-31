@@ -3,6 +3,7 @@
 	"name": "@suigar/sdk",
 	"version": "2.0.0-beta.40",
 	"license": "Apache-2.0",
+	"allowSlowTypes": true,
 	"exports": {
 		".": "./src/index.ts",
 		"./games": "./src/games.ts",

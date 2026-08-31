@@ -84,7 +84,6 @@
 		"test": "vitest run",
 		"typecheck": "tsc --noEmit",
 		"doctor": "react-doctor --yes",
-		"publish:jsr": "jsr publish",
 		"oxlint": "oxlint .",
 		"oxlint:fix": "oxlint . --fix",
 		"oxfmt": "oxfmt . --check",
