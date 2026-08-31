@@ -3,7 +3,12 @@
 
 import { z } from 'zod/v4';
 import { configInputSchema } from './config.js';
-import { ADDRESS_DESCRIPTION, BUILDER_MODES, COIN_TYPE_DESCRIPTION } from './shared.js';
+import {
+	ADDRESS_DESCRIPTION,
+	BUILDER_MODES,
+	COIN_TYPE_DESCRIPTION,
+	requireTransactionFields,
+} from './shared.js';
 
 const referralClaimInputSchema = configInputSchema
 	.extend({
@@ -33,10 +38,12 @@ export const buildReferralCommissionClaimTransactionInputSchema = referralClaimI
 	.extend({
 		coinType: z.string().min(1).optional().describe(COIN_TYPE_DESCRIPTION),
 	})
-	.strict();
+	.strict()
+	.superRefine((input, context) => requireTransactionFields(input, context, ['owner']));
 
-export const buildReferralLevelUpUsdRewardsClaimTransactionInputSchema =
-	referralClaimInputSchema.strict();
+export const buildReferralLevelUpUsdRewardsClaimTransactionInputSchema = referralClaimInputSchema
+	.strict()
+	.superRefine((input, context) => requireTransactionFields(input, context, ['owner']));
 
 export type GetReferralCommissionInput = z.input<typeof getReferralCommissionInputSchema>;
 export type GetReferralLevelUpUsdRewardsInput = z.input<

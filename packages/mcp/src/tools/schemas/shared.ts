@@ -1,6 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
+import { isValidSuiObjectId } from '@mysten/sui/utils';
 import { z } from 'zod/v4';
 import { CURRENCY_AMOUNT_PATTERN } from '../../utils/index.js';
 
@@ -16,3 +17,33 @@ export const currencyAmountSchema = z.union([
 	z.number().nonnegative(),
 	z.string().regex(CURRENCY_AMOUNT_PATTERN),
 ]);
+
+export const suiObjectIdSchema = z
+	.string()
+	.min(1)
+	.refine(isValidSuiObjectId, { message: 'Expected a valid Sui object id.' });
+
+export function requireTransactionFields(
+	input: { mode?: string; executionWallet?: string } & Record<string, unknown>,
+	context: z.RefinementCtx,
+	fields: ReadonlyArray<string>,
+): void {
+	if (input.mode === 'read-only') {
+		return;
+	}
+
+	for (const field of fields) {
+		if (field === 'owner' && input.mode === 'execute' && input.executionWallet === 'session') {
+			continue;
+		}
+
+		const value = input[field];
+		if (value === undefined || value === null || value === '') {
+			context.addIssue({
+				code: 'custom',
+				path: [field],
+				message: `${field} is required unless mode is "read-only".`,
+			});
+		}
+	}
+}

@@ -9,6 +9,8 @@ import {
 	COIN_TYPE_DESCRIPTION,
 	CURRENCY_AMOUNT_DESCRIPTION,
 	currencyAmountSchema,
+	requireTransactionFields,
+	suiObjectIdSchema,
 } from './shared.js';
 
 const sweethouseBuildInputSchema = configInputSchema
@@ -43,7 +45,8 @@ export const buildSweetHouseDepositTransactionInputSchema = sweethouseBuildInput
 			.optional()
 			.describe('Allow the SUI gas coin to be used for native SUI deposits.'),
 	})
-	.strict();
+	.strict()
+	.superRefine((input, context) => requireTransactionFields(input, context, ['owner', 'amount']));
 
 export const buildSweetHouseRedeemRequestTransactionInputSchema = sweethouseBuildInputSchema
 	.extend({
@@ -53,14 +56,18 @@ export const buildSweetHouseRedeemRequestTransactionInputSchema = sweethouseBuil
 				`Staked coin amount for the selected SweetHouse pool. ${CURRENCY_AMOUNT_DESCRIPTION}`,
 			),
 	})
-	.strict();
+	.strict()
+	.superRefine((input, context) => requireTransactionFields(input, context, ['owner', 'amount']));
 
 export const buildSweetHouseClaimOwnRedeemRequestAfterDelayTransactionInputSchema =
 	sweethouseBuildInputSchema
 		.extend({
-			requestId: z.string().min(1).optional().describe('SweetHouse redeem request id.'),
+			requestId: suiObjectIdSchema.optional().describe('SweetHouse redeem request id.'),
 		})
-		.strict();
+		.strict()
+		.superRefine((input, context) =>
+			requireTransactionFields(input, context, ['owner', 'requestId']),
+		);
 
 export type BuildSweetHouseDepositTransactionInput = z.input<
 	typeof buildSweetHouseDepositTransactionInputSchema
