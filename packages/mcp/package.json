@@ -1,6 +1,6 @@
 {
 	"name": "@suigar/mcp",
-	"version": "1.0.0-beta.26",
+	"version": "1.0.0-beta.27",
 	"description": "AI agent MCP server for Suigar provably fair on-chain Sui casino game, SweetHouse, NFT, and referral transactions.",
 	"keywords": [
 		"agent",

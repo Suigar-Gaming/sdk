@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.41
+
+### Patch Changes
+
+- [#165](https://github.com/Suigar-Gaming/ts-sdks/pull/165) [`8ed7916`](https://github.com/Suigar-Gaming/ts-sdks/commit/8ed79163898711b1a8d5a9032ed27e59ba72e041) - Fix JSR publishing from the workspace release flow by staging publishable package sources with JSR-compatible dependency metadata.
+
 ## 2.0.0-beta.40
 
 ### Major Changes
