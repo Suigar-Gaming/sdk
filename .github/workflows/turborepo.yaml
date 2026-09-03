@@ -51,8 +51,8 @@ jobs:
       - name: Setup pnpm
         uses: ./.github/actions/setup-pnpm
         with:
-          install: 'false'
-          cache: 'false'
+          install: false
+          cache: false
 
       - name: Run audit
         shell: bash
