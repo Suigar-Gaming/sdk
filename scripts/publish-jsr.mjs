@@ -34,7 +34,10 @@ function publishPackage(packageDir) {
 	const stageDir = mkdtempSync(join(tmpdir(), `${packageJson.name.replaceAll('/', '__')}-jsr-`));
 
 	try {
-		writeFileSync(join(stageDir, 'jsr.json'), `${JSON.stringify(createJsrJson(jsrJson), null, '\t')}\n`);
+		writeFileSync(
+			join(stageDir, 'jsr.json'),
+			`${JSON.stringify(createJsrJson(jsrJson), null, '\t')}\n`,
+		);
 
 		for (const entry of jsrJson.publish?.include ?? []) {
 			copyIncludedPath(packageDir, stageDir, entry);
@@ -50,7 +53,13 @@ function publishPackage(packageDir) {
 			symlinkSync(nodeModulesPath, join(stageDir, 'node_modules'), 'dir');
 		}
 
-		const jsrBin = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'node_modules', '.bin', 'jsr');
+		const jsrBin = resolve(
+			dirname(fileURLToPath(import.meta.url)),
+			'..',
+			'node_modules',
+			'.bin',
+			'jsr',
+		);
 		const result = spawnSync(jsrBin, ['publish', ...getPublishArgs(jsrJson), ...publishArgs], {
 			cwd: stageDir,
 			env: process.env,
