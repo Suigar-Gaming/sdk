@@ -1,5 +1,11 @@
 # @suigar/sdk
 
+## 2.0.0-beta.42
+
+### Patch Changes
+
+- [#121](https://github.com/Suigar-Gaming/ts-sdks/pull/121) [`d32fc51`](https://github.com/Suigar-Gaming/ts-sdks/commit/d32fc51636720bb4bf8c86f7e6e2ae6c83e2fe04) - Refresh the shared Mysten runtime dependencies.
+
 ## 2.0.0-beta.41
 
 ### Patch Changes
