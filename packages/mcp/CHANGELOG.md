@@ -1,5 +1,17 @@
 # @suigar/mcp
 
+## 1.0.0-beta.28
+
+### Patch Changes
+
+- [#167](https://github.com/Suigar-Gaming/ts-sdks/pull/167) [`a414044`](https://github.com/Suigar-Gaming/ts-sdks/commit/a4140441566f317ed1ec313a7007f324dd86fe76) - Center session wallet App action links and render funding QR code data URLs at a sharper resolution.
+
+- [#167](https://github.com/Suigar-Gaming/ts-sdks/pull/167) [`a414044`](https://github.com/Suigar-Gaming/ts-sdks/commit/a4140441566f317ed1ec313a7007f324dd86fe76) - Refresh MCP runtime dependencies for keychain storage, QR generation, and Zod schemas. Session wallet keyring access now loads lazily with an actionable unavailable-storage error, and funding QR codes use the QR encoder's native GIF data URL output.
+
+- [#121](https://github.com/Suigar-Gaming/ts-sdks/pull/121) [`d32fc51`](https://github.com/Suigar-Gaming/ts-sdks/commit/d32fc51636720bb4bf8c86f7e6e2ae6c83e2fe04) - Refresh the shared Mysten runtime dependencies.
+- Updated dependencies [[`d32fc51`](https://github.com/Suigar-Gaming/ts-sdks/commit/d32fc51636720bb4bf8c86f7e6e2ae6c83e2fe04)]:
+  - @suigar/sdk@2.0.0-beta.42
+
 ## 1.0.0-beta.27
 
 ### Patch Changes
