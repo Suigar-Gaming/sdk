@@ -9,6 +9,7 @@ const testHome = vi.hoisted(
 	() => `${process.env.TMPDIR ?? '/tmp'}/suigar-mcp-session-${process.pid}`,
 );
 const keychainEntries = vi.hoisted(() => new Map<string, string>());
+const keychainUnavailable = vi.hoisted(() => ({ value: false }));
 
 vi.mock('node:os', () => ({ homedir: () => testHome }));
 vi.mock('@napi-rs/keyring', () => ({
@@ -16,7 +17,9 @@ vi.mock('@napi-rs/keyring', () => ({
 		constructor(
 			private readonly service: string,
 			private readonly account: string,
-		) {}
+		) {
+			if (keychainUnavailable.value) throw new Error('native keyring unavailable');
+		}
 
 		getPassword() {
 			return keychainEntries.get(`${this.service}:${this.account}`) ?? null;
@@ -33,6 +36,7 @@ const crypto = await import('../../src/utils/crypto.js');
 
 beforeEach(async () => {
 	keychainEntries.clear();
+	keychainUnavailable.value = false;
 	await rm(testHome, { force: true, recursive: true });
 });
 
@@ -193,6 +197,30 @@ describe('session wallet setup', () => {
 
 		await expect(session.createSessionWalletSetup()).rejects.toThrow(
 			'Session wallet setup timeout must be a positive integer.',
+		);
+	});
+
+	it('reports unavailable secure storage when keyring cannot be loaded', async () => {
+		keychainUnavailable.value = true;
+
+		const { setupUrl } = await session.createSessionWalletSetup();
+		const page = await (await fetch(setupUrl)).text();
+		const state = page.match(/name="state" value="([0-9a-f]+)"/u)?.[1];
+		const privateKey = Ed25519Keypair.generate().getSecretKey();
+
+		const response = await fetch(`${setupUrl}import-private-key`, {
+			method: 'POST',
+			headers: { 'content-type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				state: state!,
+				privateKey,
+				name: 'Unavailable keyring',
+			}),
+		});
+
+		expect(response.ok).toBe(false);
+		expect(await response.text()).toContain(
+			'Session wallet secure storage is unavailable. Configure the operating-system keychain and retry.',
 		);
 	});
 });

@@ -1,7 +1,7 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import { DefinitionList, Panel } from '../components/inspector-components.js';
+import { ActionLink, DefinitionList, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
 
 export function SessionWalletView({ payload }: { payload: unknown }) {
@@ -23,14 +23,9 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 							? sessionWallet.note
 							: 'Create or recover the session wallet shared by mainnet and testnet.'}
 					</p>
-					<a
-						className="border-primary/75 bg-primary text-primary-foreground inline-flex min-h-10 w-max items-center justify-center rounded-md border px-4 py-2 text-sm font-extrabold"
-						href={setupUrl}
-						rel="noreferrer"
-						target="_blank"
-					>
-						Open local setup page
-					</a>
+					<div className="grid justify-items-center">
+						<ActionLink href={setupUrl}>Open local setup page</ActionLink>
+					</div>
 				</Panel>
 			</section>
 		);
@@ -90,16 +85,7 @@ export function SessionWalletView({ payload }: { payload: unknown }) {
 								? funding.note
 								: 'Scan this code in a Sui wallet to fund the session wallet.'}
 						</p>
-						{fundingUrl ? (
-							<a
-								className="border-primary/75 bg-primary text-primary-foreground inline-flex min-h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-extrabold"
-								href={fundingUrl}
-								rel="noreferrer"
-								target="_blank"
-							>
-								Fund from paired wallet
-							</a>
-						) : null}
+						{fundingUrl ? <ActionLink href={fundingUrl}>Fund from paired wallet</ActionLink> : null}
 					</div>
 				) : (
 					<p className="text-muted-foreground text-xs font-semibold">

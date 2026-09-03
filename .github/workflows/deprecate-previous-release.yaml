@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
@@ -32,7 +32,7 @@ jobs:
       - name: Setup pnpm
         uses: ./.github/actions/setup-pnpm
         with:
-          install: 'false'
+          install: false
 
       - name: Detect released packages
         id: release
@@ -61,6 +61,7 @@ jobs:
 
       - name: Skip deprecation
         if: steps.release.outputs.should_deprecate != 'true'
+        shell: bash
         run: echo "No published release packages detected; skipping deprecation."
 
       - name: Deprecate previous release

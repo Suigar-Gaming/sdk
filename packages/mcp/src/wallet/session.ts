@@ -10,7 +10,7 @@ import { decodeSuiPrivateKey, type Keypair } from '@mysten/sui/cryptography';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { Secp256k1Keypair } from '@mysten/sui/keypairs/secp256k1';
 import { Secp256r1Keypair } from '@mysten/sui/keypairs/secp256r1';
-import { Entry } from '@napi-rs/keyring';
+import type { Entry } from '@napi-rs/keyring';
 import { hex } from '@scure/base';
 import { generateMnemonic, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
@@ -24,6 +24,8 @@ const SESSION_WALLETS_FILE: string = join(SUIGAR_MCP_DATA_DIRECTORY, 'session-wa
 const DISPLAY_FILE: string = `~/${relative(homedir(), SESSION_WALLETS_FILE)}`;
 export const DEFAULT_SESSION_SETUP_TIMEOUT_MS: number = 10 * 60_000;
 export const SESSION_SETUP_TIMEOUT_MS_ENV: string = 'SUIGAR_MCP_SESSION_SETUP_TIMEOUT_MS';
+const KEYCHAIN_UNAVAILABLE_MESSAGE: string =
+	'Session wallet secure storage is unavailable. Configure the operating-system keychain and retry.';
 
 export type SessionWallet = {
 	id: string;
@@ -37,8 +39,13 @@ export type SessionWalletSetupOptions = {
 	accountUrl?: string;
 };
 
-function keychain(id: string): Entry {
-	return new Entry(KEYCHAIN_SERVICE, `session-wallet:${id}`);
+async function keychain(id: string): Promise<Entry> {
+	try {
+		const { Entry } = await import('@napi-rs/keyring');
+		return new Entry(KEYCHAIN_SERVICE, `session-wallet:${id}`);
+	} catch (error) {
+		throw new Error(KEYCHAIN_UNAVAILABLE_MESSAGE, { cause: error });
+	}
 }
 
 async function saveWalletFile(wallets: Array<SessionWallet>): Promise<void> {
@@ -67,11 +74,22 @@ export async function loadSessionWallet(id?: string): Promise<SessionWallet | nu
 export async function loadSessionSigner(id?: string): Promise<Keypair> {
 	const wallet = await loadSessionWallet(id);
 	if (!wallet) throw new Error('No session wallet is available. Create or recover one first.');
-	const secret = keychain(wallet.id).getPassword();
+	const secret = await readSessionWalletSecret(wallet.id);
 	if (!secret) {
 		throw new Error('No session wallet is available. Create or recover one first.');
 	}
 	return signerFromPrivateKey(secret);
+}
+
+async function readSessionWalletSecret(id: string): Promise<string | null> {
+	try {
+		return (await keychain(id)).getPassword();
+	} catch (error) {
+		if (error instanceof Error && error.message === KEYCHAIN_UNAVAILABLE_MESSAGE) throw error;
+		throw new Error('Unable to read the session wallet signing key from secure storage.', {
+			cause: error,
+		});
+	}
 }
 
 function signerFromPrivateKey(privateKey: string): Keypair {
@@ -94,7 +112,7 @@ async function persistSessionWallet(
 	name: string,
 ): Promise<SessionWallet> {
 	const id = randomUuid();
-	keychain(id).setPassword(signer.getSecretKey());
+	await writeSessionWalletSecret(id, signer.getSecretKey());
 	const wallet: SessionWallet = {
 		id,
 		name: name.trim() || `Session ${new Date().toLocaleDateString('en-CA')}`,
@@ -104,6 +122,17 @@ async function persistSessionWallet(
 	};
 	await saveWalletFile([...(await listSessionWallets()), wallet]);
 	return wallet;
+}
+
+async function writeSessionWalletSecret(id: string, secret: string): Promise<void> {
+	try {
+		(await keychain(id)).setPassword(secret);
+	} catch (error) {
+		if (error instanceof Error && error.message === KEYCHAIN_UNAVAILABLE_MESSAGE) throw error;
+		throw new Error('Unable to save the session wallet signing key to secure storage.', {
+			cause: error,
+		});
+	}
 }
 
 function persistMnemonicSessionWallet(
