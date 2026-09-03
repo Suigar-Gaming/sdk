@@ -43,6 +43,10 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@mysten/*'
 
+update:
+  changeset: true
+  githubActions: true
+
 peerDependencyRules:
   allowAny:
     - typescript
