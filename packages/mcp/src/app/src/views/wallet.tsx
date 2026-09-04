@@ -1,28 +1,8 @@
 // Copyright (c) Suigar
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ReactNode } from 'react';
-import { DefinitionList, Panel } from '../components/inspector-components.js';
+import { DefinitionList, InspectorTable, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
-
-function WalletTable({ children, headers }: { children: ReactNode; headers: Array<string> }) {
-	return (
-		<div className="border-border/70 overflow-x-auto rounded-md border">
-			<table className="min-w-full border-collapse text-left text-xs leading-5">
-				<thead className="bg-background/75 text-muted-foreground">
-					<tr>
-						{headers.map((header) => (
-							<th className="px-3 py-2 font-extrabold" key={header} scope="col">
-								{header}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody className="divide-border/70 divide-y">{children}</tbody>
-			</table>
-		</div>
-	);
-}
 
 export function WalletView({ payload }: { payload: unknown }) {
 	const result = asRecord(payload);
@@ -48,7 +28,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 						No balances found for this wallet.
 					</p>
 				) : (
-					<WalletTable headers={['Coin', 'Balance']}>
+					<InspectorTable headers={['Coin', 'Balance']}>
 						{balances.map((item) => {
 							const balance = asRecord(item);
 							return (
@@ -66,7 +46,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 								</tr>
 							);
 						})}
-					</WalletTable>
+					</InspectorTable>
 				)}
 			</Panel>
 			<Panel hidden={!('coins' in wallet)} title="Coin objects">
@@ -75,7 +55,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 						No coin objects found for this page.
 					</p>
 				) : (
-					<WalletTable headers={['Balance', 'Coin']}>
+					<InspectorTable headers={['Balance', 'Coin']}>
 						{coins.map((item) => {
 							const coin = asRecord(item);
 							return (
@@ -90,7 +70,7 @@ export function WalletView({ payload }: { payload: unknown }) {
 								</tr>
 							);
 						})}
-					</WalletTable>
+					</InspectorTable>
 				)}
 			</Panel>
 		</section>

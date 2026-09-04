@@ -2,35 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { formatAddress } from '@mysten/sui/utils';
-import type { JSX, ReactNode } from 'react';
+import type { JSX } from 'react';
 import { useState } from 'react';
-import { DefinitionList, Panel } from '../components/inspector-components.js';
+import { DefinitionList, InspectorTable, Panel } from '../components/inspector-components.js';
 import { asRecord } from '../lib/format.js';
-
-function NftTable({
-	children,
-	headers,
-}: {
-	children: ReactNode;
-	headers: Array<string>;
-}): JSX.Element {
-	return (
-		<div className="border-border/70 overflow-x-auto rounded-md border">
-			<table className="min-w-full border-collapse text-left text-xs leading-5">
-				<thead className="bg-background/75 text-muted-foreground">
-					<tr>
-						{headers.map((header) => (
-							<th className="px-3 py-2 font-extrabold" key={header} scope="col">
-								{header}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody className="divide-border/70 divide-y">{children}</tbody>
-			</table>
-		</div>
-	);
-}
 
 function isHttpUrl(value: string): boolean {
 	try {
@@ -66,6 +41,14 @@ function NftImage({ name, url }: { name: string; url: unknown }): JSX.Element {
 	);
 }
 
+function NftImageCell({ name, url }: { name: string; url: unknown }): JSX.Element {
+	return (
+		<td className="px-3 py-2">
+			<NftImage name={name} url={url} />
+		</td>
+	);
+}
+
 export function NftView({ payload }: { payload: unknown }): JSX.Element {
 	const result = asRecord(payload);
 	const catalog = Array.isArray(result.nftCatalog) ? result.nftCatalog : [];
@@ -83,14 +66,12 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 				/>
 			</Panel>
 			<Panel className="md:col-span-2" hidden={catalog.length === 0} title="NFT catalog">
-				<NftTable headers={['Image', 'NFT', 'Available', 'Supply', 'Price (SUI)']}>
+				<InspectorTable headers={['Image', 'NFT', 'Available', 'Supply', 'Price (SUI)']}>
 					{catalog.map((item) => {
 						const nft = asRecord(item);
 						return (
 							<tr className="bg-card/45" key={String(nft.id)}>
-								<td className="px-3 py-2">
-									<NftImage name={String(nft.name)} url={nft.url} />
-								</td>
+								<NftImageCell name={String(nft.name)} url={nft.url} />
 								<td className="px-3 py-2 font-bold">
 									<div>{String(nft.name)}</div>
 									<div className="text-muted-foreground font-mono" title={String(nft.id)}>
@@ -105,7 +86,7 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 							</tr>
 						);
 					})}
-				</NftTable>
+				</InspectorTable>
 			</Panel>
 			<Panel className="md:col-span-2" title="Owned NFTs">
 				{ownedNfts.length === 0 ? (
@@ -113,14 +94,12 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 						This address does not own any Suigar NFTs.
 					</p>
 				) : (
-					<NftTable headers={['Image', 'NFT', 'Object ID', 'Spec ID']}>
+					<InspectorTable headers={['Image', 'NFT', 'Object ID', 'Spec ID']}>
 						{ownedNfts.map((item) => {
 							const nft = asRecord(item);
 							return (
 								<tr className="bg-card/45" key={String(nft.id)}>
-									<td className="px-3 py-2">
-										<NftImage name={String(nft.name)} url={nft.imageUrl} />
-									</td>
+									<NftImageCell name={String(nft.name)} url={nft.imageUrl} />
 									<td className="px-3 py-2 font-bold">{String(nft.name)}</td>
 									<td className="px-3 py-2 font-mono" title={String(nft.id)}>
 										{formatAddress(String(nft.id))}
@@ -131,7 +110,7 @@ export function NftView({ payload }: { payload: unknown }): JSX.Element {
 								</tr>
 							);
 						})}
-					</NftTable>
+					</InspectorTable>
 				)}
 			</Panel>
 		</section>

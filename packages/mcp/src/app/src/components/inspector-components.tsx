@@ -144,6 +144,31 @@ export function DefinitionList({ entries }: { entries: Array<DefinitionEntry> })
 	);
 }
 
+export function InspectorTable({
+	children,
+	headers,
+}: {
+	children: ReactNode;
+	headers: Array<string>;
+}) {
+	return (
+		<div className="border-border/70 overflow-x-auto rounded-md border">
+			<table className="min-w-full border-collapse text-left text-xs leading-5">
+				<thead className="bg-background/75 text-muted-foreground">
+					<tr>
+						{headers.map((header) => (
+							<th className="px-3 py-2 font-extrabold" key={header} scope="col">
+								{header}
+							</th>
+						))}
+					</tr>
+				</thead>
+				<tbody className="divide-border/70 divide-y">{children}</tbody>
+			</table>
+		</div>
+	);
+}
+
 export function ListPanel({
 	className,
 	items,
