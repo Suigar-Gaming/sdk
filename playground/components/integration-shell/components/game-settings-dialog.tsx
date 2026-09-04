@@ -148,6 +148,169 @@ function GameSettingsDialogHeader({
 	);
 }
 
+function StakeSummaryValue({
+	activeStakeRange,
+	coinKey,
+	coinLabel,
+	isStakeMinimum,
+}: {
+	activeStakeRange: StakeRangeSummary | null;
+	coinKey: SupportedCoinKey;
+	coinLabel: string;
+	isStakeMinimum: boolean;
+}) {
+	if (!activeStakeRange) {
+		return '--';
+	}
+
+	return (
+		<div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+			<FieldCode className="shrink-0">{activeStakeRange.min}</FieldCode>
+			{isStakeMinimum ? null : (
+				<>
+					<span className="shrink-0">to</span>
+					<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
+				</>
+			)}
+			<span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
+				<CoinIcon coinKey={coinKey} className="size-4" />
+				{coinLabel}
+			</span>
+		</div>
+	);
+}
+
+function ConfigSummaryValue({
+	configOptions,
+	playableConfigCount,
+}: {
+	configOptions?: Array<GameConfigOption>;
+	playableConfigCount: number;
+}) {
+	return configOptions?.length ? (
+		<>
+			<FieldCode>{configOptions.length}</FieldCode>
+			<Badge variant="success">{playableConfigCount} playable</Badge>
+		</>
+	) : (
+		<FieldCode>0</FieldCode>
+	);
+}
+
+function ActiveConfigDetails({
+	activeConfigDetails,
+	activeConfigOption,
+	activeMultiplierValues,
+	coinKey,
+	coinLabel,
+}: {
+	activeConfigDetails: NonNullable<GameConfigOption['details']>;
+	activeConfigOption: GameConfigOption;
+	activeMultiplierValues: NonNullable<GameConfigOption['multiplierValues']>;
+	coinKey: SupportedCoinKey;
+	coinLabel: string;
+}) {
+	return (
+		<div className="flex flex-wrap items-center gap-2 text-base">
+			<span>{activeConfigOption.label}</span>
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button type="button" variant="outline" size="xs">
+						<SlidersHorizontal />
+						Details
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					align="start"
+					className="border-border/70 bg-popover/98 w-[min(22rem,calc(100vw-3rem))] gap-3 rounded-2xl border p-4"
+				>
+					<div className="space-y-3 text-sm">
+						<div className="min-w-0 overflow-x-auto">
+							<div className="text-muted-foreground flex w-max min-w-full flex-nowrap items-center gap-1">
+								<span className="text-foreground shrink-0 font-medium">Stake range:</span>
+								<FieldCode className="shrink-0">{activeConfigOption.stakeRange.min}</FieldCode>
+								<span className="shrink-0">to</span>
+								<FieldCode className="shrink-0">{activeConfigOption.stakeRange.max}</FieldCode>
+								<span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
+									<CoinIcon coinKey={coinKey} className="size-4" />
+									{coinLabel}
+								</span>
+							</div>
+						</div>
+						{activeConfigDetails.length ? (
+							<div className="space-y-1">
+								{activeConfigDetails.map((detail) => (
+									<div
+										key={`active-config-${detail.label}`}
+										className="text-muted-foreground flex items-center gap-1"
+									>
+										<span>{detail.label}: </span>
+										<FieldCode>{detail.value}</FieldCode>
+									</div>
+								))}
+							</div>
+						) : null}
+						{activeMultiplierValues.length ? (
+							<>
+								<div className="text-foreground mb-2 flex items-center gap-1">
+									<span>Multipliers:</span>
+									<FieldCode className="font-medium">{activeMultiplierValues.length}</FieldCode>
+								</div>
+								<div className="flex flex-wrap gap-1.5">
+									{activeMultiplierValues.map((multiplier) => (
+										<FieldCode key={multiplier.id} className="shrink-0 justify-center">
+											{multiplier.label ? `${multiplier.label}: ` : null}
+											{multiplier.value}
+										</FieldCode>
+									))}
+								</div>
+							</>
+						) : null}
+					</div>
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
+}
+
+function CurrentConfigValue({
+	activeConfigOption,
+	activeConfigDetails,
+	activeMultiplierValues,
+	coinKey,
+	coinLabel,
+	summarizedTopLevelDetails,
+}: {
+	activeConfigOption: GameConfigOption | null;
+	activeConfigDetails: NonNullable<GameConfigOption['details']>;
+	activeMultiplierValues: NonNullable<GameConfigOption['multiplierValues']>;
+	coinKey: SupportedCoinKey;
+	coinLabel: string;
+	summarizedTopLevelDetails: Array<GameSettingsDetail>;
+}) {
+	if (activeConfigOption)
+		return (
+			<ActiveConfigDetails
+				activeConfigOption={activeConfigOption}
+				activeConfigDetails={activeConfigDetails}
+				activeMultiplierValues={activeMultiplierValues}
+				coinKey={coinKey}
+				coinLabel={coinLabel}
+			/>
+		);
+	if (!summarizedTopLevelDetails.length) return <span className="text-base">N/A</span>;
+	return (
+		<div className="space-y-1.5 text-sm">
+			{summarizedTopLevelDetails.map((detail) => (
+				<div key={`top-level-${detail.label}`} className="flex items-center justify-between gap-3">
+					<span className="text-muted-foreground">{detail.label}</span>
+					<FieldCode>{detail.value}</FieldCode>
+				</div>
+			))}
+		</div>
+	);
+}
+
 function GameSettingsOverview({
 	activeConfigOption,
 	activeConfigDetails,
@@ -183,23 +346,12 @@ function GameSettingsOverview({
 				title={stakeTitle}
 				isLoading={isLoading}
 				value={
-					activeStakeRange ? (
-						<div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
-							<FieldCode className="shrink-0">{activeStakeRange.min}</FieldCode>
-							{isStakeMinimum ? null : (
-								<>
-									<span className="shrink-0">to</span>
-									<FieldCode className="shrink-0">{activeStakeRange.max}</FieldCode>
-								</>
-							)}
-							<span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
-								<CoinIcon coinKey={coinKey} className="size-4" />
-								{coinLabel}
-							</span>
-						</div>
-					) : (
-						'--'
-					)
+					<StakeSummaryValue
+						activeStakeRange={activeStakeRange}
+						coinKey={coinKey}
+						coinLabel={coinLabel}
+						isStakeMinimum={isStakeMinimum}
+					/>
 				}
 				description={isStakeMinimum ? 'Each player must stake at least this amount.' : null}
 			/>
@@ -207,14 +359,10 @@ function GameSettingsOverview({
 				title="Configs"
 				isLoading={isLoading}
 				value={
-					configOptions?.length ? (
-						<>
-							<FieldCode>{configOptions.length}</FieldCode>
-							<Badge variant="success">{playableConfigCount} playable</Badge>
-						</>
-					) : (
-						<FieldCode>0</FieldCode>
-					)
+					<ConfigSummaryValue
+						configOptions={configOptions}
+						playableConfigCount={playableConfigCount}
+					/>
 				}
 				description={hasConfigOptions ? null : 'This game uses top-level parameters only.'}
 			/>
@@ -222,87 +370,14 @@ function GameSettingsOverview({
 				title={hasConfigOptions ? 'Current config' : 'Top-level fields'}
 				isLoading={isLoading}
 				value={
-					activeConfigOption ? (
-						<div className="flex flex-wrap items-center gap-2 text-base">
-							<span>{activeConfigOption.label}</span>
-							<Popover>
-								<PopoverTrigger asChild>
-									<Button type="button" variant="outline" size="xs">
-										<SlidersHorizontal />
-										Details
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent
-									align="start"
-									className="border-border/70 bg-popover/98 w-[min(22rem,calc(100vw-3rem))] gap-3 rounded-2xl border p-4"
-								>
-									<div className="space-y-3 text-sm">
-										<div className="min-w-0 overflow-x-auto">
-											<div className="text-muted-foreground flex w-max min-w-full flex-nowrap items-center gap-1">
-												<span className="text-foreground shrink-0 font-medium">Stake range:</span>
-												<FieldCode className="shrink-0">
-													{activeConfigOption.stakeRange.min}
-												</FieldCode>
-												<span className="shrink-0">to</span>
-												<FieldCode className="shrink-0">
-													{activeConfigOption.stakeRange.max}
-												</FieldCode>
-												<span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium tracking-widest whitespace-nowrap uppercase">
-													<CoinIcon coinKey={coinKey} className="size-4" />
-													{coinLabel}
-												</span>
-											</div>
-										</div>
-										{activeConfigDetails.length ? (
-											<div className="space-y-1">
-												{activeConfigDetails.map((detail) => (
-													<div
-														key={`active-config-${detail.label}`}
-														className="text-muted-foreground flex items-center gap-1"
-													>
-														<span>{detail.label}: </span>
-														<FieldCode>{detail.value}</FieldCode>
-													</div>
-												))}
-											</div>
-										) : null}
-										{activeMultiplierValues.length ? (
-											<>
-												<div className="text-foreground mb-2 flex items-center gap-1">
-													<span>Multipliers:</span>
-													<FieldCode className="font-medium">
-														{activeMultiplierValues.length}
-													</FieldCode>
-												</div>
-												<div className="flex flex-wrap gap-1.5">
-													{activeMultiplierValues.map((multiplier) => (
-														<FieldCode key={multiplier.id} className="shrink-0 justify-center">
-															{multiplier.label ? `${multiplier.label}: ` : null}
-															{multiplier.value}
-														</FieldCode>
-													))}
-												</div>
-											</>
-										) : null}
-									</div>
-								</PopoverContent>
-							</Popover>
-						</div>
-					) : summarizedTopLevelDetails.length ? (
-						<div className="space-y-1.5 text-sm">
-							{summarizedTopLevelDetails.map((detail) => (
-								<div
-									key={`top-level-${detail.label}`}
-									className="flex items-center justify-between gap-3"
-								>
-									<span className="text-muted-foreground">{detail.label}</span>
-									<FieldCode>{detail.value}</FieldCode>
-								</div>
-							))}
-						</div>
-					) : (
-						<span className="text-base">N/A</span>
-					)
+					<CurrentConfigValue
+						activeConfigOption={activeConfigOption}
+						activeConfigDetails={activeConfigDetails}
+						activeMultiplierValues={activeMultiplierValues}
+						coinKey={coinKey}
+						coinLabel={coinLabel}
+						summarizedTopLevelDetails={summarizedTopLevelDetails}
+					/>
 				}
 				description={
 					activeConfigOption || summarizedTopLevelDetails.length

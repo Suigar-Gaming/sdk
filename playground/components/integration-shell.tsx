@@ -1,10 +1,12 @@
 'use client';
 
 import { useCurrentAccount, useCurrentClient, useDAppKit } from '@mysten/dapp-kit-react';
+import type { GrpcTransactionResult } from '@mysten/sui/grpc';
 import { BookOpenText, Cog, Gamepad2, Swords } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
+import type { SuigarClient } from '@suigar/sdk';
 import { DEFAULT_RANGE_SCALE } from '@suigar/sdk/utils';
 import { AppHeader } from '@/components/app-header';
 import { EventsTable } from '@/components/events-table';
@@ -567,6 +569,84 @@ function IntegrationSidebar({
 	);
 }
 
+type PvPLobbyControlsProps = {
+	games: Array<PvPCoinflipLobbyGame>;
+	selectedGameId: string;
+	isLoading: boolean;
+	error: string | null;
+	coinTypes: Record<SupportedCoinKey, string>;
+	getCoinDecimals: (value: string) => number;
+	onRefresh: () => void;
+	onSelectGame: (game: PvPCoinflipLobbyGame) => void;
+};
+
+function PvPJoinControls({
+	showPrivateJoinLobbies,
+	setShowPrivateJoinLobbies,
+	formValue,
+	...lobbyProps
+}: PvPLobbyControlsProps & {
+	showPrivateJoinLobbies: boolean;
+	setShowPrivateJoinLobbies: (value: boolean) => void;
+	formValue: PvPCoinflipForms['join'];
+}) {
+	return (
+		<>
+			<div className="border-border/70 bg-background/45 rounded-2xl border p-4">
+				<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+					<div className="min-w-0 space-y-1">
+						<FieldLabel htmlFor="join-private-lobbies">Show private lobbies</FieldLabel>
+						<FieldDescription size="sm">
+							Public unresolved lobbies stay visible even when the wallet is disconnected
+						</FieldDescription>
+					</div>
+					<Switch
+						id="join-private-lobbies"
+						size="default"
+						className="mt-0.5 self-start justify-self-end"
+						checked={showPrivateJoinLobbies}
+						onCheckedChange={setShowPrivateJoinLobbies}
+					/>
+				</FieldGroup>
+			</div>
+			<PvPLobbyPicker
+				title="Open lobbies to join"
+				description="Unresolved PvP lobbies are shown here. Selecting one fills the join form and switches the selected coin when needed."
+				emptyMessage="No matching unresolved PvP lobbies were found."
+				formatAmount={formatBalance}
+				{...lobbyProps}
+			/>
+			<PvPCoinflipJoinForm value={formValue} />
+		</>
+	);
+}
+
+function PvPCancelControls({
+	currentAccount,
+	formValue,
+	...lobbyProps
+}: PvPLobbyControlsProps & {
+	currentAccount: ReturnType<typeof useCurrentAccount>;
+	formValue: PvPCoinflipForms['cancel'];
+}) {
+	return (
+		<>
+			<PvPLobbyPicker
+				title="Your unresolved lobbies"
+				description="Only PvP games created by the connected wallet are shown here. Selecting one fills the cancel form and keeps execution tied to that on-chain game."
+				emptyMessage={
+					currentAccount
+						? 'No matching unresolved PvP lobbies were found.'
+						: 'Connect a wallet to load the unresolved PvP lobbies you can cancel.'
+				}
+				formatAmount={formatBalance}
+				{...lobbyProps}
+			/>
+			<PvPCoinflipCancelForm value={formValue} />
+		</>
+	);
+}
+
 function IntegrationControls({
 	mode,
 	standardGame,
@@ -636,6 +716,123 @@ function IntegrationControls({
 		) : (
 			<Swords className="text-secondary dark:text-primary size-5" />
 		);
+	const standardGameForms: Record<StandardGameId, React.ReactNode> = {
+		coinflip: (
+			<CoinflipForm
+				value={effectiveStandardForms.coinflip}
+				onChange={(patch) => updateStandardForm('coinflip', patch)}
+				onStakeBlur={() => onStandardStakeBlur('coinflip')}
+				stakeDescription={stakeDescription}
+			/>
+		),
+		limbo: (
+			<LimboForm
+				value={effectiveStandardForms.limbo}
+				onChange={(patch) => updateStandardForm('limbo', patch)}
+				onStakeBlur={() => onStandardStakeBlur('limbo')}
+				stakeDescription={stakeDescription}
+				targetMultiplierDescription={limboTargetMultiplierDescription}
+			/>
+		),
+		keno: (
+			<KenoForm
+				value={effectiveStandardForms.keno}
+				onChange={(patch) => updateStandardForm('keno', patch)}
+				onStakeBlur={() => onStandardStakeBlur('keno')}
+				configOptions={standardGameParameters?.configOptions}
+				isConfigLoading={isStandardGameParametersLoading}
+				configError={standardGameParametersError}
+				stakeDescription={stakeDescription}
+				picksDescription={kenoPicksDescription}
+			/>
+		),
+		plinko: (
+			<PlinkoForm
+				value={effectiveStandardForms.plinko}
+				onChange={(patch) => updateStandardForm('plinko', patch)}
+				onStakeBlur={() => onStandardStakeBlur('plinko')}
+				configOptions={standardGameParameters?.configOptions}
+				isConfigLoading={isStandardGameParametersLoading}
+				configError={standardGameParametersError}
+				stakeDescription={stakeDescription}
+			/>
+		),
+		range: (
+			<RangeForm
+				value={effectiveStandardForms.range}
+				onChange={(patch) => updateStandardForm('range', patch)}
+				onStakeBlur={() => onStandardStakeBlur('range')}
+				stakeDescription={stakeDescription}
+				rangeBoundsDescription={rangeBoundsDescription}
+			/>
+		),
+		soccer: (
+			<SoccerForm
+				value={effectiveStandardForms.soccer}
+				onChange={(patch) => updateStandardForm('soccer', patch)}
+				onStakeBlur={() => onStandardStakeBlur('soccer')}
+				configOptions={standardGameParameters?.configOptions}
+				countryOptions={standardGameParameters?.countryOptions}
+				isConfigLoading={isStandardGameParametersLoading}
+				configError={standardGameParametersError}
+				stakeDescription={stakeDescription}
+			/>
+		),
+		wheel: (
+			<WheelForm
+				value={effectiveStandardForms.wheel}
+				onChange={(patch) => updateStandardForm('wheel', patch)}
+				onStakeBlur={() => onStandardStakeBlur('wheel')}
+				configOptions={standardGameParameters?.configOptions}
+				isConfigLoading={isStandardGameParametersLoading}
+				configError={standardGameParametersError}
+				stakeDescription={stakeDescription}
+			/>
+		),
+	};
+	const getCoinDecimals = (value: string) => {
+		const matchingCoinKey = resolveCoinKeyForType(value, coinTypes);
+		return matchingCoinKey ? coinDecimals[matchingCoinKey] : 9;
+	};
+	const pvpActionControls: Record<PvPAction, React.ReactNode> = {
+		create: (
+			<PvPCoinflipCreateForm
+				value={pvpForms.create}
+				onChange={(patch) => updatePvPForm('create', patch)}
+				onStakeBlur={onPvPCreateStakeBlur}
+				stakeDescription={pvpStakeDescription}
+			/>
+		),
+		join: (
+			<PvPJoinControls
+				showPrivateJoinLobbies={showPrivateJoinLobbies}
+				setShowPrivateJoinLobbies={setShowPrivateJoinLobbies}
+				games={joinLobbyGames}
+				selectedGameId={pvpForms.join.gameId}
+				isLoading={isPvPLobbyLoading}
+				error={pvpLobbyError}
+				coinTypes={coinTypes}
+				getCoinDecimals={getCoinDecimals}
+				onRefresh={onRefreshPvPLobbies}
+				onSelectGame={(game) => onSelectPvPLobby('join', game)}
+				formValue={effectivePvpForms.join}
+			/>
+		),
+		cancel: (
+			<PvPCancelControls
+				currentAccount={currentAccount}
+				games={cancelLobbyGames}
+				selectedGameId={pvpForms.cancel.gameId}
+				isLoading={isPvPLobbyLoading}
+				error={pvpLobbyError}
+				coinTypes={coinTypes}
+				getCoinDecimals={getCoinDecimals}
+				onRefresh={onRefreshPvPLobbies}
+				onSelectGame={(game) => onSelectPvPLobby('cancel', game)}
+				formValue={effectivePvpForms.cancel}
+			/>
+		),
+	};
 
 	return (
 		<>
@@ -677,156 +874,10 @@ function IntegrationControls({
 							betCountLimit={standardGameParameters?.betCountLimit}
 							isLoading={isStandardGameParametersLoading}
 						>
-							{standardGame === 'coinflip' ? (
-								<CoinflipForm
-									value={effectiveStandardForms.coinflip}
-									onChange={(patch) => updateStandardForm('coinflip', patch)}
-									onStakeBlur={() => onStandardStakeBlur('coinflip')}
-									stakeDescription={stakeDescription}
-								/>
-							) : null}
-							{standardGame === 'limbo' ? (
-								<LimboForm
-									value={effectiveStandardForms.limbo}
-									onChange={(patch) => updateStandardForm('limbo', patch)}
-									onStakeBlur={() => onStandardStakeBlur('limbo')}
-									stakeDescription={stakeDescription}
-									targetMultiplierDescription={limboTargetMultiplierDescription}
-								/>
-							) : null}
-							{standardGame === 'keno' ? (
-								<KenoForm
-									value={effectiveStandardForms.keno}
-									onChange={(patch) => updateStandardForm('keno', patch)}
-									onStakeBlur={() => onStandardStakeBlur('keno')}
-									configOptions={standardGameParameters?.configOptions}
-									isConfigLoading={isStandardGameParametersLoading}
-									configError={standardGameParametersError}
-									stakeDescription={stakeDescription}
-									picksDescription={kenoPicksDescription}
-								/>
-							) : null}
-							{standardGame === 'plinko' ? (
-								<PlinkoForm
-									value={effectiveStandardForms.plinko}
-									onChange={(patch) => updateStandardForm('plinko', patch)}
-									onStakeBlur={() => onStandardStakeBlur('plinko')}
-									configOptions={standardGameParameters?.configOptions}
-									isConfigLoading={isStandardGameParametersLoading}
-									configError={standardGameParametersError}
-									stakeDescription={stakeDescription}
-								/>
-							) : null}
-							{standardGame === 'range' ? (
-								<RangeForm
-									value={effectiveStandardForms.range}
-									onChange={(patch) => updateStandardForm('range', patch)}
-									onStakeBlur={() => onStandardStakeBlur('range')}
-									stakeDescription={stakeDescription}
-									rangeBoundsDescription={rangeBoundsDescription}
-								/>
-							) : null}
-							{standardGame === 'soccer' ? (
-								<SoccerForm
-									value={effectiveStandardForms.soccer}
-									onChange={(patch) => updateStandardForm('soccer', patch)}
-									onStakeBlur={() => onStandardStakeBlur('soccer')}
-									configOptions={standardGameParameters?.configOptions}
-									countryOptions={standardGameParameters?.countryOptions}
-									isConfigLoading={isStandardGameParametersLoading}
-									configError={standardGameParametersError}
-									stakeDescription={stakeDescription}
-								/>
-							) : null}
-							{standardGame === 'wheel' ? (
-								<WheelForm
-									value={effectiveStandardForms.wheel}
-									onChange={(patch) => updateStandardForm('wheel', patch)}
-									onStakeBlur={() => onStandardStakeBlur('wheel')}
-									configOptions={standardGameParameters?.configOptions}
-									isConfigLoading={isStandardGameParametersLoading}
-									configError={standardGameParametersError}
-									stakeDescription={stakeDescription}
-								/>
-							) : null}
+							{standardGameForms[standardGame]}
 						</StandardGameBetCountProvider>
 					) : (
-						<>
-							{pvpAction === 'create' ? (
-								<PvPCoinflipCreateForm
-									value={pvpForms.create}
-									onChange={(patch) => updatePvPForm('create', patch)}
-									onStakeBlur={onPvPCreateStakeBlur}
-									stakeDescription={pvpStakeDescription}
-								/>
-							) : null}
-							{pvpAction === 'join' ? (
-								<>
-									<div className="border-border/70 bg-background/45 rounded-2xl border p-4">
-										<FieldGroup className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-											<div className="min-w-0 space-y-1">
-												<FieldLabel htmlFor="join-private-lobbies">Show private lobbies</FieldLabel>
-												<FieldDescription size="sm">
-													Public unresolved lobbies stay visible even when the wallet is
-													disconnected
-												</FieldDescription>
-											</div>
-											<Switch
-												id="join-private-lobbies"
-												size="default"
-												className="mt-0.5 self-start justify-self-end"
-												checked={showPrivateJoinLobbies}
-												onCheckedChange={setShowPrivateJoinLobbies}
-											/>
-										</FieldGroup>
-									</div>
-									<PvPLobbyPicker
-										title="Open lobbies to join"
-										description="Unresolved PvP lobbies are shown here. Selecting one fills the join form and switches the selected coin when needed."
-										games={joinLobbyGames}
-										selectedGameId={pvpForms.join.gameId}
-										isLoading={isPvPLobbyLoading}
-										error={pvpLobbyError}
-										emptyMessage="No matching unresolved PvP lobbies were found."
-										coinTypes={coinTypes}
-										formatAmount={formatBalance}
-										getCoinDecimals={(value) => {
-											const matchingCoinKey = resolveCoinKeyForType(value, coinTypes);
-											return matchingCoinKey ? coinDecimals[matchingCoinKey] : 9;
-										}}
-										onRefresh={onRefreshPvPLobbies}
-										onSelectGame={(game) => onSelectPvPLobby('join', game)}
-									/>
-									<PvPCoinflipJoinForm value={effectivePvpForms.join} />
-								</>
-							) : null}
-							{pvpAction === 'cancel' ? (
-								<>
-									<PvPLobbyPicker
-										title="Your unresolved lobbies"
-										description="Only PvP games created by the connected wallet are shown here. Selecting one fills the cancel form and keeps execution tied to that on-chain game."
-										games={cancelLobbyGames}
-										selectedGameId={pvpForms.cancel.gameId}
-										isLoading={isPvPLobbyLoading}
-										error={pvpLobbyError}
-										emptyMessage={
-											currentAccount
-												? 'No matching unresolved PvP lobbies were found.'
-												: 'Connect a wallet to load the unresolved PvP lobbies you can cancel.'
-										}
-										coinTypes={coinTypes}
-										formatAmount={formatBalance}
-										getCoinDecimals={(value) => {
-											const matchingCoinKey = resolveCoinKeyForType(value, coinTypes);
-											return matchingCoinKey ? coinDecimals[matchingCoinKey] : 9;
-										}}
-										onRefresh={onRefreshPvPLobbies}
-										onSelectGame={(game) => onSelectPvPLobby('cancel', game)}
-									/>
-									<PvPCoinflipCancelForm value={effectivePvpForms.cancel} />
-								</>
-							) : null}
-						</>
+						pvpActionControls[pvpAction]
 					)}
 				</div>
 			</SectionShell>
@@ -852,7 +903,153 @@ const projectCoinMetadata = <TCoin extends string>(
 	return { coinTypes, coinDecimals };
 };
 
-function useIntegrationState({
+async function executeIntegrationTransaction({
+	addRows,
+	coinDecimal,
+	coinType,
+	currentAccount,
+	currentClient,
+	dAppKit,
+	dispatchUi,
+	effectivePvpForms,
+	effectiveStandardForms,
+	isMissingPvPGameSelection,
+	mode,
+	pvpAction,
+	refreshBalances,
+	refreshPvPLobbies,
+	setPvpForms,
+	standardGame,
+}: {
+	addRows: ReturnType<typeof useEventLog>['addRows'];
+	coinDecimal: number;
+	coinType: string;
+	currentAccount: ReturnType<typeof useCurrentAccount>;
+	currentClient: ReturnType<typeof useCurrentClient> & {
+		suigar: SuigarClient;
+		waitForTransaction: (options: {
+			digest: string;
+			include: { events: boolean };
+		}) => Promise<GrpcTransactionResult<{ events: boolean }>>;
+	};
+	dAppKit: ReturnType<typeof useDAppKit>;
+	dispatchUi: React.Dispatch<UiAction>;
+	effectivePvpForms: PvPCoinflipForms;
+	effectiveStandardForms: StandardForms;
+	isMissingPvPGameSelection: boolean;
+	mode: Mode;
+	pvpAction: PvPAction;
+	refreshBalances: () => Promise<void>;
+	refreshPvPLobbies: () => Promise<void>;
+	setPvpForms: React.Dispatch<React.SetStateAction<PvPCoinflipForms>>;
+	standardGame: StandardGameId;
+}) {
+	if (!currentAccount) {
+		dispatchUi({ type: 'set-error', value: 'Connect a wallet before executing a transaction.' });
+		return;
+	}
+
+	dispatchUi({ type: 'clear-feedback' });
+	dispatchUi({ type: 'set-is-executing', value: true });
+	try {
+		if (mode === 'pvp' && isMissingPvPGameSelection) {
+			throw new Error(`Select a PvP lobby card before trying to ${pvpAction} a game.`);
+		}
+
+		const owner = currentAccount.address;
+		const buildResult =
+			mode === 'standard'
+				? buildStandardTransaction(
+						currentClient,
+						standardGame,
+						effectiveStandardForms[standardGame],
+						owner,
+						coinDecimal,
+						coinType,
+					)
+				: buildPvPTransaction(
+						currentClient,
+						pvpAction,
+						effectivePvpForms[pvpAction],
+						owner,
+						coinDecimal,
+						coinType,
+					);
+		const execution = await dAppKit.signAndExecuteTransaction({
+			transaction: buildResult.transaction,
+		});
+		if (execution.$kind === 'FailedTransaction')
+			throw new Error(execution.FailedTransaction.status.error?.message);
+
+		const digest = execution.Transaction.digest;
+		dispatchUi({ type: 'set-status', value: digest });
+		const finalResult = await currentClient.waitForTransaction({
+			digest,
+			include: { events: true },
+		});
+		if (finalResult.$kind === 'FailedTransaction')
+			throw new Error(finalResult.FailedTransaction.status.error?.message);
+
+		const rows = parseSuigarEvents(currentClient, digest, finalResult.Transaction.events);
+		if (rows.length > 0) addRows(rows);
+		if (mode === 'pvp' && (pvpAction === 'join' || pvpAction === 'cancel')) {
+			setPvpForms((current) => ({ ...current, [pvpAction]: { ...DEFAULT_PVP_FORMS[pvpAction] } }));
+		}
+		await Promise.all([refreshBalances(), refreshPvPLobbies()]);
+	} catch (executionError) {
+		dispatchUi({ type: 'set-error', value: parseError(executionError) });
+	} finally {
+		dispatchUi({ type: 'set-is-executing', value: false });
+	}
+}
+
+function deriveGameSettings({
+	activeStakeRange,
+	coinType,
+	isPvPGameParametersLoading,
+	isStandardGameParametersLoading,
+	mode,
+	pvpGame,
+	pvpGameParameters,
+	pvpGameParametersError,
+	pvpGameParametersPayload,
+	standardGame,
+	standardGameParameters,
+	standardGameParametersError,
+	standardGameParametersPayload,
+}: {
+	activeStakeRange: StakeRangeSummary | null;
+	coinType: string;
+	isPvPGameParametersLoading: boolean;
+	isStandardGameParametersLoading: boolean;
+	mode: Mode;
+	pvpGame: PvPGameId;
+	pvpGameParameters: PvPGameParametersSummary | null;
+	pvpGameParametersError: string | null;
+	pvpGameParametersPayload: unknown;
+	standardGame: StandardGameId;
+	standardGameParameters: StandardGameParametersSummary | null;
+	standardGameParametersError: string | null;
+	standardGameParametersPayload: unknown;
+}) {
+	const isStandard = mode === 'standard';
+	const settingsSummary = isStandard ? standardGameParameters : pvpGameParameters;
+	const settingsPayload = isStandard ? standardGameParametersPayload : pvpGameParametersPayload;
+	return {
+		serializedGameSettings: settingsPayload ? stringifyGameParameters(settingsPayload) : null,
+		settingsCallPreview: `client.suigar.getGameParameters({ game: '${isStandard ? standardGame : pvpGame}', coinType: '${coinType}' })`,
+		settingsSummary,
+		settingsError: isStandard ? standardGameParametersError : pvpGameParametersError,
+		isSettingsLoading: isStandard ? isStandardGameParametersLoading : isPvPGameParametersLoading,
+		settingsConfigOptions: isStandard ? standardGameParameters?.configOptions : undefined,
+		settingsGameLabel: isStandard ? getStandardGameLabel(standardGame) : getPvPGameLabel(pvpGame),
+		settingsStakeRange: isStandard
+			? (settingsSummary?.stakeRange ?? activeStakeRange)
+			: (settingsSummary?.stakeRange ?? null),
+	};
+}
+
+function createIntegrationState({
 	mode,
 	routeParams,
 	isRouteReady,
@@ -1148,34 +1345,30 @@ function useIntegrationState({
 			pvpGameParametersError,
 		],
 	);
-	const standardGameLabel = getStandardGameLabel(standardGame);
-	const pvpGameLabel = getPvPGameLabel(pvpGame);
-	const serializedGameSettings = React.useMemo(
-		() =>
-			mode === 'standard'
-				? standardGameParametersPayload
-					? stringifyGameParameters(standardGameParametersPayload)
-					: null
-				: pvpGameParametersPayload
-					? stringifyGameParameters(pvpGameParametersPayload)
-					: null,
-		[mode, pvpGameParametersPayload, standardGameParametersPayload],
-	);
-	const settingsCallPreview =
-		mode === 'standard'
-			? `client.suigar.getGameParameters({ game: '${standardGame}', coinType: '${coinType}' })`
-			: `client.suigar.getGameParameters({ game: '${pvpGame}', coinType: '${coinType}' })`;
-	const settingsSummary = mode === 'standard' ? standardGameParameters : pvpGameParameters;
-	const settingsError = mode === 'standard' ? standardGameParametersError : pvpGameParametersError;
-	const isSettingsLoading =
-		mode === 'standard' ? isStandardGameParametersLoading : isPvPGameParametersLoading;
-	const settingsConfigOptions =
-		mode === 'standard' ? standardGameParameters?.configOptions : undefined;
-	const settingsGameLabel = mode === 'standard' ? standardGameLabel : pvpGameLabel;
-	const settingsStakeRange =
-		mode === 'standard'
-			? (settingsSummary?.stakeRange ?? activeStakeRange)
-			: (settingsSummary?.stakeRange ?? null);
+	const {
+		isSettingsLoading,
+		serializedGameSettings,
+		settingsCallPreview,
+		settingsConfigOptions,
+		settingsError,
+		settingsGameLabel,
+		settingsStakeRange,
+		settingsSummary,
+	} = deriveGameSettings({
+		activeStakeRange,
+		coinType,
+		isPvPGameParametersLoading,
+		isStandardGameParametersLoading,
+		mode,
+		pvpGame,
+		pvpGameParameters,
+		pvpGameParametersError,
+		pvpGameParametersPayload,
+		standardGame,
+		standardGameParameters,
+		standardGameParametersError,
+		standardGameParametersPayload,
+	});
 	const handleRefreshGameSettings = React.useCallback(() => {
 		if (mode === 'standard') {
 			void refreshStandardGameParameters(true);
@@ -1544,84 +1737,25 @@ function useIntegrationState({
 		dispatchUi({ type: 'clear-feedback' });
 	}
 
-	async function handleExecute() {
-		if (!currentAccount) {
-			dispatchUi({
-				type: 'set-error',
-				value: 'Connect a wallet before executing a transaction.',
-			});
-			return;
-		}
-
-		dispatchUi({ type: 'clear-feedback' });
-		dispatchUi({ type: 'set-is-executing', value: true });
-
-		try {
-			if (mode === 'pvp' && isMissingPvPGameSelection) {
-				throw new Error(`Select a PvP lobby card before trying to ${pvpAction} a game.`);
-			}
-
-			const owner = currentAccount.address;
-			const buildResult =
-				mode === 'standard'
-					? buildStandardTransaction(
-							currentClient,
-							standardGame,
-							effectiveStandardForms[standardGame],
-							owner,
-							coinDecimal,
-							coinType,
-						)
-					: buildPvPTransaction(
-							currentClient,
-							pvpAction,
-							effectivePvpForms[pvpAction],
-							owner,
-							coinDecimal,
-							coinType,
-						);
-
-			const execution = await dAppKit.signAndExecuteTransaction({
-				transaction: buildResult.transaction,
-			});
-
-			if (execution.$kind === 'FailedTransaction') {
-				throw new Error(execution.FailedTransaction.status.error?.message);
-			}
-
-			const digest = execution.Transaction.digest;
-			dispatchUi({ type: 'set-status', value: digest });
-
-			const finalResult = await currentClient.waitForTransaction({
-				digest,
-				include: {
-					events: true,
-				},
-			});
-
-			if (finalResult.$kind === 'FailedTransaction') {
-				throw new Error(finalResult.FailedTransaction.status.error?.message);
-			}
-
-			const rows = parseSuigarEvents(currentClient, digest, finalResult.Transaction.events);
-			if (rows.length > 0) {
-				addRows(rows);
-			}
-
-			if (mode === 'pvp' && (pvpAction === 'join' || pvpAction === 'cancel')) {
-				setPvpForms((current) => ({
-					...current,
-					[pvpAction]: { ...DEFAULT_PVP_FORMS[pvpAction] },
-				}));
-			}
-
-			await Promise.all([refreshBalances(), refreshPvPLobbies()]);
-		} catch (executionError) {
-			dispatchUi({ type: 'set-error', value: parseError(executionError) });
-		} finally {
-			dispatchUi({ type: 'set-is-executing', value: false });
-		}
-	}
+	const handleExecute = () =>
+		executeIntegrationTransaction({
+			addRows,
+			coinDecimal,
+			coinType,
+			currentAccount,
+			currentClient,
+			dAppKit,
+			dispatchUi,
+			effectivePvpForms,
+			effectiveStandardForms,
+			isMissingPvPGameSelection,
+			mode,
+			pvpAction,
+			refreshBalances,
+			refreshPvPLobbies,
+			setPvpForms,
+			standardGame,
+		});
 	const navNode = React.useMemo(
 		() => (
 			<AppHeader
@@ -1786,7 +1920,7 @@ function IntegrationContent({ mode }: { mode: Mode }) {
 	}, [isMounted]);
 
 	const routeParams = React.useMemo(() => new URLSearchParams(routeSearch), [routeSearch]);
-	const integration = useIntegrationState({
+	const integration = createIntegrationState({
 		mode,
 		routeParams,
 		isRouteReady: isMounted,
